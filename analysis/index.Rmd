@@ -7,7 +7,7 @@ output:
 
 `truncash` (Truncated ASH) is an exploratory project with Matthew, built on [`ashr`].
 
-* [Idea and first simulations](truncash.html)
+* [Model and first simulations](truncash.html)
 
 [`ashr`]: https://github.com/stephens999/ashr
 
