@@ -2,7 +2,9 @@
 title: "Truncated ASH"
 author: "Lei Sun"
 date: "1/29/2017"
-output: pdf_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ## Introduction
@@ -60,7 +62,7 @@ will move more weight to $\hat\pi_1$.  Customarily, we assume $\sigma_1 \leq \cd
 
 Here is the main `truncash` function, utilizing `autoselect.mixsd`, `mixIP`, `normalmix` from `ashr`.
 
-[truncash](../code/truncash.R)
+[truncash](/code/truncash.R)
 
 ## Simulation
 
