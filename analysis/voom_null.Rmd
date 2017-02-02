@@ -1,0 +1,91 @@
+---
+title: "Voom on null data - multiple examples"
+author: "M Stephens"
+date: '2016-10-21'
+---
+
+**Last updated:** `r Sys.Date()`
+
+**Code version:** `r system("git log -1 --format='%H'", intern = TRUE)`
+
+# Introduction
+
+This document simply simulates some null data by randomly sampling two groups of 5 samples from some RNA-seq data (GTEx liver samples). We plot $p$ value histograms and see the effects of inflation: some distributions are inflated near 0 and others are inflated near 1. However, when we look at the qqplots (here of the z scores, but should be same for p values) we see something that is interesting, although obvious in hindsight: the most extreme p values (z scores) are never "too extreme" (although they are sometimes not extreme enough). The inflation comes from the "not quite so extreme" p values and z scores. This makes sense: when you have positively correlated variables, the most extreme values will tend to be less extreme than when you have independent samples, because you have "effectively" fewer independent samples. 
+
+It seems likely this can be exploited to help avoid false positives under positive correlation.
+
+
+
+```{r chunk-options, include=FALSE}
+source("chunks.R")
+```
+
+Load in the gtex liver data 
+```{r}
+library(limma)
+library(edgeR)
+library(qvalue)
+library(ashr)
+r = read.csv("../data/Liver.csv")
+r = r[,-(1:2)] # remove outliers
+#extract top g genes from G by n matrix X of expression
+top_genes_index=function(g,X){return(order(rowSums(X),decreasing =TRUE)[1:g])}
+lcpm = function(r){R = colSums(r); t(log2(((t(r)+0.5)/(R+1))* 10^6))}
+Y=lcpm(r)
+subset = top_genes_index(10000,Y)
+Y = Y[subset,]
+r = r[subset,]
+```
+
+
+Define voom transform (using code from Mengyin Lu)
+```{r}
+voom_transform = function(counts, condition, W=NULL){
+  dgecounts = calcNormFactors(DGEList(counts=counts,group=condition))
+  #dgecounts = DGEList(counts=counts,group=condition)
+  if (is.null(W)){
+    design = model.matrix(~condition)
+  }else{
+    design = model.matrix(~condition+W)
+  }
+  
+  v = voom(dgecounts,design,plot=FALSE)
+  lim = lmFit(v)
+  betahat.voom = lim$coefficients[,2]
+  sebetahat.voom = lim$stdev.unscaled[,2]*lim$sigma
+  df.voom = length(condition)-2-!is.null(W)
+  
+  return(list(v=v,lim=lim,betahat=betahat.voom, sebetahat=sebetahat.voom, df=df.voom, v=v))
+}
+
+```
+
+
+Make 2 groups of size n, and repeat random sampling.
+```{r}
+set.seed(101) 
+n = 5 # number in each group
+p = list()
+z = list()
+tscore =list()
+
+for(i in 1:10){
+  counts = r[,sample(1:ncol(r),2*n)]
+  condition = c(rep(0,n),rep(1,n))
+  r.voom = voom_transform(counts,condition)
+  r.ebayes = eBayes(r.voom$lim)
+  p[[i]] = r.ebayes$p.value[,2]
+  tscore[[i]] = r.ebayes$t[,2]
+  z[[i]] = sign(r.ebayes$t[,2]) * qnorm(p[[i]]/2)
+  hist(p[[i]],main="histogram of effect tests")
+  qqnorm(z[[i]])
+  abline(a=0,b=1,col=1)
+}
+```
+
+
+## Session information
+
+```{r info}
+sessionInfo()
+```
