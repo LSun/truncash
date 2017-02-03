@@ -9,11 +9,11 @@
 <meta name="generator" content="pandoc" />
 
 
-<meta name="author" content="M Stephens" />
+<meta name="author" content="Lei Sun" />
 
-<meta name="date" content="2016-10-21" />
+<meta name="date" content="2016-11-24" />
 
-<title>Voom on null data - multiple examples</title>
+<title>The Occurrence of Extreme Observations in Simulated Correlated Null Data</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -302,73 +302,50 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Voom on null data - multiple examples</h1>
-<h4 class="author"><em>M Stephens</em></h4>
-<h4 class="date"><em>2016-10-21</em></h4>
+<h1 class="title toc-ignore">The Occurrence of Extreme Observations in Simulated Correlated Null Data</h1>
+<h4 class="author"><em>Lei Sun</em></h4>
+<h4 class="date"><em>2016-11-24</em></h4>
 
 </div>
 
 
 <p><strong>Last updated:</strong> 2017-02-03</p>
-<p><strong>Code version:</strong> 0f4028a3dc6894dce8e53cc79ccbcfd500a626ae</p>
-<div id="introduction" class="section level1">
-<h1>Introduction</h1>
-<p>This document simply simulates some null data by randomly sampling two groups of 5 samples from some RNA-seq data (GTEx liver samples). We plot <span class="math inline">\(p\)</span> value histograms and see the effects of inflation: some distributions are inflated near 0 and others are inflated near 1. However, when we look at the qqplots (here of the z scores, but should be same for p values) we see something that is interesting, although obvious in hindsight: the most extreme p values (z scores) are never “too extreme” (although they are sometimes not extreme enough). The inflation comes from the “not quite so extreme” p values and z scores. This makes sense: when you have positively correlated variables, the most extreme values will tend to be less extreme than when you have independent samples, because you have “effectively” fewer independent samples.</p>
-<p>It seems likely this can be exploited to help avoid false positives under positive correlation.</p>
-<p>Load in the gtex liver data</p>
-<pre class="r"><code>library(limma)
-library(edgeR)
-library(qvalue)
-library(ashr)
-r = read.csv(&quot;../data/Liver.csv&quot;)
-r = r[,-(1:2)] # remove outliers
-#extract top g genes from G by n matrix X of expression
-top_genes_index=function(g,X){return(order(rowSums(X),decreasing =TRUE)[1:g])}
-lcpm = function(r){R = colSums(r); t(log2(((t(r)+0.5)/(R+1))* 10^6))}
-Y=lcpm(r)
-subset = top_genes_index(10000,Y)
-Y = Y[subset,]
-r = r[subset,]</code></pre>
-<p>Define voom transform (using code from Mengyin Lu)</p>
-<pre class="r"><code>voom_transform = function(counts, condition, W=NULL){
-  dgecounts = calcNormFactors(DGEList(counts=counts,group=condition))
-  #dgecounts = DGEList(counts=counts,group=condition)
-  if (is.null(W)){
-    design = model.matrix(~condition)
-  }else{
-    design = model.matrix(~condition+W)
-  }
-  
-  v = voom(dgecounts,design,plot=FALSE)
-  lim = lmFit(v)
-  betahat.voom = lim$coefficients[,2]
-  sebetahat.voom = lim$stdev.unscaled[,2]*lim$sigma
-  df.voom = length(condition)-2-!is.null(W)
-  
-  return(list(v=v,lim=lim,betahat=betahat.voom, sebetahat=sebetahat.voom, df=df.voom, v=v))
-}</code></pre>
-<p>Make 2 groups of size n, and repeat random sampling.</p>
-<pre class="r"><code>set.seed(101) 
-n = 5 # number in each group
-p = list()
-z = list()
-tscore =list()
+<p><strong>Code version:</strong> 0323a15</p>
+<p>During a conversation with Matthew on correlated <span class="math inline">\(z\)</span>-scores, <a href="https://galton.uchicago.edu/~stein/">Prof. Michael Stein</a> remarked that “if the marginal distribution is correct then the expected number exceeding any threshold should be correct… so if the tail is ‘usually’ deflated, it should be that with some small probability there are many large <span class="math inline">\(z\)</span>-scores (even in the tail).” So we are running this simulation to check that insight, that is, “if there are usually not enough in the tail then there must be some probability of too many in the tail,” based on the assumption that, on average, the <span class="math inline">\(p\)</span>-values are uniform after <code>voom</code> transformation.</p>
+<p>Using <a href="https://github.com/LSun/truncash/blob/master/data/liver.csv">GTex/Liver</a> data, we sample <span class="math inline">\(N = 10\)</span>K genes from a <span class="math inline">\(5\)</span> vs <span class="math inline">\(5\)</span> study, and keep the correlation among genes. The data for each gene can then be transformed by <code>voom</code> to a <span class="math inline">\(p\)</span>-value; thus we get <span class="math inline">\(10\)</span>K <span class="math inline">\(p\)</span>-values for each simulation run. A total of <span class="math inline">\(m = 1\)</span>K runs generate a <span class="math inline">\(m \times N\)</span> matrix of <span class="math inline">\(p\)</span>-values, each row an independent simulation run with <span class="math inline">\(10\)</span>K genes. This <span class="math inline">\(p\)</span>-value matrix is stored at.</p>
+<p>With different pre-specified thresholds <span class="math inline">\(T_p\)</span>, we record, for each of the <span class="math inline">\(m = 1000\)</span> runs, the number of extreme observations with <span class="math inline">\(p \leq T_p\)</span>. The occurrence table is stored in <a href="https://github.com/LSun/truncash/tree/master/output/p_null_liver_extreme.txt"><code>p_null_liver_extreme.txt</code></a>.</p>
+<pre class="r"><code># load extreme observation count table
+p_extreme = read.table(&quot;../output/p_null_liver_extreme.txt&quot;, header = TRUE, check.names = FALSE)
+thresh = as.numeric(names(p_extreme))
+m = dim(p_extreme)[1]
+J = dim(p_extreme)[2]
+N = 1e4
 
-for(i in 1:10){
-  counts = r[,sample(1:ncol(r),2*n)]
-  condition = c(rep(0,n),rep(1,n))
-  r.voom = voom_transform(counts,condition)
-  r.ebayes = eBayes(r.voom$lim)
-  p[[i]] = r.ebayes$p.value[,2]
-  tscore[[i]] = r.ebayes$t[,2]
-  z[[i]] = sign(r.ebayes$t[,2]) * qnorm(p[[i]]/2)
-  hist(p[[i]],main=&quot;histogram of effect tests&quot;)
-  qqnorm(z[[i]])
-  abline(a=0,b=1,col=1)
+# plot the counts for each threshold
+for(j in 1:J) {
+  pj = p_extreme[, j]
+  thj = thresh[j]
+  mean = mean(pj)
+  sd = sd(pj)
+  plot(table(pj),
+       xlab = bquote(&quot;no. of obs w/&quot;~p&lt;=.(thj)),
+       ylab = &quot;frequency&quot;,
+       main = bquote(paste(
+         &quot;avg&quot; == .(round(mean, 2)),
+         &quot;, sd&quot; == .(round(sd, 1)),
+         &quot;, expected&quot; == .(thj * N)
+         )
+        )
+  )
+  abline(v = N * thj, col = &quot;red&quot;, lty = 3)
+  legend(&quot;topright&quot;, &quot;expected&quot;, lty = 3, col = &quot;red&quot;)
 }</code></pre>
-<p><img src="figure/voom_null.Rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/voom_null.Rmd/unnamed-chunk-3-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/voom_null.Rmd/unnamed-chunk-3-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/voom_null.Rmd/unnamed-chunk-3-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/voom_null.Rmd/unnamed-chunk-3-5.png" width="672" style="display: block; margin: auto;" /><img src="figure/voom_null.Rmd/unnamed-chunk-3-6.png" width="672" style="display: block; margin: auto;" /><img src="figure/voom_null.Rmd/unnamed-chunk-3-7.png" width="672" style="display: block; margin: auto;" /><img src="figure/voom_null.Rmd/unnamed-chunk-3-8.png" width="672" style="display: block; margin: auto;" /><img src="figure/voom_null.Rmd/unnamed-chunk-3-9.png" width="672" style="display: block; margin: auto;" /><img src="figure/voom_null.Rmd/unnamed-chunk-3-10.png" width="672" style="display: block; margin: auto;" /><img src="figure/voom_null.Rmd/unnamed-chunk-3-11.png" width="672" style="display: block; margin: auto;" /><img src="figure/voom_null.Rmd/unnamed-chunk-3-12.png" width="672" style="display: block; margin: auto;" /><img src="figure/voom_null.Rmd/unnamed-chunk-3-13.png" width="672" style="display: block; margin: auto;" /><img src="figure/voom_null.Rmd/unnamed-chunk-3-14.png" width="672" style="display: block; margin: auto;" /><img src="figure/voom_null.Rmd/unnamed-chunk-3-15.png" width="672" style="display: block; margin: auto;" /><img src="figure/voom_null.Rmd/unnamed-chunk-3-16.png" width="672" style="display: block; margin: auto;" /><img src="figure/voom_null.Rmd/unnamed-chunk-3-17.png" width="672" style="display: block; margin: auto;" /><img src="figure/voom_null.Rmd/unnamed-chunk-3-18.png" width="672" style="display: block; margin: auto;" /><img src="figure/voom_null.Rmd/unnamed-chunk-3-19.png" width="672" style="display: block; margin: auto;" /><img src="figure/voom_null.Rmd/unnamed-chunk-3-20.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/ExtremeOccurrence.Rmd/unnamed-chunk-1-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/ExtremeOccurrence.Rmd/unnamed-chunk-1-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/ExtremeOccurrence.Rmd/unnamed-chunk-1-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/ExtremeOccurrence.Rmd/unnamed-chunk-1-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/ExtremeOccurrence.Rmd/unnamed-chunk-1-5.png" width="672" style="display: block; margin: auto;" /><img src="figure/ExtremeOccurrence.Rmd/unnamed-chunk-1-6.png" width="672" style="display: block; margin: auto;" /><img src="figure/ExtremeOccurrence.Rmd/unnamed-chunk-1-7.png" width="672" style="display: block; margin: auto;" /><img src="figure/ExtremeOccurrence.Rmd/unnamed-chunk-1-8.png" width="672" style="display: block; margin: auto;" /><img src="figure/ExtremeOccurrence.Rmd/unnamed-chunk-1-9.png" width="672" style="display: block; margin: auto;" /><img src="figure/ExtremeOccurrence.Rmd/unnamed-chunk-1-10.png" width="672" style="display: block; margin: auto;" /><img src="figure/ExtremeOccurrence.Rmd/unnamed-chunk-1-11.png" width="672" style="display: block; margin: auto;" /><img src="figure/ExtremeOccurrence.Rmd/unnamed-chunk-1-12.png" width="672" style="display: block; margin: auto;" /><img src="figure/ExtremeOccurrence.Rmd/unnamed-chunk-1-13.png" width="672" style="display: block; margin: auto;" /><img src="figure/ExtremeOccurrence.Rmd/unnamed-chunk-1-14.png" width="672" style="display: block; margin: auto;" /><img src="figure/ExtremeOccurrence.Rmd/unnamed-chunk-1-15.png" width="672" style="display: block; margin: auto;" /><img src="figure/ExtremeOccurrence.Rmd/unnamed-chunk-1-16.png" width="672" style="display: block; margin: auto;" /><img src="figure/ExtremeOccurrence.Rmd/unnamed-chunk-1-17.png" width="672" style="display: block; margin: auto;" /><img src="figure/ExtremeOccurrence.Rmd/unnamed-chunk-1-18.png" width="672" style="display: block; margin: auto;" /><img src="figure/ExtremeOccurrence.Rmd/unnamed-chunk-1-19.png" width="672" style="display: block; margin: auto;" /><img src="figure/ExtremeOccurrence.Rmd/unnamed-chunk-1-20.png" width="672" style="display: block; margin: auto;" /><img src="figure/ExtremeOccurrence.Rmd/unnamed-chunk-1-21.png" width="672" style="display: block; margin: auto;" /><img src="figure/ExtremeOccurrence.Rmd/unnamed-chunk-1-22.png" width="672" style="display: block; margin: auto;" /></p>
+<p>As Prof. Stein pointed, if the marginal distribution is correct then the expected number exceeding any threshold should be correct. So if the tail is “usually”&quot; deflated, it should be that with some small probability there are many large <span class="math inline">\(z\)</span>-scores (even in the tail). Therefore, if “on average” we have the right number of large <span class="math inline">\(z\)</span>-scores/small <span class="math inline">\(p\)</span>-values, and “usually” we have too few, then “rarely” we should have too many.</p>
+<p>For the first plot, for example, each simulation run we have <span class="math inline">\(10\)</span>K <span class="math inline">\(p\)</span>-values from <span class="math inline">\(10\)</span>K genes simulated under the global null by sampling 5 livers vs 5 livers. We are using threshold <span class="math inline">\(= 5e-4\)</span>. The <span class="math inline">\(p\)</span>-values, as shown by the previous simulations, should be generally inflated, but the extreme p-values should be deflated more often than inflated. Therefore, under the global null, on average, we should observe <span class="math inline">\(5e-4 \times 10K = 5\)</span> extreme p-values under the threshold, yet most of the time we should observe less than this average, and only occasionally we should observe far more than this average. This is exactly what we have seen from 1000 simulation runs. The red dotted line is 5, the expected number. Out of 1000 runs, most of them generated less than 5 extreme p-values, yet occasionally we have far more than 5 extreme p-values, some of which could be as many as 300. On average we have 5.33 extreme p-values, which is close to the expected 5. Other plots are similar.</p>
+<p>The <code>R</code> code to generate both <span class="math inline">\(p\)</span>-value tables is in <a href="https://github.com/LSun/truncash/blob/master/code/p_null_liver.R"><code>p_null_liver.R</code></a></p>
 <div id="session-information" class="section level2">
-<h2>Session information</h2>
+<h2>Session Information</h2>
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>R version 3.3.2 (2016-10-31)
 Platform: x86_64-apple-darwin13.4.0 (64-bit)
@@ -380,24 +357,11 @@ locale:
 attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
-other attached packages:
-[1] qvalue_2.4.2      edgeR_3.14.0      limma_3.28.5      SQUAREM_2016.10-1
-[5] ashr_2.1.2        workflowr_0.3.0   rmarkdown_1.3    
-
 loaded via a namespace (and not attached):
- [1] Rcpp_0.12.9       knitr_1.15.1      magrittr_1.5     
- [4] splines_3.3.2     REBayes_0.62      MASS_7.3-45      
- [7] munsell_0.4.3     doParallel_1.0.10 pscl_1.4.9       
-[10] colorspace_1.2-6  lattice_0.20-34   foreach_1.4.3    
-[13] plyr_1.8.3        stringr_1.1.0     tools_3.3.2      
-[16] parallel_3.3.2    grid_3.3.2        gtable_0.2.0     
-[19] git2r_0.18.0      htmltools_0.3.5   iterators_1.0.8  
-[22] assertthat_0.1    yaml_2.1.14       rprojroot_1.2    
-[25] digest_0.6.11     Matrix_1.2-7.1    reshape2_1.4.1   
-[28] ggplot2_2.1.0     codetools_0.2-15  evaluate_0.10    
-[31] stringi_1.1.2     scales_0.4.0      Rmosek_7.1.3     
-[34] backports_1.0.5   truncnorm_1.0-7  </code></pre>
-</div>
+ [1] backports_1.0.5 magrittr_1.5    rprojroot_1.2   tools_3.3.2    
+ [5] htmltools_0.3.5 yaml_2.1.14     Rcpp_0.12.9     stringi_1.1.2  
+ [9] rmarkdown_1.3   knitr_1.15.1    git2r_0.18.0    stringr_1.1.0  
+[13] digest_0.6.11   workflowr_0.3.0 evaluate_0.10  </code></pre>
 </div>
 
 <hr>

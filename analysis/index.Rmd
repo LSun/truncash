@@ -15,6 +15,10 @@ Matthew did a quick investigation of the p values and z scores obtained for simu
 
 Matthew's initial observation inspired this project.  If under positive correlation, the most extreme tend to be not inflated, maybe we can use them to control the false discoveries.  Meanwhile, if the moderate are more prone to inflation due to correlation, maybe it's better to make only partial use of their information.
 
+* [Occurrence of extreme observations](ExtremeOccurrence.html)
+
+As [Prof. Michael Stein](https://galton.uchicago.edu/~stein/) pointed during a conversation with [Matthew](http://stephenslab.uchicago.edu/), if the marginal distribution is correct then the expected number exceeding any threshold should be correct.  So if the tail is "usually"" deflated, it should be that with some small probability there are many large $z$-scores (even in the tail).  Therefore, if "on average" we have the right number of large $z$-scores/small $p$-values, and "usually" we have too few, then "rarely" we should have too many.  A simulation is run to check this intuition.
+
 * [Model and first simulations](truncash.html)
 
 [`ashr`]: https://github.com/stephens999/ashr
