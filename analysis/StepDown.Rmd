@@ -70,14 +70,7 @@ legend("topleft", c("Holm-Bonferroni", "Sidak-Holm"), col = c(1, "blue"), pch = 
 
 When $\alpha > 0.10$, we can see that empirical FWER $<$ nominal FWER, even though we would have inflated (not so extreme) $p$-values coming into play, suggesting a certain level of conservativeness.  When $\alpha$ is small, though, we do see in this simulation run empirical FWER $>$ nominal FWER, but I would argue that it's actually not that big.  For example, when nominal FWER $= 0.05$, empirical FWER of Holm_Bonferroni is $0.056$ and that of Sidak-Holm is $0.057$, fairly close to $0.05$.  Second, simulations with smaller $\alpha$ might be more prone to randomness in the simulation.
 
-Here is another simulation, with only the random seed changed from $101$ to $1$ but nothing else.
-
-[Another simulation run with only random seed changed](https://github.com/LSun/truncash/blob/master/output/p_null_liver_FWER_2.jpg)
-
-![Another simulation run with only random seed changed](https://github.com/LSun/truncash/blob/master/output/p_null_liver_FWER_2.jpg)
-
-
-This simulation only change the random seed from $101$ to $1$ but nothing else, and empirical FWER for both procedures looks much better.  I'm thinking it shows that VOOM does give $p$-values marginally uniform under the global null, and starting with most extreme $p$-values for correlated null data could control FWER.
+[Here](https://github.com/LSun/truncash/blob/master/output/p_null_liver_FWER_2.jpg) is another simulation, with only the random seed changed from $101$ to $1$ but nothing else.  This simulation only change the random seed from $101$ to $1$ but nothing else, and empirical FWER for both procedures looks much better.  I'm thinking it shows that VOOM does give $p$-values marginally uniform under the global null, and starting with most extreme $p$-values for correlated null data could control FWER.
 
 The code to generate adjusted $p$-values are stored in [`StepDown.R`](https://github.com/LSun/truncash/blob/master/code/StepDown.R)
 
