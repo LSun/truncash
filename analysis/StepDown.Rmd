@@ -3,9 +3,7 @@ title: Step-Down Multiple Comparison Procedures on Simulated Correlated Null to 
   FWER
 author: "Lei Sun"
 date: '2016-11-29'
-output:
-  html_document: default
-  pdf_document: default
+output: html_document
 ---
 
 ```{r read-chunk, include=FALSE, cache=FALSE}
@@ -74,11 +72,10 @@ When $\alpha > 0.10$, we can see that empirical FWER $<$ nominal FWER, even thou
 
 Here is another simulation, with only the random seed changed from $101$ to $1$ but nothing else.
 
-[test](https://github.com/LSun/truncash/blob/master/output/p_null_liver_FWER_2.jpg)
+[Another simulation run with only random seed changed](https://github.com/LSun/truncash/blob/master/output/p_null_liver_FWER_2.jpg)
 
-[test](https://github.com/LSun/truncash/blob/master/output/p_null_liver_FWER_2.png)
-![test](../output/p_null_liver_FWER_2.png)
-![test](../output/p_null_liver_FWER_2.jpg)
+![Another simulation run with only random seed changed](https://github.com/LSun/truncash/blob/master/output/p_null_liver_FWER_2.jpg)
+
 
 This simulation only change the random seed from $101$ to $1$ but nothing else, and empirical FWER for both procedures looks much better.  I'm thinking it shows that VOOM does give $p$-values marginally uniform under the global null, and starting with most extreme $p$-values for correlated null data could control FWER.
 

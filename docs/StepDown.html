@@ -17,12 +17,15 @@
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-1.1/default.css" rel="stylesheet" />
+<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-1.1/highlight.js"></script>
 <link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
 
@@ -164,6 +167,101 @@ $(document).ready(function () {
 
 
 
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
 
 
 <div class="navbar navbar-default  navbar-fixed-top" role="navigation">
@@ -212,7 +310,7 @@ $(document).ready(function () {
 
 
 <p><strong>Last updated:</strong> 2017-02-03</p>
-<p><strong>Code version:</strong> 36c1e4c</p>
+<p><strong>Code version:</strong> 313897f</p>
 <p>In order to understand the behavior of extreme <span class="math inline">\(p\)</span>-values obtained by simulation from GTEx data under the global null, we apply two “step-down” multiple comparison procedures on the <span class="math inline">\(p\)</span>-values. If the most extreme <span class="math inline">\(p\)</span>-values are never “too extreme” as Matthew observed, “step-down” procedures, starting with the most extreme <span class="math inline">\(p\)</span>-values, should satisfactorily control FWER, even with generally inflated <span class="math inline">\(z\)</span>-scores and hence skewed <span class="math inline">\(p\)</span>-values.</p>
 <p>The two “step-down” multiple comparison procedures are referenced in <a href="https://statweb.stanford.edu/~candes/">Prof. Emmanuel Candes</a>’s online lecture notes <a href="https://github.com/LSun/truncash/blob/master/ref/Lecture6.pdf">[1]</a><a href="https://github.com/LSun/truncash/blob/master/ref/Lecture7.pdf">[2]</a>.</p>
 <div id="holm-bonferronis-procedure" class="section level2">
@@ -251,8 +349,11 @@ legend(&quot;topleft&quot;, c(&quot;Holm-Bonferroni&quot;, &quot;Sidak-Holm&quot
 <p><img src="figure/StepDown.Rmd/unnamed-chunk-1-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>When <span class="math inline">\(\alpha &gt; 0.10\)</span>, we can see that empirical FWER <span class="math inline">\(&lt;\)</span> nominal FWER, even though we would have inflated (not so extreme) <span class="math inline">\(p\)</span>-values coming into play, suggesting a certain level of conservativeness. When <span class="math inline">\(\alpha\)</span> is small, though, we do see in this simulation run empirical FWER <span class="math inline">\(&gt;\)</span> nominal FWER, but I would argue that it’s actually not that big. For example, when nominal FWER <span class="math inline">\(= 0.05\)</span>, empirical FWER of Holm_Bonferroni is <span class="math inline">\(0.056\)</span> and that of Sidak-Holm is <span class="math inline">\(0.057\)</span>, fairly close to <span class="math inline">\(0.05\)</span>. Second, simulations with smaller <span class="math inline">\(\alpha\)</span> might be more prone to randomness in the simulation.</p>
 <p>Here is another simulation, with only the random seed changed from <span class="math inline">\(101\)</span> to <span class="math inline">\(1\)</span> but nothing else.</p>
-<p><a href="https://github.com/LSun/truncash/blob/master/output/p_null_liver_FWER_2.jpg">test</a></p>
-<p><a href="https://github.com/LSun/truncash/blob/master/output/p_null_liver_FWER_2.png">test</a> <img src="/Users/LSun/GitHub/truncash/output/p_null_liver_FWER_2.png" alt="test" /> <img src="/Users/LSun/GitHub/truncash/output/p_null_liver_FWER_2.jpg" alt="test" /></p>
+<p><a href="https://github.com/LSun/truncash/blob/master/output/p_null_liver_FWER_2.jpg">Another simulation run with only random seed changed</a></p>
+<div class="figure">
+<img src="https://github.com/LSun/truncash/blob/master/output/p_null_liver_FWER_2.jpg" alt="Another simulation run with only random seed changed" />
+<p class="caption">Another simulation run with only random seed changed</p>
+</div>
 <p>This simulation only change the random seed from <span class="math inline">\(101\)</span> to <span class="math inline">\(1\)</span> but nothing else, and empirical FWER for both procedures looks much better. I’m thinking it shows that VOOM does give <span class="math inline">\(p\)</span>-values marginally uniform under the global null, and starting with most extreme <span class="math inline">\(p\)</span>-values for correlated null data could control FWER.</p>
 <p>The code to generate adjusted <span class="math inline">\(p\)</span>-values are stored in <a href="https://github.com/LSun/truncash/blob/master/code/StepDown.R"><code>StepDown.R</code></a></p>
 </div>
@@ -276,8 +377,34 @@ loaded via a namespace (and not attached):
 [13] digest_0.6.11   workflowr_0.3.0 evaluate_0.10  </code></pre>
 </div>
 
+<hr>
+<p>
+    This <a href="http://rmarkdown.rstudio.com">R Markdown</a> site was created with <a href="https://github.com/jdblischak/workflowr">workflowr</a>
+</p>
+<hr>
+
+<!-- To enable disqus, uncomment the section below and provide your disqus_shortname -->
+
+<!-- disqus
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'rmarkdown'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+-->
 
 
+</div>
+</div>
 
 </div>
 
