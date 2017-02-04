@@ -310,7 +310,7 @@ div.tocify {
 
 
 <p><strong>Last updated:</strong> 2017-02-03</p>
-<p><strong>Code version:</strong> 0f4028a3dc6894dce8e53cc79ccbcfd500a626ae</p>
+<p><strong>Code version:</strong> d25a6e33d640cc22c808adc8d4ad715a14e538c5</p>
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
 <p>This document simply simulates some null data by randomly sampling two groups of 5 samples from some RNA-seq data (GTEx liver samples). We plot <span class="math inline">\(p\)</span> value histograms and see the effects of inflation: some distributions are inflated near 0 and others are inflated near 1. However, when we look at the qqplots (here of the z scores, but should be same for p values) we see something that is interesting, although obvious in hindsight: the most extreme p values (z scores) are never “too extreme” (although they are sometimes not extreme enough). The inflation comes from the “not quite so extreme” p values and z scores. This makes sense: when you have positively correlated variables, the most extreme values will tend to be less extreme than when you have independent samples, because you have “effectively” fewer independent samples.</p>
