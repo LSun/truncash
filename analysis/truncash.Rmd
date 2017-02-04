@@ -1,11 +1,21 @@
 ---
 title: "Truncated ASH"
 author: "Lei Sun"
-date: "1/29/2017"
-output:
-  html_document: default
-  pdf_document: default
+date: 2017-01-29
+output: html_document
 ---
+
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+**Last updated:** `r Sys.Date()`
+
+**Code version:** `r workflowr::extract_commit(".", 1)$sha1`
+
 
 ## Introduction
 
@@ -62,7 +72,7 @@ will move more weight to $\hat\pi_1$.  Customarily, we assume $\sigma_1 \leq \cd
 
 Here is the main `truncash` function, utilizing `autoselect.mixsd`, `mixIP`, `normalmix` from `ashr`.
 
-[`truncash`](https://github.com/LSun/truncash/blob/master/code/truncash.R)
+[`truncash`](https://github.com/LSun/truncash/tree/master/code/truncash.R)
 
 ## Simulation
 
@@ -125,4 +135,9 @@ plot(mse_ash, mse_truncash, xlab = "ash", ylab = "truncash", main = "MSE",
      ylim = c(min(c(mse_ash, mse_truncash)), max(c(mse_ash, mse_truncash)))
      )
 abline(0, 1, lty = 3, col = "blue")
+```
+
+## Session Information
+
+```{r session-info}
 ```
