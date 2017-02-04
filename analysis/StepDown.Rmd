@@ -1,8 +1,11 @@
 ---
-title: "Step-Down Multiple Comparison Procedures on Simulated Correlated Null to Control FWER"
+title: Step-Down Multiple Comparison Procedures on Simulated Correlated Null to Control
+  FWER
 author: "Lei Sun"
-date: 2016-11-29
-output: html_document
+date: '2016-11-29'
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r read-chunk, include=FALSE, cache=FALSE}
@@ -19,10 +22,10 @@ knitr::read_chunk("chunks.R")
 
 In order to understand the behavior of extreme $p$-values obtained by simulation from GTEx data under the global null, we apply two "step-down" multiple comparison procedures on the $p$-values.  If the most extreme $p$-values are never "too extreme" as Matthew observed, "step-down" procedures, starting with the most extreme $p$-values, should satisfactorily control FWER, even with generally inflated $z$-scores and hence skewed $p$-values.
 
-The two "step-down" multiple comparison procedures are referenced in [Prof. Emmanuel Candes](https://statweb.stanford.edu/~candes/)'s online lecture notes [1](https://github.com/LSun/truncash/tree/master/ref/lecture6.pdf)[2](https://github.com/LSun/truncash/tree/master/ref/lecture7.pdf). 
+The two "step-down" multiple comparison procedures are referenced in [Prof. Emmanuel Candes](https://statweb.stanford.edu/~candes/)'s online lecture notes [[1]](https://github.com/LSun/truncash/blob/master/ref/Lecture6.pdf)[[2]](https://github.com/LSun/truncash/blob/master/ref/Lecture7.pdf). 
 
 
-### Holm-Bonferroni's procedure
+## Holm-Bonferroni's procedure
 
 First, order the $p$-values
 
@@ -42,14 +45,14 @@ Hence the procedure starts with the most extreme (smallest) $p$-value and stops 
 
 It can be shown that Holm’s procedure controls the FWER strongly, under arbitrary correlation among $p$-values.
 
-### Sidak-Holm's procedure
+## Sidak-Holm's procedure
 
 Similar to Holm-Bonferroni's, only to replace thresholds $\alpha/n, \alpha/(n-1), \ldots, \alpha$ with $1 - (1 - \alpha)^{1/n}, 1 - (1 - \alpha)^{1/(n-1)}, \ldots, 1 - (1 - \alpha)^{1}$.  Sidak-Holm is more powerful than Holm-Bonferroni; however, it controls FWER only when $p$-values are independent.  Although we certainly don't have independent $p$-values, nevertheless we hope to see if Sidak-Holm can control FWER for our simulated data.
 
 
 The theoretical result tells us that Holm-Bonferroni controls FWER under any circumstances (arbitrary correlation) whereas Sidak-Holm is guaranteed to control FWER only when p-values are independent.  On the other hand, both procedures control FWER very conservatively; that is, under respective assumptions, both procedures are guaranteed to have FWER $< \alpha$, not $= \alpha$.
 
-### Result
+## Result
 
 ```{r, cache = TRUE}
 holm = read.table("../output/p_null_liver_holm.txt")
@@ -71,12 +74,15 @@ When $\alpha > 0.10$, we can see that empirical FWER $<$ nominal FWER, even thou
 
 Here is another simulation, with only the random seed changed from $101$ to $1$ but nothing else.
 
-[Another simulation run with a different random seed](https://github.com/LSun/truncash/tree/master/output/p_null_liver_FWER_2.png)
-![Another simulation run with a different random seed](../output/p_null_liver_FWER_2.png)
+[test](https://github.com/LSun/truncash/blob/master/output/p_null_liver_FWER_2.jpg)
+
+[test](https://github.com/LSun/truncash/blob/master/output/p_null_liver_FWER_2.png)
+![test](../output/p_null_liver_FWER_2.png)
+![test](../output/p_null_liver_FWER_2.jpg)
 
 This simulation only change the random seed from $101$ to $1$ but nothing else, and empirical FWER for both procedures looks much better.  I'm thinking it shows that VOOM does give $p$-values marginally uniform under the global null, and starting with most extreme $p$-values for correlated null data could control FWER.
 
-The code to generate adjusted $p$-values are stored in [`StepDown.R`](https://github.com/LSun/truncash/tree/master/code/StepDown.R)
+The code to generate adjusted $p$-values are stored in [`StepDown.R`](https://github.com/LSun/truncash/blob/master/code/StepDown.R)
 
 ## Session Information
 

@@ -23,7 +23,7 @@ As [Prof. Michael Stein](https://galton.uchicago.edu/~stein/) pointed during a c
 
 If the most extreme $p$-values are never "too extreme" as Matthew observed, "step-down" procedures, starting with the most extreme $p$-values, should satisfactorily control FWER, even with generally inflated $z$-scores and hence skewed $p$-values.
 
-* [Model and first simulations](truncash.html)
+* [`truncash` Model and first simulations](truncash.html)
 
 [`ashr`]: https://github.com/stephens999/ashr
 

@@ -16,11 +16,15 @@ knitr::read_chunk("chunks.R")
 
 **Code version:** `r workflowr::extract_commit(".", 1)$sha1`
 
+## Introduction
+
 During a conversation with Matthew on correlated $z$-scores, [Prof. Michael Stein](https://galton.uchicago.edu/~stein/) remarked that "if the marginal distribution is correct then the expected number exceeding any threshold should be correct... so if the tail is 'usually' deflated, it should be that with some small probability there are many large $z$-scores (even in the tail)." So we are running this simulation to check that insight, that is, "if there are usually not enough in the tail then there must be some probability of too many in the tail," based on the assumption that, on average, the $p$-values are uniform after `voom` transformation.
 
 Using [GTex/Liver](https://github.com/LSun/truncash/tree/master/data/liver.csv) data, we sample $N = 10$K genes from a $5$ vs $5$ study, and keep the correlation among genes.  The data for each gene can then be transformed by `voom` to a $p$-value; thus we get $10$K $p$-values for each simulation run.  A total of $m = 1$K runs generate a $m \times N$ matrix of $p$-values, each row an independent simulation run with $10$K genes.
 
 With different pre-specified thresholds $T_p$, we record, for each of the $m = 1000$ runs, the number of extreme observations with $p \leq T_p$.  The occurrence table is stored in [`p_null_liver_extreme.txt`](https://github.com/LSun/truncash/tree/master/output/p_null_liver_extreme.txt).
+
+## Result
 
 ```{r}
 # load extreme observation count table
