@@ -219,9 +219,9 @@ $(document).ready(function () {
 </ul>
 <p>As <a href="https://galton.uchicago.edu/~stein/">Prof. Michael Stein</a> pointed during a conversation with <a href="http://stephenslab.uchicago.edu/">Matthew</a>, if the marginal distribution is correct then the expected number exceeding any threshold should be correct. So if the tail is “usually”&quot; deflated, it should be that with some small probability there are many large <span class="math inline">\(z\)</span>-scores (even in the tail). Therefore, if “on average” we have the right number of large <span class="math inline">\(z\)</span>-scores/small <span class="math inline">\(p\)</span>-values, and “usually” we have too few, then “rarely” we should have too many. A simulation is run to check this intuition.</p>
 <ul>
-<li><a href="StepDown.html">Step-down multiple comparison procedures on correlated null</a></li>
+<li><a href="StepDown.html">Two FWER-controlling procedures on correlated null</a></li>
 </ul>
-<p>If the most extreme <span class="math inline">\(p\)</span>-values are never “too extreme” as Matthew observed, “step-down” procedures, starting with the most extreme <span class="math inline">\(p\)</span>-values, should satisfactorily control FWER, even with generally inflated <span class="math inline">\(z\)</span>-scores and hence skewed <span class="math inline">\(p\)</span>-values.</p>
+<p>In order to understand the behavior of <span class="math inline">\(p\)</span>-values of top expressed, correlated genes under the global null, simulated from GTEx data, we apply two FWER-controlling multiple comparison procedures, Holm’s “step-down” ([Holm 1979]) and Hochberg’s “step-up.” ([Hochberg 1988])</p>
 <ul>
 <li><a href="truncash.html"><code>truncash</code> Model and first simulations</a></li>
 </ul>

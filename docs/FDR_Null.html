@@ -9,11 +9,10 @@
 <meta name="generator" content="pandoc" />
 
 
-<meta name="author" content="Lei Sun" />
+<meta name="author" content="First Last" />
 
-<meta name="date" content="2016-11-29" />
 
-<title>FWER Procedures on Simulated Correlated Null to Control FWER</title>
+<title>FDR / s</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -302,86 +301,33 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">FWER Procedures on Simulated Correlated Null to Control FWER</h1>
-<h4 class="author"><em>Lei Sun</em></h4>
-<h4 class="date"><em>2016-11-29</em></h4>
+<h1 class="title toc-ignore">FDR / s</h1>
+<h4 class="author"><em>First Last</em></h4>
+<h4 class="date"><em>YYYY-MM-DD</em></h4>
 
 </div>
 
 
 <p><strong>Last updated:</strong> 2017-02-10</p>
 <p><strong>Code version:</strong> 681047c</p>
-<p>In order to understand the behavior of <span class="math inline">\(p\)</span>-values of top expressed, correlated genes under the global null, simulated from GTEx data, we apply two FWER-controlling multiple comparison procedures, Holm’s “step-down” (<a href="http://www.jstor.org/stable/4615733?seq=1#page_scan_tab_contents">Holm 1979</a>) and Hochberg’s “step-up.” (<a href="https://academic.oup.com/biomet/article-abstract/75/4/800/423177/A-sharper-Bonferroni-procedure-for-multiple-tests">Hochberg 1988</a>)</p>
-<div id="holms-step-down-procedure-start-from-the-smallest-p-value" class="section level2">
-<h2>Holm’s step-down procedure: start from the smallest <span class="math inline">\(p\)</span>-value</h2>
-<p><em>It can be shown that Holm’s procedure conservatively controls the FWER in the strong sense, under arbitrary correlation among <span class="math inline">\(p\)</span>-values.</em></p>
-<p>First, order the <span class="math inline">\(p\)</span>-values</p>
-<p><span class="math display">\[
-p_{(1)} \leq p_{(2)} \leq \cdots \leq p_{(n)}
-\]</span></p>
-<p>and let <span class="math inline">\(H_{(1)}, H_{(2)}, \ldots, H_{(n)}\)</span> be the corresponding hypotheses. Then examine the <span class="math inline">\(p\)</span>-values in order.</p>
-<p>Step 1: If <span class="math inline">\(p_{(1)} \leq \alpha/n\)</span> reject <span class="math inline">\(H_{(1)}\)</span> and go to Step 2. Otherwise, accept <span class="math inline">\(H_{(1)}, H_{(2)}, \ldots, H_{(n)}\)</span> and stop.</p>
-<p>……</p>
-<p>Step <span class="math inline">\(i\)</span>: If <span class="math inline">\(p_{(i)} \leq \alpha / (n − i + 1)\)</span> reject <span class="math inline">\(H_{(i)}\)</span> and go to step <span class="math inline">\(i + 1\)</span>. Otherwise, accept <span class="math inline">\(H_{(i)}, H_{(i + 1)}, \ldots, H_{(n)}\)</span> and stop.</p>
-<p>……</p>
-<p>Step <span class="math inline">\(n\)</span>: If <span class="math inline">\(p_{(n)} \leq \alpha\)</span>, reject <span class="math inline">\(H_{(n)}\)</span>. Otherwise, accept <span class="math inline">\(H_{(n)}\)</span>.</p>
-<p>Hence the procedure starts with the most extreme (smallest) <span class="math inline">\(p\)</span>-value and stops the first time <span class="math inline">\(p_{(i)}\)</span> exceeds the critical value <span class="math inline">\(\alpha_i = \alpha/(n − i + 1)\)</span>.</p>
-<p><strong>It can be shown that Holm’s procedure conservatively controls the FWER in the strong sense, under arbitrary correlation among <span class="math inline">\(p\)</span>-values.</strong></p>
+<div id="r-markdown" class="section level2">
+<h2>R Markdown</h2>
+<p>This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <a href="http://rmarkdown.rstudio.com" class="uri">http://rmarkdown.rstudio.com</a>.</p>
+<p>When you click the <strong>Knit</strong> button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:</p>
+<pre class="r"><code>summary(cars)</code></pre>
+<pre><code>     speed           dist       
+ Min.   : 4.0   Min.   :  2.00  
+ 1st Qu.:12.0   1st Qu.: 26.00  
+ Median :15.0   Median : 36.00  
+ Mean   :15.4   Mean   : 42.98  
+ 3rd Qu.:19.0   3rd Qu.: 56.00  
+ Max.   :25.0   Max.   :120.00  </code></pre>
 </div>
-<div id="hochbergs-step-up-procedure-start-from-the-largest-p-value" class="section level2">
-<h2>Hochberg’s step-up procedure: start from the largest <span class="math inline">\(p\)</span>-value</h2>
-<p><em>It can be shown that Hochberg’s procedure conservatively controls the FWER in the strong sense, when <span class="math inline">\(p\)</span>-values are independent.</em></p>
-<p>First, order the <span class="math inline">\(p\)</span>-values</p>
-<p><span class="math display">\[
-p_{(1)} \leq p_{(2)} \leq \cdots \leq p_{(n)}
-\]</span></p>
-<p>and let <span class="math inline">\(H_{(1)}, H_{(2)}, \ldots, H_{(n)}\)</span> be the corresponding hypotheses. Then examine the <span class="math inline">\(p\)</span>-values in order.</p>
-<p>Step 1: If <span class="math inline">\(p_{(n)} \leq \alpha\)</span> reject <span class="math inline">\(H_{(1)}, \ldots, H_{(n)}\)</span> and stop. Otherwise, accept <span class="math inline">\(H_{(n)}\)</span> and go to step 2.</p>
-<p>……</p>
-<p>Step <span class="math inline">\(i\)</span>: If <span class="math inline">\(p_{(n - i + 1)} \leq \alpha / i\)</span> reject <span class="math inline">\(H_{(1)}, \ldots, H_{(n - i + 1)}\)</span> and stop. Otherwise, accept <span class="math inline">\(H_{(n - i + 1)}\)</span> and go to step <span class="math inline">\(i + 1\)</span>.</p>
-<p>……</p>
-<p>Step <span class="math inline">\(n\)</span>: If <span class="math inline">\(p_{(1)} \leq \alpha / n\)</span>, reject <span class="math inline">\(H_{(1)}\)</span>. Otherwise, accept <span class="math inline">\(H_{(1)}\)</span>.</p>
-<p>Hence the procedure starts with the least extreme (largest) <span class="math inline">\(p\)</span>-value and stops the first time <span class="math inline">\(p_{(i)}\)</span> falls below the critical value <span class="math inline">\(\alpha_i = \alpha/(n − i + 1)\)</span>.</p>
-<p><strong>It can be shown that Hochberg’s procedure conservatively controls the FWER in the strong sense, when <span class="math inline">\(p\)</span>-values are independent.</strong></p>
-<p><strong><a href="https://projecteuclid.org/euclid.aos/1028144846">Sarkar 1998</a> also pointed out that Hochberg’s procedure can control the FWER strongly under certain dependency among the test statistics, such as a multivariate normal with a common marginal distribution and positive correlations.</strong></p>
-<p><strong>Holm’s procedure is based on Bonferroni correction, whereas Hochberg’s on Sime’s inequality. Both use exactly the same thresholds, comparing <span class="math inline">\(p_{(i)}\)</span> with <span class="math inline">\(\alpha/(n − i + 1)\)</span>, yet Holm’s starts from the smallest <span class="math inline">\(p\)</span>-value, and Hochberg’s from the largest. Hochberg’s is thus strictly more powerful than Holm’s.</strong></p>
-</div>
-<div id="result" class="section level2">
-<h2>Result</h2>
-<p>Now we apply the two procedures to the simulated, correlated null data.</p>
-<pre class="r"><code>p1 = read.table(&quot;../output/p_null_liver.txt&quot;)
-p2 = read.table(&quot;../output/p_null_liver_777.txt&quot;)
-p = rbind(p1, p2)
-m = nrow(p)
-holm = hochberg = matrix(nrow = m, ncol = ncol(p))
-
-for(i in 1:m){
-  holm[i, ] = p.adjust(p[i, ], method = &quot;holm&quot;) # p-values adjusted by Holm (1979)
-  hochberg[i, ] = p.adjust(p[i, ], method = &quot;hochberg&quot;) # p_values adjusted by Hochberg (1988)
-}</code></pre>
-<pre class="r"><code>## calculate empirical FWER at 100 nominal FWER&#39;s
-
-alpha = seq(0, 0.15, length = 100)
-fwer_holm = fwer_hochberg = c()
-for (i in 1:length(alpha)) {
-  fwer_holm[i] = mean(apply(holm, 1, function(x) {min(x) &lt;= alpha[i]}))
-  fwer_hochberg[i] = mean(apply(hochberg, 1, function(x) {min(x) &lt;= alpha[i]}))
-}
-
-fwer_holm_se = sqrt(fwer_holm * (1 - fwer_holm) / m)
-fwer_hochberg_se = sqrt(fwer_hochberg * (1 - fwer_hochberg) / m)</code></pre>
-<p>Here at each nominal FWER from <span class="math inline">\(0\)</span> to <span class="math inline">\(0.15\)</span>, we plot the empirical FWER, calculated from <span class="math inline">\(m = 2000\)</span> independent simulation trials. Dotted lines indicate one standard error computed from binomial model <span class="math inline">\(= \sqrt{\hat{\text{FWER}}(1 - \hat{\text{FWER}}) / m}\)</span>.</p>
-<pre class="r"><code>plot(alpha, fwer_holm, pch = 1, xlab = &quot;nominal FWER&quot;, ylab = &quot;empirical FWER&quot;, xlim = c(0, max(alpha)), ylim = c(0, max(alpha)), cex = 0.75)
-points(alpha, fwer_hochberg, col = &quot;blue&quot;, pch = 19, cex = 0.25)
-lines(alpha, fwer_holm - fwer_holm_se, lty = 3)
-lines(alpha, fwer_holm + fwer_holm_se, lty = 3)
-lines(alpha, fwer_hochberg + fwer_hochberg_se, lty = 3, col = &quot;blue&quot;)
-lines(alpha, fwer_hochberg - fwer_hochberg_se, lty = 3, col = &quot;blue&quot;)
-
-abline(0, 1, lty = 3, col = &quot;red&quot;)
-legend(&quot;topleft&quot;, c(&quot;Holm&quot;, &quot;Hochberg&quot;), col = c(1, &quot;blue&quot;), pch = c(1, 19))</code></pre>
-<p><img src="figure/StepDown.Rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>The results from Holm’s step-down and Hochberg’s step-up are almost the same for this simulated data set. They both give almost the same discoveries, although in theory Hochberg’s should be strictly more powerful than Holm’s. <em>The agreement of both procedures may indicate that test statistics are indeed inflated for moderate observations but not extreme observations.</em></p>
+<div id="including-plots" class="section level2">
+<h2>Including Plots</h2>
+<p>You can also embed plots, for example:</p>
+<p><img src="figure/FDR_Null.Rmd/pressure-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Note that the <code>echo = FALSE</code> parameter was added to the code chunk to prevent printing of the R code that generated the plot.</p>
 </div>
 <div id="session-information" class="section level2">
 <h2>Session Information</h2>
