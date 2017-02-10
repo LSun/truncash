@@ -1,0 +1,28 @@
+---
+title: "`truncash` on Simulated Correlated Null"
+author: "Lei Sun"
+date: 2017-02-03
+output: html_document
+---
+
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+**Last updated:** `r Sys.Date()`
+
+**Code version:** `r workflowr::extract_commit(".", 1)$sha1`
+
+## Introduction
+
+```{r}
+p = read.table("../output/")
+```
+
+## Session Information
+
+```{r session-info}
+```

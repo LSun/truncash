@@ -13,7 +13,7 @@
 
 <meta name="date" content="2016-11-29" />
 
-<title>Step-Down Multiple Comparison Procedures on Simulated Correlated Null to Control FWER</title>
+<title>FWER Procedures on Simulated Correlated Null to Control FWER</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -302,54 +302,86 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Step-Down Multiple Comparison Procedures on Simulated Correlated Null to Control FWER</h1>
+<h1 class="title toc-ignore">FWER Procedures on Simulated Correlated Null to Control FWER</h1>
 <h4 class="author"><em>Lei Sun</em></h4>
 <h4 class="date"><em>2016-11-29</em></h4>
 
 </div>
 
 
-<p><strong>Last updated:</strong> 2017-02-03</p>
-<p><strong>Code version:</strong> 4afbe4e</p>
-<p>In order to understand the behavior of extreme <span class="math inline">\(p\)</span>-values obtained by simulation from GTEx data under the global null, we apply two “step-down” multiple comparison procedures on the <span class="math inline">\(p\)</span>-values. If the most extreme <span class="math inline">\(p\)</span>-values are never “too extreme” as Matthew observed, “step-down” procedures, starting with the most extreme <span class="math inline">\(p\)</span>-values, should satisfactorily control FWER, even with generally inflated <span class="math inline">\(z\)</span>-scores and hence skewed <span class="math inline">\(p\)</span>-values.</p>
-<p>The two “step-down” multiple comparison procedures are referenced in <a href="https://statweb.stanford.edu/~candes/">Prof. Emmanuel Candes</a>’s online lecture notes <a href="https://github.com/LSun/truncash/blob/master/ref/Lecture6.pdf">[1]</a><a href="https://github.com/LSun/truncash/blob/master/ref/Lecture7.pdf">[2]</a>.</p>
-<div id="holm-bonferronis-procedure" class="section level2">
-<h2>Holm-Bonferroni’s procedure</h2>
+<p><strong>Last updated:</strong> 2017-02-10</p>
+<p><strong>Code version:</strong> 066c544</p>
+<p>In order to understand the behavior of <span class="math inline">\(p\)</span>-values of top expressed, correlated genes under the global null, simulated from GTEx data, we apply two FWER-controlling multiple comparison procedures, Holm’s “step-down” (<a href="http://www.jstor.org/stable/4615733?seq=1#page_scan_tab_contents">Holm 1979</a>) and Hochberg’s “step-up.” (<a href="https://academic.oup.com/biomet/article-abstract/75/4/800/423177/A-sharper-Bonferroni-procedure-for-multiple-tests">Hochberg 1988</a>)</p>
+<div id="holms-step-down-procedure-start-from-the-smallest-p-value" class="section level2">
+<h2>Holm’s step-down procedure: start from the smallest <span class="math inline">\(p\)</span>-value</h2>
+<p><em>It can be shown that Holm’s procedure conservatively controls the FWER in the strong sense, under arbitrary correlation among <span class="math inline">\(p\)</span>-values.</em></p>
 <p>First, order the <span class="math inline">\(p\)</span>-values</p>
 <p><span class="math display">\[
 p_{(1)} \leq p_{(2)} \leq \cdots \leq p_{(n)}
 \]</span></p>
 <p>and let <span class="math inline">\(H_{(1)}, H_{(2)}, \ldots, H_{(n)}\)</span> be the corresponding hypotheses. Then examine the <span class="math inline">\(p\)</span>-values in order.</p>
 <p>Step 1: If <span class="math inline">\(p_{(1)} \leq \alpha/n\)</span> reject <span class="math inline">\(H_{(1)}\)</span> and go to Step 2. Otherwise, accept <span class="math inline">\(H_{(1)}, H_{(2)}, \ldots, H_{(n)}\)</span> and stop.</p>
+<p>……</p>
 <p>Step <span class="math inline">\(i\)</span>: If <span class="math inline">\(p_{(i)} \leq \alpha / (n − i + 1)\)</span> reject <span class="math inline">\(H_{(i)}\)</span> and go to step <span class="math inline">\(i + 1\)</span>. Otherwise, accept <span class="math inline">\(H_{(i)}, H_{(i + 1)}, \ldots, H_{(n)}\)</span> and stop.</p>
+<p>……</p>
 <p>Step <span class="math inline">\(n\)</span>: If <span class="math inline">\(p_{(n)} \leq \alpha\)</span>, reject <span class="math inline">\(H_{(n)}\)</span>. Otherwise, accept <span class="math inline">\(H_{(n)}\)</span>.</p>
 <p>Hence the procedure starts with the most extreme (smallest) <span class="math inline">\(p\)</span>-value and stops the first time <span class="math inline">\(p_{(i)}\)</span> exceeds the critical value <span class="math inline">\(\alpha_i = \alpha/(n − i + 1)\)</span>.</p>
-<p>It can be shown that Holm’s procedure controls the FWER strongly, under arbitrary correlation among <span class="math inline">\(p\)</span>-values.</p>
+<p><strong>It can be shown that Holm’s procedure conservatively controls the FWER in the strong sense, under arbitrary correlation among <span class="math inline">\(p\)</span>-values.</strong></p>
 </div>
-<div id="sidak-holms-procedure" class="section level2">
-<h2>Sidak-Holm’s procedure</h2>
-<p>Similar to Holm-Bonferroni’s, only to replace thresholds <span class="math inline">\(\alpha/n, \alpha/(n-1), \ldots, \alpha\)</span> with <span class="math inline">\(1 - (1 - \alpha)^{1/n}, 1 - (1 - \alpha)^{1/(n-1)}, \ldots, 1 - (1 - \alpha)^{1}\)</span>. Sidak-Holm is more powerful than Holm-Bonferroni; however, it controls FWER only when <span class="math inline">\(p\)</span>-values are independent. Although we certainly don’t have independent <span class="math inline">\(p\)</span>-values, nevertheless we hope to see if Sidak-Holm can control FWER for our simulated data.</p>
-<p>The theoretical result tells us that Holm-Bonferroni controls FWER under any circumstances (arbitrary correlation) whereas Sidak-Holm is guaranteed to control FWER only when p-values are independent. On the other hand, both procedures control FWER very conservatively; that is, under respective assumptions, both procedures are guaranteed to have FWER <span class="math inline">\(&lt; \alpha\)</span>, not <span class="math inline">\(= \alpha\)</span>.</p>
+<div id="hochbergs-step-up-procedure-start-from-the-largest-p-value" class="section level2">
+<h2>Hochberg’s step-up procedure: start from the largest <span class="math inline">\(p\)</span>-value</h2>
+<p><em>It can be shown that Hochberg’s procedure conservatively controls the FWER in the strong sense, when <span class="math inline">\(p\)</span>-values are independent.</em></p>
+<p>First, order the <span class="math inline">\(p\)</span>-values</p>
+<p><span class="math display">\[
+p_{(1)} \leq p_{(2)} \leq \cdots \leq p_{(n)}
+\]</span></p>
+<p>and let <span class="math inline">\(H_{(1)}, H_{(2)}, \ldots, H_{(n)}\)</span> be the corresponding hypotheses. Then examine the <span class="math inline">\(p\)</span>-values in order.</p>
+<p>Step 1: If <span class="math inline">\(p_{(n)} \leq \alpha\)</span> reject <span class="math inline">\(H_{(1)}, \ldots, H_{(n)}\)</span> and stop. Otherwise, accept <span class="math inline">\(H_{(n)}\)</span> and go to step 2.</p>
+<p>……</p>
+<p>Step <span class="math inline">\(i\)</span>: If <span class="math inline">\(p_{(n - i + 1)} \leq \alpha / i\)</span> reject <span class="math inline">\(H_{(1)}, \ldots, H_{(n - i + 1)}\)</span> and stop. Otherwise, accept <span class="math inline">\(H_{(n - i + 1)}\)</span> and go to step <span class="math inline">\(i + 1\)</span>.</p>
+<p>……</p>
+<p>Step <span class="math inline">\(n\)</span>: If <span class="math inline">\(p_{(1)} \leq \alpha / n\)</span>, reject <span class="math inline">\(H_{(1)}\)</span>. Otherwise, accept <span class="math inline">\(H_{(1)}\)</span>.</p>
+<p>Hence the procedure starts with the least extreme (largest) <span class="math inline">\(p\)</span>-value and stops the first time <span class="math inline">\(p_{(i)}\)</span> falls below the critical value <span class="math inline">\(\alpha_i = \alpha/(n − i + 1)\)</span>.</p>
+<p><strong>It can be shown that Hochberg’s procedure conservatively controls the FWER in the strong sense, when <span class="math inline">\(p\)</span>-values are independent.</strong></p>
+<p><strong><a href="https://projecteuclid.org/euclid.aos/1028144846">Sarkar 1998</a> also pointed out that Hochberg’s procedure can control the FWER strongly under certain dependency among the test statistics, such as a multivariate normal with a common marginal distribution and positive correlations.</strong></p>
+<p><strong>Holm’s procedure is based on Bonferroni correction, whereas Hochberg’s on Sime’s inequality. Both use exactly the same thresholds, comparing <span class="math inline">\(p_{(i)}\)</span> with <span class="math inline">\(\alpha/(n − i + 1)\)</span>, yet Holm’s starts from the smallest <span class="math inline">\(p\)</span>-value, and Hochberg’s from the largest. Hochberg’s is thus strictly more powerful than Holm’s.</strong></p>
 </div>
 <div id="result" class="section level2">
 <h2>Result</h2>
-<pre class="r"><code>holm = read.table(&quot;../output/p_null_liver_holm.txt&quot;)
-sidak = read.table(&quot;../output/p_null_liver_sidak.txt&quot;)
-alpha = seq(0, 0.2, length = 1000)
-fwer_holm = fwer_sidak = c()
+<p>Now we apply the two procedures to the simulated, correlated null data.</p>
+<pre class="r"><code>p1 = read.table(&quot;../output/p_null_liver.txt&quot;)
+p2 = read.table(&quot;../output/p_null_liver_777.txt&quot;)
+p = rbind(p1, p2)
+m = nrow(p)
+holm = hochberg = matrix(nrow = m, ncol = ncol(p))
+
+for(i in 1:m){
+  holm[i, ] = p.adjust(p[i, ], method = &quot;holm&quot;) # p-values adjusted by Holm (1979)
+  hochberg[i, ] = p.adjust(p[i, ], method = &quot;hochberg&quot;) # p_values adjusted by Hochberg (1988)
+}</code></pre>
+<pre class="r"><code>## calculate empirical FWER at 100 nominal FWER&#39;s
+
+alpha = seq(0, 0.15, length = 100)
+fwer_holm = fwer_hochberg = c()
 for (i in 1:length(alpha)) {
   fwer_holm[i] = mean(apply(holm, 1, function(x) {min(x) &lt;= alpha[i]}))
-  fwer_sidak[i] = mean(apply(sidak, 1, function(x) {min(x) &lt;= alpha[i]}))
+  fwer_hochberg[i] = mean(apply(hochberg, 1, function(x) {min(x) &lt;= alpha[i]}))
 }
 
-plot(alpha, fwer_holm, pch = 20, xlab = &quot;nominal FWER&quot;, ylab = &quot;empirical FWER&quot;, xlim = c(0, max(alpha)), ylim = c(0, max(alpha)), cex = 0.25)
+fwer_holm_se = sqrt(fwer_holm * (1 - fwer_holm) / m)
+fwer_hochberg_se = sqrt(fwer_hochberg * (1 - fwer_hochberg) / m)</code></pre>
+<p>Here at each nominal FWER from <span class="math inline">\(0\)</span> to <span class="math inline">\(0.15\)</span>, we plot the empirical FWER, calculated from <span class="math inline">\(m = 2000\)</span> independent simulation trials. Dotted lines indicate one standard error computed from binomial model <span class="math inline">\(= \sqrt{\hat{\text{FWER}}(1 - \hat{\text{FWER}}) / m}\)</span>.</p>
+<pre class="r"><code>plot(alpha, fwer_holm, pch = 1, xlab = &quot;nominal FWER&quot;, ylab = &quot;empirical FWER&quot;, xlim = c(0, max(alpha)), ylim = c(0, max(alpha)), cex = 0.75)
+points(alpha, fwer_hochberg, col = &quot;blue&quot;, pch = 19, cex = 0.25)
+lines(alpha, fwer_holm - fwer_holm_se, lty = 3)
+lines(alpha, fwer_holm + fwer_holm_se, lty = 3)
+lines(alpha, fwer_hochberg + fwer_hochberg_se, lty = 3, col = &quot;blue&quot;)
+lines(alpha, fwer_hochberg - fwer_hochberg_se, lty = 3, col = &quot;blue&quot;)
+
 abline(0, 1, lty = 3, col = &quot;red&quot;)
-points(alpha, fwer_sidak, col = &quot;blue&quot;, pch = 20, cex = 0.25)
-legend(&quot;topleft&quot;, c(&quot;Holm-Bonferroni&quot;, &quot;Sidak-Holm&quot;), col = c(1, &quot;blue&quot;), pch = 20)</code></pre>
-<p><img src="figure/StepDown.Rmd/unnamed-chunk-1-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>When <span class="math inline">\(\alpha &gt; 0.10\)</span>, we can see that empirical FWER <span class="math inline">\(&lt;\)</span> nominal FWER, even though we would have inflated (not so extreme) <span class="math inline">\(p\)</span>-values coming into play, suggesting a certain level of conservativeness. When <span class="math inline">\(\alpha\)</span> is small, though, we do see in this simulation run empirical FWER <span class="math inline">\(&gt;\)</span> nominal FWER, but I would argue that it’s actually not that big. For example, when nominal FWER <span class="math inline">\(= 0.05\)</span>, empirical FWER of Holm_Bonferroni is <span class="math inline">\(0.056\)</span> and that of Sidak-Holm is <span class="math inline">\(0.057\)</span>, fairly close to <span class="math inline">\(0.05\)</span>. Second, simulations with smaller <span class="math inline">\(\alpha\)</span> might be more prone to randomness in the simulation.</p>
-<p><a href="https://github.com/LSun/truncash/blob/master/output/p_null_liver_FWER_2.jpg">Here</a> is another simulation, with only the random seed changed from <span class="math inline">\(101\)</span> to <span class="math inline">\(1\)</span> but nothing else. This simulation only change the random seed from <span class="math inline">\(101\)</span> to <span class="math inline">\(1\)</span> but nothing else, and empirical FWER for both procedures looks much better. I’m thinking it shows that VOOM does give <span class="math inline">\(p\)</span>-values marginally uniform under the global null, and starting with most extreme <span class="math inline">\(p\)</span>-values for correlated null data could control FWER.</p>
-<p>The code to generate adjusted <span class="math inline">\(p\)</span>-values are stored in <a href="https://github.com/LSun/truncash/blob/master/code/StepDown.R"><code>StepDown.R</code></a></p>
+legend(&quot;topleft&quot;, c(&quot;Holm&quot;, &quot;Hochberg&quot;), col = c(1, &quot;blue&quot;), pch = c(1, 19))</code></pre>
+<p><img src="figure/StepDown.Rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>The results from Holm’s step-down and Hochberg’s step-up are almost the same for this simulated data set. They both give almost the same discoveries, although in theory Hochberg’s should be strictly more powerful than Holm’s. <em>The agreement of both procedures may indicate that test statistics are indeed inflated for moderate observations but not extreme observations.</em></p>
 </div>
 <div id="session-information" class="section level2">
 <h2>Session Information</h2>

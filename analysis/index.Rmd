@@ -19,9 +19,9 @@ Matthew's initial observation inspired this project.  If under positive correlat
 
 As [Prof. Michael Stein](https://galton.uchicago.edu/~stein/) pointed during a conversation with [Matthew](http://stephenslab.uchicago.edu/), if the marginal distribution is correct then the expected number exceeding any threshold should be correct.  So if the tail is "usually"" deflated, it should be that with some small probability there are many large $z$-scores (even in the tail).  Therefore, if "on average" we have the right number of large $z$-scores/small $p$-values, and "usually" we have too few, then "rarely" we should have too many.  A simulation is run to check this intuition.
 
-* [Step-down multiple comparison procedures on correlated null](StepDown.html)
+* [Two FWER-controlling procedures on correlated null](StepDown.html)
 
-If the most extreme $p$-values are never "too extreme" as Matthew observed, "step-down" procedures, starting with the most extreme $p$-values, should satisfactorily control FWER, even with generally inflated $z$-scores and hence skewed $p$-values.
+In order to understand the behavior of $p$-values of top expressed, correlated genes under the global null, simulated from GTEx data, we apply two FWER-controlling multiple comparison procedures, Holm's "step-down" ([Holm 1979]) and Hochberg's "step-up." ([Hochberg 1988])
 
 * [`truncash` Model and first simulations](truncash.html)
 
