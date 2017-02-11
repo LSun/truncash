@@ -1,7 +1,7 @@
 ---
-title: "FDR / s"
-author: "First Last"
-date: YYYY-MM-DD
+title: "FDR / s-value on Correlated Null"
+author: "Lei Sun"
+date: 2017-02-10
 output: html_document
 ---
 
@@ -16,26 +16,14 @@ knitr::read_chunk("chunks.R")
 
 **Code version:** `r workflowr::extract_commit(".", 1)$sha1`
 
+## Introduction
 
-## R Markdown
+We apply Benjamini–Hochberg's FDR-controlling procedure, `ash`, and `truncash` (with the threshold $T = 1.96$) to the simulated, correlated null data, obtained from 5 vs 5 GTEx/Liver samples and 10K top expressed genes, and $1000$ independent simulation trials.  We compare the numbers of false discoveries (by definition, all discoveries will be false) obtained by these three methods, under FDR $\leq 0.05$ and $s$-value $\leq 0.05$ as cutoffs.
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```{r, cache = TRUE}
+p = 1
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
 
 ## Session Information
 

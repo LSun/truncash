@@ -13,7 +13,7 @@
 
 <meta name="date" content="2016-11-29" />
 
-<title>FWER Procedures on Simulated Correlated Null to Control FWER</title>
+<title>FWER Procedures on Simulated Correlated Null</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -302,7 +302,7 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">FWER Procedures on Simulated Correlated Null to Control FWER</h1>
+<h1 class="title toc-ignore">FWER Procedures on Simulated Correlated Null</h1>
 <h4 class="author"><em>Lei Sun</em></h4>
 <h4 class="date"><em>2016-11-29</em></h4>
 
@@ -310,8 +310,11 @@ div.tocify {
 
 
 <p><strong>Last updated:</strong> 2017-02-10</p>
-<p><strong>Code version:</strong> 681047c</p>
+<p><strong>Code version:</strong> e34faa1</p>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
 <p>In order to understand the behavior of <span class="math inline">\(p\)</span>-values of top expressed, correlated genes under the global null, simulated from GTEx data, we apply two FWER-controlling multiple comparison procedures, Holm’s “step-down” (<a href="http://www.jstor.org/stable/4615733?seq=1#page_scan_tab_contents">Holm 1979</a>) and Hochberg’s “step-up.” (<a href="https://academic.oup.com/biomet/article-abstract/75/4/800/423177/A-sharper-Bonferroni-procedure-for-multiple-tests">Hochberg 1988</a>)</p>
+</div>
 <div id="holms-step-down-procedure-start-from-the-smallest-p-value" class="section level2">
 <h2>Holm’s step-down procedure: start from the smallest <span class="math inline">\(p\)</span>-value</h2>
 <p><em>It can be shown that Holm’s procedure conservatively controls the FWER in the strong sense, under arbitrary correlation among <span class="math inline">\(p\)</span>-values.</em></p>
@@ -396,23 +399,11 @@ locale:
 attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
-other attached packages:
-[1] workflowr_0.3.0  rmarkdown_1.3    ashr_2.1.2       qvalue_2.4.2    
-[5] edgeR_3.14.0     limma_3.28.5     seqgendiff_0.1.0
-
 loaded via a namespace (and not attached):
- [1] Rcpp_0.12.9       rstudioapi_0.6    knitr_1.15.1     
- [4] magrittr_1.5      MASS_7.3-45       splines_3.3.2    
- [7] munsell_0.4.3     doParallel_1.0.10 pscl_1.4.9       
-[10] lattice_0.20-34   SQUAREM_2016.10-1 colorspace_1.2-6 
-[13] foreach_1.4.3     stringr_1.1.0     plyr_1.8.3       
-[16] tools_3.3.2       parallel_3.3.2    grid_3.3.2       
-[19] gtable_0.2.0      git2r_0.18.0      htmltools_0.3.5  
-[22] iterators_1.0.8   yaml_2.1.14       rprojroot_1.2    
-[25] digest_0.6.11     assertthat_0.1    reshape2_1.4.1   
-[28] ggplot2_2.1.0     codetools_0.2-15  evaluate_0.10    
-[31] stringi_1.1.2     backports_1.0.5   scales_0.4.0     
-[34] truncnorm_1.0-7  </code></pre>
+ [1] backports_1.0.5  magrittr_1.5     rprojroot_1.2    tools_3.3.2     
+ [5] htmltools_0.3.5  yaml_2.1.14      Rcpp_0.12.9      codetools_0.2-15
+ [9] stringi_1.1.2    rmarkdown_1.3    knitr_1.15.1     git2r_0.18.0    
+[13] stringr_1.1.0    digest_0.6.9     workflowr_0.3.0  evaluate_0.10   </code></pre>
 </div>
 
 <hr>

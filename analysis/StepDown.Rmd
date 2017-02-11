@@ -1,6 +1,5 @@
 ---
-title: FWER Procedures on Simulated Correlated Null to Control
-  FWER
+title: FWER Procedures on Simulated Correlated Null
 author: "Lei Sun"
 date: '2016-11-29'
 output: html_document
@@ -17,7 +16,7 @@ knitr::read_chunk("chunks.R")
 
 **Code version:** `r workflowr::extract_commit(".", 1)$sha1`
 
-
+## Introduction
 
 In order to understand the behavior of $p$-values of top expressed, correlated genes under the global null, simulated from GTEx data, we apply two FWER-controlling multiple comparison procedures, Holm's "step-down" ([Holm 1979]) and Hochberg's "step-up." ([Hochberg 1988])
 
