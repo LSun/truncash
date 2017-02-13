@@ -1,0 +1,136 @@
+---
+title: "Pipeline for null simulation"
+author: "Lei Sun"
+date: 2017-02-13
+output: html_document
+---
+
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+**Last updated:** `r Sys.Date()`
+
+**Code version:** `r workflowr::extract_commit(".", 1)$sha1`
+
+## Introduction
+
+Up until now, we are using simulated correlated null data for exploration, and it would be helpful to examine and document the pipeline for generating these data, including $\hat\beta$, $\hat s$, $\hat z$, $t$, $p$-value.
+
+## Pipeline
+
+An expression matrix $X_{G \times N}$ will go through the following steps to get measurements of length $g$: Choose the top $g$ expressed genes; randomly sample $n$ cases vs $n$ controls; calculate normalizing factor by `edgeR::calcNormFactors`; turn counts to $\log_2$; calculate variance weight by `limma::voom`.  We'll go through this pipeline with a toy data set.
+
+```{r}
+library(edgeR)
+library(limma)
+```
+
+### read/generate raw counts
+Suppose the raw counts are stored in a $10 \times 8$ matrix with $10$ genes and $8$ samples, counts simulated from Possion.
+
+```{r}
+r = matrix(rpois(n = 80, lambda = 5), nrow = 10)
+r
+```
+
+### Select top expressed genes:
+1. convert each count to its lcpm.
+2. select top expressed genes according their sum of lcpm.
+
+In this example we choose top $6$ genes from a total of $10$ genes.
+
+```{r}
+lcpm = function(r){R = colSums(r); t(log2(((t(r)+0.5)/(R+1))* 10^6))}
+top_genes_index=function(g,X){return(order(rowSums(X),decreasing =TRUE)[1:g])}
+Y=lcpm(r)
+subset = top_genes_index(6,Y)
+Y = Y[subset,]
+r = r[subset,]
+r
+```
+
+### randomly sample cases and controls
+In this example we use 2 cases vs 2 controls, and put labes on them by `condition`
+
+```{r}
+counts = r[,sample(1:ncol(r),2*2)]
+counts
+condition = c(rep(0,2),rep(1,2))
+condition
+```
+
+### calculate normalizing factors for each sample
+<span style="color:red">This might be potentially a problem, because the normalizing factors are only calculated based on top $g$ genes.</span>
+
+
+```{r}
+#  1. read in raw data from GTEx/Liver data, and remove gene names and sample indicators.
+# after this step, we have an expression matrix r: G by n.  expression in integers.
+# each column is a sample
+# each row is a gene
+
+r = read.csv("../data/liver.csv")
+r = r[,-(1:2)] # remove gene name and description
+
+
+#extract top g genes from G by n matrix X of expression
+# the method to extract top g genes:
+# 
+
+top_genes_index=function(g,X){return(order(rowSums(X),decreasing =TRUE)[1:g])}
+lcpm = function(r){R = colSums(r); t(log2(((t(r)+0.5)/(R+1))* 10^6))}
+Y=lcpm(r)
+subset = top_genes_index(10000,Y)
+Y = Y[subset,]
+r = r[subset,]
+
+# Define voom transform (using code from Mengyin Lu)
+
+voom_transform = function(counts, condition, W=NULL){
+  dgecounts = calcNormFactors(DGEList(counts=counts,group=condition))
+  #dgecounts = DGEList(counts=counts,group=condition)
+  if (is.null(W)){
+    design = model.matrix(~condition)
+  }else{
+    design = model.matrix(~condition+W)
+  }
+
+  v = voom(dgecounts,design,plot=FALSE)
+  lim = lmFit(v)
+  betahat.voom = lim$coefficients[,2]
+  sebetahat.voom = lim$stdev.unscaled[,2]*lim$sigma
+  df.voom = length(condition)-2-!is.null(W)
+
+  return(list(v=v,lim=lim,betahat=betahat.voom, sebetahat=sebetahat.voom, df=df.voom, v=v))
+}
+
+# Make 2 groups of size n, and repeat this random sampling for m times
+# to generate a m * 10k matrix of p values, each row is a random sampling of 10k null genes.
+
+
+set.seed(101)
+n = 5 # number in each group
+m = 1000
+p = matrix(nrow = m, ncol = 10000)
+
+for(i in 1:m){
+  counts = r[,sample(1:ncol(r),2*n)]
+  condition = c(rep(0,n),rep(1,n))
+  r.voom = voom_transform(counts,condition)
+  r.ebayes = eBayes(r.voom$lim)
+  p[i, ] = r.ebayes$p.value[,2]
+}
+
+write.table(p, file = "../output/p_null_liver.txt", quote = FALSE, col.names = FALSE, row.names = FALSE)
+
+```
+
+
+## Session Information
+
+```{r session-info}
+```
