@@ -25,6 +25,10 @@ In order to understand the behavior of $p$-values of top expressed, correlated g
 
 * [`truncash` Model and first simulations](truncash.html)
 
+* [Pipeline for simulating null data](nullpipeline.html)
+
+Using a toy model to examine and document the pipeline to simulate null summary statistics at each step, including `edgeR::calcNormFactors`, `limma::voom`, `limma::lmFit`, `limma::eBayes`.
+
 [`ashr`]: https://github.com/stephens999/ashr
 
 <!-- The goal of this new template is to simplify the setup and maintenance of a research website. -->

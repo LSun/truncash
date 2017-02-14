@@ -223,8 +223,10 @@ $(document).ready(function () {
 </ul>
 <p>In order to understand the behavior of <span class="math inline">\(p\)</span>-values of top expressed, correlated genes under the global null, simulated from GTEx data, we apply two FWER-controlling multiple comparison procedures, Holm’s “step-down” ([Holm 1979]) and Hochberg’s “step-up.” ([Hochberg 1988])</p>
 <ul>
-<li><a href="truncash.html"><code>truncash</code> Model and first simulations</a></li>
+<li><p><a href="truncash.html"><code>truncash</code> Model and first simulations</a></p></li>
+<li><p><a href="nullpipeline.html">Pipeline for simulating null data</a></p></li>
 </ul>
+<p>Using a toy model to examine and document the pipeline to simulate null summary statistics at each step, including <code>edgeR::calcNormFactors</code>, <code>limma::voom</code>, <code>limma::lmFit</code>, <code>limma::eBayes</code>.</p>
 <!-- The goal of this new template is to simplify the setup and maintenance of a research website. -->
 <!-- Specifically, -->
 <!-- *  Easier to build and extend the website using the new tools in the [rmarkdown][] package and [latest RStudio release][rstudio] -->
