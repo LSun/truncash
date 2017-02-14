@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+<meta name="author" content="Lei Sun" />
+
+<meta name="date" content="2017-02-13" />
+
+<title>Pipeline for null simulation</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs && document.readyState && document.readyState === "complete") {
+   window.setTimeout(function() {
+      hljs.initHighlighting();
+   }, 0);
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">truncash</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/LSun/truncash">
+    <span class="fa fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Pipeline for null simulation</h1>
+<h4 class="author"><em>Lei Sun</em></h4>
+<h4 class="date"><em>2017-02-13</em></h4>
+
+</div>
+
+
+<p><strong>Last updated:</strong> 2017-02-14</p>
+<p><strong>Code version:</strong> d623e66</p>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>Up until now, we are using simulated correlated null data for exploration, and it would be helpful to examine and document the pipeline for generating these data, including <span class="math inline">\(\hat\beta\)</span>, <span class="math inline">\(\hat s\)</span>, <span class="math inline">\(z\)</span> score, <span class="math inline">\(t\)</span> statistics, <span class="math inline">\(p\)</span> value.</p>
+</div>
+<div id="pipeline" class="section level2">
+<h2>Pipeline</h2>
+<p>An expression matrix <span class="math inline">\(X_{G \times N}\)</span> will go through the following steps to get measurements of length <span class="math inline">\(g\)</span>: Choose the top <span class="math inline">\(g\)</span> expressed genes; randomly sample <span class="math inline">\(n\)</span> cases vs <span class="math inline">\(n\)</span> controls; calculate normalizing factor by <code>edgeR::calcNormFactors</code>; turn counts to <span class="math inline">\(\log_2\)</span>; calculate variance weight by <code>limma::voom</code>. We’ll go through this pipeline with a toy data set.</p>
+<pre class="r"><code>library(edgeR)</code></pre>
+<pre><code>Loading required package: limma</code></pre>
+<pre class="r"><code>library(limma)</code></pre>
+<div id="readgenerate-raw-counts" class="section level3">
+<h3>read/generate raw counts</h3>
+<p>Suppose the raw counts are stored in a <span class="math inline">\(10 \times 8\)</span> matrix with <span class="math inline">\(10\)</span> genes and <span class="math inline">\(8\)</span> samples, counts simulated from Possion.</p>
+<pre class="r"><code>set.seed(777)
+r = matrix(rpois(n = 80, lambda = 5), nrow = 10)
+r</code></pre>
+<pre><code>      [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8]
+ [1,]    6    6    4    7    1    6    6    2
+ [2,]    5    6    6    6    4    4    3    7
+ [3,]    4    5    5    7    5    2    7    9
+ [4,]   12    5    3    4    4    3    0    4
+ [5,]    6    7    1    4    3    5    8    4
+ [6,]    1    2    7    4   11    3    2    8
+ [7,]    4    4    5    6    8    2    2    4
+ [8,]    3    8    5    4    8    9    3    6
+ [9,]    9    4   11    6    8    4    9    5
+[10,]    3    4    6    6    3    1    5    4</code></pre>
+</div>
+<div id="select-top-expressed-genes" class="section level3">
+<h3>Select top expressed genes:</h3>
+<ol style="list-style-type: decimal">
+<li>convert each count to its lcpm.</li>
+<li>select top expressed genes according their sum of lcpm.</li>
+</ol>
+<p>In this example we choose top <span class="math inline">\(6\)</span> genes from a total of <span class="math inline">\(10\)</span> genes.</p>
+<pre class="r"><code>lcpm = function(r){R = colSums(r); t(log2(((t(r)+0.5)/(R+1))* 10^6))}
+top_genes_index=function(g,X){return(order(rowSums(X),decreasing =TRUE)[1:g])}
+Y=lcpm(r)
+subset = top_genes_index(6,Y)
+r = r[subset,]
+r</code></pre>
+<pre><code>     [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8]
+[1,]    9    4   11    6    8    4    9    5
+[2,]    3    8    5    4    8    9    3    6
+[3,]    4    5    5    7    5    2    7    9
+[4,]    5    6    6    6    4    4    3    7
+[5,]    6    7    1    4    3    5    8    4
+[6,]    6    6    4    7    1    6    6    2</code></pre>
+</div>
+<div id="randomly-sample-cases-and-controls" class="section level3">
+<h3>randomly sample cases and controls</h3>
+<p>In this example we use 2 cases vs 2 controls, and put labes on them by <code>condition</code>, based on which a design matrix is generated.</p>
+<pre class="r"><code>counts = r[,sample(1:ncol(r),2*2)]
+counts</code></pre>
+<pre><code>     [,1] [,2] [,3] [,4]
+[1,]    6    5   11    4
+[2,]    4    6    5    9
+[3,]    7    9    5    2
+[4,]    6    7    6    4
+[5,]    4    4    1    5
+[6,]    7    2    4    6</code></pre>
+<pre class="r"><code>condition = c(rep(0,2),rep(1,2))
+condition</code></pre>
+<pre><code>[1] 0 0 1 1</code></pre>
+<pre class="r"><code>design = model.matrix(~condition)
+design</code></pre>
+<pre><code>  (Intercept) condition
+1           1         0
+2           1         0
+3           1         1
+4           1         1
+attr(,&quot;assign&quot;)
+[1] 0 1</code></pre>
+</div>
+<div id="calculate-normalizing-factors-for-each-sample" class="section level3">
+<h3>calculate normalizing factors for each sample</h3>
+<p><span style="color:red">This might be potentially a problem, because the normalizing factors are only calculated based on top <span class="math inline">\(g\)</span> genes.</span> 1. A <code>DGEList</code> object is generated by <code>counts</code> and <code>condition</code>, using <code>edgeR::DGEList</code> 2. The normalizing factors are calculated by <code>edgeR::calcNormFactors</code>.</p>
+<pre class="r"><code>DGEList_obj = edgeR::DGEList(counts=counts,group=condition)
+DGEList_obj</code></pre>
+<pre><code>An object of class &quot;DGEList&quot;
+$counts
+  Sample1 Sample2 Sample3 Sample4
+1       6       5      11       4
+2       4       6       5       9
+3       7       9       5       2
+4       6       7       6       4
+5       4       4       1       5
+6       7       2       4       6
+
+$samples
+        group lib.size norm.factors
+Sample1     0       34            1
+Sample2     0       33            1
+Sample3     1       32            1
+Sample4     1       30            1</code></pre>
+<pre class="r"><code>dgecounts = edgeR::calcNormFactors(DGEList_obj)
+dgecounts</code></pre>
+<pre><code>An object of class &quot;DGEList&quot;
+$counts
+  Sample1 Sample2 Sample3 Sample4
+1       6       5      11       4
+2       4       6       5       9
+3       7       9       5       2
+4       6       7       6       4
+5       4       4       1       5
+6       7       2       4       6
+
+$samples
+        group lib.size norm.factors
+Sample1     0       34    1.1201997
+Sample2     0       33    0.9397760
+Sample3     1       32    0.9051827
+Sample4     1       30    1.0494070</code></pre>
+</div>
+<div id="calculate-weight-for-each-log_2-expression-using-limmavoom" class="section level3">
+<h3>Calculate weight for each <span class="math inline">\(\log_2\)</span> expression using <code>limma::voom</code></h3>
+<p><code>limma::voom</code> takes in counts and normalizing factors, and gives, among other things, modified library sizes, <span class="math inline">\(\log_2\)</span> expression, weights for each expression, all for Gaussian-based linear modeling.</p>
+<p><span style="color:red">The peculiarity of <code>limma::voom</code> lies in the way it calculates the “average” log2-count for each gene.</span>: <code>sx &lt;- fit$Amean + mean(log2(lib.size + 1)) - log2(1e+06)</code>. Note that for each gene, the count as well as log2-count could vary wildly from sample to sample due to library size, sequencing depth, and / or experimental design, so the way to find an “average” is not self-evident.</p>
+<pre class="r"><code>v = voom(dgecounts, design, plot=FALSE)
+v</code></pre>
+<pre><code>An object of class &quot;EList&quot;
+$targets
+        group lib.size norm.factors
+Sample1     0 38.08679    1.1201997
+Sample2     0 31.01261    0.9397760
+Sample3     1 28.96585    0.9051827
+Sample4     1 31.48221    1.0494070
+
+$E
+   Sample1  Sample2  Sample3  Sample4
+1 17.34340 17.39043 18.54988 17.07992
+2 16.81288 17.63144 17.48575 18.15792
+3 17.54985 18.17893 17.48575 16.23192
+4 17.34340 17.83789 17.72676 17.07992
+5 16.81288 17.10093 15.61128 17.36942
+6 17.54985 16.25293 17.19625 17.61043
+
+$weights
+         [,1]     [,2]     [,3]     [,4]
+[1,] 1.849269 2.060690 1.849269 1.849269
+[2,] 4.229762 2.147872 1.849269 1.849269
+[3,] 1.849269 1.849269 1.260232 1.424488
+[4,] 1.849269 4.502218 2.095619 2.171379
+[5,] 2.133848 1.565478 1.260232 1.260232
+[6,] 2.111233 1.462248 2.095619 2.171379
+
+$design
+  (Intercept) condition
+1           1         0
+2           1         0
+3           1         1
+4           1         1
+attr(,&quot;assign&quot;)
+[1] 0 1</code></pre>
+<p>Here is what <code>limma::voom</code> does as in <a href="https://genomebiology.biomedcentral.com/articles/10.1186/gb-2014-15-2-r29">Law et al 2013</a></p>
+<p>voom: variance modeling at the observation-level</p>
+<p>The limma-trend pipeline models the variance at the gene level. However, in RNA-seq applications, the count sizes may vary considerably from sample to sample for the same gene. Different samples may be sequenced to different depths, so different count sizes may be quite different even if the cpm values are the same. For this reason, we wish to model the mean-variance trend of the log-cpm values at the individual observation level, instead of applying a gene-level variability estimate to all observations from the same gene.</p>
+<p>Our strategy is to estimate non-parametrically the mean-variance trend of the logged read counts and to use this mean-variance relationship to predict the variance of each log-cpm value. The predicted variance is then encapsulated as an inverse weight for the log-cpm value. When the weights are incorporated into a linear modeling procedure, the mean-variance relationship in the log-cpm values is effectively eliminated. A technical difficulty is that we want to predict the variances of individual observations although there is, by definition, no replication at the observational level from which variances could be estimated. We work around this inconvenience by estimating the mean-variance trend at the gene level, then interpolating this trend to predict the variances of individual observations (Figure 2). <a href="https://static-content.springer.com/image/art%3A10.1186%2Fgb-2014-15-2-r29/MediaObjects/13059_2013_Article_3227_Fig2_HTML.jpg">https://static-content.springer.com/image/art%3A10.1186%2Fgb-2014-15-2-r29/MediaObjects/13059_2013_Article_3227_Fig2_HTML.jpg</a> Figure 2</p>
+<p>voom mean-variance modeling. (a) Gene-wise square-root residual standard deviations are plotted against average log-count. (b) A functional relation between gene-wise means and variances is given by a robust LOWESS fit to the points. (c) The mean-variance trend enables each observation to map to a square-root standard deviation value using its fitted value for log-count. LOWESS, locally weighted regression.</p>
+<p>The algorithm proceeds as follows. First, gene-wise linear models are fitted to the normalized log-cpm values, taking into account the experimental design, treatment conditions, replicates and so on. This generates a residual standard deviation for each gene (Figure 2a). A robust trend is then fitted to the residual standard deviations as a function of the average log-count for each gene (Figure 2b).</p>
+<p>Also available from the linear models is a fitted value for each log-cpm observation. Taking the library sizes into account, the fitted log-cpm for each observation is converted into a predicted count. The standard deviation trend is then interpolated to predict the standard deviation of each individual observation based on its predicted count size (Figure 2c). Finally, the inverse squared predicted standard deviation for each observation becomes the weight for that observation.</p>
+<p>The log-cpm values and associated weights are then input into limma’s standard differential expression pipeline. Most limma functions are designed to accept quantitative weights, providing the ability to perform microarray-like analyses while taking account of the mean-variance relationship of the log-cpm values at the observation level.</p>
+</div>
+<div id="t-test-using-limmalmfit" class="section level3">
+<h3><span class="math inline">\(t\)</span>-test using <code>limma::lmFit</code></h3>
+<p>Taking in the <code>EList</code> from <code>limma::voom</code>, <code>limma::lmFit</code> produces <span class="math inline">\(g\)</span> <span class="math inline">\(t\)</span>-tests, giving vectors of <span class="math inline">\(\hatbeta\)</span>, <span class="math inline">\(\hat s\)</span>, degree of freedom.</p>
+<p>Note that <code>$stdev.unscaled</code><span class="math inline">\(= (X^TWX)^{-1}\)</span>, <span class="math inline">\(W\)</span> being the weights calculated by <code>limma::voom</code>.</p>
+<pre class="r"><code>lim = lmFit(v)
+lim</code></pre>
+<pre><code>An object of class &quot;MArrayLM&quot;
+$coefficients
+  (Intercept)  condition
+1    17.36819  0.4467125
+2    17.08856  0.7332766
+3    17.86439 -1.0439088
+4    17.69392 -0.2963208
+5    16.93478 -0.4444242
+6    17.01916  0.3878582
+
+$stdev.unscaled
+  (Intercept) condition
+1   0.5057244 0.7253511
+2   0.3959772 0.6535863
+3   0.5199780 0.8017827
+4   0.3967914 0.6259395
+5   0.5199226 0.8167446
+6   0.5289983 0.7170746
+
+$sigma
+[1] 1.0000276 0.8283184 0.8417619 0.6191636 1.0056442 0.9044428
+
+$df.residual
+[1] 2 2 2 2 2 2
+
+$cov.coefficients
+            (Intercept) condition
+(Intercept)         0.5      -0.5
+condition          -0.5       1.0
+
+$pivot
+[1] 1 2
+
+$rank
+[1] 2
+
+$Amean
+       1        2        3        4        5        6 
+17.59091 17.52200 17.36161 17.49699 16.72363 17.15236 
+
+$method
+[1] &quot;ls&quot;
+
+$design
+  (Intercept) condition
+1           1         0
+2           1         0
+3           1         1
+4           1         1
+attr(,&quot;assign&quot;)
+[1] 0 1</code></pre>
+<pre class="r"><code>betahat.lim = lim$coefficients[,2]
+betahat.lim</code></pre>
+<pre><code>         1          2          3          4          5          6 
+ 0.4467125  0.7332766 -1.0439088 -0.2963208 -0.4444242  0.3878582 </code></pre>
+<pre class="r"><code>sebetahat.lim = lim$stdev.unscaled[,2]*lim$sigma
+sebetahat.lim</code></pre>
+<pre><code>        1         2         3         4         5         6 
+0.7253712 0.5413776 0.6749101 0.3875590 0.8213545 0.6485530 </code></pre>
+<pre class="r"><code>t.lim = betahat.lim / sebetahat.lim
+df.lim = lim$df.residual
+df.lim</code></pre>
+<pre><code>[1] 2 2 2 2 2 2</code></pre>
+</div>
+<div id="empirical-bayes-by-limmaebayes" class="section level3">
+<h3>empirical Bayes by <code>limma::eBayes</code></h3>
+<p><span style="color:red">Is it a variance shrinkage procedure?</span></p>
+<p>Taking in summary statistics (<span class="math inline">\(\hat \beta\)</span>, <span class="math inline">\(\hat s\)</span>, d.f.) for each gene, <code>limma::eBayes</code> produces shrunk standard deviation for each gene, and thus, moderated <span class="math inline">\(t\)</span>-statistics and <span class="math inline">\(p\)</span>-values.</p>
+<pre class="r"><code>lim.ebayes = ebayes(lim)
+lim.ebayes</code></pre>
+<pre><code>$df.prior
+[1] Inf
+
+$s2.prior
+[1] 1.304242
+
+$s2.post
+[1] 1.304242 1.304242 1.304242 1.304242 1.304242 1.304242
+
+$t
+  (Intercept)  condition
+1    30.07195  0.5392632
+2    37.78820  0.9823942
+3    30.08321 -1.1400578
+4    39.04655 -0.4145250
+5    28.52080 -0.4764665
+6    28.17116  0.4736195
+
+$df.total
+[1] 12 12 12 12 12 12
+
+$p.value
+   (Intercept) condition
+1 1.144359e-12 0.5995682
+2 7.583604e-14 0.3452983
+3 1.139291e-12 0.2765067
+4 5.133780e-14 0.6858037
+5 2.142997e-12 0.6423004
+6 2.479864e-12 0.6442714
+
+$var.prior
+[1] 12.267665051  0.007667291
+
+$lods
+  (Intercept) condition
+1    436.3862 -4.600265
+2    698.1822 -4.595506
+3    436.2283 -4.593388
+4    745.8775 -4.603161
+5    391.4357 -4.599544
+6    381.4607 -4.600873</code></pre>
+<pre class="r"><code>sebetahat.ebayes = lim$stdev.unscaled[, 2] * sqrt(lim.ebayes$s2.post)
+sebetahat.ebayes</code></pre>
+<pre><code>        1         2         3         4         5         6 
+0.8283756 0.7464178 0.9156631 0.7148442 0.9327501 0.8189236 </code></pre>
+<pre class="r"><code>t.ebayes = betahat.lim / sebetahat.ebayes
+t.ebayes</code></pre>
+<pre><code>         1          2          3          4          5          6 
+ 0.5392632  0.9823942 -1.1400578 -0.4145250 -0.4764665  0.4736195 </code></pre>
+<pre class="r"><code>lim.ebayes$t[, 2]</code></pre>
+<pre><code>         1          2          3          4          5          6 
+ 0.5392632  0.9823942 -1.1400578 -0.4145250 -0.4764665  0.4736195 </code></pre>
+<pre class="r"><code>df.ebayes = lim.ebayes$df.total
+df.ebayes</code></pre>
+<pre><code>[1] 12 12 12 12 12 12</code></pre>
+<pre class="r"><code>p.ebayes = (1 - pt(abs(t.ebayes), df.ebayes)) * 2
+p.ebayes</code></pre>
+<pre><code>        1         2         3         4         5         6 
+0.5995682 0.3452983 0.2765067 0.6858037 0.6423004 0.6442714 </code></pre>
+<pre class="r"><code>lim.ebayes$p.value[, 2]</code></pre>
+<pre><code>        1         2         3         4         5         6 
+0.5995682 0.3452983 0.2765067 0.6858037 0.6423004 0.6442714 </code></pre>
+</div>
+<div id="obtain-z-scores-from-moderated-p-values-and-t-statistics" class="section level3">
+<h3>obtain <span class="math inline">\(z\)</span> scores from moderated <span class="math inline">\(p\)</span>-values and <span class="math inline">\(t\)</span>-statistics</h3>
+<pre class="r"><code>z = qnorm(1 - lim.ebayes$p[, 2] / 2) * sign(lim.ebayes$t[, 2])
+z</code></pre>
+<pre><code>         1          2          3          4          5          6 
+ 0.5250216  0.9437483 -1.0882004 -0.4045563 -0.4644849  0.4617350 </code></pre>
+</div>
+</div>
+<div id="session-information" class="section level2">
+<h2>Session Information</h2>
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 3.3.2 (2016-10-31)
+Platform: x86_64-apple-darwin13.4.0 (64-bit)
+Running under: macOS Sierra 10.12.3
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] edgeR_3.14.0  limma_3.28.14
+
+loaded via a namespace (and not attached):
+ [1] backports_1.0.5 magrittr_1.5    rprojroot_1.2   tools_3.3.2    
+ [5] htmltools_0.3.5 yaml_2.1.14     Rcpp_0.12.9     stringi_1.1.2  
+ [9] rmarkdown_1.3   knitr_1.15.1    git2r_0.18.0    stringr_1.1.0  
+[13] digest_0.6.9    workflowr_0.3.0 evaluate_0.10  </code></pre>
+</div>
+
+<hr>
+<p>
+    This <a href="http://rmarkdown.rstudio.com">R Markdown</a> site was created with <a href="https://github.com/jdblischak/workflowr">workflowr</a>
+</p>
+<hr>
+
+<!-- To enable disqus, uncomment the section below and provide your disqus_shortname -->
+
+<!-- disqus
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'rmarkdown'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+-->
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
