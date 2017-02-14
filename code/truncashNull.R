@@ -50,7 +50,7 @@ for(i in 1:m){
   r.ebayes = eBayes(r.voom$lim)
   p[i, ] = r.ebayes$p.value[,2]
   tscore[i, ] = r.ebayes$t[,2]
-  z[i, ] = sign(tscore[i, ]) * qnorm(p[i, ]/2)
+  z[i, ] = sign(tscore[i, ]) * qnorm(1 - p[i, ]/2)
   betahat[i, ] = r.voom$betahat
   sebetahat[i, ] = r.voom$sebetahat
 }

@@ -1,5 +1,5 @@
 ---
-title: "FDR / s-value on Correlated Null"
+title: "FDR / s-value on Correlated Null: Use $z$ scores only"
 author: "Lei Sun"
 date: 2017-02-10
 output: html_document
@@ -18,12 +18,50 @@ knitr::read_chunk("chunks.R")
 
 ## Introduction
 
-We apply Benjamini–Hochberg's FDR-controlling procedure, `ash`, and `truncash` (with the threshold $T = 1.96$) to the simulated, correlated null data, obtained from 5 vs 5 GTEx/Liver samples and 10K top expressed genes, and $1000$ independent simulation trials.  We compare the numbers of false discoveries (by definition, all discoveries will be false) obtained by these three methods, under FDR $\leq 0.05$ and $s$-value $\leq 0.05$ as cutoffs.
+We apply Benjamini–Hochberg's FDR-controlling procedure, `ash`, and `truncash` (with the threshold $T = 1.96$) to the simulated, correlated null data, obtained from 5 vs 5 GTEx/Liver samples and 10K top expressed genes, and $1000$ independent simulation trials.  We compare the numbers of false discoveries (by definition, all discoveries should be false) obtained by these three methods, under FDR $\leq 0.05$ and $s$-value $\leq 0.05$ as cutoffs.
 
-```{r, cache = TRUE}
-p = 1
+## Simulation: Using $p$ values for [BH] and [BY] procedures; using $z$ scores, converted from $p$ values, for `ash` and `truncash`.
+
+For `ash` and `truncash`, $\hat\beta = \hat z$, $\hat s \equiv 1$.
+
+```{r}
+library(ashr)
+source("../code/truncash.R")
 ```
 
+```{r}
+t = proc.time()
+```
+
+```{r, cache = TRUE}
+p = read.table("../output/p_null_liver_777.txt")
+t = read.table("../output/t_null_liver_777.txt")
+z = read.table("../output/z_null_liver_777.txt")
+
+m = dim(p)[1]
+n = dim(p)[2]
+fd.bh = fd.by = fd.ash = fd.truncash = c()
+
+for (i in 1:m) {
+  p_BH = p.adjust(p[i, ], method = "BH")
+  fd.bh[i] = sum(p_BH <= 0.05)
+  p_BY = p.adjust(p[i, ], method = "BY")
+  fd.by[i] = sum(p_BY <= 0.05)
+  betahat = -as.numeric(z[i, ])
+  sebetahat = rep(1, n)
+  fit.ash = ashr::ash(betahat, sebetahat, method = "fdr", mixcompdist = "normal")
+  fd.ash[i] = sum(ashr::get_svalue(fit.ash) <= 0.05)
+  fit.truncash = truncash(betahat, sebetahat, t = qnorm(0.975))
+  fd.truncash[i] = sum(get_svalue(fit.truncash) <= 0.05)
+}
+```
+
+```{r}
+proc.time() - t
+```
+
+[BH]: https://www.jstor.org/stable/2346101
+[BY]: https://projecteuclid.org/euclid.aos/1013699998
 
 ## Session Information
 
