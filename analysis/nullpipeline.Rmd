@@ -18,7 +18,7 @@ knitr::read_chunk("chunks.R")
 
 ## Introduction
 
-Up until now, we are using simulated correlated null data for exploration, and it would be helpful to examine and document the pipeline for generating these data, including $\hat\beta$, $\hat s$, $z$ score, $t$ statistics, $p$ value.
+Up until now, we are using simulated correlated null data for exploration, and it would be helpful to examine and document the pipeline for generating these summary statistics, including $\hat\beta$, $\hat s$, $z$ score, $t$ statistics, $p$ value.
 
 ## Pipeline
 
