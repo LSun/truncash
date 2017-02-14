@@ -310,17 +310,16 @@ div.tocify {
 
 
 <p><strong>Last updated:</strong> 2017-02-14</p>
-<p><strong>Code version:</strong> d623e66</p>
+<p><strong>Code version:</strong> ab7e085</p>
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
-<p>Up until now, we are using simulated correlated null data for exploration, and it would be helpful to examine and document the pipeline for generating these data, including <span class="math inline">\(\hat\beta\)</span>, <span class="math inline">\(\hat s\)</span>, <span class="math inline">\(z\)</span> score, <span class="math inline">\(t\)</span> statistics, <span class="math inline">\(p\)</span> value.</p>
+<p>Up until now, we are using simulated correlated null data for exploration, and it would be helpful to examine and document the pipeline for generating these summary statistics, including <span class="math inline">\(\hat\beta\)</span>, <span class="math inline">\(\hat s\)</span>, <span class="math inline">\(z\)</span> score, <span class="math inline">\(t\)</span> statistics, <span class="math inline">\(p\)</span> value.</p>
 </div>
 <div id="pipeline" class="section level2">
 <h2>Pipeline</h2>
 <p>An expression matrix <span class="math inline">\(X_{G \times N}\)</span> will go through the following steps to get measurements of length <span class="math inline">\(g\)</span>: Choose the top <span class="math inline">\(g\)</span> expressed genes; randomly sample <span class="math inline">\(n\)</span> cases vs <span class="math inline">\(n\)</span> controls; calculate normalizing factor by <code>edgeR::calcNormFactors</code>; turn counts to <span class="math inline">\(\log_2\)</span>; calculate variance weight by <code>limma::voom</code>. We’ll go through this pipeline with a toy data set.</p>
-<pre class="r"><code>library(edgeR)</code></pre>
-<pre><code>Loading required package: limma</code></pre>
-<pre class="r"><code>library(limma)</code></pre>
+<pre class="r"><code>library(edgeR)
+library(limma)</code></pre>
 <div id="readgenerate-raw-counts" class="section level3">
 <h3>read/generate raw counts</h3>
 <p>Suppose the raw counts are stored in a <span class="math inline">\(10 \times 8\)</span> matrix with <span class="math inline">\(10\)</span> genes and <span class="math inline">\(8\)</span> samples, counts simulated from Possion.</p>
@@ -635,13 +634,13 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] edgeR_3.14.0  limma_3.28.14
+[1] workflowr_0.3.0 rmarkdown_1.3   edgeR_3.14.0    limma_3.28.14  
 
 loaded via a namespace (and not attached):
- [1] backports_1.0.5 magrittr_1.5    rprojroot_1.2   tools_3.3.2    
- [5] htmltools_0.3.5 yaml_2.1.14     Rcpp_0.12.9     stringi_1.1.2  
- [9] rmarkdown_1.3   knitr_1.15.1    git2r_0.18.0    stringr_1.1.0  
-[13] digest_0.6.9    workflowr_0.3.0 evaluate_0.10  </code></pre>
+ [1] Rcpp_0.12.9      codetools_0.2-15 digest_0.6.9     rprojroot_1.2   
+ [5] backports_1.0.5  git2r_0.18.0     magrittr_1.5     evaluate_0.10   
+ [9] stringi_1.1.2    tools_3.3.2      stringr_1.1.0    yaml_2.1.14     
+[13] htmltools_0.3.5  knitr_1.15.1    </code></pre>
 </div>
 
 <hr>
