@@ -29,6 +29,11 @@ In order to understand the behavior of $p$-values of top expressed, correlated g
 
 Using a toy model to examine and document the pipeline to simulate null summary statistics at each step, including `edgeR::calcNormFactors`, `limma::voom`, `limma::lmFit`, `limma::eBayes`.
 
+* [FDR on Null, Part 1](FDR_Null.html)
+* [FDR on Null, Part 2](FDR_null_betahat.html)
+
+Apply two FDR-controlling procedures, BH and BY, as well as two $s$ value models, `ash` and `truncash` to the simulated, correlated null data, and compare the numbers of false discoveries (by definition, all discoveries should be false) obtained.  Part 1 uses $z$ scores only, Part 2 uses $\hat \beta$ and moderated $\hat s$.
+
 [`ashr`]: https://github.com/stephens999/ashr
 
 <!-- The goal of this new template is to simplify the setup and maintenance of a research website. -->

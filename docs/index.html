@@ -227,6 +227,11 @@ $(document).ready(function () {
 <li><p><a href="nullpipeline.html">Pipeline for simulating null data</a></p></li>
 </ul>
 <p>Using a toy model to examine and document the pipeline to simulate null summary statistics at each step, including <code>edgeR::calcNormFactors</code>, <code>limma::voom</code>, <code>limma::lmFit</code>, <code>limma::eBayes</code>.</p>
+<ul>
+<li><a href="FDR_Null.html">FDR on Null, Part 1</a></li>
+<li><a href="FDR_null_betahat.html">FDR on Null, Part 2</a></li>
+</ul>
+<p>Apply two FDR-controlling procedures, BH and BY, as well as two <span class="math inline">\(s\)</span> value models, <code>ash</code> and <code>truncash</code> to the simulated, correlated null data, and compare the numbers of false discoveries (by definition, all discoveries should be false) obtained. Part 1 uses <span class="math inline">\(z\)</span> scores only, Part 2 uses <span class="math inline">\(\hat \beta\)</span> and moderated <span class="math inline">\(\hat s\)</span>.</p>
 <!-- The goal of this new template is to simplify the setup and maintenance of a research website. -->
 <!-- Specifically, -->
 <!-- *  Easier to build and extend the website using the new tools in the [rmarkdown][] package and [latest RStudio release][rstudio] -->
