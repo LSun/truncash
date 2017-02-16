@@ -11,9 +11,9 @@
 
 <meta name="author" content="Lei Sun" />
 
-<meta name="date" content="2017-02-10" />
+<meta name="date" content="2017-02-16" />
 
-<title>FDR / s value on Correlated Null: betahat = zscore, sebetahat = 1</title>
+<title>FDR / s value on Correlated Null: betahat = betahat, sebetahat = betahat / zscore</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -302,9 +302,9 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">FDR / <span class="math inline">\(s\)</span> value on Correlated Null: <code>betahat = zscore</code>, <code>sebetahat = 1</code></h1>
+<h1 class="title toc-ignore">FDR / <span class="math inline">\(s\)</span> value on Correlated Null: <code>betahat = betahat</code>, <code>sebetahat = betahat / zscore</code></h1>
 <h4 class="author"><em>Lei Sun</em></h4>
-<h4 class="date"><em>2017-02-10</em></h4>
+<h4 class="date"><em>2017-02-16</em></h4>
 
 </div>
 
@@ -316,14 +316,14 @@ div.tocify {
 <p>Apply two FDR-controlling procedures, Benjamini–Hochberg 1995 (“<a href="https://www.jstor.org/stable/2346101">BH</a>”) and Benjamini-Yekutieli 2001 (“<a href="https://projecteuclid.org/euclid.aos/1013699998">BY</a>”), and two <span class="math inline">\(s\)</span> value models, <code>ash</code> and <code>truncash</code> (with the threshold <span class="math inline">\(T = 1.96\)</span>) to the simulated, correlated null data. The data are obtained from 5 vs 5 GTEx/Liver samples and 10K top expressed genes, and <span class="math inline">\(1000\)</span> independent simulation trials.</p>
 <p>Compare the numbers of false discoveries (by definition, all discoveries should be false) obtained by these four methods, using FDR <span class="math inline">\(\leq 0.05\)</span> and <span class="math inline">\(s\)</span>-value <span class="math inline">\(\leq 0.05\)</span> as cutoffs.</p>
 </div>
-<div id="simulation-p-values-for-bh-and-by-procedures-hatbeta-hat-z-hat-s-equiv-1-for-ash-and-truncash." class="section level2">
-<h2>Simulation: <span class="math inline">\(p\)</span> values for <a href="https://www.jstor.org/stable/2346101">BH</a> and <a href="https://projecteuclid.org/euclid.aos/1013699998">BY</a> procedures; <span class="math inline">\(\hat\beta = \hat z\)</span>, <span class="math inline">\(\hat s \equiv 1\)</span>, for <code>ash</code> and <code>truncash</code>.</h2>
-<p><strong><span class="math inline">\(\hat z\)</span> obtained from <a href="nullpipeline.html">the last step of the pipeline</a>.</strong></p>
+<div id="simulation-p-values-for-bh-and-by-procedures-hatbeta-hatbeta-hat-s-hatbeta-hat-z-for-ash-and-truncash." class="section level2">
+<h2>Simulation: <span class="math inline">\(p\)</span> values for <a href="https://www.jstor.org/stable/2346101">BH</a> and <a href="https://projecteuclid.org/euclid.aos/1013699998">BY</a> procedures; <span class="math inline">\(\hat\beta = \hat\beta\)</span>, <span class="math inline">\(\hat s = \hat\beta / \hat z\)</span>, for <code>ash</code> and <code>truncash</code>.</h2>
+<p><strong><span class="math inline">\(\hat\beta\)</span> obtained from <a href="nullpipeline.html">the <code>limma::lmFit</code> step of the pipeline</a>, <span class="math inline">\(\hat z\)</span> obtained from <a href="nullpipeline.html">the last step of the pipeline</a>.</strong></p>
 <pre class="r"><code>library(ashr)
 source(&quot;../code/truncash.R&quot;)</code></pre>
 <pre class="r"><code>p = read.table(&quot;../output/p_null_liver_777.txt&quot;)
-t = read.table(&quot;../output/t_null_liver_777.txt&quot;)
 z = read.table(&quot;../output/z_null_liver_777.txt&quot;)
+betahat = read.table(&quot;../output/betahat_null_liver_777.txt&quot;)
 
 m = dim(p)[1]
 n = dim(p)[2]
@@ -334,11 +334,11 @@ for (i in 1:m) {
   fd.bh[i] = sum(p_BH &lt;= 0.05)
   p_BY = p.adjust(p[i, ], method = &quot;BY&quot;)
   fd.by[i] = sum(p_BY &lt;= 0.05)
-  betahat = -as.numeric(z[i, ])
-  sebetahat = rep(1, n)
-  fit.ash = ashr::ash(betahat, sebetahat, method = &quot;fdr&quot;, mixcompdist = &quot;normal&quot;)
+  betahat_trial = as.numeric(betahat[i, ])
+  sebetahat_trial = - betahat_trial / as.numeric(z[i, ])
+  fit.ash = ashr::ash(betahat_trial, sebetahat_trial, method = &quot;fdr&quot;, mixcompdist = &quot;normal&quot;)
   fd.ash[i] = sum(ashr::get_svalue(fit.ash) &lt;= 0.05)
-  fit.truncash = truncash(betahat, sebetahat, t = qnorm(0.975))
+  fit.truncash = truncash(betahat_trial, sebetahat_trial, t = qnorm(0.975))
   fd.truncash[i] = sum(get_svalue(fit.truncash) &lt;= 0.05)
 }</code></pre>
 </div>
@@ -357,11 +357,11 @@ fdr.by</code></pre>
 <p>Estimated FWER or FDR by <code>ash</code></p>
 <pre class="r"><code>fdr.ash = mean(fd.ash &gt;= 1)
 fdr.ash</code></pre>
-<pre><code>[1] 0.157</code></pre>
+<pre><code>[1] 0.096</code></pre>
 <p>Estimated FWER or FDR by <code>truncash</code></p>
 <pre class="r"><code>fdr.truncash = mean(fd.truncash &gt;= 1)
 fdr.truncash</code></pre>
-<pre><code>[1] 0.111</code></pre>
+<pre><code>[1] 0.062</code></pre>
 </div>
 <div id="happenstance-of-false-discoveries-by-four-approaches" class="section level3">
 <h3>Happenstance of false discoveries by four approaches</h3>
@@ -370,13 +370,13 @@ xlim = c(0, maxcount)
 maxfreq = max(c(max(table(fd.bh)), max(table(fd.by)), max(table(fd.ash)), max(table(fd.truncash))))
 ylim = c(0, maxfreq)
 plot(table(fd.bh), xlab = &quot;Number of False Discoveries / 10K&quot;, ylab = &quot;Frequency&quot;, main = &quot;Benjamini - Hochberg 1995&quot;, xlim = xlim, ylim = ylim)</code></pre>
-<p><img src="figure/FDR_Null.Rmd/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/FDR_null_betahat.Rmd/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>plot(table(fd.by), xlab = &quot;Number of False Discoveries / 10K&quot;, ylab = &quot;Frequency&quot;, main = &quot;Benjamini - Yekutieli 2001&quot;, xlim = xlim, ylim = ylim)</code></pre>
-<p><img src="figure/FDR_Null.Rmd/unnamed-chunk-7-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/FDR_null_betahat.Rmd/unnamed-chunk-7-2.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>plot(table(fd.ash), xlab = &quot;Number of False Discoveries / 10K&quot;, ylab = &quot;Frequency&quot;, main = &quot;ash&quot;, xlim = xlim, ylim = ylim)</code></pre>
-<p><img src="figure/FDR_Null.Rmd/unnamed-chunk-7-3.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/FDR_null_betahat.Rmd/unnamed-chunk-7-3.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>plot(table(fd.truncash), xlab = &quot;Number of False Discoveries / 10K&quot;, ylab = &quot;Frequency&quot;, main = &quot;truncash&quot;, xlim = xlim, ylim = ylim)</code></pre>
-<p><img src="figure/FDR_Null.Rmd/unnamed-chunk-7-4.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/FDR_null_betahat.Rmd/unnamed-chunk-7-4.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="comparison-of-the-numbers-of-false-discoveries-by-four-approaches" class="section level3">
 <h3>Comparison of the numbers of false discoveries by four approaches</h3>
@@ -387,7 +387,7 @@ points(1:length(fd.ind), fd.by[fd.ind], pch = 4, col = 2)
 points(1:length(fd.ind), fd.ash[fd.ind], pch = 4, col = 3)
 points(1:length(fd.ind), fd.truncash[fd.ind], pch = 4, col = 4)
 legend(&quot;topright&quot;, c(&quot;BH&quot;, &quot;BY&quot;, &quot;ash&quot;, &quot;truncash&quot;), col = 1:4, pch = 4)</code></pre>
-<p><img src="figure/FDR_Null.Rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/FDR_null_betahat.Rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 </div>
 <div id="session-information" class="section level2">
