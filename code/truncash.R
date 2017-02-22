@@ -35,10 +35,19 @@ truncash = function(betahat, sebetahat, t) {
 		prior = c(10, rep(1, k - 1))
 		pi_init = c(0.5, rep(0.5/(k - 1), k - 1))
 		
-		# estimate pihat with IP
-		pihat.est = mixIP(matrix_lik = lik.mat, prior, pi_init)
+		# the last of these conditions checks whether the gradient at the null is negative wrt pi0
+		# to avoid running the optimization when the global null (pi0=1) is the optimal.
+		if(max(prior[-1])>1 || min(gradient(matrix_lik = lik.mat)+prior[1]-1,na.rm=TRUE)<0){
+		  pihat.est = mixIP(matrix_lik = lik.mat, prior, pi_init)
+		  fitted.g = normalmix(pi = pihat.est$pihat, mean = 0, sd = sd)
+		} else {
+		  fitted.g = normalmix(pi = 1, mean = 0, sd = 0)
+		}
 		
-		fitted.g = normalmix(pi = pihat.est$pihat, mean = 0, sd = sd)
+		# estimate pihat with IP
+		# pihat.est = mixIP(matrix_lik = lik.mat, prior, pi_init)
+		
+		# fitted.g = normalmix(pi = pihat.est$pihat, mean = 0, sd = sd)
 	}
 	output = ash.workhorse(betahat, sebetahat, g = fitted.g, fixg = TRUE)
 	return(output)
@@ -133,4 +142,16 @@ penloglik = function(pi, matrix_lik, prior){
   subset = (prior != 1.0)
   priordens = sum((prior-1)[subset]*log(pi[subset]))
   return(loglik+priordens)
+}
+
+gradient = function(matrix_lik){
+  n = nrow(matrix_lik)
+  grad = n - ColsumModified(matrix_lik)
+  return(grad)
+}
+
+ColsumModified = function(matrix_l){
+  small = abs(matrix_l) < 10e-100
+  matrix_l[small] = matrix_l[small]+10e-100
+  colSums(matrix_l/matrix_l[,1])
 }

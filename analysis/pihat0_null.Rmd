@@ -1,0 +1,77 @@
+---
+title: "$\\hat\\pi_0$ on correlated global null estimated by `ashr` and `truncash`"
+author: "Lei Sun"
+date: 2017-02-21
+output: html_document
+---
+
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+**Last updated:** `r Sys.Date()`
+
+**Code version:** `r workflowr::extract_commit(".", 1)$sha1`
+
+## Introduction
+
+Using correlated global null data simulated from GTEx/Liver, $\hat\pi_0$ is estimated by `truncash` and `ashr`.  Ideally the estimates should be close to $1$.
+
+## Simulation
+
+In `truncash`, the threshold is $T = 1.96$.
+
+```{r}
+library(ashr)
+source("../code/truncash.R")
+```
+
+```{r, cache = TRUE}
+p = read.table("../output/p_null_liver_777.txt")
+z = read.table("../output/z_null_liver_777.txt")
+betahat = read.table("../output/betahat_null_liver_777.txt")
+
+m = dim(p)[1]
+n = dim(p)[2]
+pihat0.ash = pihat0.truncash = c()
+
+for (i in 1:m) {
+  betahat_trial = as.numeric(betahat[i, ])
+  sebetahat_trial = - betahat_trial / as.numeric(z[i, ])
+  fit.ash = ashr::ash(betahat_trial, sebetahat_trial, method = "fdr", mixcompdist = "normal")
+  pihat0.ash[i] = get_pi0(fit.ash)
+  fit.truncash = truncash(betahat_trial, sebetahat_trial, t = qnorm(0.975))
+  pihat0.truncash[i] = get_pi0(fit.truncash)
+}
+```
+
+## Result
+
+False positive rate by `ash`
+```{r}
+mean(pihat0.ash < 1)
+```
+
+False positive rate by `truncash`
+```{r}
+mean(pihat0.truncash < 1)
+```
+
+Compare $\hat\pi_0$ estimated by `ash` and `truncash`
+```{r}
+xlim = c(min(c(pihat0.ash, pihat0.truncash)), 1)
+plot(pihat0.ash, pihat0.truncash, xlim = xlim, ylim = xlim, xlab = "ash", ylab = "truncash", main = expression(hat(pi)[0]))
+abline(0, 1, lty = 2, col = "blue")
+abline(v = 1, lty = 3, col = "red")
+abline(h = 1, lty = 3, col = "red")
+boxplot(pihat0.ash, pihat0.truncash, main = expression(hat(pi)[0]), names = c("ash", "truncash"))
+abline(h = 1, lty = 2, col = "red")
+```
+
+## Session Information
+
+```{r session-info}
+```

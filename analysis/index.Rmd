@@ -34,6 +34,10 @@ Using a toy model to examine and document the pipeline to simulate null summary 
 
 Apply two FDR-controlling procedures, BH and BY, as well as two $s$ value models, `ash` and `truncash` to the simulated, correlated null data, and compare the numbers of false discoveries (by definition, all discoveries should be false) obtained.  Part 1 uses $z$ scores only, Part 2 uses $\hat \beta$ and moderated $\hat s$.
 
+* [$\hat\pi_0$ estimated in correlated global null](pihat0_null.html)
+
+$\hat\pi_0$ estimated by `ash` and `truncash` with $T = 1.96$ on correlated global null data simulated from GTEx/Liver.  Ideally they should be close to $1$.
+
 [`ashr`]: https://github.com/stephens999/ashr
 
 <!-- The goal of this new template is to simplify the setup and maintenance of a research website. -->
