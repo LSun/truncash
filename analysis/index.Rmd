@@ -1,5 +1,5 @@
 ---
-title: "Home"
+title: "Truncated Adaptive Shrinkage (`truncash`)"
 output:
   html_document:
     toc: false
@@ -37,6 +37,8 @@ Apply two FDR-controlling procedures, BH and BY, as well as two $s$ value models
 * [$\hat\pi_0$ estimated in correlated global null](pihat0_null.html)
 
 $\hat\pi_0$ estimated by `ash` and `truncash` with $T = 1.96$ on correlated global null data simulated from GTEx/Liver.  Ideally they should be close to $1$.
+
+* [Order $p$ values vs critical values](cutoff_null.html)
 
 [`ashr`]: https://github.com/stephens999/ashr
 
