@@ -1,0 +1,59 @@
+---
+title: "Ordered $p$ values vs critical values"
+author: "Lei Sun"
+date: 2017-02-22
+output: html_document
+---
+
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+**Last updated:** `r Sys.Date()`
+
+**Code version:** `r workflowr::extract_commit(".", 1)$sha1`
+
+## Introduction
+
+Various FWER and FDR controlling procedures are working well for the simulated correlated global null data, even though some of them are only guaranteed to work under independence or certain types of correlation.  Since all of these methods are essentially comparing ordered $p$ values with some critical values, we plot these ordered $p$ values and corresponding critical values for $10$ random data sets to take a closer look.
+
+## Result
+
+```{r, cache = TRUE}
+p = read.table("../output/p_null_liver_777.txt")
+```
+
+Here we plot $10$ data sets.  For each data set the left plots the ordered $p$ values on the whole, and the right plot takes a look at the most extreme ones, as well as the critical values in Benjamini-Hochberg's FDR (green) and Hochberg's FWER (blue).
+
+We can see that with the number of $p$-values very large, even though the ordered $p$ values may be generally lower than their expected values under independence, the most extreme ones are seldom falling below the critical values used by both procedures, simply because these values are too small.  Thus, even though we have unignorable correlation, both procedures could still be able to control FDR / FWER satisfactorily.
+
+```{r, cache = TRUE}
+set.seed(777)
+m = dim(p)[1]
+n = dim(p)[2]
+alpha = 0.05
+sel = sample(m, 10)
+
+for (i in sel) {
+  par(mfrow = c(1, 2))
+  
+  plot((1:n), sort(p[i, ]), ylim = c(0, 1), cex = 0.1, xlab = "order", ylab = "ordered p value")
+  abline(0, 1 / n, col = "red")
+  
+  plot((1:n), (1:n) / n * alpha, type = "n", ylim = c(0, 0.01), xlab = "order", ylab = "ordered p value")
+  lines((1:n), (1:n) / n * alpha, col = "blue")
+  lines((1:n), alpha / (n - (1:n) + 1), col = "green")
+  abline(0, 1 / n, col = "red")
+  points((1:n), sort(p[i, ]), cex = 0.5)
+}
+```
+
+
+
+## Session Information
+
+```{r session-info}
+```
