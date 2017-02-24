@@ -38,7 +38,11 @@ Apply two FDR-controlling procedures, BH and BY, as well as two $s$ value models
 
 $\hat\pi_0$ estimated by `ash` and `truncash` with $T = 1.96$ on correlated global null data simulated from GTEx/Liver.  Ideally they should be close to $1$.
 
-* [Order $p$ values vs critical values](cutoff_null.html)
+* [Ordered $p$ values vs critical values](cutoff_null.html)
+
+For various FWER / FDR controlling procedures, and for `truncash`, what matters the most is the behavior of the most extreme observations.  Here these extreme $p$ values are plotted along with common critical values used by various procedures, in order to shed light on their behavior.
+
+It's very exploratory.  May be related to Extreme Value Thoery and Concentration of Measure.  To be continued.
 
 [`ashr`]: https://github.com/stephens999/ashr
 
