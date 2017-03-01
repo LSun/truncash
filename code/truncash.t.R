@@ -1,7 +1,7 @@
 library(ashr)
 library(SQUAREM)
 
-truncash = function (betahat, sebetahat, df, p.thresh,
+truncash = function (betahat, sebetahat, df, pval.thresh,
                      method = c("fdr", "shrink"),
                      mixcompdist = c("uniform", "halfuniform", "normal",
                                      "+uniform", "-uniform", "halfnormal"),
@@ -10,14 +10,43 @@ truncash = function (betahat, sebetahat, df, p.thresh,
                      prior = c("nullbiased", "uniform", "unit")
                      ) {
 
-  # calculate
+  # check arguments for specifying priors
+  if(!missing(pointmass) & !missing(method))
+    stop("Specify either method or pointmass, not both")
+  if(!missing(prior) & !missing(method))
+    stop("Specify either method or prior, not both")
+  if(!missing(method)){
+    method = match.arg(method)
+    if (method == "shrink"){pointmass = FALSE; prior = "uniform"}
+    if (method == "fdr"){pointmass = TRUE; prior = "nullbiased"}
+  }
+
+  ## Check to see if is Inf, then switch to NULL.
+  if (!is.null(df)) {
+    if (df == Inf) {
+      df <- NULL
+    }
+  }
+
+  # First of all, separate the observations into 2 groups: moderate and extreme
+  # given a p value threshold pval.thresh
+  # Calculate marginal p values for each observation
+  # Do normal or t calcultions according to df
+
+  if (is.null(df)) {
+    # calculate marginal p values for given data using normal distribution
+    pval = (1 - pnorm(abs(betahat / sebetahat))) * 2
+  } else {
+    pval = (1 - pt(abs(betahat / sebetahat), df)) * 2
+  }
+
   # break the observations into 2 groups: moderate and extreme
-  I = (abs(betahat/sebetahat) <= t)
+  I = (pval <= pval.thresh)
   betahat1 = betahat[I]
   sebetahat1 = sebetahat[I]
+  m = length(betahat1)
   betahat2 = betahat[!I]
   sebetahat2 = sebetahat[!I]
-  m = length(betahat1)
   n = length(betahat2)
 
   # if no elements in the extreme group, prior is set to be a point mass at 0
@@ -25,8 +54,11 @@ truncash = function (betahat, sebetahat, df, p.thresh,
   if (n == 0) {
     fitted.g = normalmix(pi = 1, mean = 0, sd = 0)
   } else {
-    # the grid of sd estimated from the extreme group only
-    sd = c(0, autoselect.mixsd(betahat2, sebetahat2, mult = sqrt(2)))
+    # the grid of sd estimated from both groups together
+    mixsd = autoselect.mixsd(list(x = betahat, s = sebetahat), gridmult, mode = 0, grange, mixcompdist)
+    if(pointmass){
+      mixsd = c(0, mixsd)
+    }
     k = length(sd)
 
     # the likelihood matrix for the moderate group
@@ -58,7 +90,8 @@ truncash = function (betahat, sebetahat, df, p.thresh,
 
     # fitted.g = normalmix(pi = pihat.est$pihat, mean = 0, sd = sd)
   }
-  output = ash.workhorse(betahat, sebetahat, g = fitted.g, fixg = TRUE)
+
+  output = ash.workhorse(betahat, sebetahat, df = df, g = fitted.g, fixg = TRUE)
   return(output)
 }
 
@@ -66,23 +99,42 @@ normalmix = function (pi, mean, sd) {
   structure(data.frame(pi, mean, sd), class = "normalmix")
 }
 
-autoselect.mixsd = function (betahat, sebetahat, mult)
-{
-  sebetahat = sebetahat[sebetahat != 0]
-  sigmaamin = min(sebetahat)/10
-  if (all(betahat^2 <= sebetahat^2)) {
-    sigmaamax = 8 * sigmaamin
+# try to select a default range for the sigmaa values
+# that should be used, based on the values of betahat and sebetahat
+# mode is the location about which inference is going to be centered
+# mult is the multiplier by which the sds differ across the grid
+# grange is the user-specified range of mixsd
+autoselect.mixsd = function(data,mult,mode,grange,mixcompdist){
+  betahat = data$x - mode
+  sebetahat = data$s
+  exclude = get_exclusions(data)
+  betahat = betahat[!exclude]
+  sebetahat = sebetahat[!exclude]
+
+  sigmaamin = min(sebetahat)/10 #so that the minimum is small compared with measurement precision
+  if(all(betahat^2<=sebetahat^2)){
+    sigmaamax = 8*sigmaamin #to deal with the occassional odd case where this could happen; 8 is arbitrary
+  }else{
+    sigmaamax = 2*sqrt(max(betahat^2-sebetahat^2)) #this computes a rough largest value you'd want to use, based on idea that sigmaamax^2 + sebetahat^2 should be at least betahat^2
   }
-  else {
-    sigmaamax = 2 * sqrt(max(betahat^2 - sebetahat^2))
+
+  if(mixcompdist=="halfuniform"){
+    sigmaamax = min(max(abs(grange-mode)), sigmaamax)
+  }else{
+    sigmaamax = min(min(abs(grange-mode)), sigmaamax)
   }
-  if (mult == 0) {
-    return(c(0, sigmaamax/2))
-  }
-  else {
+
+
+  if(mult==0){
+    return(c(0,sigmaamax/2))
+  }else{
     npoint = ceiling(log2(sigmaamax/sigmaamin)/log2(mult))
     return(mult^((-npoint):0) * sigmaamax)
   }
+}
+
+get_exclusions = function (data) {
+  return((data$s == 0 | data$s == Inf | is.na(data$x) | is.na(data$s)))
 }
 
 mixIP = function (matrix_lik, prior, pi_init = NULL, control = list()) {
