@@ -54,12 +54,53 @@ truncash = function (betahat, sebetahat, df, pval.thresh,
   if (n == 0) {
     fitted.g = normalmix(pi = 1, mean = 0, sd = 0)
   } else {
+
+    ## Generating mixture distribution g
+
     # the grid of sd estimated from both groups together
     mixsd = autoselect.mixsd(list(x = betahat, s = sebetahat), gridmult, mode = 0, grange, mixcompdist)
     if(pointmass){
       mixsd = c(0, mixsd)
     }
-    k = length(sd)
+    null.comp = which.min(mixsd) #which component is the "null"
+
+    k = length(mixsd)
+    prior = setprior(prior, k, nullweight, null.comp)
+    pi = initpi(k, length(betahat), null.comp)
+
+    if(!is.element(mixcompdist,c("normal","uniform","halfuniform","+uniform","-uniform","halfnormal")))
+      stop("Error: invalid type of mixcompdist")
+    if(mixcompdist == "normal") g=normalmix(pi,rep(mode,k),mixsd)
+    if(mixcompdist == "uniform") g=unimix(pi,mode - mixsd,mode + mixsd)
+    if(mixcompdist == "+uniform") g = unimix(pi,rep(mode,k),mode+mixsd)
+    if(mixcompdist == "-uniform") g = unimix(pi,mode-mixsd,rep(mode,k))
+    if(mixcompdist == "halfuniform"){
+
+      if(min(mixsd)>0){ #simply reflect the components
+        pi = c(pi[mode-mixsd>=min(grange)],pi[mode+mixsd<=max(grange)])
+        pi = pi/sum(pi)
+        g = unimix(pi,c((mode-mixsd)[mode-mixsd>=min(grange)],rep(mode,sum(mode+mixsd<=max(grange)))),
+                   c(rep(mode,sum(mode-mixsd>=min(grange))),(mode+mixsd)[mode+mixsd<=max(grange)]))
+        prior = c(prior[mode-mixsd>=min(grange)], prior[mode+mixsd<=max(grange)])
+      } else { #define two sets of components, but don't duplicate null component
+        null.comp=which.min(mixsd)
+        tmp = (mode+mixsd)[-null.comp]
+        pi = c(pi[mode-mixsd>=min(grange)],(pi[-null.comp])[tmp<=max(grange)])
+        pi = pi/sum(pi)
+        g = unimix(pi,
+                   c((mode-mixsd)[mode-mixsd>=min(grange)],rep(mode,sum(tmp<=max(grange)))),
+                   c(rep(mode,sum(mode-mixsd>=min(grange))),tmp[tmp<=max(grange)]))
+        prior = c(prior[mode-mixsd>=min(grange)],(prior[-null.comp])[tmp<=max(grange)])
+        #pi = c(pi,pi[-null.comp])
+      }
+    }
+
+    #check that all prior are >=1 (as otherwise have problems with infinite penalty)
+    if(!all(prior>=1)){
+      stop("Error: prior must all be >=1")}
+
+
+
 
     # the likelihood matrix for the moderate group
     sd.mat.1 = sqrt(outer(sebetahat1^2, sd^2, FUN = "+"))
@@ -99,6 +140,10 @@ normalmix = function (pi, mean, sd) {
   structure(data.frame(pi, mean, sd), class = "normalmix")
 }
 
+unimix = function (pi, a, b) {
+  structure(data.frame(pi, a, b), class = "unimix")
+}
+
 # try to select a default range for the sigmaa values
 # that should be used, based on the values of betahat and sebetahat
 # mode is the location about which inference is going to be centered
@@ -135,6 +180,42 @@ autoselect.mixsd = function(data,mult,mode,grange,mixcompdist){
 
 get_exclusions = function (data) {
   return((data$s == 0 | data$s == Inf | is.na(data$x) | is.na(data$s)))
+}
+
+setprior = function (prior, k, nullweight, null.comp) {
+  if (!is.numeric(prior)) {
+    if (prior == "nullbiased") {
+      prior = rep(1, k)
+      prior[null.comp] = nullweight
+    }
+    else if (prior == "uniform") {
+      prior = rep(1, k)
+    }
+    else if (prior == "unit") {
+      prior = rep(1/k, k)
+    }
+  }
+  if (length(prior) != k | !is.numeric(prior)) {
+    stop("invalid prior specification")
+  }
+  return(prior)
+}
+
+initpi = function (k, n, null.comp, randomstart = FALSE) {
+  if (randomstart) {
+    pi = stats::rgamma(k, 1, 1)
+  }
+  else {
+    if (k < n) {
+      pi = rep(1, k)/n
+      pi[null.comp] = (n - k + 1)/n
+    }
+    else {
+      pi = rep(1, k)/k
+    }
+  }
+  pi = normalize(pi)
+  return(pi)
 }
 
 mixIP = function (matrix_lik, prior, pi_init = NULL, control = list()) {
