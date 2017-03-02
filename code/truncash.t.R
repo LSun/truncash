@@ -1,12 +1,12 @@
 library(ashr)
 library(SQUAREM)
 
-truncash = function (betahat, sebetahat, df, pval.thresh,
+truncash.t = function (betahat, sebetahat, df = NULL, pval.thresh,
                      method = c("fdr", "shrink"),
                      mixcompdist = c("uniform", "halfuniform", "normal",
                                      "+uniform", "-uniform", "halfnormal"),
                      gridmult = sqrt(2), grange = c(-Inf,Inf),
-                     nullweight = 10, pointmass = TRUE,
+                     nullweight = 10, pointmass = TRUE, mode = 0,
                      prior = c("nullbiased", "uniform", "unit")
                      ) {
 
@@ -41,6 +41,7 @@ truncash = function (betahat, sebetahat, df, pval.thresh,
   }
 
   # break the observations into 2 groups: moderate and extreme
+  # group1 is moderate group; group2 is extreme group
   I = (pval <= pval.thresh)
   betahat1 = betahat[I]
   sebetahat1 = sebetahat[I]
@@ -48,6 +49,7 @@ truncash = function (betahat, sebetahat, df, pval.thresh,
   betahat2 = betahat[!I]
   sebetahat2 = sebetahat[!I]
   n = length(betahat2)
+  if (!is.null(df)) {df1 = df[I]; df2 = df[!I]}
 
   # if no elements in the extreme group, prior is set to be a point mass at 0
   # or else the prior is estimated
@@ -58,7 +60,7 @@ truncash = function (betahat, sebetahat, df, pval.thresh,
     ## Generating mixture distribution g
 
     # the grid of sd estimated from both groups together
-    mixsd = autoselect.mixsd(list(x = betahat, s = sebetahat), gridmult, mode = 0, grange, mixcompdist)
+    mixsd = autoselect.mixsd(list(x = betahat, s = sebetahat), gridmult, mode, grange, mixcompdist)
     if(pointmass){
       mixsd = c(0, mixsd)
     }
@@ -99,42 +101,142 @@ truncash = function (betahat, sebetahat, df, pval.thresh,
     if(!all(prior>=1)){
       stop("Error: prior must all be >=1")}
 
-
-
-
-    # the likelihood matrix for the moderate group
-    sd.mat.1 = sqrt(outer(sebetahat1^2, sd^2, FUN = "+"))
-    lik.mat.1 = apply(sd.mat.1, 2, FUN = function(x) {2 * pnorm(t * sebetahat1 / x) - 1})
+    ##3. Fitting the mixture
+    pi_init = g$pi
+    k=ncomp(g)
 
     # the likelihood matrix for the extreme group
-    sd.mat.2 = sqrt(outer(sebetahat2^2, sd^2, FUN = "+"))
-    lik.mat.2 = apply(sd.mat.2, 2, FUN = function(x) {dnorm(betahat2, 0, x)})
+    if (is.null(df)) {
+      # normal likelihood
+      if (mixcompdist == "normal") {
+        # normal mixture prior
+        sd.mat.2 = sqrt(outer(sebetahat2^2, g$sd^2, FUN = "+"))
+        matrix_lik2 = apply(sd.mat.2, 2, FUN = function(x) {dnorm(betahat2, 0, x)})
+      } else {
+        # uniform mixture prior
+        matrix_lik2 = matrix(nrow = n, ncol = k)
+        for (i in 1:n) {
+          beta.hat = betahat1[i]
+          sebeta.hat = sebetahat1[i]
+          for (j in 1:k) {
+            a = g$a[j]
+            b = g$b[j]
+            matrix_lik2[i, j] = (pnorm(b, beta.hat, sebeta.hat) - pnorm(a, beta.hat, sebeta.hat)) / (b - a)
+          }
+        }
+      }
+    } else {
+      # t likelihood
+      t = qt(1 - pval.thresh / 2, df1)
+      if (mixcompdist == "normal") {
+        # normal mixture prior
+        stop("Error: t likelihood and normal mixture prior not implemented")
+      } else {
+        # uniform mixture prior
+        for (i in 1:m) {
+          beta.hat = betahat1[i]
+          sebeta.hat = sebetahat1[i]
+          pbeta = function (beta) {
+            pt(t[i] - beta / sebeta.hat, df[i]) - pt(-t[i] - beta / sebeta.hat, df[i])
+          }
+          for (j in 1:k) {
+            a = g$a[j]
+            b = g$b[j]
+            matrix_lik1[i, j] = integrate(pbeta, a, b)$value / (b - a)
+          }
+        }
+      }
+    }
+
+    # the likelihood matrix for the moderate group
+
+    if (is.null(df)) {
+      t = qnorm(1 - pval.thresh / 2)
+      # normal likelihood
+      if (mixcompdist == "normal") {
+        # normal mixture prior
+        sd.mat.1 = sqrt(outer(sebetahat1^2, g$sd^2, FUN = "+"))
+        matrix_lik1 = apply(sd.mat.1, 2, FUN = function(x) {2 * pnorm(t * sebetahat1 / x) - 1})
+      } else {
+        # uniform mixture prior
+        matrix_lik1 = matrix(nrow = m, ncol = k)
+        for (i in 1:m) {
+          beta.hat = betahat1[i]
+          sebeta.hat = sebetahat1[i]
+          for (j in 1:k) {
+            a = g$a[j]
+            b = g$b[j]
+            pbetahat = function(beta.hat) {
+              pbeta = (pnorm(b, beta.hat, sebeta.hat) - pnorm(a, beta.hat, sebeta.hat)) / (b - a)
+              return(pbeta)
+            }
+            matrix_lik1[i, j] = integrate(pbetahat, -t * sebeta.hat, t * sebeta.hat)$value
+          }
+        }
+      }
+    } else {
+      # t likelihood
+      t = qt(1 - pval.thresh / 2, df1)
+      if (mixcompdist == "normal") {
+        # normal mixture prior
+        stop("Error: t likelihood and normal mixture prior not implemented")
+      } else {
+        # uniform mixture prior
+        for (i in 1:m) {
+          beta.hat = betahat1[i]
+          sebeta.hat = sebetahat1[i]
+          pbeta = function (beta) {
+            pt(t[i] - beta / sebeta.hat, df[i]) - pt(-t[i] - beta / sebeta.hat, df[i])
+          }
+          for (j in 1:k) {
+            a = g$a[j]
+            b = g$b[j]
+            matrix_lik1[i, j] = integrate(pbeta, a, b)$value / (b - a)
+          }
+        }
+      }
+    }
 
     # combine the likelihood matrices for two groups
-    lik.mat = rbind(lik.mat.1, lik.mat.2)
-
-    # specify prior/penalty and initial value of pihat
-    prior = c(10, rep(1, k - 1))
-    pi_init = c(0.5, rep(0.5/(k - 1), k - 1))
+    matrix_lik = rbind(matrix_lik1, matrix_lik2)
 
     # the last of these conditions checks whether the gradient at the null is negative wrt pi0
     # to avoid running the optimization when the global null (pi0=1) is the optimal.
-    if(max(prior[-1])>1 || min(gradient(matrix_lik = lik.mat)+prior[1]-1,na.rm=TRUE)<0){
-      pihat.est = mixIP(matrix_lik = lik.mat, prior, pi_init)
-      fitted.g = normalmix(pi = pihat.est$pihat, mean = 0, sd = sd)
+    if(max(prior[-1])>1 || min(gradient(matrix_lik)+prior[1]-1,na.rm=TRUE)<0){
+      pihat.est = mixIP(matrix_lik, prior, pi_init)
     } else {
-      fitted.g = normalmix(pi = 1, mean = 0, sd = 0)
+      pihat.est = c(1, rep(0, k-1))
     }
-
+    g$pi=pihat.est
     # estimate pihat with IP
     # pihat.est = mixIP(matrix_lik = lik.mat, prior, pi_init)
 
     # fitted.g = normalmix(pi = pihat.est$pihat, mean = 0, sd = sd)
   }
 
-  output = ash.workhorse(betahat, sebetahat, df = df, g = fitted.g, fixg = TRUE)
+  output = ash.workhorse(betahat, sebetahat, df = df, g = g, fixg = TRUE)
   return(output)
 }
+
+############################### METHODS FOR normalmix class ###########################
+
+#' @title Constructor for normalmix class
+#'
+#' @description Creates an object of class normalmix (finite mixture
+#'     of univariate normals)
+#'
+#' @details None
+#'
+#' @param pi vector of mixture proportions
+#' @param mean vector of means
+#' @param sd vector of standard deviations
+#'
+#' @return an object of class normalmix
+#'
+#' @export
+#'
+#' @examples normalmix(c(0.5,0.5),c(0,0),c(1,2))
+#'
 
 normalmix = function (pi, mean, sd) {
   structure(data.frame(pi, mean, sd), class = "normalmix")
@@ -217,6 +319,70 @@ initpi = function (k, n, null.comp, randomstart = FALSE) {
   pi = normalize(pi)
   return(pi)
 }
+
+normal_lik = function () {
+  list(name = "normal", const = TRUE, lcdfFUN = function(x) {
+    stats::pnorm(x, log = TRUE)
+  }, lpdfFUN = function(x) {
+    stats::dnorm(x, log = TRUE)
+  }, etruncFUN = function(a, b) {
+    my_etruncnorm(a, b)
+  }, e2truncFUN = function(a, b) {
+    my_e2truncnorm(a, b)
+  })
+}
+
+t_lik = function (df) {
+  list(name = "t", const = (length(unique(df)) == 1), lcdfFUN = function(x) {
+    stats::pt(x, df = df, log = TRUE)
+  }, lpdfFUN = function(x) {
+    stats::dt(x, df = df, log = TRUE)
+  }, etruncFUN = function(a, b) {
+    etrunct::e_trunct(a, b, df = df, r = 1)
+  }, e2truncFUN = function(a, b) {
+    etrunct::e_trunct(a, b, df = df, r = 2)
+  })
+}
+
+set_data = function (betahat, sebetahat, lik = NULL, alpha = 0) {
+  if (length(sebetahat) == 1L) {
+    sebetahat = rep(sebetahat, length(betahat))
+  }
+  data = list(x = betahat/(sebetahat^alpha), s = sebetahat^(1 -
+                                                              alpha), alpha = alpha, s_orig = sebetahat)
+  if (is.null(lik)) {
+    lik = normal_lik()
+  }
+  data$lik = lik
+  return(data)
+}
+
+#' @title log_comp_dens_conv.normalmix
+#' @description returns log-density of convolution of each component
+#'     of a normal mixture with N(0,s^2) or s*t(v) at x. Note that
+#'     convolution of two normals is normal, so it works that way
+#' @inheritParams comp_dens_conv.normalmix
+#' @return a k by n matrix
+log_comp_dens_conv.normalmix = function(m,data){
+  if(!is_normal(data$lik)){
+    stop("Error: normal mixture for non-normal likelihood is not yet implemented")
+  }
+  sdmat = sqrt(outer(data$s^2,m$sd^2,"+")) #n by k matrix of standard deviations of convolutions
+  return(t(stats::dnorm(outer(data$x,m$mean,FUN="-")/sdmat,log=TRUE) - log(sdmat)))
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 mixIP = function (matrix_lik, prior, pi_init = NULL, control = list()) {
   if(!requireNamespace("REBayes", quietly = TRUE)) {
