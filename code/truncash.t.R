@@ -3,8 +3,7 @@ library(SQUAREM)
 
 truncash.t = function (betahat, sebetahat, df = NULL, pval.thresh,
                      method = c("fdr", "shrink"),
-                     mixcompdist = c("uniform", "halfuniform", "normal",
-                                     "+uniform", "-uniform", "halfnormal"),
+                     mixcompdist = c("uniform", "normal", "halfuniform"),
                      gridmult = sqrt(2), grange = c(-Inf,Inf),
                      nullweight = 10, pointmass = TRUE, mode = 0,
                      prior = c("nullbiased", "uniform", "unit")
@@ -42,7 +41,7 @@ truncash.t = function (betahat, sebetahat, df = NULL, pval.thresh,
 
   # break the observations into 2 groups: moderate and extreme
   # group1 is moderate group; group2 is extreme group
-  I = (pval <= pval.thresh)
+  I = (pval > pval.thresh)
   betahat1 = betahat[I]
   sebetahat1 = sebetahat[I]
   m = length(betahat1)
@@ -60,7 +59,7 @@ truncash.t = function (betahat, sebetahat, df = NULL, pval.thresh,
     ## Generating mixture distribution g
 
     # the grid of sd estimated from both groups together
-    mixsd = autoselect.mixsd(list(x = betahat, s = sebetahat), gridmult, mode, grange, mixcompdist)
+    mixsd = autoselect.mixsd(data = list(x = betahat, s = sebetahat), mult = gridmult, mode = mode, grange = grange, mixcompdist = mixcompdist)
     if(pointmass){
       mixsd = c(0, mixsd)
     }
@@ -70,12 +69,10 @@ truncash.t = function (betahat, sebetahat, df = NULL, pval.thresh,
     prior = setprior(prior, k, nullweight, null.comp)
     pi = initpi(k, length(betahat), null.comp)
 
-    if(!is.element(mixcompdist,c("normal","uniform","halfuniform","+uniform","-uniform","halfnormal")))
+    if(!is.element(mixcompdist,c("normal", "uniform", "halfuniform")))
       stop("Error: invalid type of mixcompdist")
     if(mixcompdist == "normal") g=normalmix(pi,rep(mode,k),mixsd)
     if(mixcompdist == "uniform") g=unimix(pi,mode - mixsd,mode + mixsd)
-    if(mixcompdist == "+uniform") g = unimix(pi,rep(mode,k),mode+mixsd)
-    if(mixcompdist == "-uniform") g = unimix(pi,mode-mixsd,rep(mode,k))
     if(mixcompdist == "halfuniform"){
 
       if(min(mixsd)>0){ #simply reflect the components
@@ -103,7 +100,7 @@ truncash.t = function (betahat, sebetahat, df = NULL, pval.thresh,
 
     ##3. Fitting the mixture
     pi_init = g$pi
-    k=ncomp(g)
+    k = length(pi_init)
 
     # the likelihood matrix for the extreme group
     if (is.null(df)) {
@@ -121,7 +118,7 @@ truncash.t = function (betahat, sebetahat, df = NULL, pval.thresh,
           for (j in 1:k) {
             a = g$a[j]
             b = g$b[j]
-            matrix_lik2[i, j] = (pnorm(b, beta.hat, sebeta.hat) - pnorm(a, beta.hat, sebeta.hat)) / (b - a)
+            if (a == b) {matrix_lik2[i, j] = 0} else {matrix_lik2[i, j] = (pnorm(b, beta.hat, sebeta.hat) - pnorm(a, beta.hat, sebeta.hat)) / (b - a)}
           }
         }
       }
@@ -142,7 +139,7 @@ truncash.t = function (betahat, sebetahat, df = NULL, pval.thresh,
           for (j in 1:k) {
             a = g$a[j]
             b = g$b[j]
-            matrix_lik1[i, j] = integrate(pbeta, a, b)$value / (b - a)
+            if (a == b) {matrix_lik2[i, j] = 0} else {matrix_lik2[i, j] = integrate(pbeta, a, b)$value / (b - a)}
           }
         }
       }
@@ -166,11 +163,13 @@ truncash.t = function (betahat, sebetahat, df = NULL, pval.thresh,
           for (j in 1:k) {
             a = g$a[j]
             b = g$b[j]
-            pbetahat = function(beta.hat) {
+            if (a == b) {matrix_lik1[i, j] = 0} else {
+              pbetahat = function(beta.hat) {
               pbeta = (pnorm(b, beta.hat, sebeta.hat) - pnorm(a, beta.hat, sebeta.hat)) / (b - a)
               return(pbeta)
             }
             matrix_lik1[i, j] = integrate(pbetahat, -t * sebeta.hat, t * sebeta.hat)$value
+            }
           }
         }
       }
@@ -191,7 +190,7 @@ truncash.t = function (betahat, sebetahat, df = NULL, pval.thresh,
           for (j in 1:k) {
             a = g$a[j]
             b = g$b[j]
-            matrix_lik1[i, j] = integrate(pbeta, a, b)$value / (b - a)
+            if (a == b) (matrix_lik1[i, j] = 0) else {matrix_lik1[i, j] = integrate(pbeta, a, b)$value / (b - a)}
           }
         }
       }
@@ -207,15 +206,15 @@ truncash.t = function (betahat, sebetahat, df = NULL, pval.thresh,
     } else {
       pihat.est = c(1, rep(0, k-1))
     }
-    g$pi=pihat.est
+    g$pi = pihat.est
     # estimate pihat with IP
     # pihat.est = mixIP(matrix_lik = lik.mat, prior, pi_init)
 
     # fitted.g = normalmix(pi = pihat.est$pihat, mean = 0, sd = sd)
   }
 
-  output = ash.workhorse(betahat, sebetahat, df = df, g = g, fixg = TRUE)
-  return(output)
+  # output = ash.workhorse(betahat, sebetahat, df = df, g = g, fixg = TRUE)
+  return(g)
 }
 
 ############################### METHODS FOR normalmix class ###########################
@@ -355,20 +354,6 @@ set_data = function (betahat, sebetahat, lik = NULL, alpha = 0) {
   }
   data$lik = lik
   return(data)
-}
-
-#' @title log_comp_dens_conv.normalmix
-#' @description returns log-density of convolution of each component
-#'     of a normal mixture with N(0,s^2) or s*t(v) at x. Note that
-#'     convolution of two normals is normal, so it works that way
-#' @inheritParams comp_dens_conv.normalmix
-#' @return a k by n matrix
-log_comp_dens_conv.normalmix = function(m,data){
-  if(!is_normal(data$lik)){
-    stop("Error: normal mixture for non-normal likelihood is not yet implemented")
-  }
-  sdmat = sqrt(outer(data$s^2,m$sd^2,"+")) #n by k matrix of standard deviations of convolutions
-  return(t(stats::dnorm(outer(data$x,m$mean,FUN="-")/sdmat,log=TRUE) - log(sdmat)))
 }
 
 

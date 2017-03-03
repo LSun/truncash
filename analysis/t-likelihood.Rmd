@@ -25,11 +25,12 @@ knitr::read_chunk("chunks.R")
 ```{r}
 source("../code/truncash.t.R")
 source("../code/truncash.R")
-betahat = rt(1000, df = 3)
-sebetahat = rep(1, 1000)
+betahat = rt(100, df = 3)
+sebetahat = rep(1, 100)
 fit.normal.original = truncash(betahat, sebetahat, t = qnorm(0.975))
 get_pi0(fit.normal)
-fit.normal.t = truncash.t(betahat, sebetahat, pval.thresh = 0.05, method = "fdr", mixcompdist = "normal")
+fit.normal.t = truncash.t(betahat, sebetahat, pval.thresh = 0.05, df = rep(2, 100), method = "fdr", mixcompdist = "uniform")
+ashr::ash.workhorse(betahat, sebetahat, fixg = TRUE, g = fit.normal.t)
 ```
 
 ## Session Information

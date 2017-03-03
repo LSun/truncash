@@ -3,7 +3,7 @@ library(SQUAREM)
 
 truncash = function(betahat, sebetahat, t) {
 	# break the observations into 2 groups: moderate and extreme
-	I = (abs(betahat/sebetahat) <= t)
+	I = (abs(betahat/sebetahat) < t)
 	betahat1 = betahat[I]
 	sebetahat1 = sebetahat[I]
 	betahat2 = betahat[!I]
