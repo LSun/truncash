@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+<meta name="author" content="Lei Sun" />
+
+<meta name="date" content="2017-03-01" />
+
+<title>Handling t likelihood</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs && document.readyState && document.readyState === "complete") {
+   window.setTimeout(function() {
+      hljs.initHighlighting();
+   }, 0);
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">truncash</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/LSun/truncash">
+    <span class="fa fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Handling <span class="math inline">\(t\)</span> likelihood</h1>
+<h4 class="author"><em>Lei Sun</em></h4>
+<h4 class="date"><em>2017-03-01</em></h4>
+
+</div>
+
+
+<p><strong>Last updated:</strong> 2017-03-04</p>
+<p><strong>Code version:</strong> f7ef5aa</p>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>Now we are moving to handle <span class="math inline">\(t\)</span> likelihood. Suppose we have observations <span class="math display">\[
+(\hat\beta_1, \hat s_1, \nu_1), \ldots, (\hat\beta_n, \hat s_n, \nu_n)
+\]</span> <span class="math inline">\((\hat\beta_i, \hat s_i)\)</span> being the summary statistics, and <span class="math inline">\(\nu_i\)</span> the degree of freedom for estimating <span class="math inline">\(\hat s_i\)</span>. Now we are considering both <span class="math inline">\(\hat\beta_j\)</span> and <span class="math inline">\(\hat s_j\)</span> are jointly generated by a data generating mechanism as follows.</p>
+<p><span class="math display">\[
+\begin{array}{c}
+\hat\beta_j |\beta_j, s_j \sim N(\beta_j, s_j^2) \\
+\hat s_j^2 / s_j^2 |s_j, \nu_j \sim \chi_{\nu_j}^2 / \nu_j\\
+\hat\beta_j \perp \hat s_j | \beta_j, s_j, \nu_j
+\end{array}
+\Rightarrow
+\begin{array}{c}
+(\hat\beta_j - \beta_j) / \hat s_j | \beta_j\sim t_{\nu_j}\\
+\hat\beta_j / \hat s_j | \beta_j, s_j \sim t_{\nu_j}(\beta_j / s_j)
+\end{array}
+\]</span> where “<span class="math inline">\(\perp\)</span>” means “conditionally independent with,” and <span class="math inline">\(t_{\nu}(\mu)\)</span> is the noncentral <span class="math inline">\(t\)</span> distribution with <span class="math inline">\(\nu\)</span> degrees of freedom and noncentrality parameter <span class="math inline">\(\mu\)</span>. <span class="math inline">\(t_{\nu}(0) = t_\nu\)</span> is the standard <span class="math inline">\(t\)</span> distribution.</p>
+</div>
+<div id="models-for-t-likelihood" class="section level2">
+<h2>Models for <span class="math inline">\(t\)</span> likelihood</h2>
+<p>Since now we are taking into consideration the randomness of both <span class="math inline">\(\hat\beta_j\)</span> and <span class="math inline">\(\hat s_j\)</span>, or at least the fact that <span class="math inline">\(\hat s_j\)</span> is not a precise measure of <span class="math inline">\(s_j\)</span>, the model could become trickier. Idealy we would hope to use the distribution</p>
+<p><span class="math display">\[
+(\hat\beta_j - \beta_j) / \hat s_j | \beta_j\sim t_{\nu_j}
+\]</span></p>
+<p>but it’s not clear how to use it. We need a likelihood for the data, either <span class="math inline">\(\hat\beta_j\)</span> itself or <span class="math inline">\((\hat\beta_j, \hat s_j)\)</span> jointly, but this aforementioned distribution doesn’t give us such a likelihood directly as it does not specify either <span class="math inline">\(p(\hat\beta_j | \beta_j, \hat s_j)\)</span> or <span class="math inline">\(p(\hat\beta_j, \hat s_j | \beta_j)\)</span>.</p>
+<div id="current-implementation-in-ashr" class="section level3">
+<h3>1. Current implementation in <a href="https://doi.org/10.1093/biostatistics/kxw041"><code>ashr</code></a></h3>
+<p>The current implementation in <a href="https://doi.org/10.1093/biostatistics/kxw041"><code>ashr</code></a> uses a simplication</p>
+<p><span class="math display">\[
+\hat\beta_j | \beta_j, \hat s_j \sim \beta_j + \hat s_j t_{\nu_j}
+\]</span> As Matthew noted, it’s different from <span class="math inline">\((\hat\beta_j - \beta_j) / \hat s_j | \beta_j\sim t_{\nu_j}\)</span>. For one thing, under this approximation</p>
+<p><span class="math display">\[
+\hat\beta_j / \hat s_j | \beta_j, \hat s_j \sim \beta_j / \hat s_j + t_{\nu_j}
+\]</span></p>
+<p>should be unimodal and symmetric, whereas the “true” distribution</p>
+<p><span class="math display">\[
+\hat\beta_j / \hat s_j | \beta_j, s_j \sim t_{\nu_j}(\beta_j / s_j)
+\]</span> is a noncentral <span class="math inline">\(t\)</span> which is not symmetric. So it might have some problem going to <code>truncash</code> when we need to consider the probability of <span class="math inline">\(|\hat\beta_j / \hat s_j|\)</span> smaller than some threshold (more on that below). However, it works satisfactorily well with <code>ashr</code> in practice, and there seems no obviously better alternatives, detailed below.</p>
+</div>
+<div id="pivotal-likelihood" class="section level3">
+<h3>2. Pivotal likelihood</h3>
+<p>Using the fact that</p>
+<p><span class="math display">\[
+(\hat\beta_j - \beta_j) / \hat s_j | \beta_j\sim t_{\nu_j}\\
+\]</span> and assuming <span class="math inline">\(\beta_j\)</span> from a mixture of uniform</p>
+<p><span class="math display">\[
+\beta_j \sim \sum_k\pi_k \text{Unif}[a_k, b_k] 
+\]</span> we can integrate out <span class="math inline">\(\beta_j\)</span> using convolution of <span class="math inline">\(t_{\nu_j}\)</span> and each component of the mixture uniform <span class="math inline">\([a_k, b_k]\)</span></p>
+<p><span class="math display">\[
+\begin{array}{rl}
+&amp;\int p((\hat\beta_j - \beta_j) / \hat s_j | \beta_j) p(\beta_j)\text{d}\beta_j
+\\
+=&amp;\int p((\hat\beta_j - \beta_j) / \hat s_j | \beta_j) p(\beta_j|\beta_j\sim \sum_k\pi_k\text{Unif}[a_k, b_k])\text{d}\beta_j\\
+=&amp;\sum_k\pi_k\int p((\hat\beta_j - \beta_j) / \hat s_j | \beta_j) p(\beta_j|\beta_j\sim \text{Unif}[a_k, b_k])\text{d}\beta_j\\
+=&amp;\sum_k\pi_k
+\begin{cases}
+\frac{\hat s_j}{b_k - a_k}(F_{t_{\nu_j}}((\hat\beta_j - b_k) / \hat s_j) - F_{t_{\nu_j}}((\hat\beta_j - a_k) / \hat s_j)), &amp; a_k &lt; b_k \\
+f_{t_{\nu_j}}((\hat\beta_j - a_k) / \hat s_j), &amp; a_k = b_k
+\end{cases}
+\end{array}
+\]</span> It’s mathematically feasible, yet I cannot quite recognize the meaning of this “expected” probability density <span class="math inline">\(\int p((\hat\beta_j - \beta_j) / \hat s_j | \beta_j) p(\beta_j)\text{d}\beta_j\)</span> and how to use it. It turns out to be related with the pivotal likelihood idea, yet as Matthew put it, “ultimately we did not find it satisfying. It is not a well established concept and it is not clear to me that it ends up being a good idea.”</p>
+</div>
+<div id="joint-ash-jointly-modeling-hatbeta-and-hat-s" class="section level3">
+<h3>3. Joint ash: Jointly modeling <span class="math inline">\(\hat\beta\)</span> and <span class="math inline">\(\hat s\)</span></h3>
+<p>Taking advantage of the conditional indepedence of <span class="math inline">\(\hat\beta\)</span> and <span class="math inline">\(\hat s\)</span> given <span class="math inline">\(\beta\)</span> and <span class="math inline">\(s\)</span>, we can write a model as</p>
+<p><span class="math display">\[
+\begin{array}{c}
+p(\hat\beta_j, \hat s_j|\beta_j, s_j, \nu_j) = p(\hat\beta_j|\beta_j, s_j)p(\hat s_j|s_j, \nu_j)\\
+\hat\beta_j|\beta_j, s_j \sim N(\beta_j, s_j^2)\\
+\hat s_j|s_j, \nu_j \sim s_j^2\chi_{\nu_j}^2 /\nu_j\\
+\beta_j \sim \sum_k\pi_kg_k^\beta\\
+s_j \sim \sum_l\rho_lg_l^s
+\end{array}
+\]</span></p>
+<p>This line of “joint ash” is being done by <a href="https://github.com/mengyin">Mengyin</a>.</p>
+</div>
+<div id="sequential-joint-ash" class="section level3">
+<h3>4. Sequential joint ash</h3>
+<p>The “better” approach is the one that <a href="https://github.com/mengyin">Mengyin</a> now takes. First appy <a href="https://doi.org/10.1093/bioinformatics/btw483"><code>vash</code></a> to shrink the <span class="math inline">\(\hat s\)</span>, and then apply <a href="https://doi.org/10.1093/biostatistics/kxw041"><code>ashr</code></a> with its currently-implemented <span class="math inline">\(t\)</span> likelihood (taking <span class="math inline">\(\hat s\)</span>) as given) using moderated <span class="math inline">\(\hat s\)</span> (and moderated df). This approach can be formally justified, although not obvious, as Matthew noted. Probably the reason is that since <span class="math inline">\(\hat\beta\)</span> and <span class="math inline">\(\hat s\)</span> are conditionally independent given <span class="math inline">\(\beta\)</span> and <span class="math inline">\(s\)</span>, we could model them separately and sequentially.</p>
+</div>
+<div id="matthews-recommendation" class="section level3">
+<h3>5. Matthew’s recommendation</h3>
+<p>So the bottom line is that for <code>truncash</code> I think it suffices to implement the same <span class="math inline">\(t\)</span> approach as <a href="https://doi.org/10.1093/biostatistics/kxw041"><code>ashr</code></a>, since then we can use the same trick as in 4. Of course, for testing the implementation you will want to simulate from the assumed model</p>
+<p><span class="math display">\[
+\hat\beta_j | \beta_j, \hat s_j \sim \beta_j + \hat s_j t_{\nu_j}
+\]</span></p>
+</div>
+</div>
+<div id="moving-to-truncash" class="section level2">
+<h2>Moving to <code>truncash</code></h2>
+<div id="problem-setting" class="section level3">
+<h3>Problem setting</h3>
+<p>As in Normal likelihood case, suppose we have <span class="math inline">\(m + n\)</span> observations of <span class="math inline">\((\hat\beta_j, \hat s_j, \nu_j)\)</span> in two groups such that, with a pre-specified <span class="math inline">\(t_j\)</span> (related to <span class="math inline">\(\nu_j\)</span>) for each observation</p>
+<p><span class="math display">\[
+\text{Group 1: }(\hat\beta_1, \hat s_1), \ldots, (\hat\beta_m, \hat s_m), \text{with } |\hat\beta_j/\hat s_j| \leq t_j
+\]</span></p>
+<p><span class="math display">\[
+\text{Group 2: }(\hat\beta_{m+1}, \hat s_{m+1}), \ldots, (\hat\beta_{m+n}, \hat s_{m+n}), \text{with } |\hat\beta_j/\hat s_j| &gt; t_j
+\]</span></p>
+<p>For Group 1, we’ll only use the information that for each one, <span class="math inline">\(|\hat\beta_j/\hat s_j| \leq t_j\)</span>; that is, they are moderate observations. For Group 2, we’ll use the full observation <span class="math inline">\((\hat\beta_j, \hat s_j, \nu_j)\)</span>.</p>
+</div>
+<div id="the-extreme-group-business-as-usual" class="section level3">
+<h3>The extreme group: business as usual</h3>
+<p>Now for Group 2, the extreme group where we observe the whole thing, we have usual ASH with an approximate <span class="math inline">\(t_{\nu_j}\)</span> likelihood and uniform mixture priors</p>
+<p><span class="math display">\[
+\begin{array}{c}
+\hat\beta_j | \beta_j, \hat s_j \sim \beta_j + \hat s_j t_{\nu_j}\\
+\beta_j \sim \sum_k\pi_k \text{Unif}[a_k, b_k]
+\end{array}
+\]</span></p>
+</div>
+<div id="the-moderate-group-two-possible-ways" class="section level3">
+<h3>The moderate group: two possible ways</h3>
+<p>For Group 1, the extreme group where the relevant information is <span class="math inline">\(|\hat \beta_j / \hat s_j| \leq t_j\)</span>, we still use the same uniform mixture priors</p>
+<p><span class="math display">\[
+\beta_j \sim \sum_k\pi_k \text{Unif}[a_k, b_k]
+\]</span> yet two possible likelihood. One comes from the current <a href="https://doi.org/10.1093/biostatistics/kxw041"><code>ashr</code></a> implementation</p>
+<p><span class="math display">\[
+\hat\beta_j | \beta_j, \hat s_j \sim \beta_j + \hat s_j t_{\nu_j} \Rightarrow 
+\hat\beta_j / \hat s_j | \beta_j, \hat s_j \sim \beta_j / \hat s_j + t_{\nu_j}
+\]</span> based on a standard <span class="math inline">\(t\)</span>. The other approach comes from the fact</p>
+<p><span class="math display">\[
+\hat\beta_j / \hat s_j | \beta_j, s_j \sim t_{\nu_j}(\beta_j / s_j)
+\approx
+t_{\nu_j}(\beta_j / \hat s_j)
+\]</span></p>
+<p>based on a noncentral <span class="math inline">\(t\)</span>. Both use some simplification and approximation, and presumably it shouldn’t make much difference in practice.</p>
+</div>
+<div id="the-rest-back-to-business-as-usual" class="section level3">
+<h3>The rest: back to business as usual</h3>
+<p>Then we put both groups together and estimate <span class="math inline">\(\pi_k\)</span> from the marginal probability of the data in both groups.</p>
+</div>
+</div>
+<div id="code" class="section level2">
+<h2>Code</h2>
+</div>
+<div id="simulation" class="section level2">
+<h2>Simulation</h2>
+<pre class="r"><code>source(&quot;../code/truncash.t.R&quot;)
+source(&quot;../code/truncash.R&quot;)
+betahat = rt(100, df = 3)
+sebetahat = rep(1, 100)
+fit.normal.original = truncash(betahat, sebetahat, t = qnorm(0.975))
+get_pi0(fit.normal)
+fit.normal.t = truncash.t(betahat, sebetahat, pval.thresh = 0.05, df = rep(2, 100), method = &quot;fdr&quot;, mixcompdist = &quot;uniform&quot;)
+ashr::ash.workhorse(betahat, sebetahat, fixg = TRUE, g = fit.normal.t)</code></pre>
+</div>
+<div id="session-information" class="section level2">
+<h2>Session Information</h2>
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 3.3.2 (2016-10-31)
+Platform: x86_64-apple-darwin13.4.0 (64-bit)
+Running under: macOS Sierra 10.12.3
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+loaded via a namespace (and not attached):
+ [1] backports_1.0.5 magrittr_1.5    rprojroot_1.2   tools_3.3.2    
+ [5] htmltools_0.3.5 yaml_2.1.14     Rcpp_0.12.9     stringi_1.1.2  
+ [9] rmarkdown_1.3   knitr_1.15.1    git2r_0.18.0    stringr_1.1.0  
+[13] digest_0.6.11   workflowr_0.3.0 evaluate_0.10  </code></pre>
+</div>
+
+<hr>
+<p>
+    This <a href="http://rmarkdown.rstudio.com">R Markdown</a> site was created with <a href="https://github.com/jdblischak/workflowr">workflowr</a>
+</p>
+<hr>
+
+<!-- To enable disqus, uncomment the section below and provide your disqus_shortname -->
+
+<!-- disqus
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'rmarkdown'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+-->
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

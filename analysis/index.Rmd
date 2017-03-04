@@ -44,6 +44,10 @@ For various FWER / FDR controlling procedures, and for `truncash`, what matters 
 
 It's very exploratory.  May be related to Extreme Value Thoery and Concentration of Measure.  To be continued.
 
+* [Handling $t$ likelihood](t-likelihood.html)
+
+Based on discussion with Matthew.
+
 [`ashr`]: https://github.com/stephens999/ashr
 
 <!-- The goal of this new template is to simplify the setup and maintenance of a research website. -->
