@@ -18,7 +18,9 @@ knitr::read_chunk("chunks.R")
 
 ## Introducation
 
-Matthew had an idea that what if the only thing we know is the most extreme observation $(\hat\beta_{(n)}, \hat s_{(n)})$, as well as the total number of observations $n$.  What does this single data point tell us?
+Up until now, `truncash` only uses a threshold that's pre-specified, that is, independent with the data.  So a natrual question is, what will happen if we choose a threshold that is data driven, such as the $n^\text{th}$ most extreme observation or the top $q\%$ quantile?
+
+For a start, Matthew had an idea that what if the only thing we know is the most extreme observation $(\hat\beta_{(n)}, \hat s_{(n)})$, as well as the total number of observations $n$.  What does this single data point tell us?
 
 ## Model
 
@@ -38,7 +40,7 @@ $$
 $$
 \text{Group 2: }(\hat\beta_{n}, \hat s_{n}), \text{ with } |\hat\beta_{(n)}/\hat s_{(n)}| = t
 $$
-Or in other words, it should be equivalent to `truncash` using the threshold $t = |\hat\beta_{(n)}/\hat s_{(n)}|$, at least from the likelihood principle point of view.
+Or in other words, it should be related to `truncash` using the threshold $t = |\hat\beta_{(n)}/\hat s_{(n)}|$, at least from the likelihood principle point of view.
 
 ## Back-of-the-envelope calculation
 
@@ -46,16 +48,42 @@ Suppose $X_1 \sim F_1, X_2\sim F_2, \ldots, X_n \sim F_n$, with $F_i$ being the 
 
 $$
 \begin{array}{rl}
-& P(X_{(n)} \leq t) = \Pi_{i = 1}^n F_i(t) \\
-\Rightarrow & p_{X_{(n)}}(t) = dP(X_{(n)} \leq t)/dt = 
+& P(X_{(n)} \leq t) = \prod_{i = 1}^n F_i(t) \\
+\Rightarrow & p_{X_{(n)}}(t) = dP(X_{(n)} \leq t)/dt \neq
+\prod_{i = 1}^{n-1} F_i(t)f_n(t)
 \end{array}
 $$
+where $\{1, \ldots, n-1\}$ are the index set of less extreme observations and $n$ of the most extreme one.  So these two statements are not equivalent.
 
-## Simulation
+1. The largest value in $\{X_1, X_2, \ldots, X_n\}$ is $t$.
+2. We have $n$ random variables and we only observe one; all others are less than it.
 
+## Special case
 
+If we have $F_1 = F_2 = \cdots = F_n$, the two statements are somehow indeed related because
+$$
+\begin{array}{rl}
+& P(X_{(n)} \leq t) = (F(t))^n \\
+\Rightarrow & p_{X_{(n)}}(t) = dP(X_{(n)} \leq t)/dt =
+n(F(t))^{n-1}f(t) \\
+ \propto & (F(t))^{n-1}f(t)\\
+\end{array}
+$$
+In other words, we can regard "known the largest observation only" as equivalent to "using the largest observation as the threshold in `truncash`."
 
+$F_1 = F_2 = \cdots = F_n$ in current setting implies that $\hat\beta_j / \hat s_j$ has the same marginal distribution for every observation.  Actually it's not a wild assumption.  For example, [we always have](t-likelihood.html)
 
+$$
+\hat\beta_j / \hat s_j | \beta_j, s_j, \nu_j \sim t_{\nu_j}(\beta_j / s_j)
+$$
+If we further assume
+
+$$
+\beta_j / s_j \sim g
+$$
+then we'll arrive at the result that $\hat\beta_j / \hat s_j$ has the same marginal distribution.  This assumption is essentially the gold standard everybody implicitly makes, refered to as $\alpha = 1$ assumption in [`ash`].
+
+[`ash`]: https://doi.org/10.1093/biostatistics/kxw041
 
 ## Session Information
 

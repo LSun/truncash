@@ -309,11 +309,12 @@ div.tocify {
 </div>
 
 
-<p><strong>Last updated:</strong> 2017-02-27</p>
-<p><strong>Code version:</strong> 0a13d52</p>
+<p><strong>Last updated:</strong> 2017-03-04</p>
+<p><strong>Code version:</strong> be223d3</p>
 <div id="introducation" class="section level2">
 <h2>Introducation</h2>
-<p>Matthew had an idea that what if the only thing we know is the most extreme observation <span class="math inline">\((\hat\beta_{(n)}, \hat s_{(n)})\)</span>, as well as the total number of observations <span class="math inline">\(n\)</span>. What does this single data point tell us?</p>
+<p>Up until now, <code>truncash</code> only uses a threshold that’s pre-specified, that is, independent with the data. So a natrual question is, what will happen if we choose a threshold that is data driven, such as the <span class="math inline">\(n^\text{th}\)</span> most extreme observation or the top <span class="math inline">\(q\%\)</span> quantile?</p>
+<p>For a start, Matthew had an idea that what if the only thing we know is the most extreme observation <span class="math inline">\((\hat\beta_{(n)}, \hat s_{(n)})\)</span>, as well as the total number of observations <span class="math inline">\(n\)</span>. What does this single data point tell us?</p>
 </div>
 <div id="model" class="section level2">
 <h2>Model</h2>
@@ -328,20 +329,40 @@ div.tocify {
 \text{Group 1: }(\hat\beta_{(1)}, \hat s_{(1)}), \ldots, (\hat\beta_{(n - 1)}, \hat s_{(n - 1)}), \text{ with } |\hat\beta_j/\hat s_j| \leq t = |\hat\beta_{(n)}/\hat s_{(n)}|
 \]</span> <span class="math display">\[
 \text{Group 2: }(\hat\beta_{n}, \hat s_{n}), \text{ with } |\hat\beta_{(n)}/\hat s_{(n)}| = t
-\]</span> Or in other words, it should be equivalent to <code>truncash</code> using the threshold <span class="math inline">\(t = |\hat\beta_{(n)}/\hat s_{(n)}|\)</span>, at least from the likelihood principle point of view.</p>
+\]</span> Or in other words, it should be related to <code>truncash</code> using the threshold <span class="math inline">\(t = |\hat\beta_{(n)}/\hat s_{(n)}|\)</span>, at least from the likelihood principle point of view.</p>
 </div>
 <div id="back-of-the-envelope-calculation" class="section level2">
 <h2>Back-of-the-envelope calculation</h2>
 <p>Suppose <span class="math inline">\(X_1 \sim F_1, X_2\sim F_2, \ldots, X_n \sim F_n\)</span>, with <span class="math inline">\(F_i\)</span> being the cdf of the random variable <span class="math inline">\(X_i\)</span>, with a pdf <span class="math inline">\(f_i\)</span>. In <code>ash</code>’s setting, we can think of <span class="math inline">\(X_i = |\hat\beta_i/ \hat s_i|\)</span>, and <span class="math inline">\(f_i\)</span> is the convolution of a common unimodel distribution <span class="math inline">\(g\)</span> (to be estimated) and the idiosyncratic likelihood of <span class="math inline">\(|\hat\beta_j / \hat s_j|\)</span> given <span class="math inline">\(\hat s_j\)</span> (usually related to normal or Student’s t, but could be generalized to others). Let <span class="math inline">\(X_{(n)}:=\max\{X_1, X_2, \ldots, X_n\}\)</span>, the extreme value of these <span class="math inline">\(n\)</span> random variables.</p>
 <p><span class="math display">\[
 \begin{array}{rl}
-&amp; P(X_{(n)} \leq t) = \Pi_{i = 1}^n F_i(t) \\
-\Rightarrow &amp; p_{X_{(n)}}(t) = dP(X_{(n)} \leq t)/dt = 
+&amp; P(X_{(n)} \leq t) = \prod_{i = 1}^n F_i(t) \\
+\Rightarrow &amp; p_{X_{(n)}}(t) = dP(X_{(n)} \leq t)/dt \neq
+\prod_{i = 1}^{n-1} F_i(t)f_n(t)
 \end{array}
-\]</span></p>
+\]</span> where <span class="math inline">\(\{1, \ldots, n-1\}\)</span> are the index set of less extreme observations and <span class="math inline">\(n\)</span> of the most extreme one. So these two statements are not equivalent.</p>
+<ol style="list-style-type: decimal">
+<li>The largest value in <span class="math inline">\(\{X_1, X_2, \ldots, X_n\}\)</span> is <span class="math inline">\(t\)</span>.</li>
+<li>We have <span class="math inline">\(n\)</span> random variables and we only observe one; all others are less than it.</li>
+</ol>
 </div>
-<div id="simulation" class="section level2">
-<h2>Simulation</h2>
+<div id="special-case" class="section level2">
+<h2>Special case</h2>
+<p>If we have <span class="math inline">\(F_1 = F_2 = \cdots = F_n\)</span>, the two statements are somehow indeed related because <span class="math display">\[
+\begin{array}{rl}
+&amp; P(X_{(n)} \leq t) = (F(t))^n \\
+\Rightarrow &amp; p_{X_{(n)}}(t) = dP(X_{(n)} \leq t)/dt =
+n(F(t))^{n-1}f(t) \\
+ \propto &amp; (F(t))^{n-1}f(t)\\
+\end{array}
+\]</span> In other words, we can regard “known the largest observation only” as equivalent to “using the largest observation as the threshold in <code>truncash</code>.”</p>
+<p><span class="math inline">\(F_1 = F_2 = \cdots = F_n\)</span> in current setting implies that <span class="math inline">\(\hat\beta_j / \hat s_j\)</span> has the same marginal distribution for every observation. Actually it’s not a wild assumption. For example, <a href="t-likelihood.html">we always have</a></p>
+<p><span class="math display">\[
+\hat\beta_j / \hat s_j | \beta_j, s_j, \nu_j \sim t_{\nu_j}(\beta_j / s_j)
+\]</span> If we further assume</p>
+<p><span class="math display">\[
+\beta_j / s_j \sim g
+\]</span> then we’ll arrive at the result that <span class="math inline">\(\hat\beta_j / \hat s_j\)</span> has the same marginal distribution. This assumption is essentially the gold standard everybody implicitly makes, refered to as <span class="math inline">\(\alpha = 1\)</span> assumption in <a href="https://doi.org/10.1093/biostatistics/kxw041"><code>ash</code></a>.</p>
 </div>
 <div id="session-information" class="section level2">
 <h2>Session Information</h2>
