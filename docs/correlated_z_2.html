@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+<meta name="author" content="Lei Sun" />
+
+<meta name="date" content="2017-03-06" />
+
+<title>Histogram of correlated z scores, Part 2</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs && document.readyState && document.readyState === "complete") {
+   window.setTimeout(function() {
+      hljs.initHighlighting();
+   }, 0);
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">truncash</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/LSun/truncash">
+    <span class="fa fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Histogram of correlated <span class="math inline">\(z\)</span> scores, Part 2</h1>
+<h4 class="author"><em>Lei Sun</em></h4>
+<h4 class="date"><em>2017-03-06</em></h4>
+
+</div>
+
+
+<p><strong>Last updated:</strong> 2017-03-07</p>
+<p><strong>Code version:</strong> 03366d9</p>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>Following <a href="correlated_z.html">previous simulation</a> on randomly selected data sets, this time we first apply <code>ash</code> on <span class="math inline">\(z\)</span> scores for every data set, and take a second look at those data sets on which <code>ash</code> makes most mistakes, or in other words, produces smallest <span class="math inline">\(\hat\pi_0\)</span>.</p>
+</div>
+<div id="simulation-and-ash" class="section level2">
+<h2>Simulation and <code>ash</code></h2>
+<pre class="r"><code>z = read.table(&quot;../output/z_null_liver_777.txt&quot;)</code></pre>
+<pre class="r"><code>library(ashr)
+n = dim(z)[1]
+pihat0 = c()
+for (i in 1:n) {
+  ash.fit = ash(as.numeric(z[i, ]), 1, method = &quot;fdr&quot;)
+  pihat0[i] = get_pi0(ash.fit)
+}</code></pre>
+</div>
+<div id="histograms-of-z-scores-in-100-most-ash-hostile-data-sets" class="section level2">
+<h2>Histograms of <span class="math inline">\(z\)</span> scores in 100 most “<code>ash</code>-hostile” data sets</h2>
+<pre class="r"><code>I = order(pihat0)[1:100]
+x = seq(-10, 10, 0.01)
+y = dnorm(x)
+k = 1
+for (j in I) {
+  cat(&quot;N0.&quot;, k, &quot;: Data Set&quot;, j, &quot;pihat0 =&quot;, pihat0[j])
+  hist(as.numeric(z[j, ]), xlab = &quot;z scores&quot;, freq = FALSE, ylim = c(0, 0.45), main = &quot;10000 z scores, default&quot;)
+  lines(x, y, col = &quot;red&quot;)
+  hist(as.numeric(z[j, ]), xlab = &quot;z scores&quot;, freq = FALSE, ylim = c(0, 0.45), nclass = 100, main = &quot;10000 z scores, 100 bins&quot;)
+  lines(x, y, col = &quot;red&quot;)
+  k = k + 1
+}</code></pre>
+<pre><code>N0. 1 : Data Set 724 pihat0 = 0.01606004</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 2 : Data Set 33 pihat0 = 0.01680632</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-4.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 3 : Data Set 537 pihat0 = 0.01681555</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-5.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-6.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 4 : Data Set 522 pihat0 = 0.02083846</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-7.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-8.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 5 : Data Set 693 pihat0 = 0.02122591</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-9.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-10.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 6 : Data Set 840 pihat0 = 0.02316832</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-11.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-12.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 7 : Data Set 749 pihat0 = 0.02583276</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-13.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-14.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 8 : Data Set 269 pihat0 = 0.02787007</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-15.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-16.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 9 : Data Set 360 pihat0 = 0.0308234</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-17.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-18.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 10 : Data Set 23 pihat0 = 0.03139009</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-19.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-20.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 11 : Data Set 389 pihat0 = 0.03156173</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-21.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-22.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 12 : Data Set 923 pihat0 = 0.03239883</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-23.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-24.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 13 : Data Set 22 pihat0 = 0.03271534</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-25.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-26.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 14 : Data Set 885 pihat0 = 0.03413736</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-27.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-28.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 15 : Data Set 705 pihat0 = 0.03438913</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-29.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-30.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 16 : Data Set 40 pihat0 = 0.03668824</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-31.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-32.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 17 : Data Set 338 pihat0 = 0.0393062</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-33.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-34.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 18 : Data Set 379 pihat0 = 0.03958053</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-35.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-36.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 19 : Data Set 649 pihat0 = 0.04041784</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-37.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-38.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 20 : Data Set 627 pihat0 = 0.04041922</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-39.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-40.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 21 : Data Set 133 pihat0 = 0.04064386</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-41.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-42.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 22 : Data Set 915 pihat0 = 0.04083527</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-43.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-44.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 23 : Data Set 999 pihat0 = 0.04218153</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-45.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-46.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 24 : Data Set 182 pihat0 = 0.04223457</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-47.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-48.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 25 : Data Set 511 pihat0 = 0.04232901</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-49.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-50.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 26 : Data Set 122 pihat0 = 0.04301549</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-51.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-52.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 27 : Data Set 937 pihat0 = 0.04305909</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-53.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-54.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 28 : Data Set 771 pihat0 = 0.04316169</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-55.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-56.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 29 : Data Set 495 pihat0 = 0.04395344</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-57.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-58.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 30 : Data Set 41 pihat0 = 0.04491135</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-59.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-60.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 31 : Data Set 984 pihat0 = 0.04567195</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-61.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-62.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 32 : Data Set 3 pihat0 = 0.0465218</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-63.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-64.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 33 : Data Set 907 pihat0 = 0.04653847</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-65.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-66.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 34 : Data Set 355 pihat0 = 0.04750946</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-67.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-68.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 35 : Data Set 485 pihat0 = 0.04794909</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-69.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-70.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 36 : Data Set 56 pihat0 = 0.04829662</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-71.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-72.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 37 : Data Set 809 pihat0 = 0.04880257</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-73.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-74.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 38 : Data Set 404 pihat0 = 0.05059485</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-75.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-76.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 39 : Data Set 858 pihat0 = 0.05110069</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-77.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-78.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 40 : Data Set 77 pihat0 = 0.05151585</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-79.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-80.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 41 : Data Set 800 pihat0 = 0.05218407</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-81.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-82.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 42 : Data Set 562 pihat0 = 0.05247834</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-83.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-84.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 43 : Data Set 893 pihat0 = 0.05252202</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-85.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-86.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 44 : Data Set 403 pihat0 = 0.0531628</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-87.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-88.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 45 : Data Set 780 pihat0 = 0.05426134</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-89.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-90.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 46 : Data Set 538 pihat0 = 0.05493143</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-91.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-92.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 47 : Data Set 324 pihat0 = 0.05506971</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-93.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-94.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 48 : Data Set 176 pihat0 = 0.05513259</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-95.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-96.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 49 : Data Set 972 pihat0 = 0.05539611</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-97.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-98.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 50 : Data Set 644 pihat0 = 0.0557842</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-99.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-100.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 51 : Data Set 977 pihat0 = 0.0564768</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-101.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-102.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 52 : Data Set 467 pihat0 = 0.06112237</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-103.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-104.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 53 : Data Set 857 pihat0 = 0.06183555</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-105.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-106.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 54 : Data Set 783 pihat0 = 0.06208376</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-107.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-108.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 55 : Data Set 976 pihat0 = 0.06343862</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-109.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-110.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 56 : Data Set 968 pihat0 = 0.06385437</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-111.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-112.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 57 : Data Set 942 pihat0 = 0.06399678</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-113.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-114.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 58 : Data Set 402 pihat0 = 0.06468693</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-115.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-116.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 59 : Data Set 341 pihat0 = 0.06681535</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-117.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-118.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 60 : Data Set 411 pihat0 = 0.06812445</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-119.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-120.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 61 : Data Set 484 pihat0 = 0.06857855</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-121.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-122.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 62 : Data Set 476 pihat0 = 0.06944478</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-123.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-124.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 63 : Data Set 407 pihat0 = 0.07139176</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-125.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-126.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 64 : Data Set 871 pihat0 = 0.07236197</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-127.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-128.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 65 : Data Set 638 pihat0 = 0.07281058</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-129.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-130.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 66 : Data Set 232 pihat0 = 0.07317683</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-131.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-132.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 67 : Data Set 778 pihat0 = 0.07619716</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-133.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-134.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 68 : Data Set 349 pihat0 = 0.07627442</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-135.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-136.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 69 : Data Set 985 pihat0 = 0.07865805</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-137.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-138.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 70 : Data Set 259 pihat0 = 0.0794454</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-139.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-140.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 71 : Data Set 452 pihat0 = 0.079703</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-141.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-142.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 72 : Data Set 268 pihat0 = 0.08182634</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-143.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-144.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 73 : Data Set 526 pihat0 = 0.08340671</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-145.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-146.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 74 : Data Set 274 pihat0 = 0.08580661</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-147.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-148.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 75 : Data Set 685 pihat0 = 0.08592309</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-149.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-150.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 76 : Data Set 499 pihat0 = 0.08826948</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-151.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-152.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 77 : Data Set 982 pihat0 = 0.08854547</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-153.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-154.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 78 : Data Set 582 pihat0 = 0.08899861</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-155.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-156.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 79 : Data Set 953 pihat0 = 0.08900989</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-157.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-158.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 80 : Data Set 811 pihat0 = 0.08962902</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-159.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-160.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 81 : Data Set 575 pihat0 = 0.0946117</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-161.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-162.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 82 : Data Set 997 pihat0 = 0.09560788</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-163.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-164.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 83 : Data Set 231 pihat0 = 0.09686204</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-165.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-166.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 84 : Data Set 781 pihat0 = 0.09690435</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-167.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-168.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 85 : Data Set 853 pihat0 = 0.09889116</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-169.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-170.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 86 : Data Set 868 pihat0 = 0.09918104</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-171.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-172.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 87 : Data Set 502 pihat0 = 0.1001788</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-173.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-174.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 88 : Data Set 606 pihat0 = 0.1033893</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-175.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-176.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 89 : Data Set 912 pihat0 = 0.106048</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-177.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-178.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 90 : Data Set 659 pihat0 = 0.1065714</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-179.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-180.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 91 : Data Set 501 pihat0 = 0.1090034</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-181.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-182.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 92 : Data Set 296 pihat0 = 0.1115216</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-183.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-184.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 93 : Data Set 895 pihat0 = 0.1119629</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-185.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-186.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 94 : Data Set 153 pihat0 = 0.1148195</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-187.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-188.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 95 : Data Set 477 pihat0 = 0.1172838</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-189.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-190.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 96 : Data Set 769 pihat0 = 0.1187511</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-191.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-192.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 97 : Data Set 555 pihat0 = 0.1210902</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-193.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-194.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 98 : Data Set 475 pihat0 = 0.1273824</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-195.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-196.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 99 : Data Set 584 pihat0 = 0.1291777</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-197.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-198.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 100 : Data Set 949 pihat0 = 0.1308901</code></pre>
+<p><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-199.png" width="672" style="display: block; margin: auto;" /><img src="figure/correlated_z_2.Rmd/unnamed-chunk-3-200.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="session-information" class="section level2">
+<h2>Session Information</h2>
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 3.3.2 (2016-10-31)
+Platform: x86_64-apple-darwin13.4.0 (64-bit)
+Running under: macOS Sierra 10.12.3
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+loaded via a namespace (and not attached):
+ [1] backports_1.0.5 magrittr_1.5    rprojroot_1.2   tools_3.3.2    
+ [5] htmltools_0.3.5 yaml_2.1.14     Rcpp_0.12.9     stringi_1.1.2  
+ [9] rmarkdown_1.3   knitr_1.15.1    git2r_0.18.0    stringr_1.1.0  
+[13] digest_0.6.9    workflowr_0.3.0 evaluate_0.10  </code></pre>
+</div>
+
+<hr>
+<p>
+    This <a href="http://rmarkdown.rstudio.com">R Markdown</a> site was created with <a href="https://github.com/jdblischak/workflowr">workflowr</a>
+</p>
+<hr>
+
+<!-- To enable disqus, uncomment the section below and provide your disqus_shortname -->
+
+<!-- disqus
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'rmarkdown'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+-->
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

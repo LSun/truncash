@@ -1,0 +1,60 @@
+---
+title: "Histogram of correlated $z$ scores, Part 2"
+author: "Lei Sun"
+date: 2017-03-06
+output: html_document
+---
+
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+**Last updated:** `r Sys.Date()`
+
+**Code version:** `r workflowr::extract_commit(".", 1)$sha1`
+
+
+## Introduction
+
+Following [previous simulation](correlated_z.html) on randomly selected data sets, this time we first apply `ash` on $z$ scores for every data set, and take a second look at those data sets on which `ash` makes most mistakes, or in other words, produces smallest $\hat\pi_0$.
+
+## Simulation and `ash`
+
+```{r, cache = TRUE}
+z = read.table("../output/z_null_liver_777.txt")
+```
+
+```{r, cache = TRUE}
+library(ashr)
+n = dim(z)[1]
+pihat0 = c()
+for (i in 1:n) {
+  ash.fit = ash(as.numeric(z[i, ]), 1, method = "fdr")
+  pihat0[i] = get_pi0(ash.fit)
+}
+```
+
+## Histograms of $z$ scores in 100 most "`ash`-hostile" data sets
+
+```{r}
+I = order(pihat0)[1:100]
+x = seq(-10, 10, 0.01)
+y = dnorm(x)
+k = 1
+for (j in I) {
+  cat("N0.", k, ": Data Set", j, "pihat0 =", pihat0[j])
+  hist(as.numeric(z[j, ]), xlab = "z scores", freq = FALSE, ylim = c(0, 0.45), main = "10000 z scores, default")
+  lines(x, y, col = "red")
+  hist(as.numeric(z[j, ]), xlab = "z scores", freq = FALSE, ylim = c(0, 0.45), nclass = 100, main = "10000 z scores, 100 bins")
+  lines(x, y, col = "red")
+  k = k + 1
+}
+```
+
+## Session Information
+
+```{r session-info}
+```

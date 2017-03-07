@@ -54,6 +54,9 @@ What will happen if we allow the threshold in `truncash` dependent on data?  Let
 When moving to $t$ likelihood, or in other words, when taking randomness of $\hat s$ into consideration, things get trickier.  Here we review several techiniques currently used in Matthew's lab, regarding $t$ likelihood and uniform mixture priors, based on a discussion with Matthew.
 
 * [Histogram of correlated $z$ scores, Part 1](correlated_z.html)
+* [Histogram of correlated $z$ scores, Part 2](correlated_z_2.html)
+
+An implicit key question of this inquiry is: what's the behavior of $z$ scores under dependency?  We take a look at their histograms, first for randomly sampled data sets, and then for those most "hostile" to `ash`.
 
 [`ashr`]: https://github.com/stephens999/ashr
 
