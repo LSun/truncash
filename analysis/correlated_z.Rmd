@@ -1,0 +1,48 @@
+---
+title: "Histograms of correlated $z$ scores"
+author: "Lei Sun"
+date: 2017-03-06
+output: html_document
+---
+
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+**Last updated:** `r Sys.Date()`
+
+**Code version:** `r workflowr::extract_commit(".", 1)$sha1`
+
+## Introduction
+
+[Efron 2010] and [Schwartzman's comment] brings to the center the question "what's the behavior of $z$ scores under correlation?"  Schwartzman pointed out in theory that "the observed histogram is more likely to be narrow than wide, and that it cannot be too wide before it becomes bimodal."  Let's take a look if this result holds true under our simulation scheme with GTex/Liver data.
+
+## Simulation
+
+```{r, cache = TRUE}
+z = read.table("../output/z_null_liver_777.txt")
+```
+
+```{r}
+sample_z = sample(dim(z)[1], 20)
+x = seq(- 10, 10, 0.01)
+y = dnorm(x)
+for (i in sample_z) {
+  hist(as.numeric(z[i, ]), xlab = "z scores", freq = FALSE, ylim = c(0, 0.45), nclass = 50, main = "10000 z scores, 50 bins")
+  lines(x, y, col = "red")
+  hist(as.numeric(z[i, ]), xlab = "z scores", freq = FALSE, ylim = c(0, 0.45), nclass = 100, main = "10000 z scores, 100 bins")
+  lines(x, y, col = "red")
+}
+```
+
+
+[Efron 2010]: http://amstat.tandfonline.com/doi/abs/10.1198/jasa.2010.tm09129
+[Schwartzman's comment]: http://amstat.tandfonline.com/doi/abs/10.1198/jasa.2010.tm10237
+
+## Session Information
+
+```{r session-info}
+```
