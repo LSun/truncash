@@ -39,7 +39,7 @@ for (i in 1:n) {
 
 ## Histograms of $z$ scores in 100 most "`ash`-hostile" data sets
 
-```{r}
+```{r, cache = TRUE}
 I = order(pihat0)[1:100]
 x = seq(-10, 10, 0.01)
 y = dnorm(x)
@@ -52,6 +52,70 @@ for (j in I) {
   lines(x, y, col = "red")
   k = k + 1
 }
+```
+
+## Take a closer look at the $p$ values in 100 most "`ash`-hostile" data sets
+
+We take a closer look at the behavior of $p$ values in these most "`ash`-hostile" data sets, and also apply Benjamini-Hochberg's FDR procedure on them, to see if BH is robust enough against the foes that make `ash` fail badly.  False discoveries produced by BH are indicated as green points.
+
+```{r, cache = TRUE}
+p = read.table("../output/p_null_liver_777.txt")
+```
+
+
+```{r, cache = TRUE}
+fd.bh = c()
+
+for (i in 1 : n[1]) {
+  p_BH = p.adjust(p[i, ], method = "BH")
+  fd.bh[i] = sum(p_BH <= 0.05)
+}
+```
+
+
+```{r, cache = TRUE}
+I = order(pihat0)[1:100]
+x = seq(-10, 10, 0.01)
+y = dnorm(x)
+k = 1
+m = dim(p)[2]
+for (j in I) {
+  cat("N0.", k, ": Data Set", j, "; pihat0 =", pihat0[j], "; Number of False Discoveries:", fd.bh[j])
+  hist(as.numeric(z[j, ]), xlab = "z scores", freq = FALSE, ylim = c(0, 0.45), nclass = 100, main = "10000 z scores, 100 bins")
+  lines(x, y, col = "red")
+  qqnorm(as.numeric(z[j, ]), main = "Normal Q-Q plot for z scores")
+  abline(0, 1)
+  plot(sort(as.numeric(p[j, ])), xlab = "Order", ylab = "Ordered p value", main = "All p values")
+  abline(0, 1 / m, col = "blue")
+  abline(0, 0.05 / m, col = "red")
+  legend("top", lty = 1, col = c("blue", "red"), c("Uniform", "BH, FDR = 0.05"))
+  
+  pj = sort(as.numeric(p[j, ]))
+
+  plot(pj[1:max(100, fd.bh[j])], xlab = "Order", ylab = "Ordered p value", main = "Zoom-in to 100 smallest p values", ylim = c(0, pj[max(100, fd.bh[j])]))
+  abline(0, 1 / m, col = "blue")
+  points(pj[1:fd.bh[j]], col = "green", pch = 19)
+  abline(0, 0.05 / m, col = "red")
+  legend("top", lty = 1, col = c("blue", "red"), c("Uniform", "BH, FDR = 0.05"))
+  
+  plot(pj[pj <= 0.01], xlab = "Order", ylab = "Ordered p value", main = "Zoom-in to p values <= 0.01", ylim = c(0, 0.01))
+  abline(0, 1 / m, col = "blue")
+  points(pj[1:fd.bh[j]], col = "green", pch = 19)
+  abline(0, 0.05 / m, col = "red")
+  legend("top", lty = 1, col = c("blue", "red"), c("Uniform", "BH, FDR = 0.05"))
+  
+  plot(pj[pj <= 0.05], xlab = "Order", ylab = "Ordered p value", main = "Zoom-in to p values <= 0.05", ylim = c(0, 0.05))
+  abline(0, 1 / m, col = "blue")
+  points(pj[1:fd.bh[j]], col = "green", pch = 19)
+  abline(0, 0.05 / m, col = "red")
+  legend("top", lty = 1, col = c("blue", "red"), c("Uniform", "BH, FDR = 0.05"))
+  
+  k = k + 1
+}
+```
+
+```{r, cache = TRUE}
+write.table(pihat0, file = "../output/pihat0_z_null_liver_777.txt", quote = FALSE, col.names = FALSE, row.names = FALSE)
 ```
 
 ## Session Information

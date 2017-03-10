@@ -53,10 +53,17 @@ What will happen if we allow the threshold in `truncash` dependent on data?  Let
 
 When moving to $t$ likelihood, or in other words, when taking randomness of $\hat s$ into consideration, things get trickier.  Here we review several techiniques currently used in Matthew's lab, regarding $t$ likelihood and uniform mixture priors, based on a discussion with Matthew.
 
-* [Histogram of correlated $z$ scores, Part 1](correlated_z.html)
-* [Histogram of correlated $z$ scores, Part 2](correlated_z_2.html)
+* [Histogram of correlated $z$ scores, random data sets](correlated_z.html)
+* [Histogram of correlated $z$ scores, `ash`-hostile data sets](correlated_z_2.html)
+* [Histogram of correlated $z$ scores, `BH`-hostile data sets](correlated_z_3.html)
 
-An implicit key question of this inquiry is: what's the behavior of $z$ scores under dependency?  We take a look at their histograms, first for randomly sampled data sets, and then for those most "hostile" to `ash`.
+An implicit key question of this inquiry is: what's the behavior of $z$ scores under dependency?  We take a look at their histograms.  First for randomly sampled data sets.  Second for those most "hostile" to `ash`.  Third for those most "hostile" to `BH`.  The bottom line is we are reproducing what Efron observed in microarray data, that "the theoretical null may fail" in different ways.  Now the key questions are
+
+1. Why the theoretical null may fail?  What does it mean by **correlation**?
+
+2. Can `truncash` make `ash` more robust against some of the foes that make the theoretical null fail?
+
+3. Generally, how robust is empirical Bayes? Is empirical Bayes robust or non-robust to certain kinds of correlation?
 
 [`ashr`]: https://github.com/stephens999/ashr
 

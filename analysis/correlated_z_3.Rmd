@@ -1,0 +1,97 @@
+---
+title: "Histogram of correlated $z$ scores, Part 3"
+author: "Lei Sun"
+date: 2017-03-10
+output: html_document
+---
+
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+**Last updated:** `r Sys.Date()`
+
+**Code version:** `r workflowr::extract_commit(".", 1)$sha1`
+
+## Introduction
+
+From previous simulation on [FDR on correlated null](FDR_Null.html) we get a sense that Benjamini-Hochberg is surprisingly robust under correlation.  At the same time, there are cases when BH erroneously produces a large number of false discoveries.  Therefore, we take a close look at those data sets BH fails on.
+
+## Simulation
+
+```{r, cache = TRUE}
+z = read.table("../output/z_null_liver_777.txt")
+p = read.table("../output/p_null_liver_777.txt")
+n = dim(z)
+```
+
+```{r, cache = TRUE}
+pihat0 = read.table("../output/pihat0_z_null_liver_777.txt")
+pihat0 = as.numeric(t(pihat0))
+```
+
+
+```{r, cache = TRUE}
+fd.bh = c()
+
+for (i in 1 : n[1]) {
+  p_BH = p.adjust(p[i, ], method = "BH")
+  fd.bh[i] = sum(p_BH <= 0.05)
+}
+```
+
+
+## Result
+
+We take a look that all data sets where BH erroneously produces at least one false discovery (green), compared with $\hat\pi_0$ produced by `ash` on these same data sets.
+
+```{r, cache = TRUE}
+fdn = sum(fd.bh >= 1)
+I = order(fd.bh, decreasing = TRUE)[1:fdn]
+x = seq(-10, 10, 0.01)
+y = dnorm(x)
+k = 1
+m = n[2]
+for (j in I) {
+  cat("N0.", k, ": Data Set", j, "; Number of False Discoveries:", fd.bh[j], "; pihat0 =", pihat0[j])
+  hist(as.numeric(z[j, ]), xlab = "z scores", freq = FALSE, ylim = c(0, 0.45), nclass = 100, main = "10000 z scores, 100 bins")
+  lines(x, y, col = "red")
+  qqnorm(as.numeric(z[j, ]), main = "Normal Q-Q plot for z scores")
+  abline(0, 1)
+  plot(sort(as.numeric(p[j, ])), xlab = "Order", ylab = "Ordered p value", main = "All p values")
+  abline(0, 1 / m, col = "blue")
+  abline(0, 0.05 / m, col = "red")
+  legend("top", lty = 1, col = c("blue", "red"), c("Uniform", "BH, FDR = 0.05"))
+  
+  pj = sort(as.numeric(p[j, ]))
+
+  plot(pj[1:max(100, fd.bh[j])], xlab = "Order", ylab = "Ordered p value", main = "Zoom-in to 100 smallest p values", ylim = c(0, pj[max(100, fd.bh[j])]))
+  abline(0, 1 / m, col = "blue")
+  points(pj[1:fd.bh[j]], col = "green", pch = 19)
+  abline(0, 0.05 / m, col = "red")
+  legend("top", lty = 1, col = c("blue", "red"), c("Uniform", "BH, FDR = 0.05"))
+  
+  plot(pj[pj <= 0.01], xlab = "Order", ylab = "Ordered p value", main = "Zoom-in to p values <= 0.01", ylim = c(0, 0.01))
+  abline(0, 1 / m, col = "blue")
+  points(pj[1:fd.bh[j]], col = "green", pch = 19)
+  abline(0, 0.05 / m, col = "red")
+  legend("top", lty = 1, col = c("blue", "red"), c("Uniform", "BH, FDR = 0.05"))
+  
+  plot(pj[pj <= 0.05], xlab = "Order", ylab = "Ordered p value", main = "Zoom-in to p values <= 0.05", ylim = c(0, 0.05))
+  abline(0, 1 / m, col = "blue")
+  points(pj[1:fd.bh[j]], col = "green", pch = 19)
+  abline(0, 0.05 / m, col = "red")
+  legend("top", lty = 1, col = c("blue", "red"), c("Uniform", "BH, FDR = 0.05"))
+  
+  k = k + 1
+}
+```
+
+
+## Session Information
+
+```{r session-info}
+```
