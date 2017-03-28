@@ -1,0 +1,135 @@
+---
+title: "Empirical Null with Gaussian Derivatives: Fitting Examples"
+author: "Lei Sun"
+date: 2017-03-25
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+## Problem setting
+
+With [all the assumptions](gaussian_derivatives.html), we formulate a convex optimization as follows.
+
+$$
+\begin{array}{rl}
+\max\limits_{w_1, \ldots, w_K} & \sum\limits_{i = 1}^n\log\left(1 +\sum\limits_{k = 1}^K w_kh_k(z_i)\right)\\
+\text{s.t.} & 
+1 + \sum\limits_{k = 1}^K w_kh_k(z_i) \geq0
+\end{array}
+$$
+It can also be written as
+
+$$
+\begin{array}{rl}
+\max\limits_{w} & \sum\log\left(1 +Hw\right)\\
+\text{s.t.} & 
+1 +Hw \geq0
+\end{array}
+$$
+
+where $H_{ik} = h_k(z_i)$.
+
+## Choosing $K$
+
+With finite $K$ Gaussian derivatives, the fitted log-likelihood $\log\prod\limits_{i = 1}^nf_0(z_i) = \sum\limits_{i = 1}^n\log \varphi(z_i) + \sum\limits_{i = 1}^n\log\left(1 +\sum\limits_{k = 1}^K \hat w_kh_k(z_i)\right)$.  Note that $\hat w_k \equiv 0$ is a feasible solution, so the optimal solution will always have a log-likelihood no less than $\sum\limits_{i = 1}^n\log \varphi(z_i)$, the log-likelihood of $N(0, 1)$.  Similarly, let $\hat w_K$ be the optimal solution with $K$ Gaussian derivatives, then $[\hat w_K, 0]$ will be a feasible solution with $K + 1$ Gaussian derivatives, with the same objective value, which should be no larger than the optimal objective value for $K + 1$.  This fact implies that the fitted log-likelihood should be non-decreasing with respect to $K$.
+
+This property implies that for the same data set, multiple models with increasing $K$'s can be fitted, and the searching stops at a sufficiently large $K$.  Let $\hat g_K = \max\limits_w\sum\limits_{i = 1}^n\log\left(1 +\sum\limits_{k = 1}^K w_kh_k(z_i)\right) = \sum\limits_{i = 1}^n\log\left(1 +\sum\limits_{k = 1}^K \hat w_kh_k(z_i)\right)$, the optimal objective value for $K$, drawing on insight from the likelihood ratio test, the optimal $\hat K = \inf\left\{K: 2(\hat g_{K + m} - \hat g_K) \leq \chi_{m, 1-\alpha}^2, m = 1, \ldots, M\right\}$ with pre-specified $\alpha$ and $M$.
+
+$M$ should be greater than $1$ because odd order Gaussian derivatives and even order ones have distinct properties, especially in lower orders.  Odd order Gaussian derivatives are odd functions, more associated with the skewness of the empirical distribution, whereas even order ones are even functions, more associated with its kurtosis.  Therefore, it's not at all impossible that the difference in the log-likelihood objective between $K$ and $K + 1$ is small, yet that between $K$ and $K + 2$ is large.
+
+The function `ecdfz.optimal` in the script [`ecdfz.R`](https://github.com/LSun/truncash/blob/master/code/ecdfz.R) is using this rule with the default setting $\alpha = 0.05, M = 2$.
+
+## Fitting with `cvxr`
+
+The script [`ecdfz.R`](https://github.com/LSun/truncash/blob/master/code/ecdfz.R) is using [`cvxr`](https://github.com/anqif/cvxr) to find the maximum likelihood estimate of the observed density of correlated null $z$ scores.
+
+```{r, message = FALSE}
+source("../code/ecdfz.R")
+```
+
+```{r, cache = TRUE}
+z = read.table("../output/z_null_liver_777.txt")
+p = read.table("../output/p_null_liver_777.txt")
+```
+
+## Examples
+
+Several selected [`ash`-hostile](correlated_z_2.html) and/or [`BH`-hostile](correlated_z_3.Rmd) data sets are fitted as follows.  More detailed information of these selected data sets are [here](correlated_z_2.html) and [here](correlated_z_3.Rmd).
+
+For each of these selected data sets, we plot the histogram, the density of $N(0, 1)$ in red line, and that fitted by Gaussian derivatives in blue.  We also give the information of the number of false discoveries by Benjamini-Hochberg, and $\hat\pi_0$ estimated by `ash`.  Note that BH's false discoveries suggests the inflation of the most extreme observations, whereas `ash`'s $\hat\pi_0$ the empirical distribution's general deviation from $N(0, 1)$.
+
+We also plot the optimal objective $\hat g_K$ for all the fitted $K$, and indicate the optimal $\hat K$ found according to the aforementioned rule.  **It appears the second order derivative is usually the most important, followed by the fourth.**
+
+```{r, cache = TRUE, result = "hide", message = FALSE}
+library(ashr)
+DataSet = c(32, 327, 355, 483, 778)
+res_DataSet = list()
+for (i in 1:length(DataSet)) {
+  zscore = as.numeric(z[DataSet[i], ])
+  fit.ecdfz = ecdfz.optimal(zscore)
+  fit.ash = ash(zscore, 1, method = "fdr")
+  fit.ash.pi0 = get_pi0(fit.ash)
+  pvalue = as.numeric(p[DataSet[i], ])
+  fd.bh = sum(p.adjust(pvalue, method = "BH") <= 0.05)
+  res_DataSet[[i]] = list(DataSet = DataSet[i], fit.ecdfz = fit.ecdfz, fit.ash = fit.ash, fit.ash.pi0 = fit.ash.pi0, fd.bh = fd.bh, zscore = zscore, pvalue = pvalue)
+}
+```
+
+```{r, cache = TRUE, result = "hide", message = FALSE}
+library(EQL)
+x.pt = seq(-5, 5, 0.01)
+H.pt = sapply(1:15, EQL::hermite, x = x.pt)
+```
+
+```{r, cache = TRUE}
+for (i in 1:length(DataSet)) {
+  cat("Data Set", DataSet[i], ": Number of BH's False Discoveries:", res_DataSet[[i]]$fd.bh, "; ASH's pihat0 =", res_DataSet[[i]]$fit.ash.pi0, "; Chosen number of Gaussian derivatives K =", res_DataSet[[i]]$fit.ecdfz$optimal$ord.optimal, "\n")
+  cat("Optimal weights of Gaussian derivatives w =\n")
+  cat(rbind(order = paste(1:res_DataSet[[i]]$fit.ecdfz$optimal$ord.optimal, ":"), weight = paste(res_DataSet[[i]]$fit.ecdfz$optimal$w.optimal, ";")), sep = " ")
+  ymax = max(dnorm(0), max(hist(res_DataSet[[i]]$zscore, plot = FALSE, breaks = 100)$density))
+  hist(res_DataSet[[i]]$zscore, prob = TRUE, breaks = 100, xlab = "z score", main = bquote("Histogram of Data Set"~.(res_DataSet[[i]]$DataSet)), ylim = c(0, ymax))
+  y.stdnormal = dnorm(x.pt)
+  lines(x.pt, y.stdnormal, col = "red")
+  y.pt = (cbind(H.pt[, (1:res_DataSet[[i]]$fit.ecdfz$optimal$ord.optimal)]) %*% res_DataSet[[i]]$fit.ecdfz$optimal$w.optimal + 1) * y.stdnormal
+  lines(x.pt, y.pt, col = "blue")
+  legend("topright", lty = 1, col = c("red", "blue"), c("Standard Normal", "Gaussian Derivatives"))
+  plot(0:res_DataSet[[i]]$fit.ecdfz$optimal$ord.fitted, res_DataSet[[i]]$fit.ecdfz$optimal$log.lik.gd, xlab = "Highest order of Gaussian derivatives K", ylab = expression(paste("Optimal objective ", hat(g)[K])), main = "Log-likelihood increase from N(0, 1)")
+  abline(v = res_DataSet[[i]]$fit.ecdfz$optimal$ord.optimal, lty = 3, col = "blue")
+  abline(h = res_DataSet[[i]]$fit.ecdfz$optimal$log.lik.gd.optimal, lty = 3, col = "blue")
+  points(res_DataSet[[i]]$fit.ecdfz$optimal$ord.optimal, res_DataSet[[i]]$fit.ecdfz$optimal$log.lik.gd.optimal, col = "blue", pch = 19)
+  abline(v = 2, lty = 3, col = "green")
+  abline(h = res_DataSet[[i]]$fit.ecdfz$optimal$log.lik.gd[3], lty = 3, col = "green")
+  points(2, res_DataSet[[i]]$fit.ecdfz$optimal$log.lik.gd[3], col = "green", pch = 19)
+  legend("right", pch = 19, col = c("green", "blue"), legend = c("K = 2", expression(paste("Optimal ", hat(K)))))
+}
+```
+
+## Conclusion
+
+Gaussian derivatives can deal with a variety of empirical null distribution, especially those not close to normal.
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```

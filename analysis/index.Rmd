@@ -65,6 +65,11 @@ An implicit key question of this inquiry is: what's the behavior of $z$ scores u
 
 3. Generally, how robust is empirical Bayes? Is empirical Bayes robust or non-robust to certain kinds of correlation?
 
+* [Fitting empirical null with Gaussian derivatives: Theory](gaussian_derivatives.html)
+* [Fitting empirical null with Gaussian derivatives: Examples](gaussian_derivatives_2.html)
+* [Fitting empirical null with Gaussian derivatives: Numerical issues](gaussian_derivatives_3.html)
+* [Fitting empirical null with Gaussian derivatives: Perfect correlations](gaussian_derivatives_4.html)
+
 [`ashr`]: https://github.com/stephens999/ashr
 
 <!-- The goal of this new template is to simplify the setup and maintenance of a research website. -->

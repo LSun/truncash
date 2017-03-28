@@ -1,45 +1,35 @@
 require(EQL)
-require(optimx)
-
-ecdfz = function (z, ord = 5, w.init = NULL, method = "BFGS") {
-  if (is.null(w.init)) {w.init = rep(0, ord)}
-  if (ord == 0) {
-    res = list(par = NA, value = 0, convergence = NA)
-  } else {
-    res = optim(w.init, loggaussderiv, ord = ord, z = z, control = list(fnscale = -1), method = method)
-  }
-  return(list(gaussianDerivOrder = ord,
-              w = res$par,
-              loglik.standardNormal = loglikn01z(z),
-              loglik.gaussianDeriv = res$value,
-              loglik.empiricalDist = res$value + loglikn01z(z),
-              convergence = as.logical(!res$convergence)))
-}
-
-loggaussderiv = function (w, ord, z) {
-  if (ord == 0) {
-    return(0)
-  } else {
-    H = sapply(1 : ord, EQL::hermite, x = z)
-    Hw = H %*% w + 1
-    if (all(Hw > 0)) {
-      return(sum(log(H %*% w + 1)))
-    } else {
-      return(-Inf)
-    }
-  }
-}
-
-loglikn01z = function (z) {
-  return(sum(log(dnorm(z))))
-}
-
-loglikecdfz = function (w, ord, z) {
-  return(loggaussderiv(w, ord, z) + loglikn01z(z))
-}
-
-require(EQL)
 require(cvxr)
+
+ecdfz = function (z, ord = 5, method = c("un", "con")) {
+  z = as.numeric(z)
+  ord.max = max(ord)
+  H.max = sapply(1 : ord.max, EQL::hermite, x = z)
+  res = output = list()
+  status = log.lik.gd = c()
+  ind = 1
+  if (all(method == "con")) {w.cvxr = w.cvxr.cns} else {w.cvxr = w.cvxr.uncns}
+  for (i in ord) {
+    res[[ind]] = w.cvxr(cbind(H.max[, (1 : i)]))
+    status[ind] = res[[ind]]$status
+    log.lik.gd[ind] = -res[[ind]]$optimal_value
+    output[[ind]] = list(status = res[[ind]]$status, log.lik.gd = -res[[ind]]$optimal_value, w = as.vector(res[[ind]]$primal_values[[1]]))
+    ind = ind + 1
+  }
+  names(res) = paste("order =", ord)
+  names(output) = paste("order =", ord)
+  output = list(summary = output, status = status, log.lik.gd = log.lik.gd, res = res)
+  class(output) <- "ecdfz"
+  return(output)
+}
+
+summary.ecdfz = function (object) {
+  print(object$summary)
+}
+
+print.ecdfz = function (object) {
+  print(list(status = object$status, log.lik.gd = object$log.lik.gd))
+}
 
 ecdfz.optimal = function (z, ord.max = 20, k = 2, alpha = 0.05, method = c("un", "con")) {
   z = as.numeric(z)
@@ -69,12 +59,12 @@ ecdfz.optimal = function (z, ord.max = 20, k = 2, alpha = 0.05, method = c("un",
   }
 
   ord.fitted = length(res)
-  ord.optimal.found = w.stop(log.lik.gd, ord.fitted, k, alpha)
+  ord.optimal.found = w.stop(log.lik.gd, ord.fitted + 1, k, alpha)
   if (ord.optimal.found) {
     ord.optimal = ord.fitted - k
     H.optimal = H[, (1 : ord.optimal)]
     w.optimal = as.numeric(res[[ord.optimal]]$primal_values[[1]])
-    log.lik.gd.optimal = log.lik.gd[ord.optimal]
+    log.lik.gd.optimal = log.lik.gd[1 + ord.optimal]
   } else {
     ord.optimal = NA
     H.optimal = NA
@@ -100,6 +90,30 @@ summary.ecdfz.optimal <- function (object) {
 print.ecdfz.optimal <- function (object) {
   print(summary(object))
 }
+
+
+loggaussderiv = function (w, ord, z) {
+  if (ord == 0) {
+    return(0)
+  } else {
+    H = sapply(1 : ord, EQL::hermite, x = z)
+    Hw = H %*% w + 1
+    if (all(Hw > 0)) {
+      return(sum(log(H %*% w + 1)))
+    } else {
+      return(-Inf)
+    }
+  }
+}
+
+loglikn01z = function (z) {
+  return(sum(log(dnorm(z))))
+}
+
+loglikecdfz = function (w, ord, z) {
+  return(loggaussderiv(w, ord, z) + loglikn01z(z))
+}
+
 
 w.cvxr.uncns = function (H) {
   p = ncol(H)

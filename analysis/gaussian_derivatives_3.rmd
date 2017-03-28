@@ -1,0 +1,128 @@
+---
+title: "Empirical Null with Gaussian Derivatives: Numerical Issues"
+author: "Lei Sun"
+date: 2017-03-26
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+## Introduction: instability and overfitting -- $K$ can be too large
+
+Things can go wrong in choosing the optimal $\hat K$.  We are using [an automated rule](gaussian_derivatives_2.html), yet sometimes the objective (log-likelihood) could fail to pass the optimal criterion before the optimization becomes unstable.
+
+Recall that we make [two key assumptions](gaussian_derivatives.html) to make the problem tractable.  *In place of the original second constraint of non-negativity, we use $n$ observed $z$ scores instead of all $x\in\mathbb{R}$.*  Therefore, when $K$ gets larger, and the higher order Gaussian derivatives involved get more complicated, it's possible that the optimal solution will satisfy the non-negativity constraint for all $n$ observed $z$ scores, **but not the whole real line.**  *This issue also happens to [some well-behaved examples](gaussian_derivatives_2.html) if looked closely.*
+
+Meanwhile, sometimes an optimal $\hat K$ can be found according to [the rule](gaussian_derivatives_2.html), but it looks like overfitting.  A $K < \hat K$ appears better.
+
+Here we have two examples.
+
+```{r, message = FALSE}
+source("../code/ecdfz.R")
+```
+
+```{r, cache = TRUE}
+z = read.table("../output/z_null_liver_777.txt")
+p = read.table("../output/p_null_liver_777.txt")
+```
+
+```{r, cache = TRUE, result = "hide", message = FALSE}
+library(ashr)
+DataSet = c(522, 724)
+res_DataSet = list()
+for (i in 1:length(DataSet)) {
+  zscore = as.numeric(z[DataSet[i], ])
+  fit.ecdfz = ecdfz.optimal(zscore)
+  fit.ash = ash(zscore, 1, method = "fdr")
+  fit.ash.pi0 = get_pi0(fit.ash)
+  pvalue = as.numeric(p[DataSet[i], ])
+  fd.bh = sum(p.adjust(pvalue, method = "BH") <= 0.05)
+  res_DataSet[[i]] = list(DataSet = DataSet[i], fit.ecdfz = fit.ecdfz, fit.ash = fit.ash, fit.ash.pi0 = fit.ash.pi0, fd.bh = fd.bh, zscore = zscore, pvalue = pvalue)
+}
+```
+
+```{r, cache = TRUE, result = "hide", message = FALSE}
+library(EQL)
+x.pt = seq(-5, 5, 0.01)
+H.pt = sapply(1:15, EQL::hermite, x = x.pt)
+```
+
+
+## Example 1: Numerical instability when $K$ is too large
+
+```{r, cache = TRUE, echo = FALSE}
+cat("Data Set", DataSet[2], ": Number of BH's False Discoveries:", res_DataSet[[2]]$fd.bh, "; ASH's pihat0 =", res_DataSet[[2]]$fit.ash.pi0)
+ymax = max(dnorm(0), max(hist(res_DataSet[[2]]$zscore, plot = FALSE, breaks = 100)$density))
+hist(res_DataSet[[2]]$zscore, prob = TRUE, breaks = 100, xlab = "z score", main = bquote("Histogram of Data Set"~.(res_DataSet[[2]]$DataSet)), ylim = c(0, ymax))
+y.stdnormal = dnorm(x.pt)
+lines(x.pt, y.stdnormal, col = "red")
+y.pt.bad = (cbind(H.pt[, 1:14]) %*% res_DataSet[[2]]$fit.ecdfz$res[[14]]$primal_values[[1]] + 1) * y.stdnormal
+lines(x.pt, y.pt.bad, col = "blue")
+y.pt.better = (cbind(H.pt[, 1:8]) %*% res_DataSet[[2]]$fit.ecdfz$res[[8]]$primal_values[[1]] + 1) * y.stdnormal
+lines(x.pt, y.pt.better, col = "green")
+legend("topleft", lty = 1, col = c("blue", "green"), c("K = 14", "K = 8"), ncol = 2, seg.len = 1.25)
+plot(0:res_DataSet[[2]]$fit.ecdfz$optimal$ord.fitted, res_DataSet[[2]]$fit.ecdfz$optimal$log.lik.gd, xlab = "Highest order of Gaussian derivatives K", ylab = expression(paste("Optimal objective ", hat(g)[K])), main = "Log-likelihood increase from N(0, 1)")
+abline(v = 8, lty = 3, col = "green")
+abline(h = res_DataSet[[2]]$fit.ecdfz$optimal$log.lik.gd[8 + 1], lty = 3, col = "green")
+points(8, res_DataSet[[2]]$fit.ecdfz$optimal$log.lik.gd[8 + 1], col = "green", pch = 19)
+abline(v = 14, lty = 3, col = "blue")
+abline(h = res_DataSet[[2]]$fit.ecdfz$optimal$log.lik.gd[14 + 1], lty = 3, col = "blue")
+points(14, res_DataSet[[2]]$fit.ecdfz$optimal$log.lik.gd[14 + 1], col = "blue", pch = 19)
+legend("topleft", pch = 19, col = c("blue", "green"), legend = c("K = 14", "K = 8"))
+```
+
+In this example [the automated rule](gaussian_derivatives_2.html) fails to find an optimal $\hat K$.  Note that the fitted log-likelihood increased until seemingly reached a plateau, but didn't quite make the cut.  After that, as $K$ keeps getting larger, the optimization becomes unstable.  The blue $K = 14$ line obviously breaks [the non-negativity constraint](gaussian_derivatives.html) for $x \neq z_i$, the $n$ observed $z$ scores.
+
+## Example 2: Overfitting when $K$ is larger than what appears necessary
+
+```{r, cache = TRUE, echo = FALSE}
+cat("Data Set", DataSet[1], ": Number of BH's False Discoveries:", res_DataSet[[1]]$fd.bh, "; ASH's pihat0 =", res_DataSet[[1]]$fit.ash.pi0)
+ymax = max(dnorm(0), max(hist(res_DataSet[[1]]$zscore, plot = FALSE, breaks = 100)$density))
+hist(res_DataSet[[1]]$zscore, prob = TRUE, breaks = 100, xlab = "z score", main = bquote("Histogram of Data Set"~.(res_DataSet[[1]]$DataSet)), ylim = c(0, ymax))
+y.stdnormal = dnorm(x.pt)
+lines(x.pt, y.stdnormal, col = "red")
+y.pt.optimal = (cbind(H.pt[, (1:res_DataSet[[1]]$fit.ecdfz$optimal$ord.optimal)]) %*% res_DataSet[[1]]$fit.ecdfz$optimal$w.optimal + 1) * y.stdnormal
+lines(x.pt, y.pt.optimal, col = "blue")
+y.pt.better = (cbind(H.pt[, 1:6]) %*% res_DataSet[[1]]$fit.ecdfz$res[[6]]$primal_values[[1]] + 1) * y.stdnormal
+lines(x.pt, y.pt.better, col = "green")
+legend("topright", lty = 1, col = c("blue", "green"), legend = c(expression(paste("Optimal ", hat(K))), "K = 6"))
+plot(0:res_DataSet[[1]]$fit.ecdfz$optimal$ord.fitted, res_DataSet[[1]]$fit.ecdfz$optimal$log.lik.gd, xlab = "Highest order of Gaussian derivatives K", ylab = expression(paste("Optimal objective ", hat(g)[K])), main = "Log-likelihood increase from N(0, 1)")
+abline(v = res_DataSet[[1]]$fit.ecdfz$optimal$ord.optimal, lty = 3, col = "blue")
+abline(h = res_DataSet[[1]]$fit.ecdfz$optimal$log.lik.gd.optimal, lty = 3, col = "blue")
+points(res_DataSet[[1]]$fit.ecdfz$optimal$ord.optimal, res_DataSet[[1]]$fit.ecdfz$optimal$log.lik.gd.optimal, col = "blue", pch = 19)
+abline(v = 6, lty = 3, col = "green")
+abline(h = res_DataSet[[1]]$fit.ecdfz$optimal$log.lik.gd[6 + 1], lty = 3, col = "green")
+points(6, res_DataSet[[1]]$fit.ecdfz$optimal$log.lik.gd[6 + 1], col = "green", pch = 19)
+legend("left", pch = 19, col = c("blue", "green"), legend = c(expression(paste("Optimal ", hat(K))), "K = 6"))
+```
+
+In this example [the automated rule](gaussian_derivatives_2.html) is able to find an optimal $\hat K = 8$.  However, the green $K = 6$ lines seems better visually.  Their difference in the fitted log-likelihood is very small, although larger than what the rule requires.
+
+## Conclusion
+
+Things can go very wrong when the number of fitted Gaussian derivatives $K$ is too large, and it implies that we cannot blindly fit ever growing $K$ and hope the fitted log-likelihood converges.  On the other hand, the good news is oftentimes we can still reach a pattern of increasing log-likelihoods, which gives a reasonable $K$, before the optimization becomes unstable, although it might be not the optimal $K$ we would find by the current log-likelihood ratio test motivated rule.
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```

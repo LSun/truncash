@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+<meta name="author" content="Lei Sun" />
+
+<meta name="date" content="2017-03-22" />
+
+<title>Empirical Null with Gaussian Derivatives: Theory</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs && document.readyState && document.readyState === "complete") {
+   window.setTimeout(function() {
+      hljs.initHighlighting();
+   }, 0);
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">truncash</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/LSun/truncash">
+    <span class="fa fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Empirical Null with Gaussian Derivatives: Theory</h1>
+<h4 class="author"><em>Lei Sun</em></h4>
+<h4 class="date"><em>2017-03-22</em></h4>
+
+</div>
+
+
+<p><strong>Last updated:</strong> 2017-03-27</p>
+<p><strong>Code version:</strong> e384d46</p>
+<div id="empirical-null" class="section level2">
+<h2>Empirical null</h2>
+<p>Correlation among summary statistics can distort hypothesis testing and signal estimation by making the observed statistics deviate from their theoretical distribution. See previous simulations (<a href="correlated_z.html">here</a>, <a href="correlated_z_2.html">here</a>, and <a href="correlated_z_3.html">here</a>) for illustration.</p>
+<p>Efron is his series of publications proposed an “empirical null” idea to tackle the correlation among <span class="math inline">\(z\)</span> scores in the simultaneous inference setting. Essentially, he assumed that <span class="math inline">\(z\)</span> scores from those null hypotheses among all hypotheses simultaneously considered should follow an “empirical null” distribution that’s different from their marginal <span class="math inline">\(N(0, 1)\)</span>, but still a normal with estimated mean and standard deviation, thus to produce what Efron terms as the “correlation induced inflation.”</p>
+<p>However, as Matthew first noted, this doesn’t seem to hold true in our RNA-seq gene expression study. After transforming the original count data to <span class="math inline">\(z\)</span> scores using <code>limma</code> and <code>edgeR</code> (see <a href="nullpipeline.html">here</a> for the pipeline), these <span class="math inline">\(z\)</span> scores will have a <span class="math inline">\(N(0, 1)\)</span> marginal distribution, but correlation makes their empirical distribution far from normal. Normality suggests that all observations should be inflated at the same time, yet oftentimes, the more moderate observations tend to be inflated, but not the more extreme ones. Indeed, if anything, the most extreme observations tend to be deflated. See previous simulations (<a href="voom_null.html">here</a> and <a href="ExtremeOccurrence.html">here</a>) for illustrations.</p>
+<p>In his response to Efron’s paper, Schwartzman pointed out that “the core issue… is the behavior of a large collection of correlated normal variables.” Let <span class="math inline">\(z\)</span> scores <span class="math inline">\(z_1, \ldots, z_n\)</span> be <span class="math inline">\(N(0, 1)\)</span> variables with pairwise correlations <span class="math inline">\(\rho_{ij} = \text{cor}(z_i, z_j)\)</span>, and <span class="math inline">\(\hat F(x) = \frac1n\sum\limits_{i=1}^n1(z_i\geq x)\)</span>, the right-sided empirical cdf of all <span class="math inline">\(z\)</span> scores. Schwartzman showed that when the number of null hypothesis <span class="math inline">\(n\to\infty\)</span>, <span class="math inline">\(\hat F(x)\)</span> approximates a random function <span class="math inline">\(F_0(x)\)</span> generated as</p>
+<p><span class="math display">\[
+F_0(x) = \Phi^+(x) + \sum\limits_{k = 1}^\infty W_k\varphi^{(k - 1)}(x)
+\]</span></p>
+<p>where <span class="math inline">\(\Phi^+(x) = 1 - \Phi(x)\)</span> is the right-sided cdf of <span class="math inline">\(N(0, 1)\)</span> and <span class="math inline">\(\varphi^{(k - 1)}(x)\)</span> is the <span class="math inline">\((k - 1)^\text{th}\)</span> order derivative of the pdf of <span class="math inline">\(N(0,1)\)</span>. <span class="math inline">\(W_k\)</span>’s are independent random variables with mean <span class="math inline">\(0\)</span> and variance <span class="math inline">\(\text{var}(W_k) = \alpha_k/k!\)</span>, where</p>
+<p><span class="math display">\[
+\alpha_k = \frac{2}{n(n-1)}\sum\limits_{i&lt;j}\rho_{ij}^k = \int_{-1}^{1}\rho^kdG(\rho)
+\]</span> is the <span class="math inline">\(k^\text{th}\)</span> moment of <span class="math inline">\(G(\rho)\)</span>, the empirical distribution of all the <span class="math inline">\(n(n-1)/2\)</span> pairwise correlations <span class="math inline">\(\rho_{ij}\)</span>.</p>
+<p>Differentiating <span class="math inline">\(F_0(x)\)</span> gives</p>
+<p><span class="math display">\[
+f_0(x) = \varphi(x) + \sum\limits_{k = 1}^\infty W_k\varphi^{(k)}(x)
+\]</span> which can be seen as approximating the density of the <em>observed</em> distribution of correlated <span class="math inline">\(z\)</span> scores when the number of them <span class="math inline">\(n\)</span> is large. <strong>Or in other words, <span class="math inline">\(f_0(x)\)</span> can be seen as to describe the histogram of those <span class="math inline">\(z\)</span> scores.</strong></p>
+</div>
+<div id="gaussian-derivatives-and-hermite-polynomials" class="section level2">
+<h2>Gaussian derivatives and Hermite polynomials</h2>
+<p><span class="math inline">\(f_0(x)\)</span> involves Gaussian derivatives <span class="math inline">\(\varphi^{(k)}\)</span>, and many properties of them have been thoroughly studied. For starters, they are closely related to the <em>probabilists’ Hermite polynomials</em> <span class="math inline">\(h_k\)</span> in that</p>
+<p><span class="math display">\[
+\varphi^{(k)}(x) = (-1)^kh_k(x)\varphi(x)
+\]</span> where <span class="math inline">\(h_k(x)\)</span> is defined by its generating function</p>
+<p><span class="math display">\[
+\begin{array}{rcl}
+h_k(x) &amp;=&amp; (-1)^ke^{\frac{x^2}{2}}\frac{d^k}{dx^k} e^{-\frac{x^2}{2}}\\
+&amp;=&amp;
+\left(x - \frac{d}{dx}\right)^k\cdot1
+\end{array}
+\]</span> The relationship gives</p>
+<p><span class="math display">\[
+\begin{array}{rcl}
+f_0(x) &amp;=&amp; \varphi(x) + \sum\limits_{k = 1}^\infty W_k(-1)^kh_k(x)\varphi(x)\\
+&amp;=&amp;
+\varphi(x)\left(1 + \sum\limits_{k = 1}^\infty W_kh_k(x)\right)\\
+&amp;=&amp;
+\sum\limits_{k = 0}^\infty W_kh_k(x)\varphi(x)
+\end{array}
+\]</span> The simplification comes from the observation that <span class="math inline">\(W_k\)</span>’s are zero mean independent random variables, so all <span class="math inline">\((-1)^k\)</span> can be absorbed into <span class="math inline">\(W_k\)</span>. Furthermore, let <span class="math inline">\(W_0\equiv1\)</span>, and use the fact that <span class="math inline">\(h_0(x)\equiv1\)</span>, so <span class="math inline">\(f_0(x)\)</span> can be written in a more compact way.</p>
+<p>Probabilists’ Hermite polynomials are orthogonal with respect to <span class="math inline">\(\varphi(x)\)</span>, the pdf of <span class="math inline">\(N(0, 1)\)</span>. That is,</p>
+<p><span class="math display">\[
+\int_{-\infty}^\infty h_k(x)h_l(x)\varphi(x)dx = \begin{cases}
+k! &amp; k = l
+\\0 &amp; k\neq l
+\end{cases}
+\]</span> This orthogonality gives us</p>
+<p><span class="math display">\[
+W_k = \frac{1}{k!}\int_{-\infty}^\infty f_0(x)h_k(x)dx
+\]</span> With <span class="math inline">\(W_k\)</span>’s defined and obtained this way,</p>
+<p><span class="math display">\[
+\begin{array}{rcl}
+F_0(x) &amp;=&amp;
+\displaystyle\int_{-\infty}^x f_0(u)du \\
+&amp;=&amp;
+\displaystyle\int_{-\infty}^x \sum\limits_{k = 0}^\infty W_k h_k(u)\varphi(u)du\\
+&amp;=&amp;
+\displaystyle\int_{-\infty}^x \sum\limits_{k = 0}^\infty W_k(-1)^k(-1)^k h_k(u)\varphi(u)du\\
+&amp;=&amp;
+\displaystyle\int_{-\infty}^x \sum\limits_{k = 0}^\infty W_k(-1)^k
+\varphi^{(k)}(u)du\\
+&amp;=&amp;
+\displaystyle\int_{-\infty}^x
+\varphi(u)du + \sum\limits_{k = 1}^\infty W_k(-1)^k
+\displaystyle\int_{-\infty}^x\varphi^{(k)}(u)du\\
+&amp;=&amp;
+\displaystyle\Phi(x) + \sum\limits_{k = 1}^\infty W_k(-1)^k
+\varphi^{(k - 1)}(x)\\
+&amp;=&amp;
+\displaystyle\Phi(x) + \sum\limits_{k = 1}^\infty W_k(-1)^k(-1)^{k - 1}
+h_{k-1}(x)\varphi(x)\\
+&amp;=&amp;
+\displaystyle\Phi(x) - \sum\limits_{k = 1}^\infty W_kh_{k-1}(x)\varphi(x)
+\end{array}
+\]</span></p>
+</div>
+<div id="fitting-the-empirical-null" class="section level2">
+<h2>Fitting the empirical null</h2>
+<p>Given <span class="math inline">\(z\)</span> scores <span class="math inline">\(z_1, \ldots, z_n\)</span> with known marginal distribution <span class="math inline">\(N(0, 1)\)</span> but unknown correlation, their (right-sided) empirical cdf <span class="math inline">\(\hat F(x)\)</span> can be observed. Then these <span class="math inline">\(z\)</span> scores can be seen as if they are independently and identically sampled from this observed empirical cdf.</p>
+<p>Furthermore, when <span class="math inline">\(n\)</span> is sufficiently large, this observed empirical cdf approximates a cdf <span class="math inline">\(F_0(x)\)</span> which has a density</p>
+<p><span class="math display">\[
+f_0(x) = \varphi(x)\left(1 + \sum\limits_{k = 1}^\infty W_kh_k(x)\right)
+\]</span> Therefore, with observed <span class="math inline">\(z\)</span> scores, we can fit <span class="math inline">\(f_0\)</span> with estimated (realized) <span class="math inline">\(W_k\)</span>. One way of doing that is by maxmimum likelihood. In particular, we maximize the approximated log-likelihood</p>
+<p><span class="math display">\[\log\prod\limits_{i = 1}^nf_0(z_i) = \sum\limits_{i = 1}^n\log f_0(z_i) = \sum\limits_{i = 1}^n\log \varphi(z_i) + \sum\limits_{i = 1}^n\log\left(1 +\sum\limits_{k = 1}^\infty w_kh_k(z_i)\right)
+\]</span></p>
+<p>by a constrained optimization problem</p>
+<p><span class="math display">\[
+\begin{array}{rl}
+\max\limits_{w_1, w_2, \ldots} &amp; \sum\limits_{i = 1}^n\log\left(1 +\sum\limits_{k = 1}^\infty w_kh_k(z_i)\right)\\
+\text{s.t.} &amp; 
+\int_{-\infty}^{\infty}f_0(x)dx=1\Leftrightarrow
+\sum\limits_{k = 1}^\infty w_k\int_{-\infty}^\infty h_k(x)\varphi(x)dx = 0\\
+&amp; f_0(x) \geq 0 \Leftrightarrow
+1 + \sum\limits_{k = 1}^\infty w_kh_k(x) \geq0, \forall x\in\mathbb{R}
+\end{array}
+\]</span> The first constraint is self-satisfied for all <span class="math inline">\(w\)</span>: <span class="math inline">\(\int_{-\infty}^\infty h_k(x)\varphi(x)dx = 0\)</span> for any <span class="math inline">\(k\geq1\)</span> since <span class="math inline">\(h_k\)</span> and <span class="math inline">\(h_0 \equiv1\)</span> are orthogonal with respect to <span class="math inline">\(\varphi\)</span>.</p>
+<p>The second constraint and the objective are intractable in the present form because of the involvement of <span class="math inline">\(\infty\)</span>. Therefore we need to make another two key assumptions as follows.</p>
+<div id="assumption-1-the-pairwise-correlation-rho_ij-are-on-average-moderate-enough-such-that-the-influence-of-w_kh_k-will-vanish-for-sufficiently-large-k." class="section level3">
+<h3>Assumption 1: the pairwise correlation <span class="math inline">\(\rho_{ij}\)</span> are on average moderate enough, such that the influence of <span class="math inline">\(W_kh_k\)</span> will vanish for sufficiently large <span class="math inline">\(k\)</span>.</h3>
+<p>We assume that the pairwise correlation <span class="math inline">\(\rho_{ij}\)</span> are on average moderate enough, such that the influence of <span class="math inline">\(W_kh_k\)</span> will vanish for sufficiently large <span class="math inline">\(k\)</span>. Note that it doesn’t hold true in general. Recall that</p>
+<p><span class="math display">\[
+\text{var}(W_k) = \alpha_k / k! = \bar{\rho_{ij}^k} / k! \leq 1/k! \ ,
+\]</span> so it seems <strong><span class="math inline">\(W_k^2\)</span> will vanish in factorial order</strong>, yet on the other hand,</p>
+<p><span class="math display">\[
+\int_{-\infty}^\infty h_k^2(x)\varphi(x)dx = k!
+\]</span></p>
+<p>so <strong><span class="math inline">\(h_k^2\)</span> also scales in factorial order</strong>. Therefore, it’s not at all clear that the influence of <span class="math inline">\(W_kh_k\)</span> will decay in the most general case. So the decay of higher orders largely rely on the decay of higher order empirical moments of pairwise correlation <span class="math inline">\(\alpha_k\)</span>, which characterizes <span class="math inline">\(\rho_{ij}^k\)</span>.</p>
+<p>As a result, we here assume that <span class="math inline">\(\rho_{ij}\)</span>’s are on average moderate, so <span class="math inline">\(\alpha_k\)</span> decays faster, leading to faster decaying of <span class="math inline">\(W_k\)</span>, probably as well as that of <span class="math inline">\(W_kh_k\)</span>. <em>Ignoring this assumption would cause problem at least theoretically, as detailed later.</em></p>
+<p>With this assumption, we can stop at a large <span class="math inline">\(K\)</span>; that is, <span class="math inline">\(f_0(x) = \varphi(x)\left(1 + \sum\limits_{k = 1}^K W_kh_k(x)\right)\)</span>. <em>We also need to specify a method to choose <span class="math inline">\(K\)</span> in a systematic way.</em></p>
+</div>
+<div id="assumption-2-we-further-assume-that-the-number-of-observations-n-is-sufficiently-large-so-that-we-can-use-the-n-observed-z-scores-in-place-of-the-intractable-all-xinmathbbr-in-the-second-constraint." class="section level3">
+<h3>Assumption 2: we further assume that the number of observations <span class="math inline">\(n\)</span> is sufficiently large, so that we can use the <span class="math inline">\(n\)</span> observed <span class="math inline">\(z\)</span> scores in place of the intractable all <span class="math inline">\(x\in\mathbb{R}\)</span> in the second constraint.</h3>
+<p>We further assume that the number of observations <span class="math inline">\(n\)</span> is sufficiently large, so that we can use the <span class="math inline">\(n\)</span> observed <span class="math inline">\(z\)</span> scores in place of the intractable all <span class="math inline">\(x\in\mathbb{R}\)</span> in the second constraint.</p>
+<p>That is, <span class="math inline">\(1 + \sum\limits_{k = 1}^K w_kh_k(z_i) \geq0\)</span>. <em>Ignoring this assumption would also lead to numerical instability, as detailed later.</em></p>
+</div>
+<div id="convex-optimization" class="section level3">
+<h3>Convex optimization</h3>
+<p>With these assumptions, the problem is now a convex optimization.</p>
+<p><span class="math display">\[
+\begin{array}{rl}
+\max\limits_{w_1, \ldots, w_K} &amp; \sum\limits_{i = 1}^n\log\left(1 +\sum\limits_{k = 1}^K w_kh_k(z_i)\right)\\
+\text{s.t.} &amp; 
+1 + \sum\limits_{k = 1}^K w_kh_k(z_i) \geq0
+\end{array}
+\]</span> It can also be written as</p>
+<p><span class="math display">\[
+\begin{array}{rl}
+\max\limits_{w} &amp; \sum\log\left(1 +Hw\right)\\
+\text{s.t.} &amp; 
+1 +Hw \geq0
+\end{array}
+\]</span></p>
+<p>where <span class="math inline">\(H_{ik} = h_k(z_i)\)</span>.</p>
+</div>
+</div>
+<div id="session-information" class="section level2">
+<h2>Session Information</h2>
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 3.3.2 (2016-10-31)
+Platform: x86_64-apple-darwin13.4.0 (64-bit)
+Running under: macOS Sierra 10.12.3
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+loaded via a namespace (and not attached):
+ [1] backports_1.0.5 magrittr_1.5    rprojroot_1.2   tools_3.3.2    
+ [5] htmltools_0.3.5 yaml_2.1.14     Rcpp_0.12.10    stringi_1.1.2  
+ [9] rmarkdown_1.3   knitr_1.15.1    git2r_0.18.0    stringr_1.2.0  
+[13] digest_0.6.11   workflowr_0.4.0 evaluate_0.10  </code></pre>
+</div>
+
+<hr>
+<p>
+    This <a href="http://rmarkdown.rstudio.com">R Markdown</a> site was created with <a href="https://github.com/jdblischak/workflowr">workflowr</a>
+</p>
+<hr>
+
+<!-- To enable disqus, uncomment the section below and provide your disqus_shortname -->
+
+<!-- disqus
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'rmarkdown'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+-->
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

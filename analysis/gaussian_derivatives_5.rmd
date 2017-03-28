@@ -1,0 +1,66 @@
+---
+title: "Empirical Null with Gaussian Derivatives: Numerical Constraints"
+author: "Lei Sun"
+date: 2017-03-27
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+
+## Numerical examples when $\rho_{ij}$ is large
+
+As [previous examples](gaussian_derivatives_2.html) showed, current implementation can handle slight deflation, which indicates a decent positive correlation.
+
+```{r, message = FALSE, cache = TRUE, result = "hide"}
+source("../code/ecdfz.R")
+rhoV = c(0.1, 0.5, 0.9)
+n = 1e4
+res = list()
+x = seq(-3, 3, 0.01)
+i = 1
+for (rho in rhoV) {
+  z = rnorm(1) * sqrt(rho) + rnorm(n) * sqrt(1 - rho)
+  fit.ecdfz = ecdfz.optimal(z)
+  res[[i]] = list(rho = rho, z = z, fit.ecdfz = fit.ecdfz)
+  i = i + 1
+}
+```
+
+```{r, message = FALSE, echo = TRUE}
+H = sapply(1:5, EQL::hermite, x = x)
+for (i in 1:length(rhoV)) {
+  hist(res[[i]]$z, xlab = "z score", prob = TRUE, xlim = range(x), main = bquote(rho == .(rhoV[i])), breaks = 100)
+  lines(x, dnorm(x), col = "red")
+  lines(x, (cbind(H[, 1:res[[i]]$fit.ecdfz$optimal$ord.optimal]) %*% res[[1]]$fit.ecdfz$optimal$w.optimal + 1) * dnorm(x), col = "blue")
+}
+```
+
+## Method of moments estimates
+
+## Constraints of moments
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```

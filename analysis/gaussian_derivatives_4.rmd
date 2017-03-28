@@ -1,0 +1,168 @@
+---
+title: "Empirical Null with Gaussian Derivatives: Perfect Correlation"
+author: "Lei Sun"
+date: 2017-03-26
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+## Can $K$ be too small?
+
+[Another assumption](gaussian_derivatives.rmd) to make the problem tractable is that the pairwise correlation $\rho_{ij}$ is moderate enough so $W_k\varphi^{(k)}$ vanishes as the order $k$ increases.  With this assumption we can stop at a sufficiently large $K$ without consideration higher order Gaussian derivatives.  But what if $\rho_{ij}$ is large?
+
+## Extreme case: $\rho_{ij} \equiv 1$
+
+When we have perfect correlation among all $z$ scores, the approximate limit observed density $f_0(x)\to\delta_z(x) = \delta(x-z)$.  That is, with probability one, we observe $z_1 = \cdots = z_n = z$, as $n\to\infty$, $f_0(x)$ goes to a Dirac delta function peak at the observed $z$, and zero elsewhere.  Now the question is, can this Dirac delta function be decomposed with the Gaussian $\varphi$ and its derivatives $\varphi^{(k)}$, so that we still have
+
+$$
+f_0(x) = \delta(x - z) = \varphi(x)\sum\limits_{k = 0}^\infty W_kh_k(x)
+$$
+with appropriate $W_k$'s?
+
+Using the orthogonality of Hermite functions, [we have](gaussian_derivatives.rmd)
+
+$$
+W_k = \frac{1}{k!}\int_{-\infty}^{\infty}h_k(x)f_0(x)dx = \frac{1}{k!}\int_{-\infty}^{\infty}h_k(x)\delta(x-z)dx = \frac{1}{k!}h_k(z)
+$$
+Now the decomposition $\varphi(x)\sum\limits_{k = 0}^\infty W_kh_k(x)$ becomes
+
+$$
+\varphi(x)\sum\limits_{k = 0}^\infty \frac{1}{k!}h_k(z)h_k(x)
+$$
+It turns out this equation is connected to [Mehler's formula](https://en.wikipedia.org/wiki/Mehler_kernel) which can be [shown](https://en.wikipedia.org/wiki/Hermite_polynomials#Completeness_relation) to give the identity
+
+$$
+\sum\limits_{k = 0}^\infty \psi_k(x)\psi_k(z) = \delta(x - z)
+$$
+where $\psi_k$'s are the [Hermite functions](https://en.wikipedia.org/wiki/Hermite_polynomials#Hermite_functions) defined as
+
+$$
+\begin{array}{rrcl}
+& \psi_k(x) &=& (k!)^{-1/2}(\sqrt{\pi})^{-1/2}e^{-x^2/2}h_k(\sqrt{2}x)\\
+\Rightarrow & h_k(x) &=& (k!)^{1/2}(\sqrt{\pi})^{1/2}e^{x^2/4}\psi_k\left(\frac x{\sqrt{2}}\right)\\
+\Rightarrow & \varphi(x)\sum\limits_{k = 0}^\infty \frac{1}{k!}h_k(z)h_k(x) & =&
+\frac1{\sqrt{2}}e^{-\frac{x^2}4+\frac{z^2}4}\sum\limits_{k = 0}^\infty
+\psi_k\left(\frac x{\sqrt{2}}\right)\psi_k\left(\frac z{\sqrt{2}}\right)\\
+& &=&
+\frac1{\sqrt{2}}e^{-\frac{x^2}4+\frac{z^2}4}
+\delta\left(\frac{x - z}{\sqrt{2}}\right)
+\end{array}
+$$
+Note that the Dirac delta function has a property that $\delta(\alpha x) = \delta(x) / |\alpha| \Rightarrow \frac1{\sqrt{2}}\delta\left(\frac{x - z}{\sqrt{2}}\right) = \delta(x - z)$.  Therefore,
+
+$$
+\varphi(x)\sum\limits_{k = 0}^\infty \frac{1}{k!}h_k(z)h_k(x)
+=
+\delta(x-z)\exp\left(-\frac{x^2}4+\frac{z^2}4\right)
+$$
+Note that $\exp\left(-\frac{x^2}4+\frac{z^2}4\right)$ is bounded for any $z\in\mathbb{R}$, so $\delta(x-z)\exp\left(-\frac{x^2}4+\frac{z^2}4\right)$ vanishes to $0$ for any $x\neq z$, and
+
+$$
+\int_{-\infty}^\infty \delta(x-z)\exp\left(-\frac{x^2}4+\frac{z^2}4\right)dx = 
+\exp\left(-\frac{z^2}4+\frac{z^2}4\right) = 1
+$$
+Hence, in essence, $\delta(x-z)\exp\left(-\frac{x^2}4+\frac{z^2}4\right) = \delta(x-z)$.  Therefore we have
+$$
+f_0(x) = \varphi(x)\sum\limits_{k = 0}^\infty W_kh_k(x)
+=
+\varphi(x)\sum\limits_{k = 0}^\infty \frac{1}{k!}h_k(z)h_k(x)
+=\delta(x -z)
+$$
+when 
+$$
+W_k = \frac{1}{k!}h_k(z)
+$$
+Thus we show that the Dirac delta function can be decomposed by Gaussian density and its derivatives.
+
+### Visualization with finite $K$
+
+With Gaussian and its infinite orders of derivatives, we can compose a Dirac delta function at any position, yet what happens if we stop at a finite $K$?  Let $f_0^K$ be the approximation of $f_0 = \delta_z$ with first $K$ Gaussian derivatives.  That is,
+
+$$
+f_0^K(x) = \varphi(x)\sum\limits_{k = 0}^K \frac{1}{k!}h_k(z)h_k(x) \ .
+$$
+Meanwhile, let $F_0^K(x) = \int_{-\infty}^x f_0^K(u)du$.  It's easy to shown that
+
+$$
+F_0^K(x) = \Phi(x) - \varphi(x)\sum\limits_{k = 1}^K W_k h_{k - 1}(x) = \Phi(x) - \varphi(x) \sum\limits_{k = 1}^K \frac{1}{k!}h_k(z) h_{k - 1}(x) \ .
+$$
+
+Theoretically, $f_0^K$ is an approximation to empirical density of perfectly correlated $z$ scores; hence, as $K\to\infty$, $f_0^K\to\delta_z$.  Similarly, $F_0^K$ is an approximation to empirical cdf of perfectly correlated $z$ scores; hence, as $K\to\infty$, $f_0^K$ should converge to the $0$-$1$ step function, and the location of the step is the observed $z$.
+
+In practice, the convergence is not fast.  As we can see from the following visualization, the difference between $f_0^K$ and $\delta_z$, as well as that between $F_0^K$ and the step function, is still conspicuous even if $K = 20$, which is about the highest order `R` can reasonbly handle in the current implementation.  Therefore, at least in theory it's possible that $K$ can be too small.
+
+**Note that the oscillation near the presumptive step may be connected with [Gibbs phenomenon](https://en.wikipedia.org/wiki/Gibbs_phenomenon).**
+
+
+```{r, cache = TRUE, echo = FALSE}
+z = c(-1, 0, 2)
+x = seq(-max(abs(min(z) - 3), abs(max(z) + 3)), max(abs(min(z) - 3), abs(max(z) + 3)), 0.01)
+K = c(1, 10, 20)
+H = sapply(1:max(K), EQL::hermite, x = x)
+```
+
+```{r, cache = TRUE, echo = FALSE}
+K = c(1, 2, 3, 4, 10, 20)
+col.0 = "red"
+col.inf = "black"
+col = colorRampPalette(c(col.inf, col.0))(length(K) + 2)[-c(1, length(K) + 2)]
+# col = gray(0 : (length(K) - 1) / length(K))
+for (zscore in z) {
+  cat("Under perfect correlation, observed z scores =", zscore, "\n")
+  if (is.element(zscore, x)) {
+    w = H[which(x == zscore), ]
+  } else {
+    w = hermite(x = zscore, n = 1:max(K))
+  }
+  w = w / factorial(1:max(K))
+  plot(x, (H %*% w + 1) * dnorm(x), type = "n", xlab = "x", ylab = expression(f[0]^K~(x)), main = bquote(f[0]^K~"when observed z scores ="~.(zscore)))
+  lines(x, dnorm(x), col = col.0)
+  i = 1
+  for (k in sort(K, decreasing = TRUE)) {
+    lines(x, (cbind(H[, 1:k]) %*% w[1:k] + 1) * dnorm(x), col = col[i])
+    i = i + 1
+  }
+  segments(zscore, 0, zscore, par('usr')[4] + 1, col = col.inf)
+  segments(min(x), 0, max(x), 0, col = col.inf)
+  legend("topright", lty = 1, col = c(col.0, rev(col), col.inf), legend = c(expression(paste("K = 0, ", varphi)), paste("K =", K), expression(paste("K = ", infinity, ", ", delta[z]))))
+  plot(x, x, type = "n", xlab = "x", ylab = expression(F[0]^K~(x)), main = bquote(F[0]^K~"when observed z scores ="~.(zscore)), ylim = c(-0.4, 1.1))
+  lines(x, pnorm(x), col = col.0)
+  i = 1
+  for (k in sort(K, decreasing = TRUE)) {
+    lines(x, pnorm(x) - cbind(cbind(1, H)[, 1:k]) %*% w[1:k] * dnorm(x), col = col[i])
+    i = i + 1
+  }
+  abline(h = 0, lty = 3, col = col.inf)
+  abline(h = 1, lty = 3, col = col.inf)
+  segments(min(x), 0, zscore, 0, col = col.inf)
+  segments(zscore, 0, zscore, 1, col = col.inf)
+  segments(zscore, 1, max(x), 1, col = col.inf)
+  legend("right", y = 0.9, lty = 1, col = c(col.0, rev(col), col.inf), legend = c(expression(paste("K = 0, ", Phi)), paste("K =", K), expression(paste("K = ", infinity))))
+}
+```
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```
