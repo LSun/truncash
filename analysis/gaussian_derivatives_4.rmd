@@ -1,5 +1,5 @@
 ---
-title: "Empirical Null with Gaussian Derivatives: Perfect Correlation"
+title: "Empirical Null with Gaussian Derivatives: Large Correlation"
 author: "Lei Sun"
 date: 2017-03-26
 output: html_document
@@ -160,6 +160,87 @@ for (zscore in z) {
   legend("right", y = 0.9, lty = 1, col = c(col.0, rev(col), col.inf), legend = c(expression(paste("K = 0, ", Phi)), paste("K =", K), expression(paste("K = ", infinity))))
 }
 ```
+
+## Fitting experiments when $\rho_{ij}$ is large
+
+As previous theoretical result indicates, when $\rho$ is large, a large $K$ is probably needed.  However, on the other hand, when $\rho$ is large, the effective sample size is small.  Indeed when $\rho\equiv1$, the sample size is essentially $1$.
+
+Let's take a look at some examples with pairwise correlations of $z$ scores $\rho_{ij}\equiv\rho$, $\rho$ moderate to high.  Such $z$ scores can be simulated as $z_i = \epsilon\sqrt{\rho} + e_i\sqrt{1-\rho}$, where $\epsilon, e_i$ are iid $N(0, 1)$.
+
+```{r, cache = TRUE}
+n = 1e4
+rho = 0.5
+set.seed(777)
+z = rnorm(1) * sqrt(rho) + rnorm(n) * sqrt(1 - rho)
+```
+
+```{r, cache = TRUE, results = "hide", message = FALSE}
+source("../code/ecdfz.R")
+fit.ecdfz = ecdfz.optimal(z)
+```
+
+```{r, cache = TRUE, include = FALSE}
+x = seq(-3, 3, 0.01)
+H = sapply(1:6, EQL::hermite, x = x)
+```
+
+When $\rho = 0.5$, current implementation with $K = 5$ fits positively correlationed z scores reasonably well.
+
+```{r, cache = TRUE, echo = FALSE}
+cat(n, "z scores with pairwise correlation =", rho)
+hist(z, prob = TRUE, xlim = range(x), breaks = 100)
+lines(x, dnorm(x), col = "red")
+lines(x, (H[, 1:5] %*% fit.ecdfz$res[[5]]$primal_values[[1]] + 1) * dnorm(x), col = "blue")
+legend("topleft", lty = 1, col = c('red', 'blue'), c('K = 0', 'K = 5'))
+```
+
+However, as $\rho$ gets larger, current implementation usually fails to find a good $K$ before the algorithm goes unstable, as illustrated in the following $\rho = 0.7$ plot.  $K = 3$ is obviously not enough, yet $K = 4$ has already gone wildly unstable.
+
+```{r, cache = TRUE, result = "hide"}
+n = 1e4
+rho = 0.7
+set.seed(777)
+z = rnorm(1) * sqrt(rho) + rnorm(n) * sqrt(1 - rho)
+```
+
+```{r, cache = TRUE, result = "hide", message = FALSE}
+source("../code/ecdfz.R")
+fit.ecdfz = ecdfz.optimal(z)
+```
+
+```{r, cache = TRUE, echo = FALSE}
+cat(n, "z scores with pairwise correlation =", rho)
+hist(z, prob = TRUE, xlim = range(x), breaks = 100)
+lines(x, dnorm(x), col = "red")
+col = c("yellow", "green", "blue")
+for (i in 2:4) {
+  lines(x, (H[, 1:i] %*% fit.ecdfz$res[[i]]$primal_values[[1]] + 1) * dnorm(x), col = col[i - 1])
+}
+legend("topleft", lty = 1, col = c('red', col), paste("K =", c(0, 2:4)))
+```
+
+When $\rho = 0.9$, the observed $z$ scores are so concentrated in a small range, even if we have $10,000$ of them, making the effective sample size hopelessly small.  Current implementation can't even handle this data set; it goes crazy when $K = 2$.
+
+```{r, cache = TRUE, result = "hide"}
+n = 1e4
+rho = 0.9
+set.seed(777)
+z = rnorm(1) * sqrt(rho) + rnorm(n) * sqrt(1 - rho)
+```
+
+```{r, cache = TRUE, result = "hide", message = FALSE}
+source("../code/ecdfz.R")
+fit.ecdfz = ecdfz(z, 2)
+```
+
+```{r, cache = TRUE, echo = FALSE}
+cat(n, "z scores with pairwise correlation =", rho)
+hist(z, prob = TRUE, xlim = range(x), breaks = 100)
+lines(x, dnorm(x), col = "red")
+lines(x, (H[, 1:2] %*% fit.ecdfz$res[[1]]$primal_values[[1]] + 1) * dnorm(x), col = "blue")
+legend("topleft", lty = 1, col = c('red', "blue"), paste("K =", c(0, 2)))
+```
+
 
 ## Session information
 
