@@ -95,13 +95,13 @@ for (i in 1:length(DataSet)) {
 }
 ```
 
-```{r, cache = TRUE, result = "hide", message = FALSE}
+```{r, cache = TRUE, echo = FALSE, message = FALSE}
 library(EQL)
 x.pt = seq(-5, 5, 0.01)
 H.pt = sapply(1:15, EQL::hermite, x = x.pt)
 ```
 
-```{r, cache = TRUE}
+```{r, cache = TRUE, echo = FALSE}
 for (i in 1:length(DataSet)) {
   cat("Data Set", DataSet[i], ": Number of BH's False Discoveries:", res_DataSet[[i]]$fd.bh, "; ASH's pihat0 =", res_DataSet[[i]]$fit.ash.pi0, "; Chosen number of Gaussian derivatives K =", res_DataSet[[i]]$fit.ecdfz$optimal$ord.optimal, "\n")
   cat("Optimal weights of Gaussian derivatives w =\n")

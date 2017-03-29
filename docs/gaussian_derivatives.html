@@ -309,8 +309,8 @@ div.tocify {
 </div>
 
 
-<p><strong>Last updated:</strong> 2017-03-27</p>
-<p><strong>Code version:</strong> e384d46</p>
+<p><strong>Last updated:</strong> 2017-03-28</p>
+<p><strong>Code version:</strong> 5bd5d70</p>
 <div id="empirical-null" class="section level2">
 <h2>Empirical null</h2>
 <p>Correlation among summary statistics can distort hypothesis testing and signal estimation by making the observed statistics deviate from their theoretical distribution. See previous simulations (<a href="correlated_z.html">here</a>, <a href="correlated_z_2.html">here</a>, and <a href="correlated_z_3.html">here</a>) for illustration.</p>
@@ -387,6 +387,26 @@ h_{k-1}(x)\varphi(x)\\
 \end{array}
 \]</span></p>
 </div>
+<div id="illustration" class="section level2">
+<h2>Illustration</h2>
+<div id="first-orders-of-gaussian-derivatives-and-hermite-polynomials" class="section level3">
+<h3>First orders of Gaussian derivatives and Hermite polynomials</h3>
+<p><img src="figure/gaussian_derivatives.Rmd/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/gaussian_derivatives.Rmd/unnamed-chunk-2-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/gaussian_derivatives.Rmd/unnamed-chunk-2-3.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="scaled-and-unscaled-gaussian-derivatives" class="section level3">
+<h3>Scaled and unscaled Gaussian derivatives</h3>
+<p>The expectation of <span class="math inline">\(W_k^2\)</span> vanishes in the order of <span class="math inline">\(k!\)</span>, and the average <span class="math inline">\(h_k^2\)</span> also scales in the order of <span class="math inline">\(k!\)</span>, and we can define “scaled” version of these functions and quantities:</p>
+<p><span class="math display">\[
+\begin{array}{c}
+\varphi_s^{(k)} = \frac1{\sqrt{k!}}\varphi^{(k)}\\
+h_k^s(x) = \frac1{\sqrt{k!}}h_k(x)\\
+W_k^s = \sqrt{k!}W_k
+\end{array}
+\]</span></p>
+<p>We can see that the scaled Gaussian derivatives (<span class="math inline">\(\varphi_s^{(k)}\)</span>) and Hermite polynomials <span class="math inline">\(h_k^s(x)\)</span> are basically in the same order of magnitude for increasing orders.</p>
+<p><img src="figure/gaussian_derivatives.Rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/gaussian_derivatives.Rmd/unnamed-chunk-3-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/gaussian_derivatives.Rmd/unnamed-chunk-3-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/gaussian_derivatives.Rmd/unnamed-chunk-3-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/gaussian_derivatives.Rmd/unnamed-chunk-3-5.png" width="672" style="display: block; margin: auto;" /><img src="figure/gaussian_derivatives.Rmd/unnamed-chunk-3-6.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+</div>
 <div id="fitting-the-empirical-null" class="section level2">
 <h2>Fitting the empirical null</h2>
 <p>Given <span class="math inline">\(z\)</span> scores <span class="math inline">\(z_1, \ldots, z_n\)</span> with known marginal distribution <span class="math inline">\(N(0, 1)\)</span> but unknown correlation, their (right-sided) empirical cdf <span class="math inline">\(\hat F(x)\)</span> can be observed. Then these <span class="math inline">\(z\)</span> scores can be seen as if they are independently and identically sampled from this observed empirical cdf.</p>
@@ -460,10 +480,10 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 loaded via a namespace (and not attached):
- [1] backports_1.0.5 magrittr_1.5    rprojroot_1.2   tools_3.3.2    
- [5] htmltools_0.3.5 yaml_2.1.14     Rcpp_0.12.10    stringi_1.1.2  
- [9] rmarkdown_1.3   knitr_1.15.1    git2r_0.18.0    stringr_1.2.0  
-[13] digest_0.6.11   workflowr_0.4.0 evaluate_0.10  </code></pre>
+ [1] backports_1.0.5  magrittr_1.5     rprojroot_1.2    tools_3.3.2     
+ [5] htmltools_0.3.5  yaml_2.1.14      Rcpp_0.12.10     codetools_0.2-15
+ [9] stringi_1.1.2    rmarkdown_1.3    knitr_1.15.1     git2r_0.18.0    
+[13] stringr_1.2.0    digest_0.6.11    workflowr_0.4.0  evaluate_0.10   </code></pre>
 </div>
 
 <hr>

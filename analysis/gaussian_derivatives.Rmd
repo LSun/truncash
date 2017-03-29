@@ -114,6 +114,131 @@ h_{k-1}(x)\varphi(x)\\
 \end{array}
 $$
 
+## Illustration
+
+```{r, cache = TRUE, echo = FALSE, message = FALSE}
+K = 10
+x = seq(-4, 4, 0.01)
+H = sapply(1:K, EQL::hermite, x = x)
+Hphi = t(t(H) %*% diag(dnorm(x))) %*% diag((-1)^(1:K))
+```
+
+### First orders of Gaussian derivatives and Hermite polynomials
+
+```{r, cache = TRUE, echo = FALSE}
+col = rainbow(K)
+k = 4
+ylimk = range(Hphi[, 1:k])
+# col = heat.colors(k)
+# col = rainbow(k)
+# col = rainbow(k + 2, start = "black", end = "red")[-c(1, k + 2)]
+# col = colorRampPalette(c("black", "red"))(k + 2)[-c(1, k + 2)]
+plot(x, dnorm(x), type = "l", ylim = ylimk, ylab = expression(varphi^(k)~(x)), main = expression(paste("Gaussian Derivatives ", varphi^k)))
+for (i in 1:k) {
+  lines(x, Hphi[, i], col = col[i], lty = 1)
+}
+abline(h = 0, lty = 3, col = "blue")
+abline(v = 0, lty = 3, col = "blue")
+legend("topright", lty = 1, col = c(1, col),
+       legend = expression(varphi,
+                           varphi^1,
+                           varphi^2,
+                           varphi^3,
+                           varphi^4
+                          )
+      )
+
+plot(x, rep(1, length(x)), type = "l", ylim = c(-10, 10), ylab = expression((-1)^k~h[k](x)), main = expression(paste("Signed Hermite Polynomials ", (-1)^k~h[k](x))))
+for (i in 1:k) {
+  lines(x, H[, i] * (-1)^i, col = col[i], lty = 1)
+}
+abline(h = 0, lty = 3, col = "blue")
+abline(v = 0, lty = 3, col = "blue")
+legend("bottomright", lty = 1, col = c(1, col),
+       legend = expression(h[0], -h[1], h[2], -h[3], h[4]))
+
+plot(x, rep(1, length(x)), type = "l", ylim = c(-10, 10), ylab = expression(h[k](x)), main = expression(paste("Hermite Polynomials ", h[k](x))))
+for (i in 1:k) {
+  lines(x, H[, i], col = col[i], lty = 1)
+}
+abline(h = 0, lty = 3, col = "blue")
+abline(v = 0, lty = 3, col = "blue")
+legend("bottomright", lty = 1, col = c(1, col),
+       legend = expression(h[0], h[1], h[2], h[3], h[4]))
+```
+
+### Scaled and unscaled Gaussian derivatives
+
+The expectation of $W_k^2$ vanishes in the order of $k!$, and the average $h_k^2$ also scales in the order of $k!$, and we can define "scaled" version of these functions and quantities:
+
+$$
+\begin{array}{c}
+\varphi_s^{(k)} = \frac1{\sqrt{k!}}\varphi^{(k)}\\
+h_k^s(x) = \frac1{\sqrt{k!}}h_k(x)\\
+W_k^s = \sqrt{k!}W_k
+\end{array}
+$$
+
+We can see that the scaled Gaussian derivatives ($\varphi_s^{(k)}$) and Hermite polynomials $h_k^s(x)$ are basically in the same order of magnitude for increasing orders.
+
+```{r, cache = TRUE, echo = FALSE}
+## Unscaled phi^(k)
+col = rev(heat.colors(K + 1))
+k = 10
+ylimk = range(Hphi[, 1:k])
+plot(x, dnorm(x), type = "l", ylim = ylimk, ylab = expression(varphi^(k)~(x)), main = expression(paste("Unscaled Gaussian Derivatives ", varphi^(k))), col = col[1])
+for (i in 1:k) {
+  lines(x, Hphi[, i], col = col[i + 1], lty = 1)
+}
+abline(h = 0, lty = 3, col = "blue")
+abline(v = 0, lty = 3, col = "blue")
+
+## Scaled phi^(k)
+sHphi = Hphi[, 1:k] %*% diag(1 / sqrt(factorial(1:k)))
+plot(x, dnorm(x), type = "l", ylim = c(min(sHphi), dnorm(0)), ylab = expression(varphi^(k)~(x)/sqrt("k!")), main = expression(paste("Scaled Gaussian Derivatives ", varphi^(k)/sqrt("k!"))), col = col[1])
+abline(h = 0, lty = 3, col = "blue")
+abline(v = 0, lty = 3, col = "blue")
+for (i in 1:k) {
+  lines(x, sHphi[, i], col = col[i + 1], lty = 1)
+}
+
+## Unscaled (-1)^k * h[k]
+sH = H[, 1:k] %*% diag((-1)^(1:k))
+plot(x, rep(1, length(x)), type = "l", ylim = range(sH), ylab = expression((-1)^k~h[k](x)), main = expression(paste("Unscaled Signed Hermite Polynomials ", (-1)^k~h[k](x))), col = col[1])
+for (i in 1:k) {
+  lines(x, sH[, i], col = col[i + 1], lty = 1)
+}
+abline(h = 0, lty = 3, col = "blue")
+abline(v = 0, lty = 3, col = "blue")
+
+## Scaled (-1)^k * h[k]
+ssH = sH %*% diag(1 / sqrt(factorial(1:k)))
+plot(x, rep(1, length(x)), type = "l", ylim = c(-4, 4), ylab = expression((-1)^k~h[k](x) / sqrt("k!")), main = expression(paste("Scaled Signed Hermite Polynomials ", (-1)^k~h[k](x) / sqrt("k!"))), col = col[1])
+for (i in 1:k) {
+  lines(x, ssH[, i], col = col[i + 1], lty = 1)
+}
+abline(h = 0, lty = 3, col = "blue")
+abline(v = 0, lty = 3, col = "blue")
+
+# Unscale h[k]
+plot(x, rep(1, length(x)), type = "l", ylim = range(H), ylab = expression(h[k](x)), main = expression(paste("Unscaled Hermite Polynomials ", h[k](x))), col = col[1])
+for (i in 1:k) {
+  lines(x, H[, i], col = col[i + 1], lty = 1)
+}
+abline(h = 0, lty = 3, col = "blue")
+abline(v = 0, lty = 3, col = "blue")
+
+# Scale h[k]
+scH = H[, 1:k] %*% diag(1 / sqrt(factorial(1:k)))
+plot(x, rep(1, length(x)), type = "l", ylim = c(-4, 4), ylab = expression(h[k](x) / sqrt("k!")), main = expression(paste("Scaled Hermite Polynomials ", h[k](x) / sqrt("k!"))), col = col[1])
+for (i in 1:k) {
+  lines(x, scH[, i], col = col[i + 1], lty = 1)
+}
+abline(h = 0, lty = 3, col = "blue")
+abline(v = 0, lty = 3, col = "blue")
+```
+
+
 
 ## Fitting the empirical null
 
