@@ -74,7 +74,7 @@ Inspired by [Schwartzman 2010](http://amstat.tandfonline.com/doi/abs/10.1198/jas
 
 * [Fitting empirical null with Gaussian derivatives: Weight constraints](gaussian_derivatives_5.html)
 
-In Gaussian derivatives decomposition, weights $W_k$ contain substantial information. In order to produce a proper density, and in order to regularize the fitted density such that it plausibly describes an empiricall correlated null, we need to impose constraints on the weights.
+In Gaussian derivatives decomposition, weights $W_k$ contain substantial information. In order to produce a proper density, and in order to regularize the fitted density to make it describe a plausible empiricall correlated null, constraints need to be imposed on the weights.
 
 * [True signal vs correlated null](alternative.html)
 
