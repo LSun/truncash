@@ -13,7 +13,7 @@
 
 <meta name="date" content="2017-03-26" />
 
-<title>Empirical Null with Gaussian Derivatives: Perfect Correlation</title>
+<title>Empirical Null with Gaussian Derivatives: Large Correlation</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -302,7 +302,7 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Empirical Null with Gaussian Derivatives: Perfect Correlation</h1>
+<h1 class="title toc-ignore">Empirical Null with Gaussian Derivatives: Large Correlation</h1>
 <h4 class="author"><em>Lei Sun</em></h4>
 <h4 class="date"><em>2017-03-26</em></h4>
 
@@ -326,7 +326,7 @@ shared across the workflowr files. -->
 <p><span class="math display">\[
 f_0(x) = \delta(x - z) = \varphi(x)\sum\limits_{k = 0}^\infty W_kh_k(x)
 \]</span> with appropriate <span class="math inline">\(W_k\)</span>’s?</p>
-<p>Using the orthogonality of Hermite functions, <a href="gaussian_derivatives.rmd">we have</a></p>
+<p>Using the orthogonality of Hermite functions, <a href="gaussian_derivatives.html#gaussian_derivatives_and_hermite_polynomials">we have</a></p>
 <p><span class="math display">\[
 W_k = \frac{1}{k!}\int_{-\infty}^{\infty}h_k(x)f_0(x)dx = \frac{1}{k!}\int_{-\infty}^{\infty}h_k(x)\delta(x-z)dx = \frac{1}{k!}h_k(z)
 \]</span> Now the decomposition <span class="math inline">\(\varphi(x)\sum\limits_{k = 0}^\infty W_kh_k(x)\)</span> becomes</p>
@@ -430,15 +430,11 @@ locale:
 attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
-other attached packages:
-[1] cvxr_0.0.0.9009 EQL_1.0-0       ttutils_1.0-1  
-
 loaded via a namespace (and not attached):
- [1] Rcpp_0.12.10     codetools_0.2-15 lattice_0.20-34  digest_0.6.11   
- [5] rprojroot_1.2    MASS_7.3-45      grid_3.3.2       backports_1.0.5 
- [9] magrittr_1.5     evaluate_0.10    stringi_1.1.2    Matrix_1.2-7.1  
-[13] rmarkdown_1.3    tools_3.3.2      stringr_1.2.0    yaml_2.1.14     
-[17] htmltools_0.3.5  knitr_1.15.1    </code></pre>
+ [1] backports_1.0.5 magrittr_1.5    rprojroot_1.2   tools_3.3.2    
+ [5] htmltools_0.3.5 yaml_2.1.14     Rcpp_0.12.10    stringi_1.1.2  
+ [9] rmarkdown_1.3   knitr_1.15.1    stringr_1.1.0   digest_0.6.9   
+[13] evaluate_0.10  </code></pre>
 </div>
 
 <hr>

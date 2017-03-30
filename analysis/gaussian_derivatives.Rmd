@@ -179,7 +179,16 @@ W_k^s = \sqrt{k!}W_k
 \end{array}
 $$
 
-We can see that the scaled Gaussian derivatives ($\varphi_s^{(k)}$) and Hermite polynomials $h_k^s(x)$ are basically in the same order of magnitude for increasing orders.
+We can see that the scaled Gaussian derivatives ($\varphi_s^{(k)}$) and Hermite polynomials $h_k^s(x)$ are basically in the same order of magnitude for increasing orders.  *Therefore, it might make more sense to think of certain quantities in terms of their scaled versions*
+
+$$
+\begin{array} {rcl}
+f_0(x) &=& 
+\varphi(x)\left(1 + \sum\limits_{k = 1}^\infty W_kh_k(x)\right)\\
+&= &
+\varphi(x)\left(1 + \sum\limits_{k = 1}^\infty W_k^sh_k^s(x)\right)
+\end{array}
+$$
 
 ```{r, cache = TRUE, echo = FALSE}
 ## Unscaled phi^(k)

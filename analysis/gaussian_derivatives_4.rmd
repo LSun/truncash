@@ -39,7 +39,7 @@ f_0(x) = \delta(x - z) = \varphi(x)\sum\limits_{k = 0}^\infty W_kh_k(x)
 $$
 with appropriate $W_k$'s?
 
-Using the orthogonality of Hermite functions, [we have](gaussian_derivatives.rmd)
+Using the orthogonality of Hermite functions, [we have](gaussian_derivatives.html#gaussian_derivatives_and_hermite_polynomials)
 
 $$
 W_k = \frac{1}{k!}\int_{-\infty}^{\infty}h_k(x)f_0(x)dx = \frac{1}{k!}\int_{-\infty}^{\infty}h_k(x)\delta(x-z)dx = \frac{1}{k!}h_k(z)
