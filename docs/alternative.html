@@ -13,7 +13,7 @@
 
 <meta name="date" content="2017-03-29" />
 
-<title>Alternative vs Correlated Null</title>
+<title>True Signal vs Correlated Null</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -302,7 +302,7 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Alternative vs Correlated Null</h1>
+<h1 class="title toc-ignore">True Signal vs Correlated Null</h1>
 <h4 class="author"><em>Lei Sun</em></h4>
 <h4 class="date"><em>2017-03-29</em></h4>
 
@@ -329,7 +329,7 @@ z_j \sim N(\beta_j, 1)
 </div>
 <div id="illustration" class="section level2">
 <h2>Illustration</h2>
-<p>Scale weights <span class="math inline">\(w_k^s = \sqrt{k!}w_k\)</span>, so that <span class="math inline">\(\text{var}(w_k^s) = \alpha_k = \bar{\rho_{ij}^k}\)</span>.</p>
+<p>Let normalized weights <span class="math inline">\(w_k^s = w_k\sqrt{k!}\)</span> with variance <span class="math inline">\(\text{var}(w_k^s) = \alpha_k = \bar{\rho_{ij}^k}\)</span>.</p>
 <pre class="r"><code>n = 1e4
 m = 5
 set.seed(777)
@@ -345,18 +345,36 @@ for (i in 1:3) {
   ecdfz.fit = ecdfz.optimal(z)
   res[[i]] = list(z = z, p = p, bh.fd = bh.fd, pihat0.ash = pihat0.ash, ecdfz.fit = ecdfz.fit)
 }</code></pre>
-<pre><code>Number of False Discoveries: 207 ; pihat0 = 0.3309512 
-Scaled weights:
+<pre><code>Number of Discoveries: 207 ; pihat0 = 0.3309512 
+Log-likelihood with N(0, 2): -17629.27 
+Log-likelihood with Gaussian Derivatives: -17634.06 
+Normalized weights:
 1 : -0.0177035771860527 ; 2 : 0.689887136368602 ; 3 : -0.0509478089605657 ; 4 : 0.474815572091947 ; 5 : -0.0255292356243276 ; 6 : 0.197260355735445 ; 7 : 0.0209642526780779 ;</code></pre>
-<p><img src="figure/alternative.rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-5.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-6.png" width="672" style="display: block; margin: auto;" /></p>
-<pre><code>Number of False Discoveries: 210 ; pihat0 = 0.3484933 
-Scaled weights:
+<p><img src="figure/alternative.rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Zoom in to the positive tails:</code></pre>
+<p><img src="figure/alternative.rmd/unnamed-chunk-4-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Zoom in to the negative tails:</code></pre>
+<p><img src="figure/alternative.rmd/unnamed-chunk-4-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-5.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-6.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-7.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-8.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of Discoveries: 210 ; pihat0 = 0.3484933 
+Log-likelihood with N(0, 2): -17695.54 
+Log-likelihood with Gaussian Derivatives: -17696.16 
+Normalized weights:
 1 : -0.00737514574580675 ; 2 : 0.710989131104057 ; 3 : -0.0342447864738427 ; 4 : 0.555898827287519 ; 5 : -0.00986066214392825 ; 6 : 0.26603682769249 ; 7 : 0.0306361333022764 ;</code></pre>
-<p><img src="figure/alternative.rmd/unnamed-chunk-4-7.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-8.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-9.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-10.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-11.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-12.png" width="672" style="display: block; margin: auto;" /></p>
-<pre><code>Number of False Discoveries: 190 ; pihat0 = 0.3438938 
-Scaled weights:
+<p><img src="figure/alternative.rmd/unnamed-chunk-4-9.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Zoom in to the positive tails:</code></pre>
+<p><img src="figure/alternative.rmd/unnamed-chunk-4-10.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Zoom in to the negative tails:</code></pre>
+<p><img src="figure/alternative.rmd/unnamed-chunk-4-11.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-12.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-13.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-14.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-15.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-16.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of Discoveries: 190 ; pihat0 = 0.3438938 
+Log-likelihood with N(0, 2): -17620.41 
+Log-likelihood with Gaussian Derivatives: -17625.35 
+Normalized weights:
 1 : 0.00366309861970015 ; 2 : 0.686706854397367 ; 3 : 0.0586825498559195 ; 4 : 0.519903434456322 ; 5 : 0.0632968145789646 ; 6 : 0.230863448021081 ; 7 : 0.0428429372260126 ;</code></pre>
-<p><img src="figure/alternative.rmd/unnamed-chunk-4-13.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-14.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-15.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-16.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-17.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-18.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/alternative.rmd/unnamed-chunk-4-17.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Zoom in to the positive tails:</code></pre>
+<p><img src="figure/alternative.rmd/unnamed-chunk-4-18.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Zoom in to the negative tails:</code></pre>
+<p><img src="figure/alternative.rmd/unnamed-chunk-4-19.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-20.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-21.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-22.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-23.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-24.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="session-information" class="section level2">
 <h2>Session information</h2>
@@ -372,11 +390,19 @@ locale:
 attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
+other attached packages:
+[1] cvxr_0.0.0.9009 EQL_1.0-0       ttutils_1.0-1   ashr_2.1.5     
+
 loaded via a namespace (and not attached):
- [1] backports_1.0.5 magrittr_1.5    rprojroot_1.2   tools_3.3.2    
- [5] htmltools_0.3.5 yaml_2.1.14     Rcpp_0.12.10    stringi_1.1.2  
- [9] rmarkdown_1.3   knitr_1.15.1    stringr_1.2.0   digest_0.6.11  
-[13] evaluate_0.10  </code></pre>
+ [1] Rcpp_0.12.10      knitr_1.15.1      magrittr_1.5     
+ [4] MASS_7.3-45       doParallel_1.0.10 pscl_1.4.9       
+ [7] SQUAREM_2016.10-1 lattice_0.20-34   foreach_1.4.3    
+[10] stringr_1.1.0     tools_3.3.2       parallel_3.3.2   
+[13] grid_3.3.2        htmltools_0.3.5   iterators_1.0.8  
+[16] yaml_2.1.14       rprojroot_1.2     digest_0.6.9     
+[19] Matrix_1.2-7.1    codetools_0.2-15  evaluate_0.10    
+[22] rmarkdown_1.3     stringi_1.1.2     backports_1.0.5  
+[25] truncnorm_1.0-7  </code></pre>
 </div>
 
 <hr>

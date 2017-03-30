@@ -1,5 +1,5 @@
 ---
-title: "Alternative vs Correlated Null"
+title: "True Signal vs Correlated Null"
 author: "Lei Sun"
 date: 2017-03-29
 output: html_document
@@ -41,7 +41,7 @@ $$
 
 ## Illustration
 
-Scale weights $w_k^s = \sqrt{k!}w_k$, so that $\text{var}(w_k^s) = \alpha_k = 
+Let normalized weights $w_k^s = w_k\sqrt{k!}$ with variance $\text{var}(w_k^s) = \alpha_k = 
 \bar{\rho_{ij}^k}$.
 
 ```{r, cache = TRUE}
@@ -72,8 +72,10 @@ H.x = sapply(1:8, EQL::hermite, x = x)
 ```{r, cache = TRUE, echo = FALSE}
 K = c(7, 7, 7)
 for (i in 1:3) {
-  cat("Number of False Discoveries:", res[[i]]$bh.fd, "; pihat0 =", res[[i]]$pihat0.ash, "\n")
-  cat("Scaled weights:\n")
+  cat("Number of Discoveries:", res[[i]]$bh.fd, "; pihat0 =", res[[i]]$pihat0.ash, "\n")
+  cat("Log-likelihood with N(0, 2):", sum(log(dnorm(res[[i]]$z, mean = 0, sd = sqrt(2)))), "\n")
+  cat("Log-likelihood with Gaussian Derivatives:", -res[[i]]$ecdfz.fit$res[[K[i]]]$optimal_value + sum(log(dnorm(res[[i]]$z))), "\n")
+  cat("Normalized weights:\n")
   w = res[[i]]$ecdfz.fit$res[[K[i]]]$primal_values[[1]]
   cat(rbind(paste(1:K[i], ":"), paste(w * sqrt(factorial(1:K[i])), ";")), sep = " ")
   hist(res[[i]]$z, breaks = 100, prob = TRUE, ylim = c(0, dnorm(0)), xlab = "z", main = "Histogram of z", xlim = range(x))
@@ -81,6 +83,25 @@ for (i in 1:3) {
   y = dnorm(x) * (H.x[, 1:K[i]] %*% res[[i]]$ecdfz.fit$res[[K[i]]]$primal_values[[1]] + 1)
   lines(x, y, col = "blue")
   legend("topright", col = c("red", "blue"), lty = 1, paste("K =", c(0, K[i])))
+
+  tail = c(3, 5)
+
+  cat("Zoom in to the positive tails:\n")
+  hist(res[[i]]$z, breaks = 100, prob = TRUE, xlab = "z", main = "Histogram of z", xlim = sort(tail), ylim = c(0, dnorm(min(abs(tail)), 0, sqrt(2))))
+  lines(x, dnorm(x), col = "red")
+  lines(x, dnorm(x, 0, sqrt(2)), col = "red", lty = 2)
+  y = dnorm(x) * (H.x[, 1:K[i]] %*% res[[i]]$ecdfz.fit$res[[K[i]]]$primal_values[[1]] + 1)
+  lines(x, y, col = "blue")
+  legend("topright", col = c("red", "blue", "red"), lty = c(1, 1, 2), c("N(0, 1)", paste("K =", K[i]), "N(0, 2)"))
+
+  cat("Zoom in to the negative tails:\n")
+  hist(res[[i]]$z, breaks = 100, prob = TRUE, xlab = "z", main = "Histogram of z", xlim = sort(-tail), ylim = c(0, dnorm(min(abs(tail)), 0, sqrt(2))))
+  lines(x, dnorm(x), col = "red")
+  lines(x, dnorm(x, 0, sqrt(2)), col = "red", lty = 2)
+  y = dnorm(x) * (H.x[, 1:K[i]] %*% res[[i]]$ecdfz.fit$res[[K[i]]]$primal_values[[1]] + 1)
+  lines(x, y, col = "blue")
+  legend("topleft", col = c("red", "blue", "red"), lty = c(1, 1, 2), c("N(0, 1)", paste("K =", K[i]), "N(0, 2)"))
+
   qqnorm(res[[i]]$z, main = "Normal Q-Q plot for z scores")
   abline(0, 1)
   
