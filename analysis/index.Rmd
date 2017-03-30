@@ -72,6 +72,8 @@ An implicit key question of this inquiry is: what's the behavior of $z$ scores u
 
 Inspired by [Schwartzman 2010](http://amstat.tandfonline.com/doi/abs/10.1198/jasa.2010.tm10237), we experiments a new way to tackle "empirical null."
 
+* [True signal vs correlated null](alternative.html)
+
 [`ashr`]: https://github.com/stephens999/ashr
 
 <!-- The goal of this new template is to simplify the setup and maintenance of a research website. -->
