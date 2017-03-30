@@ -5,4 +5,4 @@ output:
     toc: false
 ---
 
-Building on Matthew's insight that moderate observations, defined as $|\hat\beta / \hat s| \leq t$ with a pre-specified $t$, are more prone to correlation and thus contain less information to control false discoveries than extreme ones, `truncash` makes partial use of moderate observations, combined with full use of extreme ones, to adaptively shrink the measurements with heteroskedastic noise.
+Building on [Prof. Matthew Stephens](http://stephenslab.uchicago.edu/)'s insight that under correlation, the empirical distributions of the observations are different from their theoretical one.  However, correlation affacts observations unequally.  Moderate observations, defined as $|\hat\beta / \hat s| \leq t$ with a pre-specified $t$, are more prone to correlation and thus contain less information to control false discoveries than extreme ones, `truncash` makes partial use of moderate observations, combined with full use of extreme ones, to adaptively shrink the measurements with heteroskedastic noise.

@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+<meta name="author" content="Lei Sun" />
+
+<meta name="date" content="2017-03-27" />
+
+<title>Empirical Null with Gaussian Derivatives: Weight Constraints</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs && document.readyState && document.readyState === "complete") {
+   window.setTimeout(function() {
+      hljs.initHighlighting();
+   }, 0);
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">truncash</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/LSun/truncash">
+    <span class="fa fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Empirical Null with Gaussian Derivatives: Weight Constraints</h1>
+<h4 class="author"><em>Lei Sun</em></h4>
+<h4 class="date"><em>2017-03-27</em></h4>
+
+</div>
+
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+<!-- Update knitr chunk options -->
+<!-- Insert the date the file was last updated -->
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+<!-- Add your analysis here -->
+<div id="numerical-issues" class="section level2">
+<h2>Numerical issues</h2>
+<p>When fitting Gaussian derivatives, <a href="gaussian_derivatives_3.rmd">overfitting</a> or <a href="gaussian_derivatives_4.html">heavy correlation</a> may cause numerical instability. Most of the time, the numerical instability leads to ridiculous weights <span class="math inline">\(w_k\)</span>, making the fitted density break <a href="gaussian_derivatives.html#assumption_2:_we_further_assume_that_the_number_of_observations_(n)_is_sufficiently_large,_so_that_we_can_use_the_(n)_observed_(z)_scores_in_place_of_the_intractable_all_(xinmathbb%7Br%7D)_in_the_second_constraint">the nonnegativity constraint</a> for <span class="math inline">\(x\neq z_i\)</span>’s.</p>
+<p>Let normalized weights <span class="math inline">\(W_k^s = W_k\sqrt{k!}\)</span>. As <a href="gaussian_derivatives.html">shown previously</a>, under correlated null, the variance <span class="math inline">\(\text{var}(W_k^s) = \alpha_k = \bar{\rho_{ij}^k}\)</span>. Thus, under correlated null, the Gaussian derivative decomposition of the empirical distribution should have “reasonable” weights of similar decaying patterns. In other words, <span class="math inline">\(W_k^s\)</span> with mean <span class="math inline">\(0\)</span> and variance <span class="math inline">\(\bar{\rho_{ij}^k}\)</span>, should be in the order of <span class="math inline">\(\sqrt{\rho^K}\)</span> with a <span class="math inline">\(\rho\in (0, 1)\)</span>.</p>
+</div>
+<div id="examples" class="section level2">
+<h2>Examples</h2>
+<p>This example shows that numerical instability is reflected in the number of Gaussian derivatives fitted <span class="math inline">\(K\)</span> being too large, as well as in the normalized fitted weights of Gaussian derivatives <span class="math inline">\(\hat w_k\sqrt{k!}\)</span> being completely out of order <span class="math inline">\(\sqrt{\rho^K}\)</span>.</p>
+<pre class="r"><code>source(&quot;../code/ecdfz.R&quot;)</code></pre>
+<pre class="r"><code>z = read.table(&quot;../output/z_null_liver_777.txt&quot;)
+p = read.table(&quot;../output/p_null_liver_777.txt&quot;)</code></pre>
+<pre class="r"><code>library(ashr)
+DataSet = c(522, 724)
+res_DataSet = list()
+for (i in 1:length(DataSet)) {
+  zscore = as.numeric(z[DataSet[i], ])
+  fit.ecdfz = ecdfz.optimal(zscore)
+  fit.ash = ash(zscore, 1, method = &quot;fdr&quot;)
+  fit.ash.pi0 = get_pi0(fit.ash)
+  pvalue = as.numeric(p[DataSet[i], ])
+  fd.bh = sum(p.adjust(pvalue, method = &quot;BH&quot;) &lt;= 0.05)
+  res_DataSet[[i]] = list(DataSet = DataSet[i], fit.ecdfz = fit.ecdfz, fit.ash = fit.ash, fit.ash.pi0 = fit.ash.pi0, fd.bh = fd.bh, zscore = zscore, pvalue = pvalue)
+}</code></pre>
+<pre class="r"><code>library(EQL)
+x.pt = seq(-5, 5, 0.01)
+H.pt = sapply(1:15, EQL::hermite, x = x.pt)</code></pre>
+<pre><code>Data Set 724 : Number of BH&#39;s False Discoveries: 79 ; ASH&#39;s pihat0 = 0.01606004</code></pre>
+<pre><code>Normalized Weights for K = 8:</code></pre>
+<pre><code>1 : 0.0359300698579203 ; 2 : 1.08855871642562 ; 3 : 0.0779368130366434 ; 4 : 0.345861286563959 ; 5 : 0.00912636957148547 ; 6 : -0.291318682290939 ; 7 : -0.0336534605417156 ; 8 : -0.19310963474206 ;</code></pre>
+<pre><code>Normalized Weights for K = 14:</code></pre>
+<pre><code>1 : -0.676936454061805 ; 2 : -9.24968885347997 ; 3 : -8.3124954075297 ; 4 : -87.0040400264205 ; 5 : -38.5774993866502 ; 6 : -327.811119421261 ; 7 : -92.5614572826525 ; 8 : -679.045197952641 ; 9 : -123.743821656837 ; 10 : -812.599139016504 ; 11 : -88.0469137351964 ; 12 : -530.268674468285 ; 13 : -26.1051054428588 ; 14 : -146.98364434743 ;</code></pre>
+<p><img src="figure/gaussian_derivatives_5.rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/gaussian_derivatives_5.rmd/unnamed-chunk-5-2.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="weight-constraints" class="section level2">
+<h2>Weight constraints</h2>
+<p>Therefore, we can impose regularity in the fitted Gaussian derivatives by imposing constraints on <span class="math inline">\(w_k\)</span>. A good set of weights should have following properties.</p>
+<ol style="list-style-type: decimal">
+<li>They should make <span class="math inline">\(\sum\limits_{k = 1}^\infty w_kh_k(x) + 1\)</span> non-negative for <span class="math inline">\(\forall x\in\mathbb{R}\)</span>. This constraint needs to be satisfied for any distribution.</li>
+<li>They should decay in roughly exponential order such that <span class="math inline">\(w_k^s = w_k\sqrt{k!} \sim \sqrt{\rho^K}\)</span>. This constraint needs to be satisfied particularly for empirical correlated null.</li>
+<li><span class="math inline">\(w_k\)</span> vanishes to essentially <span class="math inline">\(0\)</span> for sufficiently large <span class="math inline">\(k\)</span>. This constraint can be seen as coming from the last one, leading to the simplification that only first <span class="math inline">\(K\)</span> orders of Gaussian derivatives are enough.</li>
+</ol>
+<p>As <a href="https://galton.uchicago.edu/~pmcc/">Prof. Peter McCullagh</a> pointed out during a chat, there should be a rich literature discussing the non-negativity / positivity condition for Gaussian derivative decomposition, also known as <a href="https://en.wikipedia.org/wiki/Edgeworth_series#Disadvantages_of_the_Edgeworth_expansion">Edgeworth expansion</a>. <strong>This could potentially be a direction to look at.</strong></p>
+<p>An approximation to the non-negativity constraint may come from <a href="gaussian_derivatives.html#gaussian_derivatives_and_hermite_polynomials">the fact</a> that due to orthogonality of Hermite polynomials,</p>
+<p><span class="math display">\[
+W_k = \frac{1}{k!}\int_{-\infty}^\infty f_0(x)h_k(x)dx \ .
+\]</span> Therefore, if <span class="math inline">\(f_0\)</span> is truly a proper density,</p>
+<p><span class="math display">\[
+\begin{array}{rclcl}
+W_1 &amp;=&amp; \frac{1}{1!}\int_{-\infty}^\infty f_0(x)h_1(x)dx = \int_{-\infty}^\infty x f_0(x)dx &amp;=&amp; E[X]_{F_0} \\
+W_2 &amp;=&amp; \frac{1}{2!}\int_{-\infty}^\infty f_0(x)h_1(x)dx = \frac12\int_{-\infty}^\infty (x^2-1) f_0(x)dx &amp;=&amp; \frac12E[X^2]_{F_0} -\frac12\\
+W_3 &amp;=&amp; \frac{1}{3!}\int_{-\infty}^\infty f_0(x)h_1(x)dx = \frac16\int_{-\infty}^\infty (x^3-3x) f_0(x)dx &amp;=&amp; \frac16E[X^3]_{F_0} -\frac12E[X]_{F_0}\\
+W_4 &amp;=&amp; \frac{1}{4!}\int_{-\infty}^\infty f_0(x)h_1(x)dx = \frac1{24}\int_{-\infty}^\infty (x^4-6x^2+3) f_0(x)dx &amp;=&amp; \frac1{24}E[X^4]_{F_0} -\frac14E[X^2]_{F_0} + \frac18\\
+&amp;\vdots&amp;
+\end{array}
+\]</span> Note that <span class="math inline">\(F_0\)</span> is not the empirical cdf <span class="math inline">\(\hat F\)</span>, even if we’ve taken into consideration that <span class="math inline">\(N\)</span> is sufficiently large, and the correlation structure is solely determined by <span class="math inline">\(W_k\)</span>’s and Gaussian derivatives. <span class="math inline">\(F_0\)</span> is inherently continuous, whereas the empirical cdf <span class="math inline">\(\hat F\)</span> is inherently non-differentiable. This implies that the mean of <span class="math inline">\(F_0\)</span>, <span class="math inline">\(E[X]_{F_0} \neq \bar X\)</span>, the mean of the empirical cdf <span class="math inline">\(\hat F\)</span>. <span class="math inline">\(W_k\)</span>’s are still parameters of <span class="math inline">\(F_0\)</span> that are not readily determined even given the observations (hence given the empirical cdf).</p>
+<p>This relationship inspires the following two ways to constraint <span class="math inline">\(W_k\)</span>’s.</p>
+</div>
+<div id="method-of-moments-estimates" class="section level2">
+<h2>Method of moments estimates</h2>
+<p>Instead of using maxmimum likelihood estimates of <span class="math inline">\(f_0\)</span>, that is, <span class="math inline">\(\max\sum\limits_{i = 1}^n\log\left(\sum\limits_{k = 1}^\infty w_kh_k(z_i) + 1\right)\)</span>, we may use method of moments estimates:</p>
+<p><span class="math display">\[
+\begin{array}{rcl}
+w_1 &amp;=&amp; \hat E[X]_{F_0}\\
+w_2 &amp;=&amp; \frac12\hat E[X^2]_{F_0} -\frac12\\
+w_3 &amp;=&amp; \frac16\hat E[X^3]_{F_0} -\frac12\hat E[X]_{F_0}\\
+w_4 &amp;=&amp; \frac1{24}\hat E[X^4]_{F_0} -\frac14\hat E[X^2]_{F_0} + \frac18\\
+&amp;\vdots&amp;\\
+w_k &amp;=&amp; \cdots
+\end{array}
+\]</span></p>
+</div>
+<div id="constraining-weights-by-moments" class="section level2">
+<h2>Constraining weights by moments</h2>
+<p>Another way is to constraint the weights by the properties of the moments to prevent them going crazy, such that</p>
+<p><span class="math display">\[
+W_2 = \frac12E[X^2]_{F_0} -\frac12 \Rightarrow w_2 \geq -\frac12 \ .
+\]</span></p>
+<p>We may also combine the moment estimates and constraints like</p>
+<p><span class="math display">\[
+\begin{array}{rcl}
+w_1 &amp;=&amp; \hat E[X]_{F_0}\\
+w_2 &amp;\geq&amp; -\frac12\\
+&amp;\vdots&amp;
+\end{array}
+\]</span></p>
+</div>
+<div id="implementation" class="section level2">
+<h2>Implementation</h2>
+<p>Right now using the current implementation the results are disappointing. Using the constraint on <span class="math inline">\(w_2\)</span> usually makes the optimization unstable. Using moment estimates on <span class="math inline">\(w_1\)</span> and <span class="math inline">\(w_2\)</span> performs better, but only sporadically.</p>
+<p>Here we are re-running the optimization on <a href="gaussian_derivatives_4.html#fitting_experiments_when_(rho_%7Bij%7D)_is_large">the previous <span class="math inline">\(\rho_{ij} \equiv 0.7\)</span> example</a> with <span class="math inline">\(\hat w_1\)</span> and <span class="math inline">\(\hat w_2\)</span> estimated by the method of moments. Without this tweak current implementation can only work up to <span class="math inline">\(K = 3\)</span>, which is obviously insufficient. Now it can go up to <span class="math inline">\(K = 6\)</span>. <span class="math inline">\(K = 7\)</span> doesn’t look good, although making some improvement compared with <span class="math inline">\(K = 6\)</span>.</p>
+<p>The results are not particularly encouraging. Right now we’ll leave it here.</p>
+<pre class="r"><code>rho = 0.7
+set.seed(777)
+n = 1e4
+z = rnorm(1) * sqrt(rho) + rnorm(n) * sqrt(1 - rho)
+w.3 = list()
+for (ord in 6:7) {
+  H = sapply(1 : ord, EQL::hermite, x = z)
+  w &lt;- Variable(ord - 2)
+  w1 = mean(z)
+  w2 = mean(z^2) / 2 - .5
+  H2w = H[, 1:2] %*% c(w1, w2)
+  objective &lt;- Maximize(SumEntries(Log(H[, 3:ord] %*% w + H2w + 1)))
+  prob &lt;- Problem(objective)
+  capture.output(result &lt;- solve(prob), file = &quot;/dev/null&quot;)
+  w.3[[ord - 5]] = c(w1, w2, result$primal_values[[1]])
+}</code></pre>
+<p><img src="figure/gaussian_derivatives_5.rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="conclusion" class="section level2">
+<h2>Conclusion</h2>
+<p>Weights <span class="math inline">\(w_k\)</span> are of central importance in the algorithm. They contain the information regarding whether the composition of Gaussian derivatives is a proper density function, and if it is, whether it’s a correlated null. We need to find an ingenious way to impose appropriate constraints on <span class="math inline">\(w_k\)</span>.</p>
+</div>
+<div id="appendix-implementation-of-moments-constraints" class="section level2">
+<h2>Appendix: implementation of moments constraints</h2>
+</div>
+<div id="session-information" class="section level2">
+<h2>Session information</h2>
+<!-- Insert the session information into the document -->
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 3.3.2 (2016-10-31)
+Platform: x86_64-apple-darwin13.4.0 (64-bit)
+Running under: macOS Sierra 10.12.4
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] ashr_2.1.5      cvxr_0.0.0.9009 EQL_1.0-0       ttutils_1.0-1  
+
+loaded via a namespace (and not attached):
+ [1] Rcpp_0.12.10      knitr_1.15.1      magrittr_1.5     
+ [4] MASS_7.3-45       pscl_1.4.9        doParallel_1.0.10
+ [7] SQUAREM_2016.10-1 lattice_0.20-34   R6_2.2.0         
+[10] foreach_1.4.3     stringr_1.1.0     tools_3.3.2      
+[13] parallel_3.3.2    grid_3.3.2        htmltools_0.3.5  
+[16] iterators_1.0.8   yaml_2.1.14       rprojroot_1.2    
+[19] digest_0.6.9      Matrix_1.2-7.1    codetools_0.2-15 
+[22] evaluate_0.10     rmarkdown_1.3     stringi_1.1.2    
+[25] backports_1.0.5   truncnorm_1.0-7  </code></pre>
+</div>
+
+<hr>
+<p>
+    This <a href="http://rmarkdown.rstudio.com">R Markdown</a> site was created with <a href="https://github.com/jdblischak/workflowr">workflowr</a>
+</p>
+<hr>
+
+<!-- To enable disqus, uncomment the section below and provide your disqus_shortname -->
+
+<!-- disqus
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'rmarkdown'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+-->
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

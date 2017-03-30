@@ -316,20 +316,23 @@ shared across the workflowr files. -->
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
 <!-- Add your analysis here -->
-<div id="introduction" class="section level2">
-<h2>Introduction</h2>
-<p><a href="gaussian_derivatives_2.html">We’ve shown</a> that in many real data sets when we have correlated null <span class="math inline">\(z\)</span> scores, we can fit their empirical distribution with Gaussian and its derivatives.</p>
-<p>But what if we have real signals instead of the global null? Can we fit real signals with Gaussian derivatives with reasonable weights? Let’s start with the most basic case: <span class="math inline">\(z \sim N(0, \sqrt{2}^2)\)</span> independently. This data set can be seen as generated as follows.</p>
+<div id="identifiablity-of-true-signals-from-correlated-noise" class="section level2">
+<h2>Identifiablity of true signals from correlated noise</h2>
+<p><a href="gaussian_derivatives_2.html#examples">We’ve shown</a> that in many real data sets when we have correlated null <span class="math inline">\(z\)</span> scores, we can <a href="gaussian_derivatives.html#empirical_null">fit their empirical distribution with Gaussian and its derivatives</a>.</p>
+<p>But what if we have true signals instead of the global null? Theoretically, any distribution can be decomposed by Gaussian and its derivatives, also called <a href="https://en.wikipedia.org/wiki/Edgeworth_series">Edgeworth series or Edgeworth expansion</a>. We’ve shown that the Dirac delta function <span class="math inline">\(\delta_z\)</span> and the associated <span class="math inline">\(0\)</span>-<span class="math inline">\(1\)</span> step function <a href="gaussian_derivatives_4.html#extreme_case:_(rho_%7Bij%7D_equiv_1)">can be decomposed</a> by Gaussian derivatives. Essentially all distributions can be represented by (usually infinitely many) <span class="math inline">\(\delta_z\)</span>, and thus be decomposed by Gaussian and its derivatives. <strong>There is a rich literature on this topic, probably of further use to this project.</strong></p>
+<p>Now the more urgent problem is: can true signals also be fitted by Gaussian derivatives in a similar way as correlated null? Let normalized weights <span class="math inline">\(W_k^s = W_k\sqrt{k!}\)</span>. As <a href="gaussian_derivatives.html">shown previously</a>, under correlated null, the variance <span class="math inline">\(\text{var}(W_k^s) = \alpha_k = \bar{\rho_{ij}^k}\)</span>. Thus, under correlated null, the Gaussian derivative decomposition of the empirical distribution should have “reasonable” weights of similar decaying patterns.</p>
+<p>If it turns out Gaussian derivatives with limited orders (say, <span class="math inline">\(K \leq 10\)</span>) and reasonable normalized weights are only able to fit the empirical correlated null, but nothing else, then properly regularized Gaussian derivatives can be readily used to control the usually correlated <em>noise</em>, which are correlated null, and leave the <em>signal</em> to <code>ash</code>. But if true signals can also be fitted this way, the identifiability of true signals from correlated noise becomes an issue.</p>
+<p>Let’s start with the simplest case: <span class="math inline">\(z \sim N(0, \sqrt{2}^2)\)</span> independently. This data set can be seen as generated as follows.</p>
 <p><span class="math display">\[
 \begin{array}{c}
 \beta_j \sim N(0, 1)\\
 z_j \sim N(\beta_j, 1)
 \end{array}
 \]</span></p>
+<p>That is, a <span class="math inline">\(N(0, 1)\)</span> true signal is polluted by a <span class="math inline">\(N(0, 1)\)</span> noise.</p>
 </div>
 <div id="illustration" class="section level2">
 <h2>Illustration</h2>
-<p>Let normalized weights <span class="math inline">\(W_k^s = W_k\sqrt{k!}\)</span> with variance <span class="math inline">\(\text{var}(W_k^s) = \alpha_k = \bar{\rho_{ij}^k}\)</span>.</p>
 <pre class="r"><code>n = 1e4
 m = 5
 set.seed(777)
@@ -352,9 +355,9 @@ Log-likelihood ratio between true N(0, 2) and fitted Gaussian derivatives: 4.790
 Normalized weights:
 1 : -0.0177035771860527 ; 2 : 0.689887136368602 ; 3 : -0.0509478089605657 ; 4 : 0.474815572091947 ; 5 : -0.0255292356243276 ; 6 : 0.197260355735445 ; 7 : 0.0209642526780779 ;</code></pre>
 <p><img src="figure/alternative.rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre><code>Zoom in to the right tails:</code></pre>
-<p><img src="figure/alternative.rmd/unnamed-chunk-4-2.png" width="672" style="display: block; margin: auto;" /></p>
 <pre><code>Zoom in to the left tails:</code></pre>
+<p><img src="figure/alternative.rmd/unnamed-chunk-4-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Zoom in to the right tails:</code></pre>
 <p><img src="figure/alternative.rmd/unnamed-chunk-4-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-5.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-6.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-7.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-8.png" width="672" style="display: block; margin: auto;" /></p>
 <pre><code>Number of Discoveries: 210 ; pihat0 = 0.3484933 
 Log-likelihood with N(0, 2): -17695.54 
@@ -363,9 +366,9 @@ Log-likelihood ratio between true N(0, 2) and fitted Gaussian derivatives: -3.69
 Normalized weights:
 1 : -0.00662167797406594 ; 2 : 0.716277504382886 ; 3 : -0.0310338589748257 ; 4 : 0.594319021051848 ; 5 : -0.00405607696274195 ; 6 : 0.364148970093227 ; 7 : 0.0347791611900783 ; 8 : 0.0862488827136366 ;</code></pre>
 <p><img src="figure/alternative.rmd/unnamed-chunk-4-9.png" width="672" style="display: block; margin: auto;" /></p>
-<pre><code>Zoom in to the right tails:</code></pre>
-<p><img src="figure/alternative.rmd/unnamed-chunk-4-10.png" width="672" style="display: block; margin: auto;" /></p>
 <pre><code>Zoom in to the left tails:</code></pre>
+<p><img src="figure/alternative.rmd/unnamed-chunk-4-10.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Zoom in to the right tails:</code></pre>
 <p><img src="figure/alternative.rmd/unnamed-chunk-4-11.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-12.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-13.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-14.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-15.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-16.png" width="672" style="display: block; margin: auto;" /></p>
 <pre><code>Number of Discoveries: 190 ; pihat0 = 0.3438938 
 Log-likelihood with N(0, 2): -17620.41 
@@ -374,9 +377,9 @@ Log-likelihood ratio between true N(0, 2) and fitted Gaussian derivatives: 0.058
 Normalized weights:
 1 : 0.00412988146644346 ; 2 : 0.691757356275142 ; 3 : 0.0624186506260473 ; 4 : 0.566017599686127 ; 5 : 0.0720236790272216 ; 6 : 0.359005476183793 ; 7 : 0.0491535934289797 ; 8 : 0.11765212650001 ;</code></pre>
 <p><img src="figure/alternative.rmd/unnamed-chunk-4-17.png" width="672" style="display: block; margin: auto;" /></p>
-<pre><code>Zoom in to the right tails:</code></pre>
-<p><img src="figure/alternative.rmd/unnamed-chunk-4-18.png" width="672" style="display: block; margin: auto;" /></p>
 <pre><code>Zoom in to the left tails:</code></pre>
+<p><img src="figure/alternative.rmd/unnamed-chunk-4-18.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Zoom in to the right tails:</code></pre>
 <p><img src="figure/alternative.rmd/unnamed-chunk-4-19.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-20.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-21.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-22.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-23.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-24.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="session-information" class="section level2">
@@ -393,19 +396,11 @@ locale:
 attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
-other attached packages:
-[1] cvxr_0.0.0.9009 EQL_1.0-0       ttutils_1.0-1   ashr_2.1.5     
-
 loaded via a namespace (and not attached):
- [1] Rcpp_0.12.10      knitr_1.15.1      magrittr_1.5     
- [4] MASS_7.3-45       doParallel_1.0.10 pscl_1.4.9       
- [7] SQUAREM_2016.10-1 lattice_0.20-34   foreach_1.4.3    
-[10] stringr_1.1.0     tools_3.3.2       parallel_3.3.2   
-[13] grid_3.3.2        htmltools_0.3.5   iterators_1.0.8  
-[16] yaml_2.1.14       rprojroot_1.2     digest_0.6.9     
-[19] Matrix_1.2-7.1    codetools_0.2-15  evaluate_0.10    
-[22] rmarkdown_1.3     stringi_1.1.2     backports_1.0.5  
-[25] truncnorm_1.0-7  </code></pre>
+ [1] backports_1.0.5 magrittr_1.5    rprojroot_1.2   tools_3.3.2    
+ [5] htmltools_0.3.5 yaml_2.1.14     Rcpp_0.12.10    stringi_1.1.2  
+ [9] rmarkdown_1.3   knitr_1.15.1    stringr_1.1.0   digest_0.6.9   
+[13] evaluate_0.10  </code></pre>
 </div>
 
 <hr>

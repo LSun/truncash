@@ -26,11 +26,17 @@ knitr::read_chunk("chunks.R")
 
 <!-- Add your analysis here -->
 
-## Introduction
+## Identifiablity of true signals from correlated noise
 
-[We've shown](gaussian_derivatives_2.html) that in many real data sets when we have correlated null $z$ scores, we can fit their empirical distribution with Gaussian and its derivatives.
+[We've shown](gaussian_derivatives_2.html#examples) that in many real data sets when we have correlated null $z$ scores, we can [fit their empirical distribution with Gaussian and its derivatives](gaussian_derivatives.html#empirical_null).
 
-But what if we have real signals instead of the global null?  Can we fit real signals with Gaussian derivatives with reasonable weights?  Let's start with the most basic case: $z \sim N(0, \sqrt{2}^2)$ independently.  This data set can be seen as generated as follows.
+But what if we have true signals instead of the global null?  Theoretically, any distribution can be decomposed by Gaussian and its derivatives, also called [Edgeworth series or Edgeworth expansion](https://en.wikipedia.org/wiki/Edgeworth_series).  We've shown that the Dirac delta function $\delta_z$ and the associated $0$-$1$ step function [can be decomposed](gaussian_derivatives_4.html#extreme_case:_(rho_{ij}_equiv_1)) by Gaussian derivatives.  Essentially all distributions can be represented by (usually infinitely many) $\delta_z$, and thus be decomposed by Gaussian and its derivatives.  __There is a rich literature on this topic, probably of further use to this project.__
+
+Now the more urgent problem is: can true signals also be fitted by Gaussian derivatives in a similar way as correlated null?  Let normalized weights $W_k^s = W_k\sqrt{k!}$.  As [shown previously](gaussian_derivatives.html), under correlated null, the variance $\text{var}(W_k^s) = \alpha_k = \bar{\rho_{ij}^k}$.  Thus, under correlated null, the Gaussian derivative decomposition of the empirical distribution should have "reasonable" weights of similar decaying patterns.
+
+If it turns out Gaussian derivatives with limited orders (say, $K \leq 10$) and reasonable normalized weights are only able to fit the empirical correlated null, but nothing else, then properly regularized Gaussian derivatives can be readily used to control the usually correlated *noise*, which are correlated null, and leave the *signal* to `ash`.  But if true signals can also be fitted this way, the identifiability of true signals from correlated noise becomes an issue.
+
+Let's start with the simplest case: $z \sim N(0, \sqrt{2}^2)$ independently.  This data set can be seen as generated as follows.
 
 $$
 \begin{array}{c}
@@ -39,10 +45,9 @@ z_j \sim N(\beta_j, 1)
 \end{array}
 $$
 
-## Illustration
+That is, a $N(0, 1)$ true signal is polluted by a $N(0, 1)$ noise.
 
-Let normalized weights $W_k^s = W_k\sqrt{k!}$ with variance $\text{var}(W_k^s) = \alpha_k = 
-\bar{\rho_{ij}^k}$.
+## Illustration
 
 ```{r, cache = TRUE}
 n = 1e4
@@ -88,14 +93,6 @@ for (i in 1:3) {
 
   tail = c(3, 5)
 
-  cat("Zoom in to the right tails:\n")
-  hist(res[[i]]$z, breaks = 100, prob = TRUE, xlab = "z", main = "Histogram of z", xlim = sort(tail), ylim = c(0, dnorm(min(abs(tail)), 0, sqrt(2))))
-  lines(x, dnorm(x), col = "red")
-  lines(x, dnorm(x, 0, sqrt(2)), col = "red", lty = 2)
-  y = dnorm(x) * (H.x[, 1:K[i]] %*% res[[i]]$ecdfz.fit$res[[K[i]]]$primal_values[[1]] + 1)
-  lines(x, y, col = "blue")
-  legend("topright", col = c("red", "blue", "red"), lty = c(1, 1, 2), c("N(0, 1)", paste("K =", K[i]), "N(0, 2)"))
-
   cat("Zoom in to the left tails:\n")
   hist(res[[i]]$z, breaks = 100, prob = TRUE, xlab = "z", main = "Histogram of z", xlim = sort(-tail), ylim = c(0, dnorm(min(abs(tail)), 0, sqrt(2))))
   lines(x, dnorm(x), col = "red")
@@ -103,6 +100,14 @@ for (i in 1:3) {
   y = dnorm(x) * (H.x[, 1:K[i]] %*% res[[i]]$ecdfz.fit$res[[K[i]]]$primal_values[[1]] + 1)
   lines(x, y, col = "blue")
   legend("topleft", col = c("red", "blue", "red"), lty = c(1, 1, 2), c("N(0, 1)", paste("K =", K[i]), "N(0, 2)"))
+  
+  cat("Zoom in to the right tails:\n")
+  hist(res[[i]]$z, breaks = 100, prob = TRUE, xlab = "z", main = "Histogram of z", xlim = sort(tail), ylim = c(0, dnorm(min(abs(tail)), 0, sqrt(2))))
+  lines(x, dnorm(x), col = "red")
+  lines(x, dnorm(x, 0, sqrt(2)), col = "red", lty = 2)
+  y = dnorm(x) * (H.x[, 1:K[i]] %*% res[[i]]$ecdfz.fit$res[[K[i]]]$primal_values[[1]] + 1)
+  lines(x, y, col = "blue")
+  legend("topright", col = c("red", "blue", "red"), lty = c(1, 1, 2), c("N(0, 1)", paste("K =", K[i]), "N(0, 2)"))
 
   qqnorm(res[[i]]$z, main = "Normal Q-Q plot for z scores")
   abline(0, 1)
