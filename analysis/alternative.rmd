@@ -81,9 +81,10 @@ for (i in 1:3) {
   cat(rbind(paste(1:K[i], ":"), paste(w * sqrt(factorial(1:K[i])), ";")), sep = " ")
   hist(res[[i]]$z, breaks = 100, prob = TRUE, ylim = c(0, dnorm(0)), xlab = "z", main = "Histogram of z", xlim = range(x))
   lines(x, dnorm(x), col = "red")
+  lines(x, dnorm(x, 0, sqrt(2)), col = "red", lty = 2)
   y = dnorm(x) * (H.x[, 1:K[i]] %*% res[[i]]$ecdfz.fit$res[[K[i]]]$primal_values[[1]] + 1)
   lines(x, y, col = "blue")
-  legend("topright", col = c("red", "blue"), lty = 1, paste("K =", c(0, K[i])))
+  legend("topright", col = c("red", "blue", "red"), lty = c(1, 1, 2), c("N(0, 1)", paste("K =", K[i]), "N(0, 2)"))
 
   tail = c(3, 5)
 
