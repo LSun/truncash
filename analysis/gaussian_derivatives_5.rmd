@@ -154,6 +154,25 @@ w_2 &\geq& -\frac12\\
 &\vdots&
 \end{array}
 $$
+## Quantile Constraints
+
+It has been shown [here](FDR_Null.html#result), [here](FDR_null_betahat.html#result), [here](correlated_z_3.html#result) that Benjamini-Hochberg (BH) is suprisingly robust under correlation.  So Matthew has an idea to constrain the quantiles of the estimated empirical null.  In his words,
+
+> I wonder if you can constrain the quantiles of the estimated null distribution using something based on BH. Eg, the estimated quantiles should be no more than $1/\alpha$ times more extreme than expected under $N(0,1)$ where $\alpha$ is chosen to be the level you'd like to control FDR at under the global null.
+
+> This is not a very specific idea, but maybe gives you an idea of the kind of constraint I mean... **Something to stop that estimated null having too extreme tails.**
+
+The good thing is this idea of constraining quantiles is easy to implement.
+
+$$
+\begin{array}{rcl}
+F_0(x) &=& \displaystyle\Phi(x) + \sum\limits_{k = 1}^\infty W_k(-1)^k
+\varphi^{(k - 1)}(x)\\
+&=&
+\displaystyle\Phi(x) - \sum\limits_{k = 1}^\infty W_kh_{k-1}(x)\varphi(x)
+\end{array}
+$$
+So the constraints that $F_0(x) \leq g(\alpha)$ for certain $x, g, \alpha$ are essentially linear constraints on $W_k$.  Thus the convexity of the problem is preserved.
 
 ## Implementation
 

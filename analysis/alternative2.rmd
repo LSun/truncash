@@ -1,0 +1,228 @@
+---
+title: "True Signal vs Correlated Null: Larger Effects"
+author: "Lei Sun"
+date: 2017-03-30
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+## SNR = 2
+
+```{r, message = FALSE, result = "hide"}
+library(ashr)
+source("../code/ecdfz.R")
+```
+
+
+```{r, cache = TRUE}
+n = 1e4
+m = 5
+set.seed(777)
+SNR = 1
+z.sd = sqrt(10^(SNR / 10) + 1)
+zmat = matrix(rnorm(n * m, 0, sd = z.sd), nrow = m, byrow = TRUE)
+```
+
+```{r, message = FALSE, result = "hide"}
+res = list()
+for (i in 1:m) {
+  z = zmat[i, ]
+  p = (1 - pnorm(abs(z))) * 2
+  bh.fd = sum(p.adjust(p, method = "BH") <= 0.05)
+  pihat0.ash = get_pi0(ash(z, 1, method = "fdr"))
+  ecdfz.fit = ecdfz.optimal(z)
+  res[[i]] = list(z = z, p = p, bh.fd = bh.fd, pihat0.ash = pihat0.ash, ecdfz.fit = ecdfz.fit)
+}
+```
+
+```{r, include = FALSE, cache = TRUE}
+x = seq(-max(abs(zmat)) - 1, max(abs(zmat)) + 1, 0.01)
+H.x = sapply(1:10, EQL::hermite, x = x)
+```
+
+```{r, echo = FALSE, cache = TRUE}
+K = c(8, 9, 8, 7, 7)
+for (i in 1:m) {
+  cat("Example", i, ": True Distribution: N ( 0,", z.sd^2, "); Number of Discoveries:", res[[i]]$bh.fd, "; pihat0 =", res[[i]]$pihat0.ash, "\n")
+  cat("Log-likelihood with N(0, 2):", sum(log(dnorm(res[[i]]$z, mean = 0, sd = sqrt(2)))), "\n")
+  cat("Log-likelihood with Gaussian Derivatives:", -res[[i]]$ecdfz.fit$res[[K[i]]]$optimal_value + sum(log(dnorm(res[[i]]$z))), "\n")
+  cat("Log-likelihood ratio between true N(0, 2) and fitted Gaussian derivatives:", sum(log(dnorm(res[[i]]$z, mean = 0, sd = sqrt(2)))) - (-res[[i]]$ecdfz.fit$res[[K[i]]]$optimal_value + sum(log(dnorm(res[[i]]$z)))), "\n")
+  cat("Normalized weights:\n")
+  w = res[[i]]$ecdfz.fit$res[[K[i]]]$primal_values[[1]]
+  cat(rbind(paste(1:K[i], ":"), paste(w * sqrt(factorial(1:K[i])), ";")), sep = " ")
+
+  hist(res[[i]]$z, breaks = 100, prob = TRUE, ylim = c(0, dnorm(0)), xlab = "z", main = "Histogram of z", xlim = range(x))
+  lines(x, dnorm(x), col = "red")
+  lines(x, dnorm(x, 0, z.sd), col = "red", lty = 2)
+  y = dnorm(x) * (H.x[, 1:K[i]] %*% res[[i]]$ecdfz.fit$res[[K[i]]]$primal_values[[1]] + 1)
+  lines(x, y, col = "blue")
+  legend("topright", col = c("red", "blue", "red"), lty = c(1, 1, 2), c("N(0, 1)", paste("K =", K[i]), expression(N(0, sigma[z]^2))))
+
+  tail = c(3, 5)
+
+  cat("Zoom in to the left tail:\n")
+  hist(res[[i]]$z, breaks = 100, prob = TRUE, xlab = "z", main = "Histogram of z in the left tail", xlim = sort(-tail), ylim = c(0, dnorm(min(abs(tail)), 0, z.sd)))
+  lines(x, dnorm(x), col = "red")
+  lines(x, dnorm(x, 0, z.sd), col = "red", lty = 2)
+  y = dnorm(x) * (H.x[, 1:K[i]] %*% res[[i]]$ecdfz.fit$res[[K[i]]]$primal_values[[1]] + 1)
+  lines(x, y, col = "blue")
+  legend("topleft", col = c("red", "blue", "red"), lty = c(1, 1, 2), c("N(0, 1)", paste("K =", K[i]), expression(N(0, sigma[z]^2))))
+  
+  cat("Zoom in to the right tail:\n")
+  hist(res[[i]]$z, breaks = 100, prob = TRUE, xlab = "z", main = "Histogram of z in the right tail", xlim = sort(tail), ylim = c(0, dnorm(min(abs(tail)), 0, z.sd)))
+  lines(x, dnorm(x), col = "red")
+  lines(x, dnorm(x, 0, z.sd), col = "red", lty = 2)
+  y = dnorm(x) * (H.x[, 1:K[i]] %*% res[[i]]$ecdfz.fit$res[[K[i]]]$primal_values[[1]] + 1)
+  lines(x, y, col = "blue")
+  legend("topright", col = c("red", "blue", "red"), lty = c(1, 1, 2), c("N(0, 1)", paste("K =", K[i]), expression(N(0, sigma[z]^2))))
+
+  qqnorm(res[[i]]$z, main = "Normal Q-Q plot for z scores")
+  abline(0, 1)
+  
+  m = n
+  pj = sort(res[[i]]$p)
+  plot(pj, xlab = "Order", ylab = "Ordered p value", main = "All p values")
+  abline(0, 1 / m, col = "blue")
+  abline(0, 0.05 / m, col = "red")
+  legend("top", lty = 1, col = c("blue", "red"), c("Uniform", "BH, FDR = 0.05"))
+  
+  plot(pj[pj <= 0.05], xlab = "Order", ylab = "Ordered p value", main = expression(paste("Zoom-in to all ", p <= 0.05)), ylim = c(0, 0.05))
+  abline(0, 1 / m, col = "blue")
+  points(pj[1:res[[i]]$bh.fd], col = "green", pch = 19)
+  abline(0, 0.05 / m, col = "red")
+  legend("top", lty = 1, col = c("blue", "red"), c("Uniform", "BH, FDR = 0.05"))
+
+  plot(pj[pj <= 0.01], xlab = "Order", ylab = "Ordered p value", main = expression(paste("Zoom-in to all ", p <= 0.01)), ylim = c(0, 0.01))
+  abline(0, 1 / m, col = "blue")
+  points(pj[1:res[[i]]$bh.fd], col = "green", pch = 19)
+  abline(0, 0.05 / m, col = "red")
+  legend("top", lty = 1, col = c("blue", "red"), c("Uniform", "BH, FDR = 0.05"))
+
+  plot(pj[1:max(100, res[[i]]$bh.fd)], xlab = "Order", ylab = "Ordered p value", main = "Zoom-in to all the discoveries by BH", ylim = c(0, pj[max(100, res[[i]]$bh.fd)]))
+  abline(0, 1 / m, col = "blue")
+  points(pj[1:res[[i]]$bh.fd], col = "green", pch = 19)
+  abline(0, 0.05 / m, col = "red")
+  legend("top", lty = 1, col = c("blue", "red"), c("Uniform", "BH, FDR = 0.05"))
+}
+```
+
+
+
+```{r, cache = TRUE}
+n = 1e4
+m = 5
+set.seed(777)
+SNR = 5
+z.sd = sqrt(10^(SNR / 10) + 1)
+zmat = matrix(rnorm(n * m, 0, sd = z.sd), nrow = m, byrow = TRUE)
+```
+
+```{r, message = FALSE, result = "hide"}
+res = list()
+for (i in 1:m) {
+  z = zmat[i, ]
+  p = (1 - pnorm(abs(z))) * 2
+  bh.fd = sum(p.adjust(p, method = "BH") <= 0.05)
+  pihat0.ash = get_pi0(ash(z, 1, method = "fdr"))
+  ecdfz.fit = ecdfz.optimal(z)
+  res[[i]] = list(z = z, p = p, bh.fd = bh.fd, pihat0.ash = pihat0.ash, ecdfz.fit = ecdfz.fit)
+}
+```
+
+```{r, include = FALSE, cache = TRUE}
+x = seq(-max(abs(zmat)) - 1, max(abs(zmat)) + 1, 0.01)
+H.x = sapply(1:10, EQL::hermite, x = x)
+```
+
+```{r, echo = FALSE, cache = TRUE}
+K = c(8, 9, 8, 7, 7)
+for (i in 1:m) {
+  cat("Example", i, ": True Distribution: N ( 0,", z.sd^2, "); Number of Discoveries:", res[[i]]$bh.fd, "; pihat0 =", res[[i]]$pihat0.ash, "\n")
+  cat("Log-likelihood with N(0, 2):", sum(log(dnorm(res[[i]]$z, mean = 0, sd = sqrt(2)))), "\n")
+  cat("Log-likelihood with Gaussian Derivatives:", -res[[i]]$ecdfz.fit$res[[K[i]]]$optimal_value + sum(log(dnorm(res[[i]]$z))), "\n")
+  cat("Log-likelihood ratio between true N(0, 2) and fitted Gaussian derivatives:", sum(log(dnorm(res[[i]]$z, mean = 0, sd = sqrt(2)))) - (-res[[i]]$ecdfz.fit$res[[K[i]]]$optimal_value + sum(log(dnorm(res[[i]]$z)))), "\n")
+  cat("Normalized weights:\n")
+  w = res[[i]]$ecdfz.fit$res[[K[i]]]$primal_values[[1]]
+  cat(rbind(paste(1:K[i], ":"), paste(w * sqrt(factorial(1:K[i])), ";")), sep = " ")
+
+  hist(res[[i]]$z, breaks = 100, prob = TRUE, ylim = c(0, dnorm(0)), xlab = "z", main = "Histogram of z", xlim = range(x))
+  lines(x, dnorm(x), col = "red")
+  lines(x, dnorm(x, 0, z.sd), col = "red", lty = 2)
+  y = dnorm(x) * (H.x[, 1:K[i]] %*% res[[i]]$ecdfz.fit$res[[K[i]]]$primal_values[[1]] + 1)
+  lines(x, y, col = "blue")
+  legend("topright", col = c("red", "blue", "red"), lty = c(1, 1, 2), c("N(0, 1)", paste("K =", K[i]), expression(N(0, sigma[z]^2))))
+
+  tail = c(3, 5)
+
+  cat("Zoom in to the left tail:\n")
+  hist(res[[i]]$z, breaks = 100, prob = TRUE, xlab = "z", main = "Histogram of z in the left tail", xlim = sort(-tail), ylim = c(0, dnorm(min(abs(tail)), 0, z.sd)))
+  lines(x, dnorm(x), col = "red")
+  lines(x, dnorm(x, 0, z.sd), col = "red", lty = 2)
+  y = dnorm(x) * (H.x[, 1:K[i]] %*% res[[i]]$ecdfz.fit$res[[K[i]]]$primal_values[[1]] + 1)
+  lines(x, y, col = "blue")
+  legend("topleft", col = c("red", "blue", "red"), lty = c(1, 1, 2), c("N(0, 1)", paste("K =", K[i]), expression(N(0, sigma[z]^2))))
+  
+  cat("Zoom in to the right tail:\n")
+  hist(res[[i]]$z, breaks = 100, prob = TRUE, xlab = "z", main = "Histogram of z in the right tail", xlim = sort(tail), ylim = c(0, dnorm(min(abs(tail)), 0, z.sd)))
+  lines(x, dnorm(x), col = "red")
+  lines(x, dnorm(x, 0, z.sd), col = "red", lty = 2)
+  y = dnorm(x) * (H.x[, 1:K[i]] %*% res[[i]]$ecdfz.fit$res[[K[i]]]$primal_values[[1]] + 1)
+  lines(x, y, col = "blue")
+  legend("topright", col = c("red", "blue", "red"), lty = c(1, 1, 2), c("N(0, 1)", paste("K =", K[i]), expression(N(0, sigma[z]^2))))
+
+  qqnorm(res[[i]]$z, main = "Normal Q-Q plot for z scores")
+  abline(0, 1)
+  
+  m = n
+  pj = sort(res[[i]]$p)
+  plot(pj, xlab = "Order", ylab = "Ordered p value", main = "All p values")
+  abline(0, 1 / m, col = "blue")
+  abline(0, 0.05 / m, col = "red")
+  legend("top", lty = 1, col = c("blue", "red"), c("Uniform", "BH, FDR = 0.05"))
+  
+  plot(pj[pj <= 0.05], xlab = "Order", ylab = "Ordered p value", main = expression(paste("Zoom-in to all ", p <= 0.05)), ylim = c(0, 0.05))
+  abline(0, 1 / m, col = "blue")
+  points(pj[1:res[[i]]$bh.fd], col = "green", pch = 19)
+  abline(0, 0.05 / m, col = "red")
+  legend("top", lty = 1, col = c("blue", "red"), c("Uniform", "BH, FDR = 0.05"))
+
+  plot(pj[pj <= 0.01], xlab = "Order", ylab = "Ordered p value", main = expression(paste("Zoom-in to all ", p <= 0.01)), ylim = c(0, 0.01))
+  abline(0, 1 / m, col = "blue")
+  points(pj[1:res[[i]]$bh.fd], col = "green", pch = 19)
+  abline(0, 0.05 / m, col = "red")
+  legend("top", lty = 1, col = c("blue", "red"), c("Uniform", "BH, FDR = 0.05"))
+
+  plot(pj[1:max(100, res[[i]]$bh.fd)], xlab = "Order", ylab = "Ordered p value", main = "Zoom-in to all the discoveries by BH", ylim = c(0, pj[max(100, res[[i]]$bh.fd)]))
+  abline(0, 1 / m, col = "blue")
+  points(pj[1:res[[i]]$bh.fd], col = "green", pch = 19)
+  abline(0, 0.05 / m, col = "red")
+  legend("top", lty = 1, col = c("blue", "red"), c("Uniform", "BH, FDR = 0.05"))
+}
+```
+
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```

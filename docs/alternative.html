@@ -13,7 +13,7 @@
 
 <meta name="date" content="2017-03-29" />
 
-<title>True Signal vs Correlated Null</title>
+<title>True Signal vs Correlated Null: Identifiability &amp; Small Effects</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -302,7 +302,7 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">True Signal vs Correlated Null</h1>
+<h1 class="title toc-ignore">True Signal vs Correlated Null: Identifiability &amp; Small Effects</h1>
 <h4 class="author"><em>Lei Sun</em></h4>
 <h4 class="date"><em>2017-03-29</em></h4>
 
@@ -313,8 +313,10 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
+<p><strong>Last updated:</strong> 2017-03-31</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
+<p><strong>Code version:</strong> 6675cff</p>
 <!-- Add your analysis here -->
 <div id="identifiablity-of-true-signals-from-correlated-noise" class="section level2">
 <h2>Identifiablity of true signals from correlated noise</h2>
@@ -336,11 +338,11 @@ z_j \sim N(\beta_j, 1)
 <pre class="r"><code>n = 1e4
 m = 5
 set.seed(777)
-zmat = matrix(rnorm(n * m, 0, sd = sqrt(2)), nrow = m)</code></pre>
+zmat = matrix(rnorm(n * m, 0, sd = sqrt(2)), nrow = m, byrow = TRUE)</code></pre>
 <pre class="r"><code>library(ashr)
 source(&quot;../code/ecdfz.R&quot;)
 res = list()
-for (i in 1:3) {
+for (i in 1:m) {
   z = zmat[i, ]
   p = (1 - pnorm(abs(z))) * 2
   bh.fd = sum(p.adjust(p, method = &quot;BH&quot;) &lt;= 0.05)
@@ -348,39 +350,61 @@ for (i in 1:3) {
   ecdfz.fit = ecdfz.optimal(z)
   res[[i]] = list(z = z, p = p, bh.fd = bh.fd, pihat0.ash = pihat0.ash, ecdfz.fit = ecdfz.fit)
 }</code></pre>
-<pre><code>Number of Discoveries: 207 ; pihat0 = 0.3309512 
-Log-likelihood with N(0, 2): -17629.27 
-Log-likelihood with Gaussian Derivatives: -17634.06 
-Log-likelihood ratio between true N(0, 2) and fitted Gaussian derivatives: 4.790331 
+<pre><code>Example 1 : Number of Discoveries: 246 ; pihat0 = 0.3245191 
+Log-likelihood with N(0, 2): -17704.62 
+Log-likelihood with Gaussian Derivatives: -17702.15 
+Log-likelihood ratio between true N(0, 2) and fitted Gaussian derivatives: -2.473037 
 Normalized weights:
-1 : -0.0177035771860527 ; 2 : 0.689887136368602 ; 3 : -0.0509478089605657 ; 4 : 0.474815572091947 ; 5 : -0.0255292356243276 ; 6 : 0.197260355735445 ; 7 : 0.0209642526780779 ;</code></pre>
+1 : -0.0126888368547959 ; 2 : 0.717062378249889 ; 3 : -0.0184536200134752 ; 4 : 0.649465525394262 ; 5 : 0.00859163522314002 ; 6 : 0.521325079359314 ; 7 : 0.0334885164431775 ; 8 : 0.22636494735755 ;</code></pre>
 <p><img src="figure/alternative.rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre><code>Zoom in to the left tails:</code></pre>
+<pre><code>Zoom in to the left tail:</code></pre>
 <p><img src="figure/alternative.rmd/unnamed-chunk-4-2.png" width="672" style="display: block; margin: auto;" /></p>
-<pre><code>Zoom in to the right tails:</code></pre>
+<pre><code>Zoom in to the right tail:</code></pre>
 <p><img src="figure/alternative.rmd/unnamed-chunk-4-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-5.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-6.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-7.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-8.png" width="672" style="display: block; margin: auto;" /></p>
-<pre><code>Number of Discoveries: 210 ; pihat0 = 0.3484933 
-Log-likelihood with N(0, 2): -17695.54 
-Log-likelihood with Gaussian Derivatives: -17691.84 
-Log-likelihood ratio between true N(0, 2) and fitted Gaussian derivatives: -3.698983 
+<pre><code>Example 2 : Number of Discoveries: 218 ; pihat0 = 0.3007316 
+Log-likelihood with N(0, 2): -17620.91 
+Log-likelihood with Gaussian Derivatives: -17618.13 
+Log-likelihood ratio between true N(0, 2) and fitted Gaussian derivatives: -2.787631 
 Normalized weights:
-1 : -0.00662167797406594 ; 2 : 0.716277504382886 ; 3 : -0.0310338589748257 ; 4 : 0.594319021051848 ; 5 : -0.00405607696274195 ; 6 : 0.364148970093227 ; 7 : 0.0347791611900783 ; 8 : 0.0862488827136366 ;</code></pre>
+1 : 0.0102680011779709 ; 2 : 0.696012169853609 ; 3 : 0.0113000171720435 ; 4 : 0.544236663386519 ; 5 : -0.0208432030918437 ; 6 : 0.359654087688657 ; 7 : 0.00449356234470338 ; 8 : 0.129368209367989 ;</code></pre>
 <p><img src="figure/alternative.rmd/unnamed-chunk-4-9.png" width="672" style="display: block; margin: auto;" /></p>
-<pre><code>Zoom in to the left tails:</code></pre>
+<pre><code>Zoom in to the left tail:</code></pre>
 <p><img src="figure/alternative.rmd/unnamed-chunk-4-10.png" width="672" style="display: block; margin: auto;" /></p>
-<pre><code>Zoom in to the right tails:</code></pre>
+<pre><code>Zoom in to the right tail:</code></pre>
 <p><img src="figure/alternative.rmd/unnamed-chunk-4-11.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-12.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-13.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-14.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-15.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-16.png" width="672" style="display: block; margin: auto;" /></p>
-<pre><code>Number of Discoveries: 190 ; pihat0 = 0.3438938 
-Log-likelihood with N(0, 2): -17620.41 
-Log-likelihood with Gaussian Derivatives: -17620.47 
-Log-likelihood ratio between true N(0, 2) and fitted Gaussian derivatives: 0.05853415 
+<pre><code>Example 3 : Number of Discoveries: 201 ; pihat0 = 0.3524008 
+Log-likelihood with N(0, 2): -17627.66 
+Log-likelihood with Gaussian Derivatives: -17623.26 
+Log-likelihood ratio between true N(0, 2) and fitted Gaussian derivatives: -4.397359 
 Normalized weights:
-1 : 0.00412988146644346 ; 2 : 0.691757356275142 ; 3 : 0.0624186506260473 ; 4 : 0.566017599686127 ; 5 : 0.0720236790272216 ; 6 : 0.359005476183793 ; 7 : 0.0491535934289797 ; 8 : 0.11765212650001 ;</code></pre>
+1 : 0.000611199281683122 ; 2 : 0.697833563596919 ; 3 : -9.24232505276873e-05 ; 4 : 0.593310577011007 ; 5 : 0.0690423192366928 ; 6 : 0.402719962212205 ; 7 : 0.0821756084741036 ; 8 : 0.137136244590824 ;</code></pre>
 <p><img src="figure/alternative.rmd/unnamed-chunk-4-17.png" width="672" style="display: block; margin: auto;" /></p>
-<pre><code>Zoom in to the left tails:</code></pre>
+<pre><code>Zoom in to the left tail:</code></pre>
 <p><img src="figure/alternative.rmd/unnamed-chunk-4-18.png" width="672" style="display: block; margin: auto;" /></p>
-<pre><code>Zoom in to the right tails:</code></pre>
+<pre><code>Zoom in to the right tail:</code></pre>
 <p><img src="figure/alternative.rmd/unnamed-chunk-4-19.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-20.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-21.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-22.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-23.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-24.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Example 4 : Number of Discoveries: 134 ; pihat0 = 0.3039997 
+Log-likelihood with N(0, 2): -17572.28 
+Log-likelihood with Gaussian Derivatives: -17589.35 
+Log-likelihood ratio between true N(0, 2) and fitted Gaussian derivatives: 17.07424 
+Normalized weights:
+1 : -0.00303021567753385 ; 2 : 0.667140676046508 ; 3 : -0.00744442518950379 ; 4 : 0.4335954662891 ; 5 : 0.00652056989516479 ; 6 : 0.163579551221406 ; 7 : 0.0434395776822699 ;</code></pre>
+<p><img src="figure/alternative.rmd/unnamed-chunk-4-25.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Zoom in to the left tail:</code></pre>
+<p><img src="figure/alternative.rmd/unnamed-chunk-4-26.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Zoom in to the right tail:</code></pre>
+<p><img src="figure/alternative.rmd/unnamed-chunk-4-27.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-28.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-29.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-30.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-31.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-32.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Example 5 : Number of Discoveries: 201 ; pihat0 = 0.3864133 
+Log-likelihood with N(0, 2): -17602.8 
+Log-likelihood with Gaussian Derivatives: -17607.36 
+Log-likelihood ratio between true N(0, 2) and fitted Gaussian derivatives: 4.565327 
+Normalized weights:
+1 : -0.0149505230188178 ; 2 : 0.681006373173563 ; 3 : -0.029408092099831 ; 4 : 0.526597120212115 ; 5 : -0.0649823448928799 ; 6 : 0.248323484516014 ; 7 : -0.077154633635199 ;</code></pre>
+<p><img src="figure/alternative.rmd/unnamed-chunk-4-33.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Zoom in to the left tail:</code></pre>
+<p><img src="figure/alternative.rmd/unnamed-chunk-4-34.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Zoom in to the right tail:</code></pre>
+<p><img src="figure/alternative.rmd/unnamed-chunk-4-35.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-36.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-37.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-38.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-39.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-40.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="session-information" class="section level2">
 <h2>Session information</h2>
@@ -388,7 +412,7 @@ Normalized weights:
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>R version 3.3.2 (2016-10-31)
 Platform: x86_64-apple-darwin13.4.0 (64-bit)
-Running under: macOS Sierra 10.12.3
+Running under: macOS Sierra 10.12.4
 
 locale:
 [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
@@ -399,8 +423,8 @@ attached base packages:
 loaded via a namespace (and not attached):
  [1] backports_1.0.5 magrittr_1.5    rprojroot_1.2   tools_3.3.2    
  [5] htmltools_0.3.5 yaml_2.1.14     Rcpp_0.12.10    stringi_1.1.2  
- [9] rmarkdown_1.3   knitr_1.15.1    stringr_1.1.0   digest_0.6.9   
-[13] evaluate_0.10  </code></pre>
+ [9] rmarkdown_1.3   knitr_1.15.1    git2r_0.18.0    stringr_1.2.0  
+[13] digest_0.6.11   evaluate_0.10  </code></pre>
 </div>
 
 <hr>
