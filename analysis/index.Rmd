@@ -76,7 +76,10 @@ Inspired by [Schwartzman 2010](http://amstat.tandfonline.com/doi/abs/10.1198/jas
 
 In Gaussian derivatives decomposition, weights $W_k$ and especially [normalized weights](gaussian_derivatives_5.html#numerical_issues) $W_k^s = W_k\sqrt{k!}$ contain substantial information. In order to produce a proper density, and in order to regularize the fitted density to make it describe a plausible empiricall correlated null, constraints need to be imposed on the weights.
 
-* [True signal vs correlated null](alternative.html)
+* [True signal vs correlated null: small effects](alternative.html)
+* [True signal vs correlated null: larger effects](alternative2.html)
+
+Both true effects and correlation can distort the empirical distribution away from the standard normal $N(0, 1)$, and Gaussian derivatives are presumably able to fit both.  Therefore, is there a way to let Gaussian derivatives with [a reasonable number of reasonable weights](gaussian_derivatives_5.html#weight_constraints) automatically identify correlated null from true effects?  It works well when effects are *not too small* right now.
 
 [`ashr`]: https://github.com/stephens999/ashr
 

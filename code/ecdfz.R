@@ -31,7 +31,7 @@ print.ecdfz = function (object) {
   print(list(status = object$status, log.lik.gd = object$log.lik.gd))
 }
 
-ecdfz.optimal = function (z, ord.max = 20, k = 2, alpha = 0.05, method = c("un", "con")) {
+ecdfz.optimal = function (z, ord.max = 20, k = 2, alpha = 0.05, method = c("un", "con"), firstk = FALSE) {
   z = as.numeric(z)
   H = log.lik.gd = c()
   log.lik.gd = c(0, log.lik.gd)
@@ -40,16 +40,16 @@ ecdfz.optimal = function (z, ord.max = 20, k = 2, alpha = 0.05, method = c("un",
   conv = "OPTIMAL"
   if (all(method == "con")) {w.cvxr = w.cvxr.cns} else {w.cvxr = w.cvxr.uncns}
 
-  while ((ord <= k) & (conv == "OPTIMAL")) {
-    H = cbind(H, hermite(x = z, n = ord))
-    res[[ord]] = w.cvxr(H)
-    conv = res[[ord]]$status
-    log.lik.gd[1 + ord] = -res[[ord]]$optimal_value
-    ord = ord + 1
-  }
-
-  if (conv == "OPTIMAL") {
-    while (!w.stop(log.lik.gd, ord, k, alpha) & (ord <= (ord.max + k)) & (conv == "OPTIMAL")) {
+  if (firstk) {
+    while ((ord <= k)) {
+      H = cbind(H, hermite(x = z, n = ord))
+      res[[ord]] = w.cvxr(H)
+      log.lik.gd[1 + ord] = -res[[ord]]$optimal_value
+      ord = ord + 1
+    }
+    conv = "OPTIMAL"
+  } else {
+    while ((ord <= k) & (conv == "OPTIMAL")) {
       H = cbind(H, hermite(x = z, n = ord))
       res[[ord]] = w.cvxr(H)
       conv = res[[ord]]$status
@@ -58,9 +58,17 @@ ecdfz.optimal = function (z, ord.max = 20, k = 2, alpha = 0.05, method = c("un",
     }
   }
 
+  while (!w.stop(log.lik.gd, ord, k, alpha) & (ord <= (ord.max + k)) & (conv == "OPTIMAL")) {
+    H = cbind(H, hermite(x = z, n = ord))
+    res[[ord]] = w.cvxr(H)
+    conv = res[[ord]]$status
+    log.lik.gd[1 + ord] = -res[[ord]]$optimal_value
+    ord = ord + 1
+  }
+
   ord.fitted = length(res)
-  ord.optimal.found = w.stop(log.lik.gd, ord.fitted + 1, k, alpha)
-  if (ord.optimal.found) {
+  ord.optimal.found = w.stop(log.lik.gd, ord.fitted + 1, k, alpha) & (ord.fitted >= k)
+  if (ord.fitted >=k & ord.optimal.found & conv == "OPTIMAL") {
     ord.optimal = ord.fitted - k
     H.optimal = H[, (1 : ord.optimal)]
     w.optimal = as.numeric(res[[ord.optimal]]$primal_values[[1]])
