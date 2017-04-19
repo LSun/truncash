@@ -1,0 +1,127 @@
+---
+title: "Diagnostic Plots for ASH on Correlated Null"
+author: "Lei Sun"
+date: 2017-04-18
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+## Correlation makes `ASH` fit less well
+
+[Diagnostic plots for `ASH`](diagnostic_plot.html) can be used to measure the goodness of fit of `ASH`.  Breaking any of [the assumptions behind `ASH`](diagnostic_plot.html#goodness_of_fit_for_ash) would make its fit less well, as shown in the non-uniformness of $\left\{\hat F_j\right\}$, among which some cases have been discussed.
+
+A special case closely related to this project is about correlation.  The presence of correlation could affects the accuracy of estimating $g$, as [shown before](correlated_z_2.html).  Moreover, the correlation will inflate the empirical distribution of the correlated noise, making it less regular, thus less able to be captured by the mixture of normals or uniforms as in `ASH`.
+
+## Dignostic plots for all `BH`-hostile data sets
+
+Here we get $1K$ simulated, correlated null data sets, each having $10K$ $z$ scores, $p$ values associated $10K$ genes.  We choose those data sets most hostile to $BH$ procedure -- those which produce at least false discovery under `BH` using $\alpha = 0.05$.  And then feed $\hat\beta_j = z_j, \hat s_j \equiv 1$ to `ASH`, using a prior of normal mixtures and uniform mixtures, respectively.
+
+If these $z$ scores are independent, `ASH` should be able to estimated $\hat g =\delta_0$ reasonably well.  However, with correlation, estimated $\hat g$ will be different from $\delta_0$.  **Moreover, with this estimated $\hat g$, $\left\{\hat F_j\right\}$ might not behave like $\text{Unif}\left[0, 1\right]$.**
+
+This is because the pseudo-effect due to the correlation-induced inflation is not regular and not likely to be captured by unimodal mixtures of normals of uniforms.  For example, as Matthew's initial observation which inspired the whole project in the first place, the correlation may only inflate the moderate observations but not the extreme ones.  Thus, a mixture of normals, which simultaneously inflates both the moderate and the extreme observations, would be ill-advised.
+
+```{r, cache = TRUE}
+library(ashr)
+```
+
+```{r, cache = TRUE}
+z = read.table("../output/z_null_liver_777.txt")
+p = read.table("../output/p_null_liver_777.txt")
+n = nrow(z)
+m = ncol(z)
+```
+
+```{r, cache = TRUE, echo = FALSE}
+fd.bh = c()
+for (i in 1 : n) {
+  p_BH = p.adjust(as.numeric(p[i, ]), method = "BH")
+  fd.bh[i] = sum(p_BH <= 0.05)
+}
+```
+
+It's worth noting that for the same data set, that is, for the same correlated $z$ scores, the diagnostic plots of `ASH` using a mixture uniform prior is usually conspicuously better than those using a mixture normal prior.  This might be because uniform mixtures are more flexible than normal mixtures at dealing with irregular distributions, like the "moderates inflated yet extremes not inflated" one.  For the same reason, `mixcompdist = "halfuniform"` is occasionally better than `mixcompdist = "uniform"`.
+
+```{r, cache = TRUE, echo = FALSE}
+fdn = sum(fd.bh >= 1)
+I = order(fd.bh, decreasing = TRUE)[1:fdn]
+x = seq(-10, 10, 0.01)
+y = dnorm(x)
+k = 1
+for (j in I) {
+  fit.ash.n.n = ash.workhorse(as.numeric(z[j, ]), 1, mixcompdist = "normal", method = "fdr")
+  data.n = fit.ash.n.n$data
+  ghat.n = get_fitted_g(fit.ash.n.n)
+  Fjkhat.n = pnorm(outer(data.n$x, ghat.n$mean, "-") / sqrt(outer((data.n$s)^2, ghat.n$sd^2, "+")))
+  Fhat.n = Fjkhat.n %*% ghat.n$pi
+  fit.ash.n.u = ash.workhorse(as.numeric(z[j, ]), 1, mixcompdist = "uniform", method = "fdr")
+  data.u = fit.ash.n.u$data
+  ghat.u = get_fitted_g(fit.ash.n.u)
+  a_mat = outer(data.u$x, ghat.u$a, "-") / data.u$s
+  b_mat = outer(data.u$x, ghat.u$b, "-") / data.u$s
+  Fjkhat.u = ((a_mat * pnorm(a_mat) + dnorm(a_mat)) - (b_mat * pnorm(b_mat) + dnorm(b_mat))) / (a_mat - b_mat)
+  Fjkhat.u[a_mat == b_mat] = pnorm(a_mat[a_mat == b_mat])
+  Fhat.u = Fjkhat.u %*% ghat.u$pi
+  fit.ash.n.hu = ash.workhorse(as.numeric(z[j, ]), 1, mixcompdist = "halfuniform", method = "fdr")
+  data.hu = fit.ash.n.hu$data
+  ghat.hu = get_fitted_g(fit.ash.n.hu)
+  a_mat = outer(data.hu$x, ghat.hu$a, "-") / data.hu$s
+  b_mat = outer(data.hu$x, ghat.hu$b, "-") / data.hu$s
+  Fjkhat.hu = ((a_mat * pnorm(a_mat) + dnorm(a_mat)) - (b_mat * pnorm(b_mat) + dnorm(b_mat))) / (a_mat - b_mat)
+  Fjkhat.hu[a_mat == b_mat] = pnorm(a_mat[a_mat == b_mat])
+  Fhat.hu = Fjkhat.hu %*% ghat.hu$pi
+  cat("N0.", k, ": Data Set", j, "; Number of False Discoveries:", fd.bh[j], "; pihat0 =", get_pi0(fit.ash.n.n))
+  hist(as.numeric(z[j, ]), xlab = "z scores", freq = FALSE, ylim = c(0, 0.45), nclass = 100, main = "10000 z scores, 100 bins")
+  lines(x, y, col = "red")
+  qqnorm(as.numeric(z[j, ]), main = "Normal Q-Q plot for z scores")
+  abline(0, 1)
+  pj = sort(as.numeric(p[j, ]))
+  plot(pj[pj <= 0.01], xlab = "Order", ylab = "Ordered p value", main = "Zoom-in to p values <= 0.01", ylim = c(0, 0.01))
+  abline(0, 1 / m, col = "blue")
+  points(pj[1:fd.bh[j]], col = "green", pch = 19)
+  abline(0, 0.05 / m, col = "red")
+  legend("top", lty = 1, col = c("blue", "red"), c("Uniform", "BH, FDR = 0.05"), bty = "n")
+  hist(Fhat.n, breaks = 100, prob = TRUE, xlab = expression(hat("F")[j]^"normal"), main = expression(paste("Histogram of estimated ", hat("F")^"normal")))
+  abline(h = 1, lty = 2, col = "red")
+  plot(sort(Fhat.n), xlab = "Order", ylab = "Ordered CDF", pch = 19, cex = 0.25, ylim = c(0, 1), main = expression(paste("Ordered F & ", hat("F")^"normal")))
+  abline(-1/(m-1), 1/(m-1), col = "red", lty = 2)
+  hist(Fhat.u, breaks = 100, prob = TRUE, xlab = expression(hat("F")[j]^"uniform"), main = expression(paste("Histogram of estimated ", hat("F")^"uniform")))
+  abline(h = 1, lty = 2, col = "red")
+  plot(sort(Fhat.u), xlab = "Order", ylab = "Ordered CDF", pch = 19, cex = 0.25, ylim = c(0, 1), main = expression(paste("Ordered F & ", hat("F")^"uniform")))
+  abline(-1/(m-1), 1/(m-1), col = "red", lty = 2)
+  hist(Fhat.hu, breaks = 100, prob = TRUE, xlab = expression(hat("F")[j]^"half-uniform"), main = expression(paste("Histogram of estimated ", hat("F")^"half-uniform")))
+  abline(h = 1, lty = 2, col = "red")
+  plot(sort(Fhat.hu), xlab = "Order", ylab = "Ordered CDF", pch = 19, cex = 0.25, ylim = c(0, 1), main = expression(paste("Ordered F & ", hat("F")^"half-uniform")))
+  abline(-1/(m-1), 1/(m-1), col = "red", lty = 2)
+  k = k + 1
+}
+```
+
+## Remarks on goodness of fit
+
+The simulation shows that oftentimes, `ASH`, no matter what kind of mixture prior is used, would only be able to produce a bad fit for the pseudo-effects due to correlation-induced inflation.  However, occasionally, if `uniform` or `halfuniform` is used as the mixture component for the prior, the model may have a good fit, as indicated by the uniformness of $\left\{\hat F_j\right\}$.
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```

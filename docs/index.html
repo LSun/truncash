@@ -276,6 +276,11 @@ $(document).ready(function () {
 <li><a href="alternative2.html">True signal vs correlated null: larger effects</a></li>
 </ul>
 <p>Both true effects and correlation can distort the empirical distribution away from the standard normal <span class="math inline">\(N(0, 1)\)</span>, and Gaussian derivatives are presumably able to fit both. Therefore, is there a way to let Gaussian derivatives with <a href="gaussian_derivatives_5.html#weight_constraints">a reasonable number of reasonable weights</a> automatically identify correlated null from true effects? It works well when effects are <em>not too small</em> right now.</p>
+<ul>
+<li><a href="diagnostic_plot.html">Diagnostic plots for <code>ASH</code></a></li>
+<li><a href="diagnostic_correlated_z.html">Diagnostic plots for <code>ASH</code> on correlated null</a></li>
+</ul>
+<p>Under the exchangeability assumption, the goodness of fit of empirical Bayes can be measured by the behavior of <span class="math inline">\(\left\{\hat F_j = \hat F_{\hat\beta_j | \hat s_j}\left(\hat\beta_j\mid\hat s_j\right)\right\}\)</span>. Meanwhile, if <code>ASH</code> is applied to correlated null <span class="math inline">\(z\)</span> scores, estimated <span class="math inline">\(\hat g\)</span> will not only be different from <span class="math inline">\(\delta_0\)</span>; moreover, with this estimated <span class="math inline">\(\hat g\)</span>, <span class="math inline">\(\left\{\hat F_j\right\}\)</span> might not behave like <span class="math inline">\(\text{Unif}\left[0, 1\right]\)</span>.</p>
 <!-- The goal of this new template is to simplify the setup and maintenance of a research website. -->
 <!-- Specifically, -->
 <!-- *  Easier to build and extend the website using the new tools in the [rmarkdown][] package and [latest RStudio release][rstudio] -->

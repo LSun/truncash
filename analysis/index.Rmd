@@ -81,6 +81,11 @@ In Gaussian derivatives decomposition, weights $W_k$ and especially [normalized 
 
 Both true effects and correlation can distort the empirical distribution away from the standard normal $N(0, 1)$, and Gaussian derivatives are presumably able to fit both.  Therefore, is there a way to let Gaussian derivatives with [a reasonable number of reasonable weights](gaussian_derivatives_5.html#weight_constraints) automatically identify correlated null from true effects?  It works well when effects are *not too small* right now.
 
+* [Diagnostic plots for `ASH`](diagnostic_plot.html)
+* [Diagnostic plots for `ASH` on correlated null](diagnostic_correlated_z.html)
+
+Under the exchangeability assumption, the goodness of fit of empirical Bayes can be measured by the behavior of $\left\{\hat F_j = \hat F_{\hat\beta_j | \hat s_j}\left(\hat\beta_j\mid\hat s_j\right)\right\}$.  Meanwhile, if `ASH` is applied to correlated null $z$ scores, estimated $\hat g$ will not only be different from $\delta_0$; moreover, with this estimated $\hat g$, $\left\{\hat F_j\right\}$ might not behave like $\text{Unif}\left[0, 1\right]$.
+
 [`ashr`]: https://github.com/stephens999/ashr
 
 <!-- The goal of this new template is to simplify the setup and maintenance of a research website. -->
