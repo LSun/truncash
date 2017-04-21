@@ -316,7 +316,7 @@ shared across the workflowr files. -->
 <p><strong>Last updated:</strong> 2017-04-21</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 4eb2aa0</p>
+<p><strong>Code version:</strong> 239f195</p>
 <!-- Add your analysis here -->
 <div id="problem-setting" class="section level2">
 <h2>Problem setting</h2>
@@ -351,7 +351,7 @@ g_k(\beta_j)d\beta_j\\
 &amp;:=&amp; \displaystyle \sum_k \sum_l \pi_k w_l
 f_{jkl} \ .
 \end{array}
-\]</span> Hence, it’s all bogged down to calculate <span class="math inline">\(f_{jkl}\)</span>, which is the convolution of a Gaussian derivative <span class="math inline">\(\varphi^{(l)}\)</span> and a prior component <span class="math inline">\(g_k\)</span>, with some change of variables manipulation. Note that in usual <code>ASH</code> settings, <span class="math inline">\(g_k\)</span> is either uniform or normal, both of which can be handled without conceptual difficulty.</p>
+\]</span> Hence, it’s all boiled down to calculate <span class="math inline">\(f_{jkl}\)</span>, which is the convolution of a Gaussian derivative <span class="math inline">\(\varphi^{(l)}\)</span> and a prior component <span class="math inline">\(g_k\)</span>, with some change of variables manipulation. Note that in usual <code>ASH</code> settings, <span class="math inline">\(g_k\)</span> is either uniform or normal, both of which can be handled without conceptual difficulty.</p>
 <p>If <span class="math inline">\(g_k\)</span> is a uniform, the convolution of a Gaussian derivative and a uniform is just another Gaussian derivative in a lower order, such as</p>
 <p><span class="math display">\[
 \varphi^{(l)} * \text{Unif} \leadsto \varphi^{(l-1)} \ .
@@ -603,7 +603,7 @@ e^{it\mu_k - \frac12\left(\sigma_k^2+\hat s_j^2\right)t^2}
 </div>
 <div id="optimization-problem" class="section level2">
 <h2>Optimization problem</h2>
-<p>The problem is now bogged down to maximize the joint likelihood</p>
+<p>The problem is now boiled down to maximize the joint likelihood</p>
 <p><span class="math display">\[
 \begin{array}{rcl}
 \max\limits_{\pi, w}\prod\limits_j f(\hat\beta_j|\hat s_j) &amp;=&amp; \max\limits_{\pi, w}\prod\limits_j \left(\sum_k\sum_l\pi_k w_l f_{jkl}\right)\\

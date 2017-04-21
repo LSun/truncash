@@ -88,7 +88,7 @@ Under the exchangeability assumption, the goodness of fit of empirical Bayes can
 
 * [Normal means inference with heteroskedastic and correlated noise](ash_gd.html)
 
-The previous investigation is bogged down to a prototypical problem: the classic normal means problem, but with heteroskedastic and especially correlated noise.  Gaussian derivatives and `ASH` provide a way to tackle it.
+The previous investigation is boiled down to a prototypical problem: the classic normal means inference, but with heteroskedastic and especially correlated noise.  Gaussian derivatives and `ASH` provide a way to tackle it.
 
 [`ashr`]: https://github.com/stephens999/ashr
 

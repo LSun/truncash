@@ -69,7 +69,7 @@ g_k(\beta_j)d\beta_j\\
 f_{jkl} \ .
 \end{array}
 $$
-Hence, it's all bogged down to calculate $f_{jkl}$, which is the convolution of a Gaussian derivative $\varphi^{(l)}$ and a prior component $g_k$, with some change of variables manipulation.  Note that in usual `ASH` settings, $g_k$ is either uniform or normal, both of which can be handled without conceptual difficulty.
+Hence, it's all boiled down to calculate $f_{jkl}$, which is the convolution of a Gaussian derivative $\varphi^{(l)}$ and a prior component $g_k$, with some change of variables manipulation.  Note that in usual `ASH` settings, $g_k$ is either uniform or normal, both of which can be handled without conceptual difficulty.
 
 If $g_k$ is a uniform, the convolution of a Gaussian derivative and a uniform is just another Gaussian derivative in a lower order, such as
 
@@ -365,7 +365,7 @@ In common applications, $\mu_k\equiv\mu\equiv0$.
 
 ## Optimization problem
 
-The problem is now bogged down to maximize the joint likelihood
+The problem is now boiled down to maximize the joint likelihood
 
 $$
 \begin{array}{rcl}
