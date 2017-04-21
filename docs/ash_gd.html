@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+<meta name="author" content="Lei Sun" />
+
+<meta name="date" content="2017-04-12" />
+
+<title>Normal Means with Heteroskedastic and Correlated Noise</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs && document.readyState && document.readyState === "complete") {
+   window.setTimeout(function() {
+      hljs.initHighlighting();
+   }, 0);
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">truncash</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/LSun/truncash">
+    <span class="fa fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Normal Means with Heteroskedastic and Correlated Noise</h1>
+<h4 class="author"><em>Lei Sun</em></h4>
+<h4 class="date"><em>2017-04-12</em></h4>
+
+</div>
+
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+<!-- Update knitr chunk options -->
+<!-- Insert the date the file was last updated -->
+<p><strong>Last updated:</strong> 2017-04-21</p>
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+<p><strong>Code version:</strong> 4eb2aa0</p>
+<!-- Add your analysis here -->
+<div id="problem-setting" class="section level2">
+<h2>Problem setting</h2>
+<p>We are considering the normal means problem with heteroskedastic noise. Furthermore, The noise are not independent, with unknown pairwise correlation <span class="math inline">\(\rho_{ij}\)</span>.</p>
+<p><span class="math display">\[
+\begin{array}{rcl}
+\hat\beta_j |\beta_j, \hat s_j &amp;=&amp; \beta_j + \hat s_j z_j \ ;\\
+z_j &amp;\sim&amp; N(0, 1) \text{ marginally} \ ;\\
+z_j &amp;:&amp; \text{correlated} \ .
+\end{array}
+\]</span></p>
+<p>Under <a href="https://academic.oup.com/biostatistics/article/18/2/275/2557030/False-discovery-rates-a-new-deal"><code>ash</code> framework</a>, a prior is put on exchangeable <span class="math inline">\(\beta_j\)</span>:</p>
+<p><span class="math display">\[
+g(\beta_j) = \sum_k \pi_k g_k(\beta_j)\ .
+\]</span></p>
+<p>According to <a href="gaussian_derivatives.html">previous exploration</a>, correlated standard normal <span class="math inline">\(z\)</span> scores can be <em>seen as iid from a density composed of Gaussian derivatives</em>.</p>
+<p><span class="math display">\[
+f_0(z_j) = \sum_{l=0}^\infty w_l \varphi^{(l)}(z_j) \ .
+\]</span> By change of variables, the likelihood</p>
+<p><span class="math display">\[
+p(\hat\beta_j | \beta_j, \hat s_j) = \frac{1}{\hat s_j}f_0\left(\frac{\hat\beta_j - \beta_j}{\hat s_j}\right) = \sum_l w_l \frac{1}{\hat s_j}\varphi^{(l)}\left(\frac{\hat\beta_j - \beta_j}{\hat s_j}\right) \ .
+\]</span></p>
+<p>Thus for each pair of observation <span class="math inline">\((\hat\beta_j, \hat s_j)\)</span>, the likelihood becomes</p>
+<p><span class="math display">\[
+\begin{array}{rcl}
+f(\hat\beta_j|\hat s_j) &amp;=&amp; \displaystyle\int p(\hat\beta_j | \beta_j, \hat s_j)g(\beta_j)d\beta_j\\
+&amp;=&amp;\displaystyle\int \sum_l w_l \frac{1}{\hat s_j}\varphi^{(l)}\left(\frac{\hat\beta_j - \beta_j}{\hat s_j}\right) \sum_k \pi_k g_k(\beta_j)d\beta_j\\
+&amp;=&amp; \displaystyle \sum_k \sum_l \pi_k w_l 
+\int\frac{1}{\hat s_j}
+\varphi^{(l)}\left(\frac{\hat\beta_j - \beta_j}{\hat s_j}\right)
+g_k(\beta_j)d\beta_j\\
+&amp;:=&amp; \displaystyle \sum_k \sum_l \pi_k w_l
+f_{jkl} \ .
+\end{array}
+\]</span> Hence, it’s all bogged down to calculate <span class="math inline">\(f_{jkl}\)</span>, which is the convolution of a Gaussian derivative <span class="math inline">\(\varphi^{(l)}\)</span> and a prior component <span class="math inline">\(g_k\)</span>, with some change of variables manipulation. Note that in usual <code>ASH</code> settings, <span class="math inline">\(g_k\)</span> is either uniform or normal, both of which can be handled without conceptual difficulty.</p>
+<p>If <span class="math inline">\(g_k\)</span> is a uniform, the convolution of a Gaussian derivative and a uniform is just another Gaussian derivative in a lower order, such as</p>
+<p><span class="math display">\[
+\varphi^{(l)} * \text{Unif} \leadsto \varphi^{(l-1)} \ .
+\]</span> On the other hand, if <span class="math inline">\(g_k\)</span> is a normal, we can use <a href="https://en.wikipedia.org/wiki/Convolution#Differentiation">a fact about convolution</a> that</p>
+<p><span class="math display">\[
+\begin{array}{rcl}
+&amp;&amp; \frac{d}{dx}(f*g) = \frac{df}{dx} * g = f * \frac{dg}{dx}\\
+&amp;\Rightarrow&amp;
+\varphi^{(l)} * N(\mu, \sigma^2) = \left(\varphi * N(\mu, \sigma^2)\right)^{(l)} \leadsto \tilde\varphi^{(l)} \ .
+\end{array}
+\]</span> Because the convolution of <span class="math inline">\(\varphi\)</span>, a Gaussian, and another Gaussian is still a Gaussian, the convolution of a Gaussian derivative and a normal gives another Gaussian derivative.</p>
+<p>With <span class="math inline">\(f_{jkl}\)</span> computed, the goal is then to maximize the joint likeliood of the observation <span class="math inline">\(\left\{\left(\hat\beta_1, \hat s_1\right), \cdots,\left(\hat\beta_n, \hat s_n\right) \right\}\)</span> which is <span class="math display">\[
+\max\limits_{\pi, w}\prod_j f(\hat\beta_j|\hat s_j) = \prod_j \left(\displaystyle \sum_k \sum_l \pi_k w_l
+f_{jkl}\right) \ ,
+\]</span> subject to reasonable, well designed constraints on <span class="math inline">\(\pi_k\)</span> and <a href="gaussian_derivatives_5.html">especially <span class="math inline">\(w_l\)</span></a>.</p>
+</div>
+<div id="characteristic-function-fourier-transform" class="section level2">
+<h2>Characteristic function / Fourier transform</h2>
+<p>The exact form of <span class="math inline">\(f_{jkl}\)</span> can be derived analytically. Below is a method using characteristic functions or Fourier transforms.</p>
+<p>Let <span class="math inline">\(\zeta_X(t) = \zeta_F(t) =\zeta_f(t) := E[e^{itX}]\)</span> be the characteristic function of the random variable <span class="math inline">\(X\sim dF = f\)</span>. Either the random variable, its distribution, or its density function can be put in the subscript, depending on the circumstances.</p>
+<p>On the other hand, the characteristic function of a random variable is also closely related to the Fourier transform of its density. In particular,</p>
+<p><span class="math display">\[
+\zeta_f(t) = E[e^{itX}] = \int e^{itx}dF(x) = \int e^{itx}f(x)dx := \mathscr{F}_f(t) \ .
+\]</span> Note that in usual definition, the Fourier transform is given by <span class="math display">\[
+\hat f(\xi) := \int f(x)e^{-2\pi ix\xi}dx \ ,
+\]</span> with a normalizing factor <span class="math inline">\(2\pi\)</span> and a negative sign. However, even defined in different ways, <span class="math inline">\(\mathscr{F}_f(t)\)</span> carries over many nice properties of <span class="math inline">\(\hat f(\xi)\)</span>, for example, as we’ll show,</p>
+<p><span class="math display">\[
+\mathscr{F}_{f^{(m)}}(t) = (-it)^m\mathscr{F}_f(t) \ ,
+\]</span></p>
+<p>where <span class="math inline">\(f^{(m)}\)</span> is the <span class="math inline">\(m^\text{th}\)</span> derivative of <span class="math inline">\(f\)</span>.</p>
+<p>Also, <span class="math display">\[
+\mathscr{F}_{f*g}(t) = \mathscr{F}_f(t)\mathscr{F}_g(t) \ ,
+\]</span> where <span class="math inline">\(*\)</span> stands for convolution.</p>
+<p>With these properties, the Fourier transform tool could be very useful when dealing with Gaussian derivatives and their convolution with other (density) functions.</p>
+<p>Under this definition, the inversion formula for the characteristic functions, also known as the inverse Fourier transform, is</p>
+<p><span class="math display">\[
+f(x) = \frac1{2\pi} \int e^{-itx}\zeta_f(t)dt = \frac{1}{2\pi}\int e^{-itx}\mathscr{F}_f(t)dt \ .
+\]</span></p>
+<p>Then the characteristic function of <span class="math inline">\(\hat\beta_j | \hat s_j\)</span></p>
+<p><span class="math display">\[
+\zeta_{\hat\beta_j|\hat s_j}(t) = E\left[e^{it\hat\beta_j}\mid\hat s_j\right] = E\left[e^{it(\beta_j + \hat s_j z_j)}\mid\hat s_j\right] = E\left[e^{it\beta_j}\right]E\left[e^{it\hat s_jz_j}\mid\hat s_j\right] = \zeta_{\beta}(t)\zeta_{f_0}\left(\hat s_jt\right) \ .
+\]</span></p>
+<p>Let’s take care of <span class="math inline">\(\zeta_{\beta}(t)\)</span> and <span class="math inline">\(\zeta_{f_0}\left(\hat s_jt\right)\)</span> one by one. Note that</p>
+<p><span class="math display">\[
+\begin{array}{rrcl}
+&amp;\beta_j &amp;\sim&amp; \sum_k\pi_kg_k \\
+\Rightarrow &amp; \zeta_{\beta}(t) &amp;=&amp; \displaystyle\int e^{it\beta_j}p(\beta_j)d\beta_j = \int e^{it\beta_j}\sum_k\pi_kg_k(\beta_j)d\beta_j
+=\sum_k\pi_k\int e^{it\beta_j}g_k(\beta_j)d\beta_j \\
+&amp;&amp;=&amp; \sum_k\pi_k\zeta_{g_k}(t) \ .
+\end{array}
+\]</span></p>
+<p>Meanwhile, using the fact that <em>Gaussian derivatives should be absolutely integrable</em>,</p>
+<p><span class="math display">\[
+\begin{array}{rrcl}
+&amp;f_0(z_j) &amp;=&amp; \sum_l w_l \varphi^{(l)}(z_j)
+\\
+\Rightarrow &amp; \zeta_{f_0}(t) &amp;=&amp; \displaystyle 
+\int e^{itz_j}f_0(z_j)dz_j = \int e^{itz_j}\sum_lw_l\varphi^{(l)}(z_j)dz_j = 
+\sum_lw_l\int e^{itz_j}\varphi^{(l)}(z_j)dz_j\\
+&amp;&amp;=&amp;
+\sum_l w_l \mathscr{F}_{\varphi^{(l)}}(t) \ . 
+\end{array}
+\]</span> Each Fourier transform of gaussian derivatives</p>
+<p><span class="math display">\[
+\begin{array}{rcl}
+\mathscr{F}_{\varphi^{(l)}}(t) &amp;=&amp;
+\displaystyle\int e^{itz_j}\varphi^{(l)}(z_j)dz_j\\
+&amp;=&amp; \displaystyle e^{itz_j}\varphi^{(l-1)}(z_j)|_{-\infty}^\infty
+-
+\int it e^{itz_j}\varphi^{(l-1)}(z_j)dz_j\\
+&amp;=&amp;\displaystyle 0-it\int e^{itz_j}\varphi^{(l-1)}(z_j)dz_j\\
+&amp;=&amp;\displaystyle
+-it\int e^{itz_j}\varphi^{(l-1)}(z_j)dz_j\\
+&amp;=&amp;\displaystyle
+\cdots\\
+&amp;=&amp;\displaystyle
+(-it)^l \int e^{itz_j}\varphi(z_j)dz_j\\
+&amp;=&amp;(-it)^l \mathscr{F}_{\varphi}(t)\\
+&amp;=&amp;(-it)^l \zeta_\varphi(t)\\
+&amp;=&amp;\displaystyle
+(-it)^l e^{-\frac12t^2} \ .
+\end{array}
+\]</span> Thus,</p>
+<p><span class="math display">\[
+\begin{array}{rrcl}
+&amp;\zeta_{\hat\beta_j|\hat s_j}(t)
+&amp;=&amp;\zeta_{\beta}(t)\zeta_{f_0}(\hat s_jt)\\
+&amp;&amp;=&amp;\left(\sum_k\pi_k\zeta_{g_k}(t)\right)
+\left(\sum_lw_l(-i\hat s_jt)^l \zeta_\varphi(\hat s_jt)\right)\\
+&amp;&amp;=&amp;\sum_k\sum_l\pi_kw_l(-i\hat s_jt)^l \zeta_{g_k}(t)
+\zeta_\varphi(\hat s_jt)\\
+&amp;&amp;=&amp;\sum_k\sum_l\pi_kw_l(-i\hat s_jt)^l \zeta_{g_k}(t)
+e^{-\frac12\hat s_j^2t^2}\\
+\Rightarrow &amp; f(\hat\beta_j|\hat s_j)
+&amp;=&amp;\displaystyle\frac1{2\pi}\int e^{-it\hat\beta_j}\zeta_{\hat\beta_j|\hat s_j}(t)dt\\
+&amp;&amp;=&amp;\displaystyle\frac1{2\pi}\int e^{-it\hat\beta_j}\left(\sum_k\sum_l\pi_kw_l(-i\hat s_jt)^l \zeta_{g_k}(t)
+\zeta_\varphi(\hat s_jt)\right)dt\\
+&amp;&amp;=&amp;\displaystyle\sum_k\sum_l\pi_kw_l
+\frac1{2\pi}\int e^{-it\hat\beta_j}(-i\hat s_jt)^l \zeta_{g_k}(t)
+\zeta_\varphi(\hat s_jt)dt\\
+&amp;&amp;:=&amp;
+\sum_k\sum_l\pi_kw_lf_{jkl} \ .
+\end{array}
+\]</span> It is essentially the equivalent expression of <span class="math inline">\(f_{jkl}\)</span> as</p>
+<p><span class="math display">\[
+\begin{array}{rcl}
+f_{jkl} &amp;=&amp;
+\displaystyle 
+\int\frac{1}{\hat s_j}
+\varphi^{(l)}\left(\frac{\hat\beta_j - \beta_j}{\hat s_j}\right)
+g_k(\beta_j)d\beta_j\\
+&amp;=&amp;
+\displaystyle\frac1{2\pi}\int e^{-it\hat\beta_j}(-i\hat s_jt)^l \zeta_{g_k}(t)
+\zeta_\varphi(\hat s_jt)dt \ .
+\end{array}
+\]</span></p>
+<div id="uniform-mixture-prior" class="section level3">
+<h3>Uniform mixture prior</h3>
+<p>If the prior of <span class="math inline">\(\beta\)</span> is a mixture of uniforms, <span class="math inline">\(\beta \sim g = \sum_k\pi_kg_k\)</span> where <span class="math inline">\(g_k = \text{Unif}\left[a_k, b_k\right]\)</span>,</p>
+<p><span class="math display">\[
+\begin{array}{rrcl}
+&amp;\zeta_{g_k}(t) &amp;=&amp; \displaystyle\frac{e^{itb_k} - e^{ita_k}}{it(b_k - a_k)}\\
+\Rightarrow &amp;\zeta_{g_k}(t)\zeta_\varphi(\hat s_jt) &amp;=&amp;
+\displaystyle\frac{e^{itb_k} - e^{ita_k}}{it(b_k - a_k)} e^{-\frac12\hat s_j^2t^2}\\
+&amp;&amp;=&amp;
+\displaystyle\frac{e^{itb_k-\frac12\hat s_j^2t^2}}{it(b_k - a_k)}
+-\displaystyle\frac{e^{ita_k-\frac12\hat s_j^2t^2}}{it(b_k - a_k)}\\
+\Rightarrow &amp; f_{jkl} &amp;=&amp; 
+\displaystyle\frac1{2\pi}\int e^{-it\hat\beta_j}(-i\hat s_jt)^l \zeta_{g_k}(t)
+\zeta_\varphi(\hat s_jt)dt\\
+&amp;&amp;=&amp;
+\displaystyle\frac1{2\pi}\int e^{-it\hat\beta_j}(-i\hat s_jt)^l\displaystyle\frac{e^{itb_k-\frac12\hat s_j^2t^2}}{it(b_k - a_k)}dt - 
+\displaystyle\frac1{2\pi}\int e^{-it\hat\beta_j}(-i\hat s_jt)^l\displaystyle\frac{e^{ita_k-\frac12\hat s_j^2t^2}}{it(b_k - a_k)}dt \ .
+\end{array}
+\]</span></p>
+<p>It looks pretty complicated, but if we take advantage of usual Fourier transform tricks things get clearer.</p>
+<p>Let <span class="math inline">\(\varphi_{\mu, \sigma^2}\)</span> denote the density function of <span class="math inline">\(N(\mu, \sigma^2)\)</span>,</p>
+<p><span class="math display">\[
+\begin{array}{rl}
+&amp;\varphi_{\mu, \sigma^2}(z) = \frac1\sigma\varphi\left(\frac{z - \mu}{\sigma}\right)\\
+\Rightarrow &amp; \varphi_{\mu, \sigma^2}^{(m)}(z) = \frac1{\sigma^{m+1}}\varphi^{(m)}\left(\frac{z - \mu}{\sigma}\right) \\
+\Rightarrow &amp; \zeta_{\varphi_{\mu, \sigma^2}}(t)
+=
+e^{it\mu - \frac12\sigma^2t^2} \ .
+\end{array}
+\]</span></p>
+<p>Take the first part of <span class="math inline">\(f_{jkl}\)</span>, <span class="math display">\[
+\begin{array}{rrcl}
+&amp; (-i\hat s_jt)^l\displaystyle\frac{e^{itb_k-\frac12\hat s_j^2t^2}}{it(b_k - a_k)}
+&amp;=&amp;\displaystyle
+-\frac{\hat s_j^l}{b_k - a_k}(-it)^{l-1}\zeta_{\varphi_{b_k, \hat s_j^2}}(t)\\
+&amp;&amp;=&amp;\displaystyle
+-\frac{\hat s_j^l}{b_k - a_k}(-it)^{l-1}\mathscr{F}_{\varphi_{b_k, \hat s_j^2}}(t)\\
+&amp;&amp;=&amp;\displaystyle
+-\frac{\hat s_j^l}{b_k - a_k}\mathscr{F}_{\varphi_{b_k, \hat s_j^2}^{(l-1)}}(t)\\
+\Rightarrow &amp; 
+\displaystyle\frac1{2\pi}\int e^{-it\hat\beta_j}(-i\hat s_jt)^l\displaystyle\frac{e^{itb_k-\frac12\hat s_j^2t^2}}{it(b_k - a_k)}dt
+&amp;=&amp;
+-\displaystyle\frac1{2\pi}\int e^{-it\hat\beta_j}
+\frac{\hat s_j^l}{b_k - a_k}\mathscr{F}_{\varphi_{b_k, \hat s_j^2}^{(l-1)}}(t)dt
+\\
+&amp;&amp;=&amp;\displaystyle
+-\frac{\hat s_j^l}{b_k - a_k}
+\frac1{2\pi}
+\int
+e^{-it\hat\beta_j}
+\mathscr{F}_{\varphi_{b_k, \hat s_j^2}^{(l-1)}}(t)
+dt\\
+&amp;&amp;=&amp;\displaystyle
+-\frac{\hat s_j^l}{b_k - a_k}
+\varphi_{b_k, \hat s_j^2}^{(l-1)}\left(\hat\beta_j\right)\\
+&amp;&amp;=&amp;\displaystyle
+-\frac{\hat s_j^l}{b_k - a_k}
+\frac1{\hat s_j^{l}}\varphi^{(l-1)}\left(\frac{\hat\beta_j- b_k}{\hat s_j}\right)\\
+&amp;&amp;=&amp;\displaystyle
+-
+\frac{\varphi^{(l-1)}\left(\frac{\hat\beta_j- b_k}{\hat s_j}\right)}{b_k-a_k} \ .
+\end{array}
+\]</span> Therefore,</p>
+<p><span class="math display">\[
+\begin{array}{rcl}
+f_{jkl} &amp;=&amp; \displaystyle
+\frac1{2\pi}\int e^{-it\hat\beta_j}(-i\hat s_jt)^l\displaystyle\frac{e^{itb_k-\frac12\hat s_j^2t^2}}{it(b_k - a_k)}dt - 
+\frac1{2\pi}\int e^{-it\hat\beta_j}(-i\hat s_jt)^l\displaystyle\frac{e^{ita_k-\frac12\hat s_j^2t^2}}{it(b_k - a_k)}dt\\
+&amp;=&amp;
+\displaystyle
+\left(-
+\frac{\varphi^{(l-1)}\left(\frac{\hat\beta_j- b_k}{\hat s_j}\right)}{b_k-a_k}\right)
+-
+\left(-
+\frac{\varphi^{(l-1)}\left(\frac{\hat\beta_j- a_k}{\hat s_j}\right)}{b_k-a_k}\right)\\
+&amp;=&amp;\displaystyle
+\frac{\varphi^{(l-1)}\left(\frac{\hat\beta_j- a_k}{\hat s_j}\right) - \varphi^{(l-1)}\left(\frac{\hat\beta_j- b_k}{\hat s_j}\right)}{b_k-a_k}
+\end{array}
+\]</span></p>
+</div>
+<div id="normal-mixture-prior" class="section level3">
+<h3>Normal mixture prior</h3>
+<p>Likewise, if the prior of <span class="math inline">\(\beta\)</span> is a mixture of normals, <span class="math inline">\(\beta \sim g = \sum_k\pi_kg_k\)</span> where <span class="math inline">\(g_k = N(\mu_k, \sigma_k^2)\)</span>,</p>
+<p><span class="math display">\[
+\begin{array}{rrcl}
+&amp;\zeta_{g_k}(t) &amp;=&amp; \displaystyle
+e^{it\mu_k - \frac12\sigma_k^2t^2}\\
+\Rightarrow &amp;\zeta_{g_k}(t)\zeta_\varphi(\hat s_jt) 
+&amp;=&amp;
+e^{it\mu_k - \frac12\sigma_k^2t^2} e^{-\frac12\hat s_j^2t^2}\\
+&amp;&amp;=&amp;
+e^{it\mu_k - \frac12\left(\sigma_k^2+\hat s_j^2\right)t^2}
+\\
+&amp;&amp;=&amp;
+\zeta_{\varphi_{\mu_k, \sigma_k^2 + \hat s_j^2}}(t)\\
+&amp;&amp;=&amp;
+\mathscr{F}_{\varphi_{\mu_k, \sigma_k^2 + \hat s_j^2}}(t)
+\\
+\Rightarrow &amp; 
+(-i\hat s_jt)^l\zeta_{g_k}(t)\zeta_\varphi(\hat s_jt) &amp;=&amp; 
+(-i\hat s_jt)^l\mathscr{F}_{\varphi_{\mu_k, \sigma_k^2 + \hat s_j^2}}(t)\\
+&amp;&amp;=&amp;
+\hat s_j^l(-it)^l\mathscr{F}_{\varphi_{\mu_k, \sigma_k^2 + \hat s_j^2}}(t)
+\\
+&amp;&amp;=&amp;
+\hat s_j^l
+\mathscr{F}_{\varphi_{\mu_k, \sigma_k^2 + \hat s_j^2}^{(l)}}(t)
+\\
+\Rightarrow &amp; f_{jkl} &amp;=&amp; 
+\displaystyle\frac1{2\pi}\int e^{-it\hat\beta_j}(-i\hat s_jt)^l \zeta_{g_k}(t)
+\zeta_\varphi(\hat s_jt)dt\\
+&amp;&amp;=&amp;
+\displaystyle\frac1{2\pi}\int e^{-it\hat\beta_j}
+\hat s_j^l
+\mathscr{F}_{\varphi_{\mu_k, \sigma_k^2 + \hat s_j^2}^{(l)}}(t)dt\\
+&amp;&amp;=&amp;
+\hat s_j^l
+\displaystyle\frac1{2\pi}\int e^{-it\hat\beta_j}
+\mathscr{F}_{\varphi_{\mu_k, \sigma_k^2 + \hat s_j^2}^{(l)}}(t)dt\\
+&amp;&amp;=&amp;
+\hat s_j^l
+\varphi_{\mu_k, \sigma_k^2 + \hat s_j^2}^{(l)}\left(\hat\beta_j\right)\\
+&amp;&amp;=&amp; \displaystyle
+\hat s_j^l
+\frac{1}{\left(\sqrt{\sigma_k^2 + \hat s_j^2}\right)^{l+1}}
+\varphi^{(l)}\left(\frac{\hat\beta_j - \mu_k}{\sqrt{\sigma_k^2 + \hat s_j^2}}\right)\\
+&amp;&amp;=&amp; \displaystyle
+\frac{\hat s_j^l}{\left(\sqrt{\sigma_k^2 + \hat s_j^2}\right)^{l+1}}
+\varphi^{(l)}\left(\frac{\hat\beta_j - \mu_k}{\sqrt{\sigma_k^2 + \hat s_j^2}}\right) \ .
+\end{array}
+\]</span> In common applications, <span class="math inline">\(\mu_k\equiv\mu\equiv0\)</span>.</p>
+</div>
+</div>
+<div id="optimization-problem" class="section level2">
+<h2>Optimization problem</h2>
+<p>The problem is now bogged down to maximize the joint likelihood</p>
+<p><span class="math display">\[
+\begin{array}{rcl}
+\max\limits_{\pi, w}\prod\limits_j f(\hat\beta_j|\hat s_j) &amp;=&amp; \max\limits_{\pi, w}\prod\limits_j \left(\sum_k\sum_l\pi_k w_l f_{jkl}\right)\\
+&amp;\Leftrightarrow&amp;
+\max\limits_{\pi, w}\sum_j\log\left(\sum_k\sum_l\pi_k w_l f_{jkl}\right) \ ,
+\end{array}
+\]</span></p>
+<p>subject to appropriate constraints on <span class="math inline">\(\pi_k\)</span> and <a href="gaussian_derivatives_5.html">especially <span class="math inline">\(w_l\)</span></a>, where the specific form of <span class="math inline">\(f_{jkl}\)</span> depends on the mixture component of the prior <span class="math inline">\(g\)</span> of <span class="math inline">\(\beta_j\)</span>. Here we consider two cases.</p>
+<div id="uniform-mixture-prior-1" class="section level3">
+<h3>Uniform mixture prior</h3>
+<p><span class="math display">\[
+\begin{array}{rrcl}
+&amp;\beta_j &amp;\sim &amp; \sum_k \pi_k \text{ Unif }[a_k, b_k]\\
+\Rightarrow &amp; f_{jkl} &amp;= &amp;
+\displaystyle\frac{\varphi^{(l-1)}\left(\frac{\hat\beta_j-a_k}{\hat s_j}\right) - \varphi^{(l-1)}\left(\frac{\hat\beta_j-b_k}{\hat s_j}\right)}{b_k - a_k} \ .
+\end{array}
+\]</span></p>
+</div>
+<div id="normal-mixture-prior-1" class="section level3">
+<h3>Normal mixture prior</h3>
+<p><span class="math display">\[
+\begin{array}{rrcl}
+&amp;\beta_j &amp;\sim &amp; \sum_k \pi_k N\left(\mu_k, \sigma_k^2\right) \\
+\Rightarrow &amp; f_{jkl} &amp;= &amp;
+\displaystyle\frac{\hat s_j^l}{\left(\sqrt{\sigma_k^2 + \hat s_j^2}\right)^{l+1}}
+\varphi^{(l)}\left(\frac{
+\hat\beta_j - \mu_k
+}{
+\sqrt{\sigma_k^2 + \hat s_j^2}
+}\right) \ .
+\end{array}
+\]</span></p>
+</div>
+<div id="biconvex-optimization" class="section level3">
+<h3>Biconvex optimization</h3>
+<p>Our goal is then to estimate <span class="math inline">\(\hat\pi\)</span> by solving the following constrained biconvex optimization problem</p>
+<p><span class="math display">\[
+\begin{array}{rl}
+\max\limits_{\pi,w} &amp; \sum_j\log\left(\sum_k\sum_l\pi_k w_l f_{jkl}\right)\\
+\text{subject to} &amp; \sum_k\pi_k = 1\\
+&amp; w_0 = 1\\
+&amp; \sum_l w_l \varphi^{l}(z) \geq 0, \forall z\in \mathbb{R}\\
+&amp; w_l \text{ decay reasonably fast.}
+\end{array}
+\]</span></p>
+</div>
+</div>
+
+<hr>
+<p>
+    This <a href="http://rmarkdown.rstudio.com">R Markdown</a> site was created with <a href="https://github.com/jdblischak/workflowr">workflowr</a>
+</p>
+<hr>
+
+<!-- To enable disqus, uncomment the section below and provide your disqus_shortname -->
+
+<!-- disqus
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'rmarkdown'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+-->
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

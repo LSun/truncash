@@ -1,0 +1,417 @@
+---
+title: "Normal Means with Heteroskedastic and Correlated Noise"
+author: "Lei Sun"
+date: 2017-04-12
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+## Problem setting
+
+We are considering the normal means problem with heteroskedastic noise.  Furthermore, The noise are not independent, with unknown pairwise correlation $\rho_{ij}$.
+
+$$
+\begin{array}{rcl}
+\hat\beta_j |\beta_j, \hat s_j &=& \beta_j + \hat s_j z_j \ ;\\
+z_j &\sim& N(0, 1) \text{ marginally} \ ;\\
+z_j &:& \text{correlated} \ .
+\end{array}
+$$
+
+Under [`ash` framework](https://academic.oup.com/biostatistics/article/18/2/275/2557030/False-discovery-rates-a-new-deal), a prior is put on exchangeable $\beta_j$:
+
+$$
+g(\beta_j) = \sum_k \pi_k g_k(\beta_j)\ .
+$$
+
+According to [previous exploration](gaussian_derivatives.html), correlated standard normal $z$ scores can be *seen as iid from a density composed of Gaussian derivatives*.
+
+$$
+f_0(z_j) = \sum_{l=0}^\infty w_l \varphi^{(l)}(z_j) \ .
+$$
+By change of variables, the likelihood
+
+$$
+p(\hat\beta_j | \beta_j, \hat s_j) = \frac{1}{\hat s_j}f_0\left(\frac{\hat\beta_j - \beta_j}{\hat s_j}\right) = \sum_l w_l \frac{1}{\hat s_j}\varphi^{(l)}\left(\frac{\hat\beta_j - \beta_j}{\hat s_j}\right) \ .
+$$
+
+Thus for each pair of observation $(\hat\beta_j, \hat s_j)$, the likelihood becomes
+
+$$
+\begin{array}{rcl}
+f(\hat\beta_j|\hat s_j) &=& \displaystyle\int p(\hat\beta_j | \beta_j, \hat s_j)g(\beta_j)d\beta_j\\
+&=&\displaystyle\int \sum_l w_l \frac{1}{\hat s_j}\varphi^{(l)}\left(\frac{\hat\beta_j - \beta_j}{\hat s_j}\right) \sum_k \pi_k g_k(\beta_j)d\beta_j\\
+&=& \displaystyle \sum_k \sum_l \pi_k w_l 
+\int\frac{1}{\hat s_j}
+\varphi^{(l)}\left(\frac{\hat\beta_j - \beta_j}{\hat s_j}\right)
+g_k(\beta_j)d\beta_j\\
+&:=& \displaystyle \sum_k \sum_l \pi_k w_l
+f_{jkl} \ .
+\end{array}
+$$
+Hence, it's all bogged down to calculate $f_{jkl}$, which is the convolution of a Gaussian derivative $\varphi^{(l)}$ and a prior component $g_k$, with some change of variables manipulation.  Note that in usual `ASH` settings, $g_k$ is either uniform or normal, both of which can be handled without conceptual difficulty.
+
+If $g_k$ is a uniform, the convolution of a Gaussian derivative and a uniform is just another Gaussian derivative in a lower order, such as
+
+$$
+\varphi^{(l)} * \text{Unif} \leadsto \varphi^{(l-1)} \ .
+$$
+On the other hand, if $g_k$ is a normal, we can use [a fact about convolution](https://en.wikipedia.org/wiki/Convolution#Differentiation) that
+
+$$
+\begin{array}{rcl}
+&& \frac{d}{dx}(f*g) = \frac{df}{dx} * g = f * \frac{dg}{dx}\\
+&\Rightarrow&
+\varphi^{(l)} * N(\mu, \sigma^2) = \left(\varphi * N(\mu, \sigma^2)\right)^{(l)} \leadsto \tilde\varphi^{(l)} \ .
+\end{array}
+$$
+Because the convolution of $\varphi$, a Gaussian, and another Gaussian is still a Gaussian, the convolution of a Gaussian derivative and a normal gives another Gaussian derivative.
+
+With $f_{jkl}$ computed, the goal is then to maximize the joint likeliood of the observation $\left\{\left(\hat\beta_1, \hat s_1\right), \cdots,\left(\hat\beta_n, \hat s_n\right) \right\}$ which is
+$$
+\max\limits_{\pi, w}\prod_j f(\hat\beta_j|\hat s_j) = \prod_j \left(\displaystyle \sum_k \sum_l \pi_k w_l
+f_{jkl}\right) \ ,
+$$
+subject to reasonable, well designed constraints on $\pi_k$ and [especially $w_l$](gaussian_derivatives_5.html).
+
+## Characteristic function / Fourier transform
+
+The exact form of $f_{jkl}$ can be derived analytically.  Below is a method using characteristic functions or Fourier transforms.
+
+Let $\zeta_X(t)  = \zeta_F(t) =\zeta_f(t) := E[e^{itX}]$ be the characteristic function of the random variable $X\sim dF = f$.  Either the random variable, its distribution, or its density function can be put in the subscript, depending on the circumstances.  
+
+On the other hand, the characteristic function of a random variable is also closely related to the Fourier transform of its density. In particular,
+
+$$
+\zeta_f(t) = E[e^{itX}] = \int e^{itx}dF(x) = \int e^{itx}f(x)dx := \mathscr{F}_f(t) \ .
+$$
+Note that in usual definition, the Fourier transform is given by 
+$$
+\hat f(\xi) := \int f(x)e^{-2\pi ix\xi}dx \ ,
+$$
+with a normalizing factor $2\pi$ and a negative sign.  However, even defined in different ways, $\mathscr{F}_f(t)$ carries over many nice properties of $\hat f(\xi)$, for example, as we'll show,
+
+$$
+\mathscr{F}_{f^{(m)}}(t) = (-it)^m\mathscr{F}_f(t) \ ,
+$$
+
+where $f^{(m)}$ is the $m^\text{th}$ derivative of $f$.
+
+Also,
+$$
+\mathscr{F}_{f*g}(t) = \mathscr{F}_f(t)\mathscr{F}_g(t) \ ,
+$$
+where $*$ stands for convolution.
+
+With these properties, the Fourier transform tool could be very useful when dealing with Gaussian derivatives and their convolution with other (density) functions.
+
+Under this definition, the inversion formula for the characteristic functions, also known as the inverse Fourier transform, is
+
+$$
+f(x) = \frac1{2\pi} \int e^{-itx}\zeta_f(t)dt = \frac{1}{2\pi}\int e^{-itx}\mathscr{F}_f(t)dt \ .
+$$
+
+Then the characteristic function of $\hat\beta_j | \hat s_j$
+
+$$
+\zeta_{\hat\beta_j|\hat s_j}(t) = E\left[e^{it\hat\beta_j}\mid\hat s_j\right] = E\left[e^{it(\beta_j + \hat s_j z_j)}\mid\hat s_j\right] = E\left[e^{it\beta_j}\right]E\left[e^{it\hat s_jz_j}\mid\hat s_j\right] = \zeta_{\beta}(t)\zeta_{f_0}\left(\hat s_jt\right) \ .
+$$
+
+Let's take care of $\zeta_{\beta}(t)$ and $\zeta_{f_0}\left(\hat s_jt\right)$ one by one.  Note that
+
+$$
+\begin{array}{rrcl}
+&\beta_j &\sim& \sum_k\pi_kg_k \\
+\Rightarrow & \zeta_{\beta}(t) &=& \displaystyle\int e^{it\beta_j}p(\beta_j)d\beta_j = \int e^{it\beta_j}\sum_k\pi_kg_k(\beta_j)d\beta_j
+=\sum_k\pi_k\int e^{it\beta_j}g_k(\beta_j)d\beta_j \\
+&&=& \sum_k\pi_k\zeta_{g_k}(t) \ .
+\end{array}
+$$
+
+Meanwhile, using the fact that *Gaussian derivatives should be absolutely integrable*,
+
+$$
+\begin{array}{rrcl}
+&f_0(z_j) &=& \sum_l w_l \varphi^{(l)}(z_j)
+\\
+\Rightarrow & \zeta_{f_0}(t) &=& \displaystyle 
+\int e^{itz_j}f_0(z_j)dz_j = \int e^{itz_j}\sum_lw_l\varphi^{(l)}(z_j)dz_j = 
+\sum_lw_l\int e^{itz_j}\varphi^{(l)}(z_j)dz_j\\
+&&=&
+\sum_l w_l \mathscr{F}_{\varphi^{(l)}}(t) \ . 
+\end{array}
+$$
+Each Fourier transform of gaussian derivatives
+
+$$
+\begin{array}{rcl}
+\mathscr{F}_{\varphi^{(l)}}(t) &=&
+\displaystyle\int e^{itz_j}\varphi^{(l)}(z_j)dz_j\\
+&=& \displaystyle e^{itz_j}\varphi^{(l-1)}(z_j)|_{-\infty}^\infty
+-
+\int it e^{itz_j}\varphi^{(l-1)}(z_j)dz_j\\
+&=&\displaystyle 0-it\int e^{itz_j}\varphi^{(l-1)}(z_j)dz_j\\
+&=&\displaystyle
+-it\int e^{itz_j}\varphi^{(l-1)}(z_j)dz_j\\
+&=&\displaystyle
+\cdots\\
+&=&\displaystyle
+(-it)^l \int e^{itz_j}\varphi(z_j)dz_j\\
+&=&(-it)^l \mathscr{F}_{\varphi}(t)\\
+&=&(-it)^l \zeta_\varphi(t)\\
+&=&\displaystyle
+(-it)^l e^{-\frac12t^2} \ .
+\end{array}
+$$
+Thus,
+
+$$
+\begin{array}{rrcl}
+&\zeta_{\hat\beta_j|\hat s_j}(t)
+&=&\zeta_{\beta}(t)\zeta_{f_0}(\hat s_jt)\\
+&&=&\left(\sum_k\pi_k\zeta_{g_k}(t)\right)
+\left(\sum_lw_l(-i\hat s_jt)^l \zeta_\varphi(\hat s_jt)\right)\\
+&&=&\sum_k\sum_l\pi_kw_l(-i\hat s_jt)^l \zeta_{g_k}(t)
+\zeta_\varphi(\hat s_jt)\\
+&&=&\sum_k\sum_l\pi_kw_l(-i\hat s_jt)^l \zeta_{g_k}(t)
+e^{-\frac12\hat s_j^2t^2}\\
+\Rightarrow & f(\hat\beta_j|\hat s_j)
+&=&\displaystyle\frac1{2\pi}\int e^{-it\hat\beta_j}\zeta_{\hat\beta_j|\hat s_j}(t)dt\\
+&&=&\displaystyle\frac1{2\pi}\int e^{-it\hat\beta_j}\left(\sum_k\sum_l\pi_kw_l(-i\hat s_jt)^l \zeta_{g_k}(t)
+\zeta_\varphi(\hat s_jt)\right)dt\\
+&&=&\displaystyle\sum_k\sum_l\pi_kw_l
+\frac1{2\pi}\int e^{-it\hat\beta_j}(-i\hat s_jt)^l \zeta_{g_k}(t)
+\zeta_\varphi(\hat s_jt)dt\\
+&&:=&
+\sum_k\sum_l\pi_kw_lf_{jkl} \ .
+\end{array}
+$$
+It is essentially the equivalent expression of $f_{jkl}$ as
+
+$$
+\begin{array}{rcl}
+f_{jkl} &=&
+\displaystyle 
+\int\frac{1}{\hat s_j}
+\varphi^{(l)}\left(\frac{\hat\beta_j - \beta_j}{\hat s_j}\right)
+g_k(\beta_j)d\beta_j\\
+&=&
+\displaystyle\frac1{2\pi}\int e^{-it\hat\beta_j}(-i\hat s_jt)^l \zeta_{g_k}(t)
+\zeta_\varphi(\hat s_jt)dt \ .
+\end{array}
+$$
+
+### Uniform mixture prior
+
+If the prior of $\beta$ is a mixture of uniforms, $\beta \sim g = \sum_k\pi_kg_k$ where $g_k = \text{Unif}\left[a_k, b_k\right]$,
+
+$$
+\begin{array}{rrcl}
+&\zeta_{g_k}(t) &=& \displaystyle\frac{e^{itb_k} - e^{ita_k}}{it(b_k - a_k)}\\
+\Rightarrow &\zeta_{g_k}(t)\zeta_\varphi(\hat s_jt) &=&
+\displaystyle\frac{e^{itb_k} - e^{ita_k}}{it(b_k - a_k)} e^{-\frac12\hat s_j^2t^2}\\
+&&=&
+\displaystyle\frac{e^{itb_k-\frac12\hat s_j^2t^2}}{it(b_k - a_k)}
+-\displaystyle\frac{e^{ita_k-\frac12\hat s_j^2t^2}}{it(b_k - a_k)}\\
+\Rightarrow & f_{jkl} &=& 
+\displaystyle\frac1{2\pi}\int e^{-it\hat\beta_j}(-i\hat s_jt)^l \zeta_{g_k}(t)
+\zeta_\varphi(\hat s_jt)dt\\
+&&=&
+\displaystyle\frac1{2\pi}\int e^{-it\hat\beta_j}(-i\hat s_jt)^l\displaystyle\frac{e^{itb_k-\frac12\hat s_j^2t^2}}{it(b_k - a_k)}dt - 
+\displaystyle\frac1{2\pi}\int e^{-it\hat\beta_j}(-i\hat s_jt)^l\displaystyle\frac{e^{ita_k-\frac12\hat s_j^2t^2}}{it(b_k - a_k)}dt \ .
+\end{array}
+$$
+
+It looks pretty complicated, but if we take advantage of usual Fourier transform tricks things get clearer.
+
+Let $\varphi_{\mu, \sigma^2}$ denote the density function of $N(\mu, \sigma^2)$,
+
+$$
+\begin{array}{rl}
+&\varphi_{\mu, \sigma^2}(z) = \frac1\sigma\varphi\left(\frac{z - \mu}{\sigma}\right)\\
+\Rightarrow & \varphi_{\mu, \sigma^2}^{(m)}(z) = \frac1{\sigma^{m+1}}\varphi^{(m)}\left(\frac{z - \mu}{\sigma}\right) \\
+\Rightarrow & \zeta_{\varphi_{\mu, \sigma^2}}(t)
+=
+e^{it\mu - \frac12\sigma^2t^2} \ .
+\end{array}
+$$
+
+Take the first part of $f_{jkl}$,
+$$
+\begin{array}{rrcl}
+& (-i\hat s_jt)^l\displaystyle\frac{e^{itb_k-\frac12\hat s_j^2t^2}}{it(b_k - a_k)}
+&=&\displaystyle
+-\frac{\hat s_j^l}{b_k - a_k}(-it)^{l-1}\zeta_{\varphi_{b_k, \hat s_j^2}}(t)\\
+&&=&\displaystyle
+-\frac{\hat s_j^l}{b_k - a_k}(-it)^{l-1}\mathscr{F}_{\varphi_{b_k, \hat s_j^2}}(t)\\
+&&=&\displaystyle
+-\frac{\hat s_j^l}{b_k - a_k}\mathscr{F}_{\varphi_{b_k, \hat s_j^2}^{(l-1)}}(t)\\
+\Rightarrow & 
+\displaystyle\frac1{2\pi}\int e^{-it\hat\beta_j}(-i\hat s_jt)^l\displaystyle\frac{e^{itb_k-\frac12\hat s_j^2t^2}}{it(b_k - a_k)}dt
+&=&
+-\displaystyle\frac1{2\pi}\int e^{-it\hat\beta_j}
+\frac{\hat s_j^l}{b_k - a_k}\mathscr{F}_{\varphi_{b_k, \hat s_j^2}^{(l-1)}}(t)dt
+\\
+&&=&\displaystyle
+-\frac{\hat s_j^l}{b_k - a_k}
+\frac1{2\pi}
+\int
+e^{-it\hat\beta_j}
+\mathscr{F}_{\varphi_{b_k, \hat s_j^2}^{(l-1)}}(t)
+dt\\
+&&=&\displaystyle
+-\frac{\hat s_j^l}{b_k - a_k}
+\varphi_{b_k, \hat s_j^2}^{(l-1)}\left(\hat\beta_j\right)\\
+&&=&\displaystyle
+-\frac{\hat s_j^l}{b_k - a_k}
+\frac1{\hat s_j^{l}}\varphi^{(l-1)}\left(\frac{\hat\beta_j- b_k}{\hat s_j}\right)\\
+&&=&\displaystyle
+-
+\frac{\varphi^{(l-1)}\left(\frac{\hat\beta_j- b_k}{\hat s_j}\right)}{b_k-a_k} \ .
+\end{array}
+$$
+Therefore,
+
+$$
+\begin{array}{rcl}
+f_{jkl} &=& \displaystyle
+\frac1{2\pi}\int e^{-it\hat\beta_j}(-i\hat s_jt)^l\displaystyle\frac{e^{itb_k-\frac12\hat s_j^2t^2}}{it(b_k - a_k)}dt - 
+\frac1{2\pi}\int e^{-it\hat\beta_j}(-i\hat s_jt)^l\displaystyle\frac{e^{ita_k-\frac12\hat s_j^2t^2}}{it(b_k - a_k)}dt\\
+&=&
+\displaystyle
+\left(-
+\frac{\varphi^{(l-1)}\left(\frac{\hat\beta_j- b_k}{\hat s_j}\right)}{b_k-a_k}\right)
+-
+\left(-
+\frac{\varphi^{(l-1)}\left(\frac{\hat\beta_j- a_k}{\hat s_j}\right)}{b_k-a_k}\right)\\
+&=&\displaystyle
+\frac{\varphi^{(l-1)}\left(\frac{\hat\beta_j- a_k}{\hat s_j}\right) - \varphi^{(l-1)}\left(\frac{\hat\beta_j- b_k}{\hat s_j}\right)}{b_k-a_k}
+\end{array}
+$$
+
+### Normal mixture prior
+
+Likewise, if the prior of $\beta$ is a mixture of normals, $\beta \sim g = \sum_k\pi_kg_k$ where $g_k = N(\mu_k, \sigma_k^2)$,
+
+$$
+\begin{array}{rrcl}
+&\zeta_{g_k}(t) &=& \displaystyle
+e^{it\mu_k - \frac12\sigma_k^2t^2}\\
+\Rightarrow &\zeta_{g_k}(t)\zeta_\varphi(\hat s_jt) 
+&=&
+e^{it\mu_k - \frac12\sigma_k^2t^2} e^{-\frac12\hat s_j^2t^2}\\
+&&=&
+e^{it\mu_k - \frac12\left(\sigma_k^2+\hat s_j^2\right)t^2}
+\\
+&&=&
+\zeta_{\varphi_{\mu_k, \sigma_k^2 + \hat s_j^2}}(t)\\
+&&=&
+\mathscr{F}_{\varphi_{\mu_k, \sigma_k^2 + \hat s_j^2}}(t)
+\\
+\Rightarrow & 
+(-i\hat s_jt)^l\zeta_{g_k}(t)\zeta_\varphi(\hat s_jt) &=& 
+(-i\hat s_jt)^l\mathscr{F}_{\varphi_{\mu_k, \sigma_k^2 + \hat s_j^2}}(t)\\
+&&=&
+\hat s_j^l(-it)^l\mathscr{F}_{\varphi_{\mu_k, \sigma_k^2 + \hat s_j^2}}(t)
+\\
+&&=&
+\hat s_j^l
+\mathscr{F}_{\varphi_{\mu_k, \sigma_k^2 + \hat s_j^2}^{(l)}}(t)
+\\
+\Rightarrow & f_{jkl} &=& 
+\displaystyle\frac1{2\pi}\int e^{-it\hat\beta_j}(-i\hat s_jt)^l \zeta_{g_k}(t)
+\zeta_\varphi(\hat s_jt)dt\\
+&&=&
+\displaystyle\frac1{2\pi}\int e^{-it\hat\beta_j}
+\hat s_j^l
+\mathscr{F}_{\varphi_{\mu_k, \sigma_k^2 + \hat s_j^2}^{(l)}}(t)dt\\
+&&=&
+\hat s_j^l
+\displaystyle\frac1{2\pi}\int e^{-it\hat\beta_j}
+\mathscr{F}_{\varphi_{\mu_k, \sigma_k^2 + \hat s_j^2}^{(l)}}(t)dt\\
+&&=&
+\hat s_j^l
+\varphi_{\mu_k, \sigma_k^2 + \hat s_j^2}^{(l)}\left(\hat\beta_j\right)\\
+&&=& \displaystyle
+\hat s_j^l
+\frac{1}{\left(\sqrt{\sigma_k^2 + \hat s_j^2}\right)^{l+1}}
+\varphi^{(l)}\left(\frac{\hat\beta_j - \mu_k}{\sqrt{\sigma_k^2 + \hat s_j^2}}\right)\\
+&&=& \displaystyle
+\frac{\hat s_j^l}{\left(\sqrt{\sigma_k^2 + \hat s_j^2}\right)^{l+1}}
+\varphi^{(l)}\left(\frac{\hat\beta_j - \mu_k}{\sqrt{\sigma_k^2 + \hat s_j^2}}\right) \ .
+\end{array}
+$$
+In common applications, $\mu_k\equiv\mu\equiv0$.
+
+## Optimization problem
+
+The problem is now bogged down to maximize the joint likelihood
+
+$$
+\begin{array}{rcl}
+\max\limits_{\pi, w}\prod\limits_j f(\hat\beta_j|\hat s_j) &=& \max\limits_{\pi, w}\prod\limits_j \left(\sum_k\sum_l\pi_k w_l f_{jkl}\right)\\
+&\Leftrightarrow&
+\max\limits_{\pi, w}\sum_j\log\left(\sum_k\sum_l\pi_k w_l f_{jkl}\right) \ ,
+\end{array}
+$$
+
+subject to appropriate constraints on $\pi_k$ and [especially $w_l$](gaussian_derivatives_5.html), where the specific form of $f_{jkl}$ depends on the mixture component of the prior $g$ of $\beta_j$.  Here we consider two cases.
+
+### Uniform mixture prior
+
+$$
+\begin{array}{rrcl}
+&\beta_j &\sim & \sum_k \pi_k \text{ Unif }[a_k, b_k]\\
+\Rightarrow & f_{jkl} &= &
+\displaystyle\frac{\varphi^{(l-1)}\left(\frac{\hat\beta_j-a_k}{\hat s_j}\right) - \varphi^{(l-1)}\left(\frac{\hat\beta_j-b_k}{\hat s_j}\right)}{b_k - a_k} \ .
+\end{array}
+$$
+
+### Normal mixture prior
+
+$$
+\begin{array}{rrcl}
+&\beta_j &\sim & \sum_k \pi_k N\left(\mu_k, \sigma_k^2\right) \\
+\Rightarrow & f_{jkl} &= &
+\displaystyle\frac{\hat s_j^l}{\left(\sqrt{\sigma_k^2 + \hat s_j^2}\right)^{l+1}}
+\varphi^{(l)}\left(\frac{
+\hat\beta_j - \mu_k
+}{
+\sqrt{\sigma_k^2 + \hat s_j^2}
+}\right) \ .
+\end{array}
+$$
+
+### Biconvex optimization
+
+Our goal is then to estimate $\hat\pi$ by solving the following constrained biconvex optimization problem
+
+$$
+\begin{array}{rl}
+\max\limits_{\pi,w} & \sum_j\log\left(\sum_k\sum_l\pi_k w_l f_{jkl}\right)\\
+\text{subject to} & \sum_k\pi_k = 1\\
+& w_0 = 1\\
+& \sum_l w_l \varphi^{l}(z) \geq 0, \forall z\in \mathbb{R}\\
+& w_l \text{ decay reasonably fast.}
+\end{array}
+$$
