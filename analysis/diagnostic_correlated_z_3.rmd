@@ -1,0 +1,142 @@
+---
+title: "Diagnostic Plots for `BH`-friendly, `lfsr`-hostile Correlated $N(0, 1)$ Scores"
+author: "Lei Sun"
+date: 2017-04-23
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+## Introduction
+
+We take a look at those data sets where `BH` produces few (false) discoveries, and at the same time, `ASH`'s `lfsr` produces many (false) discoveries.  For each data set, $z$ scores, $p$ values, and diagnostic $\hat F_j$ are plotted.
+
+```{r, cache = TRUE, message = FALSE}
+library(ashr)
+z = read.table("../output/z_null_liver_777.txt")
+p = read.table("../output/p_null_liver_777.txt")
+pihat0 = as.numeric(unlist(read.table("../output/pihat0_z_null_liver_777.txt")))
+fd.bh = as.numeric(unlist(read.table("../output/fd.bh.0.05_null_liver_777.txt")))
+fd.lfsr = as.numeric(unlist(read.table("../output/fd.lfsr.0.05.z.normal_null_liver_777.txt")))
+```
+
+```{r, cache = TRUE, echo = FALSE}
+n = nrow(z)
+m = ncol(p)
+```
+
+```{r, cache = TRUE, echo = FALSE}
+ind.lfsr = intersect(
+  intersect(order(fd.lfsr, decreasing = TRUE),
+            which(fd.lfsr != 0)),
+  which(fd.bh == 0))
+ind.bh = intersect(
+  intersect(order(fd.bh, decreasing = TRUE),
+            which(fd.bh != 0)),
+  which(fd.lfsr == 0))
+```
+
+## The 118 data sets where `BH` didn't produce false discoveries but `lfsr` does.
+
+In this simulation, `BH` used the FDR level $\alpha = 0.05$, whereas `ASH` declared a discovery when `lfsr` $\leq 0.05$.
+
+```{r, cache = TRUE, echo = FALSE}
+x = seq(-10, 10, 0.01)
+y = dnorm(x)
+k = 1
+for (j in ind.lfsr) {
+  fit.ash.n.n = ash.workhorse(as.numeric(z[j, ]), 1, mixcompdist = "normal", method = "fdr")
+  fit.ash.n.u = ash.workhorse(as.numeric(z[j, ]), 1, mixcompdist = "uniform", method = "fdr")
+  fit.ash.n.hu = ash.workhorse(as.numeric(z[j, ]), 1, mixcompdist = "halfuniform", method = "fdr")
+  cat("N0.", k, ": Data Set", j, "; Number of False Discoveries by BH:", fd.bh[j], "; Number of False Discoveries by ASH's lfsr:", fd.lfsr[j], "; pihat0 =", get_pi0(fit.ash.n.n))
+  hist(as.numeric(z[j, ]), xlab = "z scores", freq = FALSE, ylim = c(0, 0.45), nclass = 100, main = "10000 z scores, 100 bins")
+  lines(x, y, col = "red")
+  qqnorm(as.numeric(z[j, ]), main = "Normal Q-Q plot for z scores")
+  ind.z = order(abs(as.numeric(z[j, ])), decreasing = TRUE)[1 : fd.lfsr[j]]
+  points(qnorm(ppoints(m)[order(order(as.numeric(z[j, ])))][ind.z]), as.numeric(z[j, ])[ind.z], col = "green", pch = 19)
+  abline(0, 1, lty = 2, col = "red")
+  legend("bottomright", pch = 19, col = "green", legend = expression("lfsr "<= 0.05))
+  pj = sort(as.numeric(p[j, ]))
+  plot(pj[1:max(50, fd.lfsr[j])], xlab = "Order", ylab = "Ordered p value", main = c("All false discoveries by lfsr", "or 50 smallest p values"), pch = 21)
+  abline(0, 1 / m, col = "blue")
+  points(pj[min(1, fd.lfsr[j]) : fd.lfsr[j]], col = "green", pch = 19)
+  abline(0, 0.05 / m, col = "red")
+  legend("top", lty = 1, col = c("blue", "red"), c("Uniform", "BH, FDR = 0.05"), bty = "n")
+  ashr::plot_diagnostic(fit.ash.n.n, main = c("Diagnostic Plot for ASH", "Normal Mixture Prior"))
+  ashr::plot_diagnostic(fit.ash.n.u, main = c("Diagnostic Plot for ASH", "Uniform Mixture Prior"))
+  ashr::plot_diagnostic(fit.ash.n.hu, main = c("Diagnostic Plot for ASH", "Half-Uniform Mixture Prior"))
+  k = k + 1
+}
+```
+
+## The 7 data sets where `lfsr` is more conservative than `BH`.
+
+```{r, cache = TRUE, echo = FALSE}
+x = seq(-10, 10, 0.01)
+y = dnorm(x)
+k = 1
+for (j in ind.bh) {
+  fit.ash.n.n = ash.workhorse(as.numeric(z[j, ]), 1, mixcompdist = "normal", method = "fdr")
+  fit.ash.n.u = ash.workhorse(as.numeric(z[j, ]), 1, mixcompdist = "uniform", method = "fdr")
+  fit.ash.n.hu = ash.workhorse(as.numeric(z[j, ]), 1, mixcompdist = "halfuniform", method = "fdr")
+  cat("N0.", k, ": Data Set", j, "; Number of False Discoveries by BH:", fd.bh[j], "; Number of False Discoveries by ASH's lfsr:", fd.lfsr[j], "; pihat0 =", get_pi0(fit.ash.n.n))
+  hist(as.numeric(z[j, ]), xlab = "z scores", freq = FALSE, ylim = c(0, 0.45), nclass = 100, main = "10000 z scores, 100 bins")
+  lines(x, y, col = "red")
+  qqnorm(as.numeric(z[j, ]), main = "Normal Q-Q plot for z scores")
+  ind.z = order(abs(as.numeric(z[j, ])), decreasing = TRUE)[1 : fd.bh[j]]
+  points(qnorm(ppoints(m)[order(order(as.numeric(z[j, ])))][ind.z]), as.numeric(z[j, ])[ind.z], col = "green", pch = 19)
+  abline(0, 1, lty = 2, col = "red")
+  legend("bottomright", pch = 19, col = "green", legend = expression(paste("BH at ", alpha == 0.05)))
+  pj = sort(as.numeric(p[j, ]))
+  plot(pj[1:max(10, fd.bh[j])], xlab = "Order", ylab = "Ordered p value", main = c("All false discoveries by BH", "or 10 smallest p values"), pch = 21)
+  abline(0, 1 / m, col = "blue")
+  points(pj[min(1, fd.bh[j]) : fd.bh[j]], col = "green", pch = 19)
+  abline(0, 0.05 / m, col = "red")
+  legend("top", lty = 1, col = c("blue", "red"), c("Uniform", "BH, FDR = 0.05"), bty = "n")
+  ashr::plot_diagnostic(fit.ash.n.n, main = c("Diagnostic Plot for ASH", "Normal Mixture Prior"))
+  ashr::plot_diagnostic(fit.ash.n.u, main = c("Diagnostic Plot for ASH", "Uniform Mixture Prior"))
+  ashr::plot_diagnostic(fit.ash.n.hu, main = c("Diagnostic Plot for ASH", "Half-Uniform Mixture Prior"))
+  k = k + 1
+}
+```
+
+## Comparison of false discoveries by `BH` and `lfsr`
+
+To get a more comprehensive picture, we plot as follows the numbers of false discoveries by `BH` and `lfsr` for each data set.  These data sets were selected out of $1000$ of them, because they produced at least one false discoveries by either method.  Note that for every data set there are $10K$ correlated null statistics.
+
+```{r, echo = FALSE, cache = TRUE}
+ind.bh.lfsr = intersect(
+  order(fd.lfsr, decreasing = TRUE),
+  union(
+    which(fd.lfsr != 0), which(fd.bh != 0)
+  )
+)
+plot(fd.lfsr[ind.bh.lfsr], pch = 19, cex = 0.5, ylab = "Number of False Discoveries", main = "False Discoveries by lfsr and BH")
+points(fd.bh[ind.bh.lfsr], pch = 19, cex = 0.5, col = "red")
+legend("topright", pch = 19, pt.cex = 0.5, col = c("black", "red"), c("lfsr", "BH"))
+```
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```

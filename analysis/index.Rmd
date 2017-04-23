@@ -83,6 +83,8 @@ Both true effects and correlation can distort the empirical distribution away fr
 
 * [Diagnostic plots for `ASH`](diagnostic_plot.html)
 * [Diagnostic plots for `ASH` on correlated null](diagnostic_correlated_z.html)
+* [Diagnostic plots for `ASH` on correlated null: `BH` vs $\hat\pi_0$](diagnostic_correlated_z_2.html)
+* [Diagnostic plots for `ASH` on correlated null: `BH` vs `lfsr`](diagnostic_correlated_z_3.html)
 
 Under the exchangeability assumption, the goodness of fit of empirical Bayes can be measured by the behavior of $\left\{\hat F_j = \hat F_{\hat\beta_j | \hat s_j}\left(\hat\beta_j\mid\hat s_j\right)\right\}$.  Meanwhile, if `ASH` is applied to correlated null $z$ scores, estimated $\hat g$ will not only be different from $\delta_0$; moreover, with this estimated $\hat g$, $\left\{\hat F_j\right\}$ might not behave like $\text{Unif}\left[0, 1\right]$.
 

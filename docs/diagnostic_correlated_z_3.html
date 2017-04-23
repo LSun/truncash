@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+<meta name="author" content="Lei Sun" />
+
+<meta name="date" content="2017-04-23" />
+
+<title>Diagnostic Plots for BH-friendly, lfsr-hostile Correlated N(0, 1) Scores</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs && document.readyState && document.readyState === "complete") {
+   window.setTimeout(function() {
+      hljs.initHighlighting();
+   }, 0);
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">truncash</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/LSun/truncash">
+    <span class="fa fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Diagnostic Plots for <code>BH</code>-friendly, <code>lfsr</code>-hostile Correlated <span class="math inline">\(N(0, 1)\)</span> Scores</h1>
+<h4 class="author"><em>Lei Sun</em></h4>
+<h4 class="date"><em>2017-04-23</em></h4>
+
+</div>
+
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+<!-- Update knitr chunk options -->
+<!-- Insert the date the file was last updated -->
+<p><strong>Last updated:</strong> 2017-04-23</p>
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+<p><strong>Code version:</strong> 3c00d15</p>
+<!-- Add your analysis here -->
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>We take a look at those data sets where <code>BH</code> produces few (false) discoveries, and at the same time, <code>ASH</code>’s <code>lfsr</code> produces many (false) discoveries. For each data set, <span class="math inline">\(z\)</span> scores, <span class="math inline">\(p\)</span> values, and diagnostic <span class="math inline">\(\hat F_j\)</span> are plotted.</p>
+<pre class="r"><code>library(ashr)
+z = read.table(&quot;../output/z_null_liver_777.txt&quot;)
+p = read.table(&quot;../output/p_null_liver_777.txt&quot;)
+pihat0 = as.numeric(unlist(read.table(&quot;../output/pihat0_z_null_liver_777.txt&quot;)))
+fd.bh = as.numeric(unlist(read.table(&quot;../output/fd.bh.0.05_null_liver_777.txt&quot;)))
+fd.lfsr = as.numeric(unlist(read.table(&quot;../output/fd.lfsr.0.05.z.normal_null_liver_777.txt&quot;)))</code></pre>
+</div>
+<div id="the-118-data-sets-where-bh-didnt-produce-false-discoveries-but-lfsr-does." class="section level2">
+<h2>The 118 data sets where <code>BH</code> didn’t produce false discoveries but <code>lfsr</code> does.</h2>
+<p>In this simulation, <code>BH</code> used the FDR level <span class="math inline">\(\alpha = 0.05\)</span>, whereas <code>ASH</code> declared a discovery when <code>lfsr</code> <span class="math inline">\(\leq 0.05\)</span>.</p>
+<pre><code>N0. 1 : Data Set 693 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 1890 ; pihat0 = 0.01296388</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-5.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-6.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 2 : Data Set 33 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 1111 ; pihat0 = 0.01048871</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-7.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-8.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-9.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-10.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-11.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-12.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 3 : Data Set 537 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 1060 ; pihat0 = 0.01174394</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-13.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-14.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-15.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-16.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-17.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-18.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 4 : Data Set 885 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 1012 ; pihat0 = 0.01285109</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-19.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-20.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-21.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-22.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-23.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-24.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 5 : Data Set 338 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 991 ; pihat0 = 0.01832042</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-25.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-26.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-27.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-28.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-29.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-30.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 6 : Data Set 942 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 844 ; pihat0 = 0.02694257</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-31.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-32.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-33.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-34.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-35.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-36.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 7 : Data Set 627 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 771 ; pihat0 = 0.02034137</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-37.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-38.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-39.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-40.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-41.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-42.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 8 : Data Set 176 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 763 ; pihat0 = 0.03005686</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-43.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-44.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-45.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-46.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-47.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-48.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 9 : Data Set 41 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 671 ; pihat0 = 0.03013827</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-49.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-50.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-51.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-52.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-53.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-54.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 10 : Data Set 407 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 648 ; pihat0 = 0.02274312</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-55.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-56.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-57.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-58.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-59.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-60.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 11 : Data Set 467 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 648 ; pihat0 = 0.0513426</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-61.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-62.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-63.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-64.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-65.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-66.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 12 : Data Set 404 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 642 ; pihat0 = 0.01757131</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-67.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-68.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-69.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-70.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-71.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-72.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 13 : Data Set 649 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 630 ; pihat0 = 0.02077128</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-73.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-74.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-75.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-76.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-77.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-78.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 14 : Data Set 411 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 484 ; pihat0 = 0.05617472</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-79.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-80.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-81.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-82.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-83.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-84.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 15 : Data Set 341 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 463 ; pihat0 = 0.04295436</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-85.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-86.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-87.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-88.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-89.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-90.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 16 : Data Set 538 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 449 ; pihat0 = 0.04976013</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-91.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-92.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-93.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-94.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-95.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-96.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 17 : Data Set 562 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 416 ; pihat0 = 0.05014307</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-97.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-98.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-99.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-100.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-101.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-102.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 18 : Data Set 705 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 365 ; pihat0 = 0.03966321</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-103.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-104.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-105.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-106.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-107.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-108.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 19 : Data Set 937 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 346 ; pihat0 = 0.04736585</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-109.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-110.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-111.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-112.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-113.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-114.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 20 : Data Set 893 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 309 ; pihat0 = 0.0422105</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-115.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-116.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-117.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-118.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-119.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-120.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 21 : Data Set 324 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 252 ; pihat0 = 0.04925775</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-121.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-122.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-123.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-124.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-125.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-126.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 22 : Data Set 915 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 217 ; pihat0 = 0.03371413</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-127.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-128.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-129.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-130.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-131.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-132.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 23 : Data Set 511 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 204 ; pihat0 = 0.04832825</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-133.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-134.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-135.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-136.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-137.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-138.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 24 : Data Set 3 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 193 ; pihat0 = 0.04912382</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-139.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-140.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-141.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-142.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-143.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-144.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 25 : Data Set 476 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 193 ; pihat0 = 0.06738787</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-145.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-146.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-147.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-148.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-149.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-150.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 26 : Data Set 985 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 182 ; pihat0 = 0.04389071</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-151.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-152.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-153.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-154.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-155.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-156.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 27 : Data Set 133 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 168 ; pihat0 = 0.04729238</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-157.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-158.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-159.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-160.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-161.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-162.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 28 : Data Set 495 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 167 ; pihat0 = 0.04841265</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-163.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-164.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-165.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-166.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-167.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-168.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 29 : Data Set 976 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 161 ; pihat0 = 0.06447058</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-169.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-170.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-171.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-172.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-173.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-174.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 30 : Data Set 809 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 156 ; pihat0 = 0.03198968</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-175.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-176.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-177.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-178.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-179.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-180.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 31 : Data Set 499 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 155 ; pihat0 = 0.07477045</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-181.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-182.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-183.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-184.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-185.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-186.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 32 : Data Set 999 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 154 ; pihat0 = 0.04802764</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-187.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-188.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-189.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-190.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-191.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-192.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 33 : Data Set 83 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 151 ; pihat0 = 0.06797304</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-193.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-194.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-195.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-196.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-197.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-198.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 34 : Data Set 780 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 145 ; pihat0 = 0.05197813</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-199.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-200.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-201.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-202.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-203.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-204.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 35 : Data Set 182 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 141 ; pihat0 = 0.04835373</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-205.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-206.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-207.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-208.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-209.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-210.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 36 : Data Set 982 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 129 ; pihat0 = 0.04228667</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-211.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-212.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-213.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-214.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-215.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-216.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 37 : Data Set 800 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 124 ; pihat0 = 0.0352261</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-217.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-218.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-219.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-220.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-221.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-222.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 38 : Data Set 972 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 118 ; pihat0 = 0.06009152</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-223.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-224.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-225.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-226.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-227.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-228.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 39 : Data Set 40 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 117 ; pihat0 = 0.04225311</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-229.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-230.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-231.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-232.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-233.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-234.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 40 : Data Set 895 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 113 ; pihat0 = 0.05313983</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-235.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-236.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-237.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-238.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-239.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-240.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 41 : Data Set 968 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 109 ; pihat0 = 0.05946434</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-241.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-242.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-243.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-244.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-245.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-246.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 42 : Data Set 644 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 108 ; pihat0 = 0.06256917</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-247.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-248.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-249.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-250.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-251.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-252.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 43 : Data Set 232 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 96 ; pihat0 = 0.07981507</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-253.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-254.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-255.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-256.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-257.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-258.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 44 : Data Set 15 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 94 ; pihat0 = 0.047921</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-259.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-260.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-261.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-262.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-263.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-264.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 45 : Data Set 251 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 89 ; pihat0 = 0.1130911</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-265.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-266.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-267.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-268.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-269.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-270.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 46 : Data Set 685 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 89 ; pihat0 = 0.04238147</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-271.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-272.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-273.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-274.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-275.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-276.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 47 : Data Set 659 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 85 ; pihat0 = 0.04122881</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-277.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-278.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-279.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-280.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-281.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-282.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 48 : Data Set 734 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 82 ; pihat0 = 0.05525044</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-283.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-284.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-285.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-286.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-287.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-288.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 49 : Data Set 484 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 73 ; pihat0 = 0.03296313</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-289.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-290.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-291.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-292.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-293.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-294.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 50 : Data Set 638 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 71 ; pihat0 = 0.05038079</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-295.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-296.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-297.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-298.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-299.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-300.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 51 : Data Set 268 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 70 ; pihat0 = 0.07180346</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-301.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-302.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-303.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-304.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-305.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-306.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 52 : Data Set 425 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 67 ; pihat0 = 0.1239249</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-307.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-308.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-309.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-310.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-311.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-312.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 53 : Data Set 781 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 65 ; pihat0 = 0.04563832</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-313.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-314.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-315.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-316.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-317.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-318.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 54 : Data Set 379 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 64 ; pihat0 = 0.03824364</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-319.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-320.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-321.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-322.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-323.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-324.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 55 : Data Set 303 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 59 ; pihat0 = 0.06374509</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-325.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-326.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-327.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-328.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-329.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-330.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 56 : Data Set 871 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 59 ; pihat0 = 0.07502045</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-331.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-332.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-333.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-334.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-335.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-336.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 57 : Data Set 606 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 56 ; pihat0 = 0.08713022</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-337.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-338.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-339.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-340.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-341.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-342.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 58 : Data Set 259 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 48 ; pihat0 = 0.06952575</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-343.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-344.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-345.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-346.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-347.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-348.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 59 : Data Set 526 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 45 ; pihat0 = 0.06426254</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-349.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-350.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-351.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-352.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-353.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-354.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 60 : Data Set 831 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 44 ; pihat0 = 0.08150764</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-355.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-356.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-357.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-358.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-359.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-360.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 61 : Data Set 853 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 37 ; pihat0 = 0.07850494</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-361.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-362.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-363.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-364.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-365.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-366.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 62 : Data Set 402 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 34 ; pihat0 = 0.07096583</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-367.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-368.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-369.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-370.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-371.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-372.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 63 : Data Set 190 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 33 ; pihat0 = 0.08695344</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-373.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-374.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-375.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-376.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-377.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-378.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 64 : Data Set 977 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 29 ; pihat0 = 0.06351771</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-379.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-380.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-381.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-382.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-383.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-384.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 65 : Data Set 452 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 24 ; pihat0 = 0.04829788</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-385.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-386.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-387.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-388.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-389.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-390.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 66 : Data Set 477 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 23 ; pihat0 = 0.05702149</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-391.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-392.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-393.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-394.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-395.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-396.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 67 : Data Set 633 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 22 ; pihat0 = 0.1001185</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-397.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-398.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-399.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-400.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-401.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-402.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 68 : Data Set 505 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 21 ; pihat0 = 0.09021379</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-403.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-404.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-405.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-406.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-407.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-408.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 69 : Data Set 953 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 21 ; pihat0 = 0.06148864</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-409.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-410.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-411.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-412.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-413.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-414.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 70 : Data Set 653 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 19 ; pihat0 = 0.09313401</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-415.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-416.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-417.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-418.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-419.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-420.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 71 : Data Set 907 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 18 ; pihat0 = 0.03578098</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-421.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-422.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-423.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-424.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-425.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-426.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 72 : Data Set 296 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 17 ; pihat0 = 0.08233874</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-427.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-428.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-429.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-430.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-431.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-432.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 73 : Data Set 845 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 16 ; pihat0 = 0.09543107</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-433.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-434.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-435.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-436.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-437.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-438.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 74 : Data Set 857 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 16 ; pihat0 = 0.07138568</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-439.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-440.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-441.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-442.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-443.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-444.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 75 : Data Set 423 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 15 ; pihat0 = 0.08643177</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-445.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-446.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-447.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-448.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-449.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-450.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 76 : Data Set 434 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 14 ; pihat0 = 0.0835438</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-451.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-452.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-453.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-454.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-455.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-456.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 77 : Data Set 349 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 13 ; pihat0 = 0.08685835</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-457.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-458.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-459.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-460.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-461.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-462.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 78 : Data Set 588 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 13 ; pihat0 = 0.2121708</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-463.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-464.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-465.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-466.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-467.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-468.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 79 : Data Set 622 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 12 ; pihat0 = 0.0782977</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-469.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-470.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-471.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-472.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-473.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-474.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 80 : Data Set 986 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 12 ; pihat0 = 0.2194227</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-475.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-476.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-477.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-478.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-479.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-480.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 81 : Data Set 866 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 11 ; pihat0 = 0.1081335</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-481.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-482.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-483.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-484.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-485.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-486.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 82 : Data Set 231 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 9 ; pihat0 = 0.1099259</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-487.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-488.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-489.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-490.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-491.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-492.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 83 : Data Set 532 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 9 ; pihat0 = 0.1006315</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-493.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-494.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-495.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-496.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-497.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-498.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 84 : Data Set 241 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 8 ; pihat0 = 0.2951308</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-499.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-500.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-501.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-502.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-503.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-504.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 85 : Data Set 433 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 8 ; pihat0 = 0.06930144</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-505.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-506.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-507.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-508.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-509.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-510.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 86 : Data Set 949 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 8 ; pihat0 = 0.09631564</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-511.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-512.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-513.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-514.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-515.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-516.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 87 : Data Set 618 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 6 ; pihat0 = 0.07763429</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-517.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-518.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-519.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-520.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-521.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-522.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 88 : Data Set 711 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 6 ; pihat0 = 0.09199754</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-523.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-524.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-525.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-526.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-527.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-528.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 89 : Data Set 44 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 5 ; pihat0 = 0.07141674</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-529.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-530.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-531.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-532.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-533.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-534.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 90 : Data Set 153 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 5 ; pihat0 = 0.05761454</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-535.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-536.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-537.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-538.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-539.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-540.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 91 : Data Set 671 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 5 ; pihat0 = 0.1067464</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-541.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-542.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-543.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-544.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-545.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-546.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 92 : Data Set 849 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 4 ; pihat0 = 0.1557612</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-547.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-548.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-549.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-550.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-551.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-552.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 93 : Data Set 32 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 3 ; pihat0 = 0.1531939</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-553.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-554.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-555.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-556.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-557.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-558.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 94 : Data Set 71 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 3 ; pihat0 = 0.1989475</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-559.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-560.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-561.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-562.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-563.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-564.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 95 : Data Set 266 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 3 ; pihat0 = 0.2153199</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-565.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-566.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-567.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-568.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-569.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-570.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 96 : Data Set 353 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 3 ; pihat0 = 0.1153508</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-571.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-572.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-573.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-574.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-575.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-576.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 97 : Data Set 487 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 3 ; pihat0 = 0.3311973</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-577.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-578.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-579.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-580.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-581.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-582.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 98 : Data Set 799 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 3 ; pihat0 = 0.1880441</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-583.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-584.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-585.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-586.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-587.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-588.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 99 : Data Set 868 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 3 ; pihat0 = 0.1153411</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-589.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-590.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-591.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-592.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-593.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-594.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 100 : Data Set 877 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 3 ; pihat0 = 0.1894112</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-595.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-596.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-597.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-598.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-599.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-600.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 101 : Data Set 39 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 2 ; pihat0 = 0.1052546</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-601.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-602.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-603.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-604.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-605.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-606.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 102 : Data Set 132 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 2 ; pihat0 = 0.109358</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-607.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-608.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-609.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-610.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-611.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-612.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 103 : Data Set 424 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 2 ; pihat0 = 0.1877424</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-613.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-614.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-615.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-616.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-617.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-618.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 104 : Data Set 502 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 2 ; pihat0 = 0.1171748</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-619.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-620.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-621.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-622.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-623.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-624.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 105 : Data Set 552 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 2 ; pihat0 = 0.1703334</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-625.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-626.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-627.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-628.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-629.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-630.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 106 : Data Set 27 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 1 ; pihat0 = 0.2143327</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-631.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-632.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-633.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-634.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-635.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-636.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 107 : Data Set 70 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 1 ; pihat0 = 0.30275</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-637.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-638.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-639.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-640.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-641.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-642.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 108 : Data Set 97 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 1 ; pihat0 = 0.184987</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-643.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-644.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-645.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-646.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-647.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-648.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 109 : Data Set 180 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 1 ; pihat0 = 0.1318437</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-649.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-650.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-651.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-652.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-653.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-654.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 110 : Data Set 188 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 1 ; pihat0 = 0.2319604</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-655.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-656.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-657.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-658.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-659.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-660.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 111 : Data Set 199 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 1 ; pihat0 = 0.1978562</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-661.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-662.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-663.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-664.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-665.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-666.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 112 : Data Set 280 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 1 ; pihat0 = 0.1960971</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-667.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-668.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-669.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-670.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-671.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-672.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 113 : Data Set 291 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 1 ; pihat0 = 0.1825971</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-673.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-674.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-675.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-676.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-677.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-678.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 114 : Data Set 393 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 1 ; pihat0 = 0.1925067</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-679.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-680.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-681.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-682.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-683.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-684.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 115 : Data Set 475 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 1 ; pihat0 = 0.06974273</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-685.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-686.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-687.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-688.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-689.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-690.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 116 : Data Set 584 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 1 ; pihat0 = 0.0723416</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-691.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-692.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-693.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-694.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-695.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-696.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 117 : Data Set 721 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 1 ; pihat0 = 0.1049651</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-697.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-698.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-699.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-700.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-701.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-702.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 118 : Data Set 892 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 1 ; pihat0 = 0.2868517</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-703.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-704.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-705.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-706.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-707.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-708.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="the-7-data-sets-where-lfsr-is-more-conservative-than-bh." class="section level2">
+<h2>The 7 data sets where <code>lfsr</code> is more conservative than <code>BH</code>.</h2>
+<pre><code>N0. 1 : Data Set 901 ; Number of False Discoveries by BH: 2 ; Number of False Discoveries by ASH&#39;s lfsr: 0 ; pihat0 = 0.9997685</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-5.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-6.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 2 : Data Set 187 ; Number of False Discoveries by BH: 1 ; Number of False Discoveries by ASH&#39;s lfsr: 0 ; pihat0 = 0.6662317</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-7.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-8.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-9.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-10.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-11.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-12.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 3 : Data Set 285 ; Number of False Discoveries by BH: 1 ; Number of False Discoveries by ASH&#39;s lfsr: 0 ; pihat0 = 0.5178013</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-13.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-14.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-15.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-16.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-17.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-18.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 4 : Data Set 483 ; Number of False Discoveries by BH: 1 ; Number of False Discoveries by ASH&#39;s lfsr: 0 ; pihat0 = 0.9998828</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-19.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-20.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-21.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-22.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-23.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-24.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 5 : Data Set 817 ; Number of False Discoveries by BH: 1 ; Number of False Discoveries by ASH&#39;s lfsr: 0 ; pihat0 = 1</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-25.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-26.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-27.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-28.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-29.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-30.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 6 : Data Set 837 ; Number of False Discoveries by BH: 1 ; Number of False Discoveries by ASH&#39;s lfsr: 0 ; pihat0 = 0.828704</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-31.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-32.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-33.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-34.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-35.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-36.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>N0. 7 : Data Set 955 ; Number of False Discoveries by BH: 1 ; Number of False Discoveries by ASH&#39;s lfsr: 0 ; pihat0 = 0.9998902</code></pre>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-37.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-38.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-39.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-40.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-41.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-42.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="comparison-of-false-discoveries-by-bh-and-lfsr" class="section level2">
+<h2>Comparison of false discoveries by <code>BH</code> and <code>lfsr</code></h2>
+<p>To get a more comprehensive picture, we plot as follows the numbers of false discoveries by <code>BH</code> and <code>lfsr</code> for each data set. These data sets were selected out of <span class="math inline">\(1000\)</span> of them, because they produced at least one false discoveries by either method. Note that for every data set there are <span class="math inline">\(10K\)</span> correlated null statistics.</p>
+<p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="session-information" class="section level2">
+<h2>Session information</h2>
+<!-- Insert the session information into the document -->
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 3.3.3 (2017-03-06)
+Platform: x86_64-apple-darwin13.4.0 (64-bit)
+Running under: macOS Sierra 10.12.4
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+loaded via a namespace (and not attached):
+ [1] backports_1.0.5 magrittr_1.5    rprojroot_1.2   tools_3.3.3    
+ [5] htmltools_0.3.5 yaml_2.1.14     Rcpp_0.12.10    stringi_1.1.2  
+ [9] rmarkdown_1.3   knitr_1.15.1    git2r_0.18.0    stringr_1.2.0  
+[13] digest_0.6.11   evaluate_0.10  </code></pre>
+</div>
+
+<hr>
+<p>
+    This <a href="http://rmarkdown.rstudio.com">R Markdown</a> site was created with <a href="https://github.com/jdblischak/workflowr">workflowr</a>
+</p>
+<hr>
+
+<!-- To enable disqus, uncomment the section below and provide your disqus_shortname -->
+
+<!-- disqus
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'rmarkdown'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+-->
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

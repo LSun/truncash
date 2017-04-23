@@ -1,0 +1,81 @@
+---
+title: "Diagnostic Plots for `BH`-friendly, $\\hat{\\pi}_0$-hostile Correlated $N(0, 1)$ Scores"
+author: "Lei Sun"
+date: 2017-04-22
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+We take a look at those data sets where `BH` gives no (false) discoveries at FDR $\alpha = 0.05$, and at the same time `ASH` estimates $\hat\pi_0 \leq 0.1$.  For each data set, $z$ scores, $p$ values, and diagnostic $\hat F_j$ are plotted.
+
+```{r, cache = TRUE, message = FALSE}
+library(ashr)
+z = read.table("../output/z_null_liver_777.txt")
+p = read.table("../output/p_null_liver_777.txt")
+pihat0 = as.numeric(unlist(read.table("../output/pihat0_z_null_liver_777.txt")))
+fd.bh = as.numeric(unlist(read.table("../output/fd.bh.0.05_null_liver_777.txt")))
+```
+
+```{r, cache = TRUE, echo = FALSE}
+n = nrow(z)
+m = ncol(p)
+```
+
+```{r, cache = TRUE, echo = FALSE}
+pihat0.cutoff = 0.1
+pihat0.ord = order(pihat0)[1:sum(pihat0 <= pihat0.cutoff)]
+fd.bh.ind = which(fd.bh == 0)
+ind = intersect(pihat0.ord, fd.bh.ind)
+```
+
+```{r, cache = TRUE, echo = FALSE}
+x = seq(-10, 10, 0.01)
+y = dnorm(x)
+k = 1
+for (j in ind) {
+  fit.ash.n.n = ash.workhorse(as.numeric(z[j, ]), 1, mixcompdist = "normal", method = "fdr")
+  fit.ash.n.u = ash.workhorse(as.numeric(z[j, ]), 1, mixcompdist = "uniform", method = "fdr")
+  fit.ash.n.hu = ash.workhorse(as.numeric(z[j, ]), 1, mixcompdist = "halfuniform", method = "fdr")
+  cat("N0.", k, ": Data Set", j, "; Number of False Discoveries:", fd.bh[j], "; pihat0 =", get_pi0(fit.ash.n.n))
+  hist(as.numeric(z[j, ]), xlab = "z scores", freq = FALSE, ylim = c(0, 0.45), nclass = 100, main = "10000 z scores, 100 bins")
+  lines(x, y, col = "red")
+  qqnorm(as.numeric(z[j, ]), main = "Normal Q-Q plot for z scores")
+  abline(0, 1)
+  pj = sort(as.numeric(p[j, ]))
+  plot(pj[1:100], xlab = "Order", ylab = "Ordered p value", main = "Zoom-in to the 100 smallest p values")
+  abline(0, 1 / m, col = "blue")
+  points(pj[min(1, fd.bh[j]) : fd.bh[j]], col = "green", pch = 19)
+  abline(0, 0.05 / m, col = "red")
+  legend("top", lty = 1, col = c("blue", "red"), c("Uniform", "BH, FDR = 0.05"), bty = "n")
+  ashr::plot_diagnostic(fit.ash.n.n, main = c("Diagnostic Plot for ASH", "Normal Mixture Prior"))
+  ashr::plot_diagnostic(fit.ash.n.u, main = c("Diagnostic Plot for ASH", "Uniform Mixture Prior"))
+  ashr::plot_diagnostic(fit.ash.n.hu, main = c("Diagnostic Plot for ASH", "Half-Uniform Mixture Prior"))
+  k = k + 1
+}
+```
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```
