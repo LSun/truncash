@@ -165,7 +165,7 @@ Here are some ideas.
 
 ## Idea 1: Ignore it
 
-Take a look at the non-uniform plot and the ten uniform plots.  It's true that the uniform ones are commonly outside the error bounds, but they are not going too far, compared with that non-uniform one.  So maybe we can just ignore the "casual" bound-crossings and accept them as uniform.  Of course this will generate a lot of ambiguity for borderline cases, but borderline cases are difficult any way.
+Take a look at the non-uniform plot and the ten uniform plots.  It's true that the uniform ones are not-uncommonly outside the error bounds, but they are not going too far, compared with that non-uniform one.  So maybe we can just ignore the "casual" bound-crossings and accept them as uniform.  Of course this will generate a lot of ambiguity for borderline cases, but borderline cases are difficult any way.
 
 ## Idea 2: Bonferroni correction
 
