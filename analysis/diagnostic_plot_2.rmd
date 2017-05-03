@@ -1,0 +1,357 @@
+---
+title: "Diagnostic Plot for Uniform Distribution"
+author: "Lei Sun"
+date: 2017-05-02
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+## Introduction
+
+Suppose we have $n$ iid samples presumably from $\text{Uniform}\left[0, 1\right]$.  Our goal is to make a diagnostic plot to check if they are truly coming from $\text{Uniform}\left[0, 1\right]$.
+
+## Plotting positions
+
+The basic tool is the [Q-Q plot](https://en.wikipedia.org/wiki/Q%E2%80%93Q_plot).  Basically, we are ploting the sample quantiles against their theoretical quantiles, also called "plotting positions."  But it turns out it's more complicated than what it appears, because it's not clear what are the best "theoretical quantiles" or plotting positions.  For example, $\left\{1/n, 2/n, \ldots, n/n\right\}$ appears an obvious option, but if the distribution is normal, the quantile of $n/n = 1$ is $\infty$.  Even if the distribution is compactly supported, like $\text{Uniform}\left[0, 1\right]$, the quantile of $1$ is $1$, yet the largest sample will always be strictly less than $1$.
+
+This is called the "plotting positions problem." It has a long history and a rich literature.  [Harter 1984](http://www.tandfonline.com/doi/abs/10.1080/03610928408828781) and [Makkonen 2008](http://www.tandfonline.com/doi/abs/10.1080/03610920701653094) seem to be two good reviews.  Popular choices include $\left\{\frac{k-0.5}{n}\right\}$, $\left\{\frac{k}{n+1}\right\}$, $\left\{\frac{k - 0.3}{n+0.4}\right\}$, or in general, $\left\{\frac{k-\alpha}{n+1-2\alpha}\right\}$, $\alpha\in\left[0, 1\right]$, which approximates $F\left(E\left[X_{(k)}\right]\right)$ for certain $\alpha$, and includes all above as special cases.
+
+For practical purposes, for $\text{Uniform}\left[0, 1\right]$ distribution, we are using $\left\{\frac{1}{n+1}, \frac{2}{n+1}, \ldots, \frac{n}{n+1}\right\}$ as plotting positions for diagnosing $\text{Uniform}\left[0, 1\right]$. [Harter 1984](http://www.tandfonline.com/doi/abs/10.1080/03610928408828781) provided some justification for this choice.  In short, $\text{Uniform}\left[0, 1\right]$ is unique in that it has the property
+
+$$
+\displaystyle
+F\left(E\left[X_{(k)}\right]\right)
+= E\left[F\left(X_{(k)}\right)\right]
+= \frac{k}{n + 1} \ ,
+$$
+where $X_{(k)}$ is the order statistic.
+
+## De-trending the $0$-$1$ line
+
+Another problem is also related to Q-Q plots in general, and especially to the problem we have right now.  In uniform Q-Q plots, in Matthew's words, "current plots are dominated by the trend from 0 to 1," so it' would be better to "remove that trend to better highlight the deviations from the expectation."
+
+The order statistics $X_{(k)}$ for $\text{Uniform}\left[0, 1\right]$ [follows a beta distribution](https://en.wikipedia.org/wiki/Order_statistic#Order_statistics_sampled_from_a_uniform_distribution),
+
+$$
+X_{(k)} \sim \text{Beta}\left(k, n+1-k\right) \ ,
+$$
+
+which has the [mean and variance](https://en.wikipedia.org/wiki/Uniform_distribution_(continuous)#Order_statistics) as
+
+$$
+\begin{array}{rcll}
+E\left[X_{(k)}\right] & = & \displaystyle\frac{k}{n+1} &;\\
+Var\left(X_{(k)}\right) &=& \displaystyle\frac{k(n - k + 1)}{\left(n+1\right)^2\left(n + 2\right)} &.
+\end{array}
+$$
+
+Therefore, we can plot $X_{(k)} - E\left[X_{(k)}\right]$ along with two error bounds.  One choice of the error bounds is to use $\pm2\sqrt{Var\left(X_{(k)}\right)}$ (in blue); another is to use the $\alpha / 2$ and $1-\alpha/2$ quantiles of $\text{Beta}\left(k, n+1-k\right)$ (in red).  Points outside the error bounds thus indicate deviation from the uniform distribution.  This plot can be called the de-trended plot.
+
+As an example, here is a data set of $10K$ null $z$ scores distorted by correlation.  We apply `ASH` to this data set.  Since the empirical distribution of these $z$ scores are highly non-normal due to correlation, presumably `ASH` with normal prior components and normal likelihood wouldn't fit this data set well.
+
+
+```{r, cache = TRUE}
+z = read.table("../output/z_null_liver_777.txt")
+```
+
+```{r, cache = TRUE}
+z.33 = as.numeric(z[33, ])
+```
+
+```{r, cache = TRUE}
+library(ashr)
+fit = ash.workhorse(z.33, 1, method = "fdr", mixcompdist = "normal")
+cdfhat = plot_diagnostic(fit, plot.it = FALSE)
+```
+
+The histogram of the data set is plotted as follows, as compared with the density of $N(0, 1)$.  In this case since $\hat s\equiv 1$, all $\hat z_j$ share the same estimated predictive density, defined as
+
+$$
+\hat f = \hat g * N(0, \hat s_j^2 \equiv 1) \ .
+$$
+
+$\hat f(x)$ at a given set of $x$ positions can be evaluated using the following `R` code.
+
+```{r, cache = TRUE}
+fhat = function(ash.fit, x, sebetahat = 1) {
+  data = ashr::set_data(x, sebetahat, ash.fit$data$lik, ash.fit$data$alpha)
+  return(ashr:::dens_conv.default(ash.fit$fitted_g, data))
+}
+```
+
+W can also plot the estimated predictive density (in blue) on top of the histogram.  As we can see, the blue line is not fitting the histogram well, as an indicator of ASH's lack of goodness of fit to this data set.
+
+```{r, cache = TRUE, echo = FALSE}
+z.ed = hist(z.33, breaks = 100, plot = FALSE)
+ylim = c(0, max(z.ed$density, dnorm(0)))
+x.pt = seq(-4.5, 4.5, 0.01)
+y.pt = dnorm(x.pt)
+f.hat = fhat(fit, x.pt)
+hist(z.33, breaks = 100, prob = TRUE, ylim = ylim, main = "Histogram of correlated null z scores", xlab = "Correlated z scores")
+lines(x.pt, y.pt, col = "red")
+lines(x.pt, f.hat, col = "blue")
+legend("topright", legend = c(expression(hat(f)), "N(0, 1)"), lty = 1, col = c("blue", "red"))
+```
+
+The predictive CDF of this data set should be far from $\text{Uniform}\left[0, 1\right]$, so the diagnostic Q-Q plot should be conspicuously deviating from the $0$-$1$ straight line.  And we've also seen many points outside of the error bounds in the de-trended plot.  We can also see that the two choices of error bounds don't make too much difference.
+
+```{r, cache = TRUE, echo = FALSE}
+plot_diagnostic(fit)
+n = length(z.33)
+diff = sort(cdfhat) - (1:n) / (n + 1)
+upper = qbeta(0.975, 1:n, n + 1 - (1:n)) - (1:n) / (n + 1)
+lower = qbeta(0.025, 1:n, n + 1 - (1:n)) - (1:n) / (n + 1)
+sd = sqrt(((1:n) * (n - (1:n) + 1)) / ((n + 1)^2 * (n + 2)))
+ylim = c(min(c(diff, lower, 0, -2 * sd)), max(c(diff, upper, 0, 2 * sd)))
+plot(diff, cex = 0.1, pch = 19, ylab = expression(X[(k)] - E(X[(k)])),
+     main = "De-trended Diagnostic Plot for ASH", ylim = ylim)
+abline(h = 0, col = "red", lty = 2)
+lines(upper, col = "red")
+lines(2 * sd, col = "blue")
+lines(lower, col = "red")
+lines(-2 * sd, col = "blue")
+legend("topleft", lty = 1, col = c("blue", "red"), legend = c(expression(2~sqrt("Var"(X[(k)]))), expression("Beta Quantile")), bty = "n")
+```
+
+### Correlated multiple comparison
+
+However, this simple de-trended plot has drawbacks.  Suppose we apply `ASH` to independent $z$ scores.  `ASH` should correctly estimate $\hat g$ to be a point mass at $0$ or something very close to it.  Then the predictive cdf should be approximately uniformly distributed, which means we shouldn't observe too many points outside the error bounds.  However, here we do this simulation $10$ times, and it's more common than expected to observe points outside the bounds.
+
+```{r multiple, cache = TRUE, echo = FALSE}
+set.seed(777)
+n = 1e4
+upper = qbeta(0.975, 1:n, n + 1 - (1:n)) - (1:n) / (n + 1)
+twosd = 2 * sqrt((1:n) * (n + 1 - (1:n)) / ((n + 1)^2 * (n + 2)))
+lower = qbeta(0.025, 1:n, n + 1 - (1:n)) - (1:n) / (n + 1)
+for (i in 1:10) {
+  n = 1e4
+  z.normal = rnorm(n)
+  fit.normal = ash.workhorse(z.normal, 1, method = "fdr", mixcompdist = "normal")
+  cdfhat.normal = plot_diagnostic(fit.normal, plot.it = FALSE)
+  diff = sort(cdfhat.normal) - (1:n) / (n + 1)
+  ylim = c(min(c(diff, lower, 0, -twosd)), max(c(diff, upper, 0, twosd)))
+  plot(diff, cex = 0.1, pch = 19, ylim = ylim, ylab = expression(X[(k)] - E(X[(k)])), main = "De-trended Diagnostic Plot for ASH")
+  abline(h = 0, col = "red", lty = 2)
+  lines(upper, col = "red")
+  lines(lower, col = "red")
+  lines(twosd, col = "blue")
+  lines(-twosd, col = "blue")
+}
+```
+
+It happens because the de-trended plot has an inherent *multiple testing under correlation* issue.  First we are comparing $n$ sample quantiles, and then these quantiles are correlated.  It may have connection with multiple testing in time series.  Like in all multiple testing problems, we need to obtain a better error bound.
+
+Here are some ideas.
+
+## Idea 1: Ignore it
+
+Take a look at the non-uniform plot and the ten uniform plots.  It's true that the uniform ones are commonly outside the error bounds, but they are not going too far, compared with that non-uniform one.  So maybe we can just ignore the "casual" bound-crossings and accept them as uniform.  Of course this will generate a lot of ambiguity for borderline cases, but borderline cases are difficult any way.
+
+## Idea 2: Bonferroni correction
+
+Instead of using an error bound that's at $\alpha$ level for each order statistic, we can use Bonferroni correction at $\alpha / n$ level.  Hopefully it will control false positives whereas still be powerful.  Let's take a look at the previously run examples.
+
+### Non-uniform
+
+In the presence of strong non-uniformity, the de-trended plot is still well outside the Bonferroni-corrected error bounds.
+
+```{r, cache = TRUE, echo = FALSE}
+plot_diagnostic(fit)
+n = length(z.33)
+diff = sort(cdfhat) - (1:n) / (n + 1)
+upper = qbeta(0.975, 1:n, n + 1 - (1:n)) - (1:n) / (n + 1)
+lower = qbeta(0.025, 1:n, n + 1 - (1:n)) - (1:n) / (n + 1)
+upper.bon = qbeta(1 - 0.025 / n, 1:n, n + 1 - (1:n)) - (1:n) / (n + 1)
+lower.bon = qbeta(0.025 / n, 1:n, n + 1 - (1:n)) - (1:n) / (n + 1)
+sd = sqrt(((1:n) * (n - (1:n) + 1)) / ((n + 1)^2 * (n + 2)))
+ylim = c(min(c(diff, lower.bon, 0, -2 * sd)), max(c(diff, upper.bon, 0, 2 * sd)))
+plot(diff, cex = 0.1, pch = 19, ylab = expression(X[(k)] - E(X[(k)])),
+     main = "De-trended Diagnostic Plot for ASH", ylim = ylim)
+abline(h = 0, col = "red", lty = 2)
+lines(upper, col = "red")
+lines(2 * sd, col = "blue")
+lines(lower, col = "red")
+lines(-2 * sd, col = "blue")
+lines(lower.bon, col = "green")
+lines(upper.bon, col = "green")
+legend("topleft", lty = 1, col = c("blue", "red", "green"), legend = c(expression(2~sqrt("Var"(X[(k)]))), "Beta Quantile", "Beta Quantile with Bonferroni"), bty = "n")
+```
+
+### Uniform
+
+As always with Bonferroni correction, it could seem under-powered, or over-controlling the type I error.
+
+```{r multiple bonferroni, cache = TRUE, echo = FALSE}
+set.seed(777)
+n = 1e4
+upper = qbeta(0.975, 1:n, n + 1 - (1:n)) - (1:n) / (n + 1)
+twosd = 2 * sqrt((1:n) * (n + 1 - (1:n)) / ((n + 1)^2 * (n + 2)))
+lower = qbeta(0.025, 1:n, n + 1 - (1:n)) - (1:n) / (n + 1)
+upper.bon = qbeta(1 - 0.025 / n, 1:n, n + 1 - (1:n)) - (1:n) / (n + 1)
+lower.bon = qbeta(0.025 / n, 1:n, n + 1 - (1:n)) - (1:n) / (n + 1)
+for (i in 1:10) {
+  n = 1e4
+  z.normal = rnorm(n)
+  fit.normal = ash.workhorse(z.normal, 1, method = "fdr", mixcompdist = "normal")
+  cdfhat.normal = plot_diagnostic(fit.normal, plot.it = FALSE)
+  diff = sort(cdfhat.normal) - (1:n) / (n + 1)
+  ylim = c(min(c(diff, lower.bon, 0, -twosd)), max(c(diff, upper.bon, 0, twosd)))
+  plot(diff, cex = 0.1, pch = 19, ylim = ylim, ylab = expression(X[(k)] - E(X[(k)])), main = "De-trended Diagnostic Plot for ASH")
+  abline(h = 0, col = "red", lty = 2)
+  lines(upper, col = "red")
+  lines(lower, col = "red")
+  lines(twosd, col = "blue")
+  lines(-twosd, col = "blue")
+  lines(lower.bon, col = "green")
+  lines(upper.bon, col = "green")
+}
+```
+
+
+## Idea 3: Predictive density on top of histogram
+
+As discussed above, when we have constant $\hat s_j\equiv s$, the estimated predictive density $\hat f = \hat g * N\left(0, s^2\right)$ is the same for all observations.  Therefore, we could plot $\hat f\left(\hat \beta_j\right)$ on top of the histogram of all $\hat \beta_j$ to see if `ASH` fits the data and estimates the prior $g$ well.
+
+We are selecting four data sets with $N(0, 1)$ $z$ scores distorted by correlation.  The first two are inflated, and the latter two mildly deflated.  `ASH` has a hard time handling both cases, and the fitted predictive density curves can show that.
+
+```{r, echo = FALSE, cache = TRUE}
+x.pt = seq(-4.5, 4.5, 0.01)
+y.pt = dnorm(x.pt)
+sel = c(355, 23, 4, 5)
+for (i in sel) {
+  z.ed = hist(as.numeric(z[i, ]), breaks = 100, plot = FALSE)
+  ylim = c(0, max(z.ed$density, dnorm(0)))
+  fit = ash.workhorse(as.numeric(z[i, ]), 1, method = "fdr", mixcompdist = "normal")
+  f.hat = fhat(fit, x.pt)
+  hist(as.numeric(z[i, ]), breaks = 100, prob = TRUE, ylim = ylim, main = "Histogram of correlated null z scores", xlab = "Correlated z scores")
+  lines(x.pt, y.pt, col = "red")
+  lines(x.pt, f.hat, col = "blue")
+  legend("topright", legend = c(expression(hat(f)), "N(0, 1)"), lty = 1, col = c("blue", "red"))
+}
+```
+
+## Idea 4: Kolmogorov-Smirnov (K-S) test
+
+As explained in [Wikipedia](https://en.wikipedia.org/wiki/Kolmogorov%E2%80%93Smirnov_test),
+
+> In statistics, the Kolmogorov–Smirnov test (K–S test or KS test) is a nonparametric test of the equality of continuous, one-dimensional probability distributions that can be used to compare a sample with a reference probability distribution (one-sample K–S test), or to compare two samples (two-sample K–S test). It is named after Andrey Kolmogorov and Nikolai Smirnov.
+
+The K-S test gives a $p$-value, which can be displayed alongside all kinds of diagnostic plots mentioned above, as below.
+
+```{r KS, echo = FALSE, cache = TRUE}
+fit = ash.workhorse(as.numeric(z[33, ]), 1, method = "fdr", mixcompdist = "normal")
+cdfhat = plot_diagnostic(fit, plot.it = FALSE)
+p.ks = ks.test(cdfhat, "punif")$p.value
+n = length(z.33)
+diff = sort(cdfhat) - (1:n) / (n + 1)
+upper = qbeta(0.975, 1:n, n + 1 - (1:n)) - (1:n) / (n + 1)
+lower = qbeta(0.025, 1:n, n + 1 - (1:n)) - (1:n) / (n + 1)
+upper.bon = qbeta(1 - 0.025 / n, 1:n, n + 1 - (1:n)) - (1:n) / (n + 1)
+lower.bon = qbeta(0.025 / n, 1:n, n + 1 - (1:n)) - (1:n) / (n + 1)
+sd = sqrt(((1:n) * (n - (1:n) + 1)) / ((n + 1)^2 * (n + 2)))
+ylim = c(min(c(diff, lower.bon, 0, -2 * sd)), max(c(diff, upper.bon, 0, 2 * sd)))
+plot(diff, cex = 0.1, pch = 19, ylab = expression(X[(k)] - E(X[(k)])),
+     main = c("De-trended Diagnostic Plot for ASH", paste("One-Sample K-S Test p Value:", p.ks)), ylim = ylim)
+abline(h = 0, col = "red", lty = 2)
+lines(upper, col = "red")
+lines(2 * sd, col = "blue")
+lines(lower, col = "red")
+lines(-2 * sd, col = "blue")
+lines(lower.bon, col = "green")
+lines(upper.bon, col = "green")
+legend("topleft", lty = 1, col = c("blue", "red", "green"), legend = c(expression(2~sqrt("Var"(X[(k)]))), "Beta Quantile", "Beta Quantile with Bonferroni"), bty = "n")
+```
+
+```{r echo = FALSE, cache = TRUE}
+n = 1e4
+fit = ash.workhorse(rnorm(n), 1, method = "fdr", mixcompdist = "normal")
+cdfhat = plot_diagnostic(fit, plot.it = FALSE)
+p.ks = ks.test(cdfhat, "punif")$p.value
+diff = sort(cdfhat) - (1:n) / (n + 1)
+upper = qbeta(0.975, 1:n, n + 1 - (1:n)) - (1:n) / (n + 1)
+lower = qbeta(0.025, 1:n, n + 1 - (1:n)) - (1:n) / (n + 1)
+sd = sqrt(((1:n) * (n - (1:n) + 1)) / ((n + 1)^2 * (n + 2)))
+ylim = c(min(c(diff, lower, 0, -2 * sd)), max(c(diff, upper, 0, 2 * sd)))
+plot(diff, cex = 0.1, pch = 19, ylab = expression(X[(k)] - E(X[(k)])),
+     main = c("De-trended Diagnostic Plot for ASH", paste("One-Sample K-S Test p Value:", round(p.ks, 2))), ylim = ylim)
+abline(h = 0, col = "red", lty = 2)
+lines(upper, col = "red")
+lines(2 * sd, col = "blue")
+lines(lower, col = "red")
+lines(-2 * sd, col = "blue")
+legend("topleft", lty = 1, col = c("blue", "red"), legend = c(expression(2~sqrt("Var"(X[(k)]))), "Beta Quantile"), bty = "n")
+```
+
+
+## Idea 5: Empirical CDF and DKW inequality
+
+The K-S test is related to [the DKW inequality](https://en.wikipedia.org/wiki/Dvoretzky%E2%80%93Kiefer%E2%80%93Wolfowitz_inequality) for the empirical CDF.  Let $X_1, \ldots, X_n$ be $n$ iid samples from $F$.  Let $F_n$ denote the empirical cumulative distribution function estimated from them.  Then
+
+$$
+\Pr\left(\sup\limits_{x\in\mathbb{R}}\left|F_n\left(x\right) - F\left(x\right)\right| > \epsilon\right) \leq 2e^{-2n\epsilon^2} \ .
+$$
+
+Therefore, we can set $\epsilon$ so that $\alpha = 2e^{-2n\epsilon^2}$, and plot $F_n\left(X_{(k)}\right) - F\left(X_{(k)}\right) = \frac kn - X_{(k)}$ against $\pm\epsilon$.  Note that in this case we are plotting $F_n\left(X_{(k)}\right) - F\left(X_{(k)}\right)$, not $X_{(k)} - E\left[X_{(k)}\right]$, but under uniform they are very close, with no practical difference.
+
+
+
+```{r, echo = FALSE, cache = TRUE}
+alpha = 0.05
+eps = sqrt(log(2 / alpha) / (2 * n))
+fit = ash.workhorse(as.numeric(z[33, ]), 1, method = "fdr", mixcompdist = "normal")
+cdfhat = plot_diagnostic(fit, plot.it = FALSE)
+diff_ecdf = (1:n) / n - sort(cdfhat)
+upper = qbeta(0.975, 1:n, n + 1 - (1:n)) - (1:n) / (n + 1)
+lower = qbeta(0.025, 1:n, n + 1 - (1:n)) - (1:n) / (n + 1)
+ylim = range(c(diff_ecdf, eps, -eps, 0, upper, lower))
+plot(diff_ecdf, cex = 0.2, pch = 19, ylab = expression(F[n](X[(k)]) - F(X[(k)])), ylim = ylim, main = "De-trended Diagnostic Plot for ASH")
+abline(h = eps, col = "red")
+abline(h = -eps, col = "red")
+lines(upper, col = "blue")
+lines(lower, col = "blue")
+abline(h = 0, col = "red", lty = 2)
+legend("bottomleft", lty = 1, col = c("blue", "red"), legend = c("Beta Quantile", "DKW Bound"), bty = "n")
+```
+
+```{r, echo = FALSE, cache = TRUE}
+n = 1e4
+fit = ash.workhorse(rnorm(n), 1, method = "fdr", mixcompdist = "normal")
+cdfhat = plot_diagnostic(fit, plot.it = FALSE)
+diff_ecdf = (1:n) / n - sort(cdfhat)
+upper = qbeta(0.975, 1:n, n + 1 - (1:n)) - (1:n) / (n + 1)
+lower = qbeta(0.025, 1:n, n + 1 - (1:n)) - (1:n) / (n + 1)
+ylim = range(c(diff_ecdf, eps, -eps, 0, upper, lower))
+plot(diff_ecdf, cex = 0.2, pch = 19, ylab = expression(F[n](X[(k)]) - F(X[(k)])), ylim = ylim, main = "De-trended Diagnostic Plot for ASH")
+abline(h = eps, col = "red")
+abline(h = -eps, col = "red")
+lines(upper, col = "blue")
+lines(lower, col = "blue")
+abline(h = 0, col = "red", lty = 2)
+legend("bottomleft", lty = 1, col = c("blue", "red"), legend = c("Beta Quantile", "DKW Bound"), bty = "n")
+```
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```

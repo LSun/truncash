@@ -92,6 +92,10 @@ Under the exchangeability assumption, the goodness of fit of empirical Bayes can
 
 The previous investigation is boiled down to a prototypical problem: the classic normal means inference, but with heteroskedastic and especially correlated noise.  Gaussian derivatives and `ASH` provide a way to tackle it.
 
+* [Diagnostic Plots for Uniformity](diagnostic_plot_2.html)
+
+Essentially we hope to tell whether $n$ random samples are uniformly distributed, and the task seems more complicated than what it sounds.
+
 [`ashr`]: https://github.com/stephens999/ashr
 
 <!-- The goal of this new template is to simplify the setup and maintenance of a research website. -->
