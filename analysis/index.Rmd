@@ -96,6 +96,10 @@ The previous investigation is boiled down to a prototypical problem: the classic
 
 Essentially we hope to tell whether $n$ random samples are uniformly distributed, and the task seems more complicated than what it sounds.
 
+* [Marginal distribution $z$ scores](marginal_z.html)
+
+Take a look at the $z$ scores we've been experimenting with and check whether they truly are marginally $N\left(0, 1\right)$.  It's an enhanced version of the simulation on [occurrence of extreme observations](ExtremeOccurrence.html).
+
 [`ashr`]: https://github.com/stephens999/ashr
 
 <!-- The goal of this new template is to simplify the setup and maintenance of a research website. -->
