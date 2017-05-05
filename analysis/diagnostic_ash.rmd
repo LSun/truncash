@@ -1,0 +1,68 @@
+---
+title: "Diagnostic Plot for `ASH`"
+author: "Lei Sun"
+date: 2017-05-05
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+## Introduction
+
+Based on discussion with Matthew on several ideas to improve the diagnostic plot for `ASH`, this file documents the latest version of `plot_diagnostic` function in `ashr`.
+
+```{r, cache = TRUE, cache = TRUE, message = FALSE}
+library(ashr)
+```
+
+## $\alpha = 0.01$ rather than $0.05$.
+
+The idea is to "reduce the number of crossings some, but still give a good idea of what is expected without being too conservative."
+
+```{r 0.01, cache = TRUE, echo = FALSE}
+set.seed(777)
+n = 1e4
+upper = qbeta(0.995, 1:n, n + 1 - (1:n)) - (1:n) / (n + 1)
+lower = qbeta(0.005, 1:n, n + 1 - (1:n)) - (1:n) / (n + 1)
+for (i in 1:10) {
+  n = 1e4
+  z.normal = rnorm(n)
+  fit.normal = ash.workhorse(z.normal, 1, method = "fdr", mixcompdist = "normal")
+  cdfhat.normal = plot_diagnostic(fit.normal, plot.it = FALSE)
+  diff = sort(cdfhat.normal) - (1:n) / (n + 1)
+  ylim = range(diff, upper, lower, 0)
+  plot(diff, cex = 0.1, pch = 19, ylim = ylim, ylab = expression(X[(k)] - E(X[(k)])), main = "De-trended Diagnostic Plot for ASH")
+  abline(h = 0, col = "red", lty = 2)
+  lines(upper, col = "red")
+  lines(lower, col = "red")
+}
+```
+
+## Other ideas
+
+All have been put into the `ashr::plot_diagnostic` function.
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```

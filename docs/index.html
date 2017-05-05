@@ -289,12 +289,13 @@ $(document).ready(function () {
 <p>The previous investigation is boiled down to a prototypical problem: the classic normal means inference, but with heteroskedastic and especially correlated noise. Gaussian derivatives and <code>ASH</code> provide a way to tackle it.</p>
 <ul>
 <li><a href="diagnostic_plot_2.html">Diagnostic Plots for Uniformity</a></li>
+<li><a href="diagnostic_ash.html">Diagnostic Plots for <code>ASH</code></a></li>
 </ul>
-<p>Essentially we hope to tell whether <span class="math inline">\(n\)</span> random samples are uniformly distributed, and the task seems more complicated than what it sounds.</p>
+<p>Essentially we hope to tell whether <span class="math inline">\(n\)</span> random samples are uniformly distributed, and the task seems more complicated than what it sounds. There are multiple ways to do it, and some of them have been absorbed into the <code>ashr</code> package.</p>
 <ul>
-<li><a href="marginal_z.html">Marginal distribution <span class="math inline">\(z\)</span> scores</a></li>
+<li><a href="marginal_z.html">Marginal distribution of correlated null <span class="math inline">\(z\)</span> scores</a></li>
 </ul>
-<p>Take a look at the <span class="math inline">\(z\)</span> scores we’ve been experimenting with and check whether they truly are marginally <span class="math inline">\(N\left(0, 1\right)\)</span>. It’s an enhanced version of the simulation on <a href="ExtremeOccurrence.html">occurrence of extreme observations</a>.</p>
+<p>Take a look at the <span class="math inline">\(z\)</span> scores we’ve been experimenting with so far and check whether they truly are marginally <span class="math inline">\(N\left(0, 1\right)\)</span>. It’s an enhanced version of the simulation on <a href="ExtremeOccurrence.html">occurrence of extreme observations</a>.</p>
 <!-- The goal of this new template is to simplify the setup and maintenance of a research website. -->
 <!-- Specifically, -->
 <!-- *  Easier to build and extend the website using the new tools in the [rmarkdown][] package and [latest RStudio release][rstudio] -->
