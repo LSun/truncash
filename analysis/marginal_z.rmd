@@ -1,0 +1,217 @@
+---
+title: "Marginal Distribution of $z$ Scores"
+author: "Lei Sun"
+date: 2017-04-25
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+**This simulation can be seen as an enhanced version of [a previous simulation](ExtremeOccurrence.html).**
+
+## Introduction
+
+An assumption of using [Gaussian derivatives](gaussian_derivatives.html) to fit correlated null $z$ scores is that each of these $z$ scores should actually be null.  That is, for $n$ $z$ scores $z_1, \ldots, z_n$, although the correlation between $z_i$ and $z_j$ are not necessarily zero, the marginal distribution of $z_i$, $\forall i$, should be $N\left(0, 1\right)$.
+
+However, in practice, it's not easy to check whether these correlated $z$ scores are truly marginally $N\left(0, 1\right)$.  [We've seen](correlated_z.html) that their historgram could be far from normal.  Further more, $z$ scores in different data sets are distorted by different correlation structures.  Therefore, we don't have replicates here; that is, each data set is one single realization of a lot of random variables under correlation.
+
+For our data sets in particular, let $Z = \left[z_{ij}\right]_{m \times n}$ be the matrix of $z$ scores.  Each $z_{ij}$ denotes the gene differential expression $z$ score for gene $j$ in the data set $i$.  Since all of these $z$ scores are obtained from the same tissue, theoretically they should all be marginally $N\left(0, 1\right)$.
+
+Each row is a data set, consisting of $10K$ realized $z$ scores presumably marginally $N\left(0, 1\right)$, whose empirical distribution distorted by correlation.  If we plot the histogram of each row, it is grossly not $N\left(0, 1\right)$ due to correlation.  Therefore, it's not easy to verify that they are truly marginally $N\left(0, 1\right)$.
+
+Here are two pieces of evidence that they are.  Let's take a look one by one, compared with the independent $z$ scores case.
+
+```{r, cache = TRUE}
+z.null <- read.table("../output/z_null_liver_777.txt")
+n = ncol(z.null)
+m = nrow(z.null)
+```
+
+```{r, cache = TRUE}
+set.seed(777)
+z.sim = matrix(rnorm(m * n), nrow = m, ncol = n)
+```
+
+## Row-wise: $E\left[F_n\left(z\right)\right] = \Phi\left(z\right)$
+
+Let $F_n^{R_i}\left(z\right)$ be the empirical CDF of $p$ correlated $z$ scores in row $i$.  For any $i$, $F_n^{R_i}\left(z\right)$ should be conspicuously different from $\Phi\left(z\right)$, yet on average, $E\left[F_n^{R_i}\left(z\right)\right]$ should be equal to $\Phi\left(z\right)$, if all $z$ scores are marginally $N\left(0, 1\right)$.
+
+In order to check that, we can borrow [Prof. Michael Stein's insight](index.html) to look at the tail events, or empirical CDF.
+
+For each row, let $\alpha$ be a given probability level, $z_\alpha  = \Phi^{-1}\left(\alpha\right)$ be the associated quantile, and we record a number $R_i^\alpha$ defined as follows.
+
+If $\alpha \leq 0.5$, $R_\alpha^i$ is the number of $z$ scores in row $i$ that are smaller than $z_\alpha$; otherwise, if $\alpha > 0.5$, $R_\alpha^i$ is the number of $z$ scores in row $i$ that are larger than $z_\alpha$.
+
+Defined this way, $R_\alpha^i$ should be a sample from $n \times F_n^{R_i}\left(z_\alpha\right)$ or $n \times \left(1- F_n^{R_i}\left(z_\alpha\right)\right)$.  We can check if $E\left[F_n\left(z\right)\right] = \Phi\left(z\right)$ by looking at if the average
+$$
+\bar R_\alpha \approx \begin{cases} n\Phi\left(z_\alpha\right) = n\alpha & \alpha \leq 0.5 \\ n\left(1-\Phi\left(z_\alpha\right)\right) = n\left(1 - \alpha\right) & \alpha > 0.5\end{cases} \ .
+$$
+We may also compare the frequencies of $R_\alpha^i$ with their theoretical expected values $m \times \text{Binomial}\left(n, \alpha\right)$ (in blue) assuming $z_{ij}$ are independent.
+
+```{r, cache = TRUE, echo = FALSE}
+tail.num = function(x, alpha) {
+  num = ifelse(alpha <= 0.5,
+               sum(as.numeric(x) <= qnorm(alpha)),
+               sum(as.numeric(x) >= qnorm(alpha))
+        ) 
+}
+```
+
+```{r, cache = TRUE, echo = FALSE}
+alpha.vec.row = c(0.0001, 0.0005, 0.001, 0.005, 0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99, 0.995, 0.999, 0.9995, 0.9999)
+tail.row = c()
+for (alpha in alpha.vec.row) {
+  tail.row = cbind(
+    tail.row,
+    apply(z.null, 1, tail.num, alpha = alpha)
+  )
+}
+colnames(tail.row) = alpha.vec.row
+saveRDS(tail.row, "../output/tail.row_z_null_liver_777.RDS")
+```
+
+```{r, cache = TRUE, echo = FALSE}
+tail.row = readRDS("../output/tail.row_z_null_liver_777.RDS")
+alpha.vec.row = colnames(tail.row)
+for (alpha in alpha.vec.row) {
+  alpha.adj = ifelse(as.numeric(alpha) <= 0.5, as.numeric(alpha), 1 - as.numeric(alpha))
+  plot(table(tail.row[, alpha]),
+       xlab = bquote(R[.(alpha)]^i),
+       ylab = "Frequencies")
+  if (as.numeric(alpha) <= 0.5) {
+    title(bquote(paste("Correlated case: ", bar(R)[.(alpha)] == .(mean(tail.row[, alpha])), ", ", n %*% alpha == .(n * as.numeric(alpha)))))
+  } else {
+    title(bquote(paste("Correlated case: ", bar(R)[.(alpha)] == .(mean(tail.row[, alpha])), ", ", n %*% (1 - alpha) == .(n * (1 - as.numeric(alpha))))))
+  }
+  abline(v = alpha.adj * n, col = "red")
+  range.alpha.row = range(tail.row[, alpha])
+  expt.alpha.row = dbinom(range.alpha.row[1] : range.alpha.row[2], n, prob = alpha.adj) * m
+  lines(range.alpha.row[1] : range.alpha.row[2], expt.alpha.row, col = "blue")
+}
+```
+
+### Independent case: row-wise
+
+```{r, cache = TRUE, echo = FALSE}
+alpha.vec.row = c(0.0001, 0.0005, 0.001, 0.005, 0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99, 0.995, 0.999, 0.9995, 0.9999)
+tail.row = c()
+for (alpha in alpha.vec.row) {
+  tail.row = cbind(
+    tail.row,
+    apply(z.sim, 1, tail.num, alpha = alpha)
+  )
+}
+colnames(tail.row) = alpha.vec.row
+alpha.vec.row = colnames(tail.row)
+for (alpha in alpha.vec.row) {
+  alpha.adj = ifelse(as.numeric(alpha) <= 0.5, as.numeric(alpha), 1 - as.numeric(alpha))
+  plot(table(tail.row[, alpha]),
+       xlab = bquote(R[.(alpha)]^i),
+       ylab = "Frequencies")
+  if (as.numeric(alpha) <= 0.5) {
+    title(bquote(paste("Independent case: ", bar(R)[.(alpha)] == .(mean(tail.row[, alpha])), ", ", n %*% alpha == .(n * as.numeric(alpha)))))
+  } else {
+    title(bquote(paste("Independent case: ", bar(R)[.(alpha)] == .(mean(tail.row[, alpha])), ", ", n %*% (1 - alpha) == .(n * (1 - as.numeric(alpha))))))
+  }
+  abline(v = alpha.adj * n, col = "red")
+  range.alpha.row = range(tail.row[, alpha])
+  expt.alpha.row = dbinom(range.alpha.row[1] : range.alpha.row[2], n, prob = alpha.adj) * m
+  lines(range.alpha.row[1] : range.alpha.row[2], expt.alpha.row, col = "blue")
+}
+```
+
+## Column-wise: closer to $N\left(0, 1\right)$
+
+Each column of $z$ should be seen as $z$ scores of a non-differentially expressed gene in different data sets.  Therefore, column-wise, the empirical distribution $F_m^{C_j}\left(z\right)$ should be closer to $\Phi\left(z\right)$ than $F_m^{R_i}\left(z\right)$.
+
+Similarly, we are plotting $C_\alpha^i$, compared with their theoretical frequencies as follows.
+
+```{r, cache = TRUE, echo = FALSE}
+alpha.vec.col = c(0.001, 0.005, 0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99, 0.995, 0.999)
+tail.col = c()
+for (alpha in alpha.vec.col) {
+  tail.col = cbind(
+    tail.col,
+    apply(z.null, 2, tail.num, alpha = alpha)
+  )
+}
+colnames(tail.col) = alpha.vec.col
+saveRDS(tail.col, "../output/tail.col_z_null_liver_777.RDS")
+```
+
+```{r, cache = TRUE, echo = FALSE}
+tail.col = readRDS("../output/tail.col_z_null_liver_777.RDS")
+alpha.vec.col = colnames(tail.col)
+for (alpha in alpha.vec.col) {
+  alpha.adj = ifelse(as.numeric(alpha) <= 0.5, as.numeric(alpha), 1 - as.numeric(alpha))
+  plot(table(tail.col[, alpha]),
+       xlab = bquote(C[.(alpha)]^i),
+       ylab = "Frequencies")
+  if (as.numeric(alpha) <= 0.5) {
+    title(bquote(paste("Correlated case: ", bar(C)[.(alpha)] == .(mean(tail.col[, alpha])), ", ", m %*% alpha == .(m * as.numeric(alpha)))))
+  } else {
+    title(bquote(paste("Correlated case: ", bar(C)[.(alpha)] == .(mean(tail.col[, alpha])), ", ", m %*% (1 - alpha) == .(m * (1 - as.numeric(alpha))))))
+  }
+  abline(v = alpha.adj * m, col = "red")
+  range.alpha.col = range(tail.col[, alpha])
+  expt.alpha.col = dbinom(range.alpha.col[1] : range.alpha.col[2], m, prob = alpha.adj) * n
+  lines(range.alpha.col[1] : range.alpha.col[2], expt.alpha.col, col = "blue")
+}
+```
+
+### Independent case: column wise
+
+```{r, cache = TRUE, echo = FALSE}
+alpha.vec.col = c(0.001, 0.005, 0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99, 0.995, 0.999)
+tail.col = c()
+for (alpha in alpha.vec.col) {
+  tail.col = cbind(
+    tail.col,
+    apply(z.sim, 2, tail.num, alpha = alpha)
+  )
+}
+colnames(tail.col) = alpha.vec.col
+alpha.vec.col = colnames(tail.col)
+for (alpha in alpha.vec.col) {
+  alpha.adj = ifelse(as.numeric(alpha) <= 0.5, as.numeric(alpha), 1 - as.numeric(alpha))
+  plot(table(tail.col[, alpha]),
+       xlab = bquote(C[.(alpha)]^i),
+       ylab = "Frequencies")
+  if (as.numeric(alpha) <= 0.5) {
+    title(bquote(paste("Independent case: ", bar(C)[.(alpha)] == .(mean(tail.col[, alpha])), ", ", m %*% alpha == .(m * as.numeric(alpha)))))
+  } else {
+    title(bquote(paste("Independent case: ", bar(C)[.(alpha)] == .(mean(tail.col[, alpha])), ", ", m %*% (1 - alpha) == .(m * (1 - as.numeric(alpha))))))
+  }
+  abline(v = alpha.adj * m, col = "red")
+  range.alpha.col = range(tail.col[, alpha])
+  expt.alpha.col = dbinom(range.alpha.col[1] : range.alpha.col[2], m, prob = alpha.adj) * n
+  lines(range.alpha.col[1] : range.alpha.col[2], expt.alpha.col, col = "blue")
+}
+```
+
+
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```
