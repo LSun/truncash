@@ -31,7 +31,7 @@ knitr::read_chunk("chunks.R")
 Being in the development stage, `cvxr` is not very efficient at [the convex optimization](gaussian_derivatives.html) in fitting Gaussian derivatives.  We are moving to `Rmosek`.
 
 ```{r, echo = TRUE, message = FALSE}
-source("../code/opt.mosek.R")
+source("../code/gdash.R")
 ```
 
 ```{r, cache = TRUE, message = FALSE}
@@ -107,7 +107,7 @@ for (i in both.good) {
 
 ## Remarks
 
-The implementation by `Rmosek` is more convenient, cleaner, yet more complicated.  Need to understand different issues such as initialization, controlling parameters, dual construction, etc.
+The implementation by `Rmosek` is more convenient, cleaner, yet more complicated.  Need to understand different issues such as initialization, optimal orders, controlling parameters, dual construction, etc.
 
 ## Session information
 
