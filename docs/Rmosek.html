@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+<meta name="author" content="Lei Sun" />
+
+<meta name="date" content="2017-05-02" />
+
+<title>Implementation by Rmosek</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs && document.readyState && document.readyState === "complete") {
+   window.setTimeout(function() {
+      hljs.initHighlighting();
+   }, 0);
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">truncash</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/LSun/truncash">
+    <span class="fa fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Implementation by <code>Rmosek</code></h1>
+<h4 class="author"><em>Lei Sun</em></h4>
+<h4 class="date"><em>2017-05-02</em></h4>
+
+</div>
+
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+<!-- Update knitr chunk options -->
+<!-- Insert the date the file was last updated -->
+<p><strong>Last updated:</strong> 2017-05-06</p>
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+<p><strong>Code version:</strong> 06eff07</p>
+<!-- Add your analysis here -->
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>Being in the development stage, <code>cvxr</code> is not very efficient at <a href="gaussian_derivatives.html">the convex optimization</a> in fitting Gaussian derivatives. We are moving to <code>Rmosek</code>.</p>
+<pre class="r"><code>source(&quot;../code/gdash.R&quot;)</code></pre>
+<pre class="r"><code>z.mat = read.table(&quot;../output/z_null_liver_777.txt&quot;)
+fd.bh = scan(&quot;../output/fd.bh.0.05_null_liver_777.txt&quot;)
+pihat0 = scan(&quot;../output/pihat0_z_null_liver_777.txt&quot;)</code></pre>
+</div>
+<div id="bad" class="section level2">
+<h2>Bad</h2>
+<p>These data sets are unfriendly for both <code>BH</code> and <code>ASH</code>.</p>
+<pre><code>Data Set  355 :
+ Number of BH false discoveries:  639 ;
+ ASH&#39;s pihat0 =  0.04750946 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0.0225585778660563 ; 2 : 1.30307541409737 ; 3 : 0.0529119988564207 ; 4 : 0.86434625413445 ; 5 : 0 ; 6 : 0.115991285668782 ; 7 : 0 ; 8 : 0 ; 9 : 0 ; 10 : 0.012768069558034 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20bad-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20bad-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  23 :
+ Number of BH false discoveries:  408 ;
+ ASH&#39;s pihat0 =  0.03139009 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0.016039132567407 ; 2 : 1.34993003351774 ; 3 : 0.081263929095916 ; 4 : 0.714486051374311 ; 5 : 0.139320458700019 ; 6 : 0 ; 7 : 0.100823265137825 ; 8 : 0 ; 9 : 0.0608462191710317 ; 10 : 0.000964802431909129 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20bad-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20bad-4.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  122 :
+ Number of BH false discoveries:  331 ;
+ ASH&#39;s pihat0 =  0.04301549 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0.00711459304239053 ; 2 : 1.1037821799492 ; 3 : 0 ; 4 : 0.528402132228434 ; 5 : 0 ; 6 : 0 ; 7 : 0 ; 8 : 0 ; 9 : 0.000977244957534518 ; 10 : 0 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20bad-5.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20bad-6.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  749 :
+ Number of BH false discoveries:  114 ;
+ ASH&#39;s pihat0 =  0.02583276 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0.0458626422285871 ; 2 : 1.0692347200711 ; 3 : 0.00127673630293041 ; 4 : 0.437875595583542 ; 5 : 0 ; 6 : 0 ; 7 : 0.110561067339144 ; 8 : 0 ; 9 : 0.104817311821469 ; 10 : 0 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20bad-7.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20bad-8.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  724 :
+ Number of BH false discoveries:  79 ;
+ ASH&#39;s pihat0 =  0.01606004 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0.0352454327180146 ; 2 : 1.085621208483 ; 3 : 0.072031313135509 ; 4 : 0.313477034131008 ; 5 : 0 ; 6 : 0 ; 7 : 0 ; 8 : 0 ; 9 : 0 ; 10 : 0 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20bad-9.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20bad-10.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  56 :
+ Number of BH false discoveries:  35 ;
+ ASH&#39;s pihat0 =  0.04829662 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0.015603437988185 ; 2 : 0.863695602978145 ; 3 : 0.135238823162622 ; 4 : 0.336622180491709 ; 5 : 0.18630322261983 ; 6 : 0.00268136598387189 ; 7 : 0.0339747362866559 ; 8 : 0.0181307043838827 ; 9 : 0 ; 10 : 0.0344310653486728 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20bad-11.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20bad-12.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  840 :
+ Number of BH false discoveries:  28 ;
+ ASH&#39;s pihat0 =  0.02316832 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0 ; 2 : 1.03471486197017 ; 3 : 0 ; 4 : 0.329235042804543 ; 5 : 0 ; 6 : 0 ; 7 : 0 ; 8 : 0 ; 9 : 0.00321461375022215 ; 10 : 0.0593306511691146 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20bad-13.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20bad-14.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  858 :
+ Number of BH false discoveries:  16 ;
+ ASH&#39;s pihat0 =  0.05110069 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0 ; 2 : 1.00711281742885 ; 3 : 0 ; 4 : 0.390477482047559 ; 5 : 0 ; 6 : 0 ; 7 : 0.0551377637495718 ; 8 : 0 ; 9 : 0.0479292544081263 ; 10 : 0.0837572023674743 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20bad-15.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20bad-16.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  771 :
+ Number of BH false discoveries:  12 ;
+ ASH&#39;s pihat0 =  0.04316169 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0 ; 2 : 0.73920141158121 ; 3 : 0.077182005444609 ; 4 : 0.167446690539398 ; 5 : 0.114289140310117 ; 6 : 0 ; 7 : 0.00550636320542386 ; 8 : 0.0464055959765927 ; 9 : 0 ; 10 : 0.0398398101639301 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20bad-17.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20bad-18.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  389 :
+ Number of BH false discoveries:  11 ;
+ ASH&#39;s pihat0 =  0.03156173 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0.0104278129211743 ; 2 : 0.81975416226431 ; 3 : 0.175093847880514 ; 4 : 0.237691296370699 ; 5 : 0.0928656721296627 ; 6 : 0 ; 7 : 0 ; 8 : 0.0957748191090392 ; 9 : 0 ; 10 : 0.14869448917214 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20bad-19.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20bad-20.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  485 :
+ Number of BH false discoveries:  9 ;
+ ASH&#39;s pihat0 =  0.04794909 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0 ; 2 : 0.688297974677999 ; 3 : 0.102717821163846 ; 4 : 0.1348683673964 ; 5 : 0.0774735270815003 ; 6 : 0 ; 7 : 0 ; 8 : 0 ; 9 : 0 ; 10 : 0 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20bad-21.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20bad-22.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  77 :
+ Number of BH false discoveries:  7 ;
+ ASH&#39;s pihat0 =  0.05151585 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0.0316698203536559 ; 2 : 0.900083565443527 ; 3 : 0.369105500650609 ; 4 : 0.348606888712178 ; 5 : 0.225564147471124 ; 6 : 0 ; 7 : 0 ; 8 : 0 ; 9 : 0 ; 10 : 0 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20bad-23.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20bad-24.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  984 :
+ Number of BH false discoveries:  7 ;
+ ASH&#39;s pihat0 =  0.04567195 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0 ; 2 : 0.699043214591173 ; 3 : 0.100302581737407 ; 4 : 0.145190970625763 ; 5 : 0.0474679405200551 ; 6 : 0 ; 7 : 0 ; 8 : 0.134635889035747 ; 9 : 0 ; 10 : 0.110318005619196 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20bad-25.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20bad-26.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  360 :
+ Number of BH false discoveries:  6 ;
+ ASH&#39;s pihat0 =  0.0308234 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0.0370729985554797 ; 2 : 0.965843584122268 ; 3 : 0.113777617637278 ; 4 : 0.182892304104783 ; 5 : 0.0985758556513691 ; 6 : 0 ; 7 : 0 ; 8 : 0.175602983077514 ; 9 : 0 ; 10 : 0.128160801611689 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20bad-27.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20bad-28.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  522 :
+ Number of BH false discoveries:  4 ;
+ ASH&#39;s pihat0 =  0.02083846 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0 ; 2 : 0.836683104968565 ; 3 : 0 ; 4 : 0.0380324164945556 ; 5 : 0 ; 6 : 0 ; 7 : 0 ; 8 : 0.299307885307397 ; 9 : 0 ; 10 : 0.0990067134691387 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20bad-29.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20bad-30.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  22 :
+ Number of BH false discoveries:  1 ;
+ ASH&#39;s pihat0 =  0.03271534 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0.011182140702874 ; 2 : 0.637669154664922 ; 3 : 0.0954740117610049 ; 4 : 0.0145362179577236 ; 5 : 0.0384875211132818 ; 6 : 0 ; 7 : 0 ; 8 : 0 ; 9 : 0 ; 10 : 0.0366040528004269 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20bad-31.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20bad-32.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  269 :
+ Number of BH false discoveries:  1 ;
+ ASH&#39;s pihat0 =  0.02787007 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0.0350127752264117 ; 2 : 0.665763246213506 ; 3 : 0 ; 4 : 0 ; 5 : 0.360745065018111 ; 6 : 0 ; 7 : 0.660778015759139 ; 8 : 0 ; 9 : 0.341451404165077 ; 10 : 0 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20bad-33.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20bad-34.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  403 :
+ Number of BH false discoveries:  1 ;
+ ASH&#39;s pihat0 =  0.0531628 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0.00287620650301181 ; 2 : 0.547191548824974 ; 3 : 0 ; 4 : 0 ; 5 : 0.0381682188675178 ; 6 : 0.000237362926646135 ; 7 : 0.0760788952836512 ; 8 : 0.155507732499129 ; 9 : 0.0557968950438762 ; 10 : 0.00176813778552284 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20bad-35.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20bad-36.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  923 :
+ Number of BH false discoveries:  1 ;
+ ASH&#39;s pihat0 =  0.03239883 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0.0237509340668928 ; 2 : 0.920816163763449 ; 3 : 0.126877447333694 ; 4 : 0.158793996465808 ; 5 : 0.0298935777348498 ; 6 : 0 ; 7 : 0 ; 8 : 0 ; 9 : 0 ; 10 : 0 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20bad-37.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20bad-38.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  3 :
+ Number of BH false discoveries:  0 ;
+ ASH&#39;s pihat0 =  0.0465218 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0.0232314826078553 ; 2 : 0.491281828479503 ; 3 : 0.165633823951823 ; 4 : 0 ; 5 : 0 ; 6 : 0 ; 7 : 0 ; 8 : 0 ; 9 : 0 ; 10 : 0 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20bad-39.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20bad-40.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="good" class="section level2">
+<h2>Good</h2>
+<p>These data sets are friendly for both <code>BH</code> and <code>ASH</code>.</p>
+<pre><code>Data Set  4 :
+ Number of BH false discoveries:  0 ;
+ ASH&#39;s pihat0 =  1 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0 ; 2 : 0 ; 3 : 0.0220506376197135 ; 4 : 0 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  5 :
+ Number of BH false discoveries:  0 ;
+ ASH&#39;s pihat0 =  1 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0.00299571447314808 ; 2 : 0 ; 3 : 0 ; 4 : 0 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-4.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  7 :
+ Number of BH false discoveries:  0 ;
+ ASH&#39;s pihat0 =  1 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0 ; 2 : 0 ; 3 : 0 ; 4 : 0.0154789111560678 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-5.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-6.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  8 :
+ Number of BH false discoveries:  0 ;
+ ASH&#39;s pihat0 =  1 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0.0448250444179864 ; 2 : 0 ; 3 : 0 ; 4 : 0.143559202208159 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-7.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-8.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  9 :
+ Number of BH false discoveries:  0 ;
+ ASH&#39;s pihat0 =  1 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0 ; 2 : 0.00733790864173648 ; 3 : 0.0163403533804334 ; 4 : 0 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-9.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-10.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  12 :
+ Number of BH false discoveries:  0 ;
+ ASH&#39;s pihat0 =  1 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0 ; 2 : 0 ; 3 : 0 ; 4 : 0.0221346391841642 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-11.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-12.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  13 :
+ Number of BH false discoveries:  0 ;
+ ASH&#39;s pihat0 =  1 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0 ; 2 : 0 ; 3 : 0 ; 4 : 0 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-13.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-14.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  14 :
+ Number of BH false discoveries:  0 ;
+ ASH&#39;s pihat0 =  1 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0 ; 2 : 0 ; 3 : 0.0319220622489123 ; 4 : 0.0192425975845108 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-15.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-16.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  16 :
+ Number of BH false discoveries:  0 ;
+ ASH&#39;s pihat0 =  1 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0.0132467627058809 ; 2 : 0 ; 3 : 0.0050633052630629 ; 4 : 0.0460280223671055 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-17.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-18.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  17 :
+ Number of BH false discoveries:  0 ;
+ ASH&#39;s pihat0 =  1 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0.019759781277875 ; 2 : 0 ; 3 : 0 ; 4 : 0.0663856267063882 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-19.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-20.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  18 :
+ Number of BH false discoveries:  0 ;
+ ASH&#39;s pihat0 =  1 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0 ; 2 : 0 ; 3 : 0.0334151016576349 ; 4 : 0.00459370714209619 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-21.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-22.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  25 :
+ Number of BH false discoveries:  0 ;
+ ASH&#39;s pihat0 =  1 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0 ; 2 : 0 ; 3 : 0.0110557207434819 ; 4 : 0.165219572806289 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-23.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-24.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  28 :
+ Number of BH false discoveries:  0 ;
+ ASH&#39;s pihat0 =  1 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0.0200505087249252 ; 2 : 0 ; 3 : 0 ; 4 : 0 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-25.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-26.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  30 :
+ Number of BH false discoveries:  0 ;
+ ASH&#39;s pihat0 =  1 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0 ; 2 : 0 ; 3 : 0.0118483507943389 ; 4 : 0 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-27.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-28.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  34 :
+ Number of BH false discoveries:  0 ;
+ ASH&#39;s pihat0 =  1 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0 ; 2 : 0 ; 3 : 0.101371139384381 ; 4 : 0 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-29.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-30.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  35 :
+ Number of BH false discoveries:  0 ;
+ ASH&#39;s pihat0 =  1 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0.0165529780499778 ; 2 : 0 ; 3 : 0 ; 4 : 0.102360725261069 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-31.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-32.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  36 :
+ Number of BH false discoveries:  0 ;
+ ASH&#39;s pihat0 =  1 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0.00780175544762885 ; 2 : 0 ; 3 : 0 ; 4 : 0.0653975820808355 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-33.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-34.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  38 :
+ Number of BH false discoveries:  0 ;
+ ASH&#39;s pihat0 =  1 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0 ; 2 : 0 ; 3 : 0 ; 4 : 0.0643337534695275 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-35.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-36.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  42 :
+ Number of BH false discoveries:  0 ;
+ ASH&#39;s pihat0 =  1 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0 ; 2 : 0 ; 3 : 0.0117929353952078 ; 4 : 0.14259210767113 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-37.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-38.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  43 :
+ Number of BH false discoveries:  0 ;
+ ASH&#39;s pihat0 =  1 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0 ; 2 : 0 ; 3 : 0.0266591670097924 ; 4 : 0.119934975949713 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-39.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-40.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  45 :
+ Number of BH false discoveries:  0 ;
+ ASH&#39;s pihat0 =  1 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0.0197168202529947 ; 2 : 0 ; 3 : 0.00535774384797348 ; 4 : 0.0981326520063197 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-41.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-42.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  46 :
+ Number of BH false discoveries:  0 ;
+ ASH&#39;s pihat0 =  1 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0 ; 2 : 0 ; 3 : 0.0142593356797949 ; 4 : 0 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-43.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-44.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  47 :
+ Number of BH false discoveries:  0 ;
+ ASH&#39;s pihat0 =  1 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0.0553713103730739 ; 2 : 0 ; 3 : 0 ; 4 : 0.0424140129177028 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-45.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-46.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  49 :
+ Number of BH false discoveries:  0 ;
+ ASH&#39;s pihat0 =  1 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0 ; 2 : 0 ; 3 : 0.0399557075219927 ; 4 : 0.0203389185614439 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-47.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-48.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  52 :
+ Number of BH false discoveries:  0 ;
+ ASH&#39;s pihat0 =  1 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0.0717118497321021 ; 2 : 0 ; 3 : 0 ; 4 : 0 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-49.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-50.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  53 :
+ Number of BH false discoveries:  0 ;
+ ASH&#39;s pihat0 =  1 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0 ; 2 : 0 ; 3 : 0.0203994359033729 ; 4 : 0 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-51.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-52.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set  54 :
+ Number of BH false discoveries:  0 ;
+ ASH&#39;s pihat0 =  1 ;
+Normalized coefficients of Gaussian derivatives:
+ 1 : 0.0226491329325567 ; 2 : 0 ; 3 : 0 ; 4 : 0.0369913458520336 ;</code></pre>
+<p><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-53.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd%20fitting%20for%20good-54.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="remarks" class="section level2">
+<h2>Remarks</h2>
+<p>The implementation by <code>Rmosek</code> is more convenient, cleaner, yet more complicated. Need to understand different issues such as initialization, optimal orders, controlling parameters, dual construction, etc.</p>
+</div>
+<div id="session-information" class="section level2">
+<h2>Session information</h2>
+<!-- Insert the session information into the document -->
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 3.3.3 (2017-03-06)
+Platform: x86_64-apple-darwin13.4.0 (64-bit)
+Running under: macOS Sierra 10.12.4
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] Rmosek_7.1.3      PolynomF_0.94     cvxr_0.0.0.9009   REBayes_0.62     
+[5] Matrix_1.2-8      SQUAREM_2016.10-1 EQL_1.0-0         ttutils_1.0-1    
+
+loaded via a namespace (and not attached):
+ [1] Rcpp_0.12.10    lattice_0.20-34 digest_0.6.11   rprojroot_1.2  
+ [5] MASS_7.3-45     grid_3.3.3      backports_1.0.5 git2r_0.18.0   
+ [9] magrittr_1.5    evaluate_0.10   stringi_1.1.2   rmarkdown_1.3  
+[13] tools_3.3.3     stringr_1.2.0   yaml_2.1.14     htmltools_0.3.5
+[17] knitr_1.15.1   </code></pre>
+</div>
+
+<hr>
+<p>
+    This <a href="http://rmarkdown.rstudio.com">R Markdown</a> site was created with <a href="https://github.com/jdblischak/workflowr">workflowr</a>
+</p>
+<hr>
+
+<!-- To enable disqus, uncomment the section below and provide your disqus_shortname -->
+
+<!-- disqus
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'rmarkdown'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+-->
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
