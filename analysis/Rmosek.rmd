@@ -1,0 +1,116 @@
+---
+title: "Implementation by `Rmosek`"
+author: "Lei Sun"
+date: 2017-05-02
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+## Introduction
+
+Being in the development stage, `cvxr` is not very efficient at [the convex optimization](gaussian_derivatives.html) in fitting Gaussian derivatives.  We are moving to `Rmosek`.
+
+```{r, echo = TRUE, message = FALSE}
+source("../code/opt.mosek.R")
+```
+
+```{r, cache = TRUE, message = FALSE}
+z.mat = read.table("../output/z_null_liver_777.txt")
+fd.bh = scan("../output/fd.bh.0.05_null_liver_777.txt")
+pihat0 = scan("../output/pihat0_z_null_liver_777.txt")
+```
+
+```{r, cache = TRUE, echo = FALSE}
+bh.bad = order(fd.bh, decreasing = TRUE)[1:50]
+ash.bad = order(pihat0, decreasing = FALSE)[1:50]
+both.bad = intersect(bh.bad, ash.bad)
+
+bh.good = order(fd.bh, decreasing = FALSE)[1:50]
+ash.good = order(pihat0, decreasing = TRUE)[1:50]
+both.good = intersect(bh.good, ash.good)
+```
+
+```{r, cache = TRUE, echo = FALSE}
+x.pt = seq(-5, 5, 0.01)
+H.pt = sapply(1:10, EQL::hermite, x = x.pt)
+```
+
+## Bad
+
+These data sets are unfriendly for both `BH` and `ASH`.
+
+```{r gd fitting for bad, cache = TRUE, echo = FALSE}
+for (i in both.bad) {
+  cat("Data Set ", i, ":\n", "Number of BH false discoveries: ", fd.bh[i], ";\n", "ASH's pihat0 = ", pihat0[i], ";\n")
+  z = as.numeric(z.mat[i, ])
+  H = sapply(1 : 10, EQL::hermite, x = z)
+  H = cbind(1, H)
+  w.fit = w.mosek(H)
+  cat("Normalized coefficients of Gaussian derivatives:\n", rbind(paste(1:10, ":"), paste(w.fit$w * sqrt(factorial(1:10)), ";")), sep = " ")
+  y.pt = (H.pt %*% w.fit$w + 1) * dnorm(x.pt)
+  plot.hist = hist(z, breaks = 100, plot = FALSE)
+  ylim = range(c(plot.hist$density, y.pt, dnorm(0)))
+  hist(z, breaks = 100, probability = TRUE, ylim = ylim, xlab = "Correlated z scores", main = "Histogram of correlated z scores")
+  lines(x.pt, dnorm(x.pt), col = "red")
+  lines(x.pt, y.pt, col = "blue")
+  plot(ecdf(z), main = "Empirical CDF of correlated z scores")
+  lines(x.pt, pnorm(x.pt), col = "red")
+  Y.pt = pnorm(x.pt) - (cbind(1, H.pt)[, 1:10] %*% w.fit$w) * dnorm(x.pt)
+  lines(x.pt, Y.pt, col = "blue")
+}
+```
+
+## Good
+
+These data sets are friendly for both `BH` and `ASH`.
+
+```{r gd fitting for good, cache = TRUE, echo = FALSE}
+for (i in both.good) {
+  cat("Data Set ", i, ":\n", "Number of BH false discoveries: ", fd.bh[i], ";\n", "ASH's pihat0 = ", pihat0[i], ";\n")
+  z = as.numeric(z.mat[i, ])
+  H = sapply(1 : 4, EQL::hermite, x = z)
+  H = cbind(1, H)
+  w.fit = w.mosek(H)
+  cat("Normalized coefficients of Gaussian derivatives:\n", rbind(paste(1:4, ":"), paste(w.fit$w * sqrt(factorial(1:4)), ";")), sep = " ")
+  y.pt = (H.pt[, 1:4] %*% w.fit$w + 1) * dnorm(x.pt)
+  plot.hist = hist(z, breaks = 100, plot = FALSE)
+  ylim = range(c(plot.hist$density, y.pt, dnorm(0)))
+  hist(z, breaks = 100, probability = TRUE, ylim = ylim, xlab = "Correlated z scores", main = "Histogram of correlated z scores")
+  lines(x.pt, dnorm(x.pt), col = "red")
+  lines(x.pt, y.pt, col = "blue")
+  plot(ecdf(z), main = "Empirical CDF of correlated z scores")
+  lines(x.pt, pnorm(x.pt), col = "red")
+  Y.pt = pnorm(x.pt) - (cbind(1, H.pt)[, 1:4] %*% w.fit$w) * dnorm(x.pt)
+  lines(x.pt, Y.pt, col = "blue")
+}
+```
+
+## Remarks
+
+The implementation by `Rmosek` is more convenient, cleaner, yet more complicated.  Need to understand different issues such as initialization, controlling parameters, dual construction, etc.
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```
