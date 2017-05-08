@@ -1,0 +1,305 @@
+---
+title: "Improvement on Implementation with `Rmosek`"
+author: "Lei Sun"
+date: 2017-05-07
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+## Introduction
+
+We are experimenting different ways to improve the performance of `Rmosek`, using typical data sets of correlated $z$ scores.
+
+```{r read in correlated z, cache = TRUE}
+z <- read.table("../output/z_null_liver_777.txt")
+```
+
+```{r select data sets, cache = TRUE}
+sel <- c(32, 327, 355, 483, 778)
+ord <- c(4, 9, 9, 4, 4)
+```
+
+```{r select z score matrix, cache = TRUE, echo = FALSE}
+sel.num = length(sel)
+zscore = list()
+for (i in 1 : sel.num) {
+  zscore[[i]] = as.numeric(z[sel[i], ])
+}
+```
+
+```{r gdash script, message = FALSE}
+source("../code/gdash.R")
+```
+
+```{r Hermite polynomials, cache = TRUE, echo = FALSE}
+library(PolynomF)
+x <- polynom()
+H <- polylist(x, - 1 + x^2)
+for(n in 2 : 19)
+  H[[n+1]] <- x * H[[n]] - n * H[[n-1]]
+```
+
+## Algorithm and variations
+
+Recall that our [biconvex optimization problem](ash_gd.html#optimization_problem) is as follows.
+
+$$
+\begin{array}{rl}
+\min\limits_{\pi,w} & -\sum\limits_{j = 1}^n\log\left(\sum\limits_{k = 1}^K\sum\limits_{l=1}^L\pi_k w_l f_{jkl} + \sum\limits_{k = 1}^K\pi_kf_{jk0}\right) - \sum\limits_{k = 1}^K\left(\lambda_k^\pi - 1\right)\log\pi_k + \sum\limits_{l = 1}^L\lambda_l^wpen\left(\left|w_l\right|\right)
+\\
+\text{subject to} & \sum\limits_{k = 1}^K\pi_k = 1\\
+& \sum\limits_{l=1}^L w_l \varphi^{(l)}\left(z\right) + \varphi\left(z\right) \geq 0, \forall z\in \mathbb{R}\\
+& w_l \text{ decay reasonably fast.}
+\end{array}
+$$
+This problem can be solved iteratively.  Starting with an initial value, each step two convex optimization problems are solved.
+
+With a given $\hat w$, $\hat\pi$ is solved by
+
+$$
+\begin{array}{rl}
+\min\limits_{\pi} & -\sum\limits_{j = 1}^n\log\left(\sum\limits_{k = 1}^K\pi_k \left(\sum\limits_{l=1}^L \hat w_l f_{jkl} + f_{jk0}\right)\right) - \sum\limits_{k = 1}^K\left(\lambda_k^\pi - 1\right)\log\pi_k\\
+\text{subject to} & \sum\limits_{k = 1}^K\pi_k = 1 \ ,\\
+\end{array}
+$$
+
+which is readily available with functions in `cvxr`.
+
+Meanwhile, with a given $\hat\pi$, the optimization problem to obtain $\hat w$ becomes
+
+$$
+\begin{array}{rl}
+\min\limits_{w} & -\sum\limits_{j = 1}^n\log\left(\sum\limits_{l=1}^Lw_l\left(\sum\limits_{k = 1}^K\hat\pi_k  f_{jkl}\right) + \sum\limits_{k = 1}^K\hat\pi_kf_{jk0}\right) + \sum\limits_{l = 1}^L\lambda_l^wpen\left(\left|w_l\right|\right)
+\\
+\text{subject to} & \sum\limits_{l=1}^L w_l \varphi^{(l)}\left(z\right) + \varphi\left(z\right) \geq 0, \forall z\in \mathbb{R}\\
+& w_l \text{ decay reasonably fast.}
+\end{array}
+$$
+The two constraints are important to prevent [numerical instability](gaussian_derivatives_3.html).  Yet they are not readily manifested as convex.  Ideally, the regularization $\sum\limits_{l = 1}^L\lambda_l^wpen\left(\left|w_l\right|\right)$ would be able to capture the essence of these two constaints, and at the same time maintain the convexity.  Different ideas will be explored.
+
+In this part, we'll mainly work on the "basic form" of the $w$ optimization problem; that is, the optimization problem without regularization $+ \sum\limits_{l = 1}^L\lambda_l^wpen\left(\left|w_l\right|\right)$.
+
+In the following, we'll take a look at the basic form in its primal and dual formulations, optimized by `w.mosek()` and `w.mosek.primal` functions.  First, they are applied to the correlated null, and their performance can be compared with [the previous implementation](gaussian_derivatives_2.html) by `cvxr`.  Then, they are applied to the simulated non-null data sets, and the results are compared with those obtained by `ASH`, as well as the truth.
+
+## Basic form: primal
+
+In its most basic form, the $w$ estimation problem is as follows.
+
+$$
+\begin{array}{rl}
+\min\limits_{w} & 
+-\sum\limits_{j = 1}^n
+\log\left(\sum\limits_{l=1}^Lw_l a_{jl} + a_{j0}\right) 
+\\
+\text{subject to} & \sum\limits_{l=1}^Lw_l a_{jl} + a_{j0} \geq 0, \forall j \ .\\
+\end{array}
+$$
+Let the matrix $A = \left[a_{jl}\right]$, the vector $a = \left[a_{j0}\right]$, and we have its equivalent form,
+
+$$
+\begin{array}{rl}
+\min\limits_{w, g} & 
+-\sum\limits_{j = 1}^n
+\log\left(g_j\right) 
+\\
+\text{subject to}
+& Aw + a = g \\
+& g \geq 0\ .
+\end{array}
+$$
+
+This problem can be coded by `Rmosek` as a "separable convex optimization" (SCOPT) problem.
+
+### Correlated null
+
+```{r Rmosek primal fitting, cache = TRUE, echo = FALSE}
+n = ncol(z)
+gd.primal = list()
+time.primal = list()
+for (i in 1 : sel.num) {
+  K = ord[i]
+  gd.mat = matrix(0, nrow = n, ncol = K)
+  for (k in 1 : K)
+    gd.mat[, k] = dnorm(zscore[[i]]) * H[[k]](zscore[[i]])
+  gd.mat = cbind(dnorm(zscore[[i]]), gd.mat)
+  time.primal[[i]] <- system.time(gd.primal[[i]] <- w.mosek.primal(gd.mat, w_prior = rep(0, K)))
+}
+```
+
+```{r Rmosek primal fitting plotting, cache = TRUE, echo = FALSE}
+n = ncol(z)
+x.seq = seq(-6, 6, 0.01)
+for (i in 1 : sel.num) {
+  K = ord[i]
+  gd.seq.mat = matrix(0, nrow = length(x.seq), ncol = K)
+  for (k in 1 : K)
+    gd.seq.mat[, k] = dnorm(x.seq) * H[[k]](x.seq)
+  y.seq = gd.seq.mat %*% gd.primal[[i]]$w + dnorm(x.seq)
+  z.hist = hist(zscore[[i]], breaks = 100, plot = FALSE)
+  z.hist.ymax = max(c(z.hist$density, dnorm(0)))
+  cat("Fitted w:", gd.primal[[i]]$w, "\n")
+  cat("Time Cost in Seconds:", time.primal[[i]][1:3], "\n")
+  hist(zscore[[i]], breaks = 100, probability = TRUE, ylim = c(0, z.hist.ymax), main = "Histogram of Correlated Z Scores", xlab = "Correlated Z Scores")
+  lines(x.seq, dnorm(x.seq), col = "red")
+  lines(x.seq, y.seq, col = "blue")
+}
+```
+
+### Signal $+$ correlated error
+
+```{r signal simulation, cache = TRUE, echo = FALSE}
+true.g = ashr::normalmix(pi = c(0.6, 0.3, 0.1), mean = 0, sd = c(0, 2, 4))
+x = seq(-10, 10, 0.01)
+y.true = ashr::mixcdf(true.g, x, lower.tail = TRUE)
+beta <- c(
+  rep(0, 6000),
+  rnorm(3000, 0, 2),
+  rnorm(1000, 0, 4)
+)
+beta <- sample(beta)
+sebetahat <- rep(1, 1e4)
+betahat <- list()
+for (i in 1 : sel.num) {
+  betahat[[i]] = beta + sebetahat * zscore[[i]]
+}
+```
+
+```{r ash signal fitting, cache = TRUE, echo = FALSE}
+ash.signal = list()
+for (i in 1 : sel.num) {
+  ash.signal[[i]] <- ashr::ash(betahat[[i]], 1, mixcompdist = "normal", method = "fdr")
+}
+```
+
+```{r gdash primal signal fitting, cache = TRUE, echo = FALSE}
+time.primal.signal = list()
+gd.primal.signal = list()
+for (i in 1 : sel.num) {
+  time.primal.signal[[i]] <- system.time(gd.primal.signal[[i]] <- gdash(betahat[[i]], sebetahat, gd.ord = ord[i], primal = TRUE, gd.normalized = FALSE, w.lambda = NULL, mixcompdist = "normal", method = "fdr", control = list(maxiter = 100)))
+}
+```
+
+```{r gdash primal signal plotting, cache = TRUE, echo = FALSE}
+for (i in 1 : sel.num) {
+  cat("Converged:", gd.primal.signal[[i]]$converged, "\n")
+  cat("Number of Iteration:", gd.primal.signal[[i]]$niter, "\n")
+  cat("Time Cost in Seconds:", time.primal.signal[[i]][1:3], "\n")
+  plot(x, y.true, type = "l", ylab = expression(F[hat(g)](x)),
+       main = "CDF of Fitted g")
+  y.gdash = ashr::mixcdf(gd.primal.signal[[i]]$fitted_g, x, lower.tail = TRUE)
+  y.ash = ashr::mixcdf(ash.signal[[i]]$fitted_g, x, lower.tail = TRUE)
+  lines(x, y.ash, col = "red", lty = 2)
+  lines(x, y.gdash, col = "blue")
+  legend("topleft", lty = c(1, 2, 1), col = c("black", "red", "blue"), legend = c("True", "ASH", "GD-ASH"))
+}
+```
+
+## Basic form: dual
+
+The primal $w$ optimization problem has $n + L$ variables and $n$ constraints.  When $n$ is large, such as $n = 10K$ in our simulations, the time cost is usually substantial.  As the authors of `REBayes` pointed out, it's better to work on the dual form, which is
+
+$$
+\begin{array}{rl}
+\min\limits_{v} & 
+-\sum\limits_{j = 1}^n
+\log\left(v_j\right) + a^Tv
+\\
+\text{subject to}
+& A^Tv = 0 \\
+& v \geq 0\ .
+\end{array}
+$$
+The dual form has $n$ variables and more importantly, only $L$ constraints.  As $L \ll n$, the dual form is far more computationally efficient.
+
+`Rmosek` provides optimal solutions to both primal and dual variables, so $\hat w$ is readily available when working on $v$ optimization.  But we need to be careful on which dual variables to use, such as `$sol$itr$suc`, `$sol$itr$slc`, or others.
+
+### Correlated null
+
+```{r Rmosek dual fitting, cache = TRUE, echo = FALSE}
+n = ncol(z)
+gd.dual = list()
+time.dual = list()
+for (i in 1 : sel.num) {
+  K = ord[i]
+  gd.mat = matrix(0, nrow = n, ncol = K)
+  for (k in 1 : K)
+    gd.mat[, k] = dnorm(zscore[[i]]) * H[[k]](zscore[[i]])
+  gd.mat = cbind(dnorm(zscore[[i]]), gd.mat)
+  time.dual[[i]] <- system.time(gd.dual[[i]] <- w.mosek(gd.mat, w_prior = rep(0, K)))
+}
+```
+
+```{r Rmosek dual fitting plotting, cache = TRUE, echo = FALSE}
+n = ncol(z)
+x.seq = seq(-6, 6, 0.01)
+for (i in 1 : sel.num) {
+  K = ord[i]
+  gd.seq.mat = matrix(0, nrow = length(x.seq), ncol = K)
+  for (k in 1 : K)
+    gd.seq.mat[, k] = dnorm(x.seq) * H[[k]](x.seq)
+  y.seq = gd.seq.mat %*% gd.dual[[i]]$w + dnorm(x.seq)
+  z.hist = hist(zscore[[i]], breaks = 100, plot = FALSE)
+  z.hist.ymax = max(c(z.hist$density, dnorm(0)))
+  cat("Fitted w:", gd.dual[[i]]$w, "\n")
+  cat("Time Cost in Seconds:", time.dual[[i]][1:3], "\n")
+  hist(zscore[[i]], breaks = 100, probability = TRUE, ylim = c(0, z.hist.ymax), main = "Histogram of Correlated Z Scores", xlab = "Correlated Z Scores")
+  lines(x.seq, dnorm(x.seq), col = "red")
+  lines(x.seq, y.seq, col = "blue")
+}
+```
+
+### Signal $+$ correlated error
+
+```{r gdash dual signal fitting, cache = TRUE, echo = FALSE}
+time.dual.signal = list()
+gd.dual.signal = list()
+for (i in 1 : sel.num) {
+  time.dual.signal[[i]] <- system.time(gd.dual.signal[[i]] <- gdash(betahat[[i]], sebetahat, gd.ord = ord[i], primal = FALSE, gd.normalized = FALSE, w.lambda = NULL, mixcompdist = "normal", method = "fdr", control = list(maxiter = 1000)))
+}
+```
+
+```{r gdash dual signal plotting, cache = TRUE, echo = FALSE}
+for (i in 1 : sel.num) {
+  cat("Converged:", gd.dual.signal[[i]]$converged, "\n")
+  cat("Number of Iteration:", gd.dual.signal[[i]]$niter, "\n")
+  cat("Time Cost in Seconds:", time.dual.signal[[i]][1:3], "\n")
+  plot(x, y.true, type = "l", ylab = expression(F[hat(g)](x)),
+       main = "CDF of Fitted g")
+  y.gdash = ashr::mixcdf(gd.dual.signal[[i]]$fitted_g, x, lower.tail = TRUE)
+  y.ash = ashr::mixcdf(ash.signal[[i]]$fitted_g, x, lower.tail = TRUE)
+  lines(x, y.ash, col = "red", lty = 2)
+  lines(x, y.gdash, col = "blue")
+  legend("topleft", lty = c(1, 2, 1), col = c("black", "red", "blue"), legend = c("True", "ASH", "GD-ASH"))
+}
+```
+
+## Conclusion
+
+Implementation by `Rmosek` can fully reproduce the results obtained by `cvxr`.  Moreover, the dual form gives the same results as the primal dorm does, with only a fraction of time.
+
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```

@@ -88,10 +88,6 @@ Both true effects and correlation can distort the empirical distribution away fr
 
 Under the exchangeability assumption, the goodness of fit of empirical Bayes can be measured by the behavior of $\left\{\hat F_j = \hat F_{\hat\beta_j | \hat s_j}\left(\hat\beta_j\mid\hat s_j\right)\right\}$.  Meanwhile, if `ASH` is applied to correlated null $z$ scores, estimated $\hat g$ will not only be different from $\delta_0$; moreover, with this estimated $\hat g$, $\left\{\hat F_j\right\}$ might not behave like $\text{Unif}\left[0, 1\right]$.
 
-* [Normal means inference with heteroskedastic and correlated noise: Model](ash_gd.html)
-
-The previous investigation is boiled down to a prototypical problem: the classic normal means inference, but with heteroskedastic and especially correlated noise.  Gaussian derivatives and `ASH` provide a way to tackle it.
-
 * [Diagnostic Plots for Uniformity](diagnostic_plot_2.html)
 * [Diagnostic Plots for `ASH`](diagnostic_ash.html)
 
@@ -101,11 +97,16 @@ Essentially we hope to tell whether $n$ random samples are uniformly distributed
 
 Take a look at the $z$ scores we've been experimenting with so far and check whether they truly are marginally $N\left(0, 1\right)$.  It's an enhanced version of the simulation on [occurrence of extreme observations](ExtremeOccurrence.html).
 
-* [Implementation by `Rmosek`](Rmosek.html)
+* [Normal means inference with heteroskedastic and correlated noise: Model](ash_gd.html)
 
-`cvxr` is still under active development.  We are moving to the more established `Rmosek`.
+The previous investigation is boiled down to a prototypical problem: the classic normal means inference, but with heteroskedastic and especially correlated noise.  Gaussian derivatives and `ASH` provide a way to tackle it.
 
-* [Normal means inference with heteroskedastic and correlated noise: Model](gd_ash.html)
+* [Implementation by `Rmosek`: Correlated null](Rmosek.html)
+* [Implementation by `Rmosek`: Simulated non-null](gd_ash.html)
+
+`cvxr` is still under active development.  We are moving to the more established `Rmosek`, exploring and experimenting this convex optimization package.
+
+* [Improvement on Implementation with `Rmosek`: Primal and dual](mosek_reg.html)
 
 [`ashr`]: https://github.com/stephens999/ashr
 

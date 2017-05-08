@@ -1,0 +1,93 @@
+---
+title: "Implementation by `Rmosek`: Simulated Non-Null"
+author: "Lei Sun"
+date: 2017-05-06
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+## Introduction
+
+We are exploring the [`GD-ASH` method](ash_gd.html) to fit $g$ and the empirical null together.
+
+```{r read z scores, cache = TRUE}
+z <- read.table("../output/z_null_liver_777.txt")
+n = ncol(z)
+```
+
+```{r selected data sets, cache = TRUE}
+sel <- c(32, 327, 355, 483, 778)
+ord <- c(4, 9, 9, 4, 4)
+sel.num = length(sel)
+```
+
+```{r cdf of true g, echo = FALSE, cache = TRUE}
+true.g = ashr::normalmix(pi = c(0.6, 0.3, 0.1), mean = 0, sd = c(0, 2, 4))
+x = seq(-10, 10, 0.01)
+y.true = ashr::mixcdf(true.g, x, lower.tail = TRUE)
+```
+
+```{r true effects and simulated measures, cache = TRUE}
+beta <- c(
+  rep(0, 6000),
+  rnorm(3000, 0, 2),
+  rnorm(1000, 0, 4)
+)
+beta <- sample(beta)
+sebetahat <- rep(1, 1e4)
+betahat.mat <- matrix(0, nrow = sel.num, ncol = n)
+for (i in 1 : sel.num) {
+  betahat.mat[i, ] = beta + sebetahat * as.numeric(z[sel[i], ])
+}
+```
+
+```{r implementation, message = FALSE, cache = TRUE}
+source("../code/gdash.R")
+```
+
+```{r fitting, echo = FALSE, cache = TRUE}
+gdash.fit = ash.fit = list()
+gdash.time = c()
+for (i in 1 : sel.num) {
+  ash.fit[[i]] <- ashr::ash(betahat.mat[i, ], sebetahat, mixcompdist = "normal", method = "fdr")
+  gdash.time[i] <- system.time(gdash.fit[[i]] <- gdash(betahat.mat[i, ], sebetahat, gd.ord = ord[i], primal = FALSE, gd.normalized = FALSE, w.lambda = 0, w.rho = 0.5, control = list(maxiter = 100)))[3]
+}
+```
+
+```{r plotting, echo = FALSE}
+for (i in 1 : sel.num) {
+  plot(x, y.true, type = "l", ylab = expression(F[hat(g)](x)),
+       main = "CDF of Fitted g")
+  y.gdash = ashr::mixcdf(gdash.fit[[i]]$fitted_g, x, lower.tail = TRUE)
+  y.ash = ashr::mixcdf(ash.fit[[i]]$fitted_g, x, lower.tail = TRUE)
+  lines(x, y.gdash, col = "blue")
+  lines(x, y.ash, col = "red", lty = 2)
+  legend("topleft", lty = 1, col = c("black", "red", "blue"), legend = c("True", "ASH", "GD-ASH"))
+}
+```
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```

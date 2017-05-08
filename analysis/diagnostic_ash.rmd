@@ -61,6 +61,21 @@ for (i in 1:10) {
 
 All have been put into the `ashr::plot_diagnostic` function.
 
+## Illustration
+
+```{r, cache = TRUE, echo = FALSE}
+z = read.table("../output/z_null_liver_777.txt")
+```
+
+```{r, cache = TRUE, echo = FALSE}
+betahat = as.numeric(z[327, ])
+hist(betahat, breaks = 100, prob = TRUE, ylim = c(0, dnorm(0)), xlab = "Correlated Z Scores", main = "Histogram of Correlated Z Scores")
+lines(seq(-6, 6, 0.01), dnorm(seq(-6, 6, 0.01)), col = "red")
+legend("topleft", lty = 1, col = "red", legend = "N(0, 1)")
+fit = ashr::ash(betahat, 1, mixcompdist = "normal", method = "fdr")
+plot_diagnostic(fit)
+```
+
 ## Session information
 
 <!-- Insert the session information into the document -->
