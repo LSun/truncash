@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+<meta name="author" content="Lei Sun" />
+
+<meta name="date" content="2017-05-07" />
+
+<title>Improvement on Implementation with Rmosek</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs && document.readyState && document.readyState === "complete") {
+   window.setTimeout(function() {
+      hljs.initHighlighting();
+   }, 0);
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">truncash</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/LSun/truncash">
+    <span class="fa fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Improvement on Implementation with <code>Rmosek</code></h1>
+<h4 class="author"><em>Lei Sun</em></h4>
+<h4 class="date"><em>2017-05-07</em></h4>
+
+</div>
+
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+<!-- Update knitr chunk options -->
+<!-- Insert the date the file was last updated -->
+<p><strong>Last updated:</strong> 2017-05-08</p>
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+<p><strong>Code version:</strong> 6bac69e</p>
+<!-- Add your analysis here -->
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>We are experimenting different ways to improve the performance of <code>Rmosek</code>, using typical data sets of correlated <span class="math inline">\(z\)</span> scores.</p>
+<pre class="r"><code>z &lt;- read.table(&quot;../output/z_null_liver_777.txt&quot;)</code></pre>
+<pre class="r"><code>sel &lt;- c(32, 327, 355, 483, 778)
+ord &lt;- c(4, 9, 9, 4, 4)</code></pre>
+<pre class="r"><code>source(&quot;../code/gdash.R&quot;)</code></pre>
+</div>
+<div id="algorithm-and-variations" class="section level2">
+<h2>Algorithm and variations</h2>
+<p>Recall that our <a href="ash_gd.html#optimization_problem">biconvex optimization problem</a> is as follows.</p>
+<p><span class="math display">\[
+\begin{array}{rl}
+\min\limits_{\pi,w} &amp; -\sum\limits_{j = 1}^n\log\left(\sum\limits_{k = 1}^K\sum\limits_{l=1}^L\pi_k w_l f_{jkl} + \sum\limits_{k = 1}^K\pi_kf_{jk0}\right) - \sum\limits_{k = 1}^K\left(\lambda_k^\pi - 1\right)\log\pi_k + \sum\limits_{l = 1}^L\lambda_l^wpen\left(\left|w_l\right|\right)
+\\
+\text{subject to} &amp; \sum\limits_{k = 1}^K\pi_k = 1\\
+&amp; \sum\limits_{l=1}^L w_l \varphi^{(l)}\left(z\right) + \varphi\left(z\right) \geq 0, \forall z\in \mathbb{R}\\
+&amp; w_l \text{ decay reasonably fast.}
+\end{array}
+\]</span> This problem can be solved iteratively. Starting with an initial value, each step two convex optimization problems are solved.</p>
+<p>With a given <span class="math inline">\(\hat w\)</span>, <span class="math inline">\(\hat\pi\)</span> is solved by</p>
+<p><span class="math display">\[
+\begin{array}{rl}
+\min\limits_{\pi} &amp; -\sum\limits_{j = 1}^n\log\left(\sum\limits_{k = 1}^K\pi_k \left(\sum\limits_{l=1}^L \hat w_l f_{jkl} + f_{jk0}\right)\right) - \sum\limits_{k = 1}^K\left(\lambda_k^\pi - 1\right)\log\pi_k\\
+\text{subject to} &amp; \sum\limits_{k = 1}^K\pi_k = 1 \ ,\\
+\end{array}
+\]</span></p>
+<p>which is readily available with functions in <code>cvxr</code>.</p>
+<p>Meanwhile, with a given <span class="math inline">\(\hat\pi\)</span>, the optimization problem to obtain <span class="math inline">\(\hat w\)</span> becomes</p>
+<p><span class="math display">\[
+\begin{array}{rl}
+\min\limits_{w} &amp; -\sum\limits_{j = 1}^n\log\left(\sum\limits_{l=1}^Lw_l\left(\sum\limits_{k = 1}^K\hat\pi_k  f_{jkl}\right) + \sum\limits_{k = 1}^K\hat\pi_kf_{jk0}\right) + \sum\limits_{l = 1}^L\lambda_l^wpen\left(\left|w_l\right|\right)
+\\
+\text{subject to} &amp; \sum\limits_{l=1}^L w_l \varphi^{(l)}\left(z\right) + \varphi\left(z\right) \geq 0, \forall z\in \mathbb{R}\\
+&amp; w_l \text{ decay reasonably fast.}
+\end{array}
+\]</span> The two constraints are important to prevent <a href="gaussian_derivatives_3.html">numerical instability</a>. Yet they are not readily manifested as convex. Ideally, the regularization <span class="math inline">\(\sum\limits_{l = 1}^L\lambda_l^wpen\left(\left|w_l\right|\right)\)</span> would be able to capture the essence of these two constaints, and at the same time maintain the convexity. Different ideas will be explored.</p>
+<p>In this part, we’ll mainly work on the “basic form” of the <span class="math inline">\(w\)</span> optimization problem; that is, the optimization problem without regularization <span class="math inline">\(+ \sum\limits_{l = 1}^L\lambda_l^wpen\left(\left|w_l\right|\right)\)</span>.</p>
+<p>In the following, we’ll take a look at the basic form in its primal and dual formulations, optimized by <code>w.mosek()</code> and <code>w.mosek.primal</code> functions. First, they are applied to the correlated null, and their performance can be compared with <a href="gaussian_derivatives_2.html">the previous implementation</a> by <code>cvxr</code>. Then, they are applied to the simulated non-null data sets, and the results are compared with those obtained by <code>ASH</code>, as well as the truth.</p>
+</div>
+<div id="basic-form-primal" class="section level2">
+<h2>Basic form: primal</h2>
+<p>In its most basic form, the <span class="math inline">\(w\)</span> estimation problem is as follows.</p>
+<p><span class="math display">\[
+\begin{array}{rl}
+\min\limits_{w} &amp; 
+-\sum\limits_{j = 1}^n
+\log\left(\sum\limits_{l=1}^Lw_l a_{jl} + a_{j0}\right) 
+\\
+\text{subject to} &amp; \sum\limits_{l=1}^Lw_l a_{jl} + a_{j0} \geq 0, \forall j \ .\\
+\end{array}
+\]</span> Let the matrix <span class="math inline">\(A = \left[a_{jl}\right]\)</span>, the vector <span class="math inline">\(a = \left[a_{j0}\right]\)</span>, and we have its equivalent form,</p>
+<p><span class="math display">\[
+\begin{array}{rl}
+\min\limits_{w, g} &amp; 
+-\sum\limits_{j = 1}^n
+\log\left(g_j\right) 
+\\
+\text{subject to}
+&amp; Aw + a = g \\
+&amp; g \geq 0\ .
+\end{array}
+\]</span></p>
+<p>This problem can be coded by <code>Rmosek</code> as a “separable convex optimization” (SCOPT) problem.</p>
+<div id="correlated-null" class="section level3">
+<h3>Correlated null</h3>
+<pre><code>Fitted w: -0.03653526 0.1999284 0.01047094 -0.02012681 
+Time Cost in Seconds: 7.945 2.884 13.152 </code></pre>
+<p><img src="figure/mosek_reg.rmd/Rmosek%20primal%20fitting%20plotting-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Fitted w: 0.03394291 0.7345604 -0.1532514 0.1883912 -0.05504895 0.02297176 -0.006908406 0.001216017 -0.0003147927 
+Time Cost in Seconds: 6.902 1.98 6.669 </code></pre>
+<p><img src="figure/mosek_reg.rmd/Rmosek%20primal%20fitting%20plotting-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Fitted w: 0.02262546 0.9213963 0.02180428 0.1760983 -0.01379674 0.003968132 -0.004904973 -0.0006085249 -0.0002990675 
+Time Cost in Seconds: 5.375 1.932 6.116 </code></pre>
+<p><img src="figure/mosek_reg.rmd/Rmosek%20primal%20fitting%20plotting-3.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Fitted w: 0.04540484 -0.1275978 0.009150985 0.01004515 
+Time Cost in Seconds: 19.294 2.066 14.959 </code></pre>
+<p><img src="figure/mosek_reg.rmd/Rmosek%20primal%20fitting%20plotting-4.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Fitted w: 0.005943196 0.3980709 -0.009222458 0.02630697 
+Time Cost in Seconds: 6.636 1.954 6.815 </code></pre>
+<p><img src="figure/mosek_reg.rmd/Rmosek%20primal%20fitting%20plotting-5.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="signal-correlated-error" class="section level3">
+<h3>Signal <span class="math inline">\(+\)</span> correlated error</h3>
+<pre><code>Converged: FALSE 
+Number of Iteration: 101 
+Time Cost in Seconds: 2181.997 255.051 1644.499 </code></pre>
+<p><img src="figure/mosek_reg.rmd/gdash%20primal%20signal%20plotting-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Converged: FALSE 
+Number of Iteration: 101 
+Time Cost in Seconds: 2634.559 296.365 1970.452 </code></pre>
+<p><img src="figure/mosek_reg.rmd/gdash%20primal%20signal%20plotting-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Converged: TRUE 
+Number of Iteration: 45 
+Time Cost in Seconds: 553.188 127.588 540.733 </code></pre>
+<p><img src="figure/mosek_reg.rmd/gdash%20primal%20signal%20plotting-3.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Converged: TRUE 
+Number of Iteration: 49 
+Time Cost in Seconds: 781.062 126.839 622.938 </code></pre>
+<p><img src="figure/mosek_reg.rmd/gdash%20primal%20signal%20plotting-4.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Converged: FALSE 
+Number of Iteration: 101 
+Time Cost in Seconds: 2161.426 247.628 1565.216 </code></pre>
+<p><img src="figure/mosek_reg.rmd/gdash%20primal%20signal%20plotting-5.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="basic-form-dual" class="section level2">
+<h2>Basic form: dual</h2>
+<p>The primal <span class="math inline">\(w\)</span> optimization problem has <span class="math inline">\(n + L\)</span> variables and <span class="math inline">\(n\)</span> constraints. When <span class="math inline">\(n\)</span> is large, such as <span class="math inline">\(n = 10K\)</span> in our simulations, the time cost is usually substantial. As the authors of <code>REBayes</code> pointed out, it’s better to work on the dual form, which is</p>
+<p><span class="math display">\[
+\begin{array}{rl}
+\min\limits_{v} &amp; 
+-\sum\limits_{j = 1}^n
+\log\left(v_j\right) + a^Tv
+\\
+\text{subject to}
+&amp; A^Tv = 0 \\
+&amp; v \geq 0\ .
+\end{array}
+\]</span> The dual form has <span class="math inline">\(n\)</span> variables and more importantly, only <span class="math inline">\(L\)</span> constraints. As <span class="math inline">\(L \ll n\)</span>, the dual form is far more computationally efficient.</p>
+<p><code>Rmosek</code> provides optimal solutions to both primal and dual variables, so <span class="math inline">\(\hat w\)</span> is readily available when working on <span class="math inline">\(v\)</span> optimization. But we need to be careful on which dual variables to use, such as <code>$sol$itr$suc</code>, <code>$sol$itr$slc</code>, or others.</p>
+<div id="correlated-null-1" class="section level3">
+<h3>Correlated null</h3>
+<pre><code>Fitted w: -0.03642797 0.1971637 0.01074601 -0.02181494 
+Time Cost in Seconds: 0.485 0.049 0.388 </code></pre>
+<p><img src="figure/mosek_reg.rmd/Rmosek%20dual%20fitting%20plotting-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Fitted w: 0.03361434 0.7339189 -0.1544144 0.1875235 -0.0560049 0.02267003 -0.007151714 0.001187682 -0.0003321398 
+Time Cost in Seconds: 0.524 0.009 0.372 </code></pre>
+<p><img src="figure/mosek_reg.rmd/Rmosek%20dual%20fitting%20plotting-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Fitted w: 0.02273596 0.9206369 0.02224234 0.1750273 -0.01339113 0.003607418 -0.004794795 -0.0006395078 -0.0002908422 
+Time Cost in Seconds: 0.529 0.008 0.375 </code></pre>
+<p><img src="figure/mosek_reg.rmd/Rmosek%20dual%20fitting%20plotting-3.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Fitted w: 0.04544396 -0.1272823 0.008811108 0.009915311 
+Time Cost in Seconds: 0.448 0.006 0.322 </code></pre>
+<p><img src="figure/mosek_reg.rmd/Rmosek%20dual%20fitting%20plotting-4.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Fitted w: 0.006084177 0.3976595 -0.009103231 0.02610567 
+Time Cost in Seconds: 0.489 0.005 0.313 </code></pre>
+<p><img src="figure/mosek_reg.rmd/Rmosek%20dual%20fitting%20plotting-5.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="signal-correlated-error-1" class="section level3">
+<h3>Signal <span class="math inline">\(+\)</span> correlated error</h3>
+<pre><code>Converged: TRUE 
+Number of Iteration: 21 
+Time Cost in Seconds: 46.978 2.71 29.017 </code></pre>
+<p><img src="figure/mosek_reg.rmd/gdash%20dual%20signal%20plotting-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Converged: TRUE 
+Number of Iteration: 21 
+Time Cost in Seconds: 45.406 5.343 52.01 </code></pre>
+<p><img src="figure/mosek_reg.rmd/gdash%20dual%20signal%20plotting-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Converged: TRUE 
+Number of Iteration: 16 
+Time Cost in Seconds: 34.293 3.519 26.79 </code></pre>
+<p><img src="figure/mosek_reg.rmd/gdash%20dual%20signal%20plotting-3.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Converged: TRUE 
+Number of Iteration: 31 
+Time Cost in Seconds: 64.198 3.902 39.897 </code></pre>
+<p><img src="figure/mosek_reg.rmd/gdash%20dual%20signal%20plotting-4.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Converged: TRUE 
+Number of Iteration: 12 
+Time Cost in Seconds: 27.247 1.446 15.392 </code></pre>
+<p><img src="figure/mosek_reg.rmd/gdash%20dual%20signal%20plotting-5.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="conclusion" class="section level2">
+<h2>Conclusion</h2>
+<p>Implementation by <code>Rmosek</code> can fully reproduce the results obtained by <code>cvxr</code>. Moreover, the dual form gives the same results as the primal dorm does, with only a fraction of time.</p>
+</div>
+<div id="session-information" class="section level2">
+<h2>Session information</h2>
+<!-- Insert the session information into the document -->
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 3.3.3 (2017-03-06)
+Platform: x86_64-apple-darwin13.4.0 (64-bit)
+Running under: macOS Sierra 10.12.4
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] Rmosek_7.1.3      PolynomF_0.94     cvxr_0.0.0.9009   REBayes_0.62     
+[5] Matrix_1.2-8      SQUAREM_2016.10-1 EQL_1.0-0         ttutils_1.0-1    
+
+loaded via a namespace (and not attached):
+ [1] Rcpp_0.12.10    lattice_0.20-34 digest_0.6.11   rprojroot_1.2  
+ [5] MASS_7.3-45     grid_3.3.3      backports_1.0.5 git2r_0.18.0   
+ [9] magrittr_1.5    evaluate_0.10   stringi_1.1.2   rmarkdown_1.3  
+[13] tools_3.3.3     stringr_1.2.0   yaml_2.1.14     htmltools_0.3.5
+[17] knitr_1.15.1   </code></pre>
+</div>
+
+<hr>
+<p>
+    This <a href="http://rmarkdown.rstudio.com">R Markdown</a> site was created with <a href="https://github.com/jdblischak/workflowr">workflowr</a>
+</p>
+<hr>
+
+<!-- To enable disqus, uncomment the section below and provide your disqus_shortname -->
+
+<!-- disqus
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'rmarkdown'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+-->
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

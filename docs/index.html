@@ -284,10 +284,6 @@ $(document).ready(function () {
 </ul>
 <p>Under the exchangeability assumption, the goodness of fit of empirical Bayes can be measured by the behavior of <span class="math inline">\(\left\{\hat F_j = \hat F_{\hat\beta_j | \hat s_j}\left(\hat\beta_j\mid\hat s_j\right)\right\}\)</span>. Meanwhile, if <code>ASH</code> is applied to correlated null <span class="math inline">\(z\)</span> scores, estimated <span class="math inline">\(\hat g\)</span> will not only be different from <span class="math inline">\(\delta_0\)</span>; moreover, with this estimated <span class="math inline">\(\hat g\)</span>, <span class="math inline">\(\left\{\hat F_j\right\}\)</span> might not behave like <span class="math inline">\(\text{Unif}\left[0, 1\right]\)</span>.</p>
 <ul>
-<li><a href="ash_gd.html">Normal means inference with heteroskedastic and correlated noise: Model</a></li>
-</ul>
-<p>The previous investigation is boiled down to a prototypical problem: the classic normal means inference, but with heteroskedastic and especially correlated noise. Gaussian derivatives and <code>ASH</code> provide a way to tackle it.</p>
-<ul>
 <li><a href="diagnostic_plot_2.html">Diagnostic Plots for Uniformity</a></li>
 <li><a href="diagnostic_ash.html">Diagnostic Plots for <code>ASH</code></a></li>
 </ul>
@@ -297,11 +293,16 @@ $(document).ready(function () {
 </ul>
 <p>Take a look at the <span class="math inline">\(z\)</span> scores we’ve been experimenting with so far and check whether they truly are marginally <span class="math inline">\(N\left(0, 1\right)\)</span>. It’s an enhanced version of the simulation on <a href="ExtremeOccurrence.html">occurrence of extreme observations</a>.</p>
 <ul>
-<li><a href="Rmosek.html">Implementation by <code>Rmosek</code></a></li>
+<li><a href="ash_gd.html">Normal means inference with heteroskedastic and correlated noise: Model</a></li>
 </ul>
-<p><code>cvxr</code> is still under active development. We are moving to the more established <code>Rmosek</code>.</p>
+<p>The previous investigation is boiled down to a prototypical problem: the classic normal means inference, but with heteroskedastic and especially correlated noise. Gaussian derivatives and <code>ASH</code> provide a way to tackle it.</p>
 <ul>
-<li><a href="gd_ash.html">Normal means inference with heteroskedastic and correlated noise: Model</a></li>
+<li><a href="Rmosek.html">Implementation by <code>Rmosek</code>: Correlated null</a></li>
+<li><a href="gd_ash.html">Implementation by <code>Rmosek</code>: Simulated non-null</a></li>
+</ul>
+<p><code>cvxr</code> is still under active development. We are moving to the more established <code>Rmosek</code>, exploring and experimenting this convex optimization package.</p>
+<ul>
+<li><a href="mosek_reg.html">Improvement on Implementation with <code>Rmosek</code>: Primal and dual</a></li>
 </ul>
 <!-- The goal of this new template is to simplify the setup and maintenance of a research website. -->
 <!-- Specifically, -->
