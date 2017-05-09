@@ -1,0 +1,173 @@
+---
+title: "Creating Null"
+author: "Lei Sun"
+date: 2017-05-08
+output: html_document
+---
+
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+**Last updated:** `r Sys.Date()`
+
+**Code version:** `r workflowr::extract_commit(".", 1)$sha1`
+
+## Introduction
+
+In many of his seminal papers on simultaneous inference, for example, [Efron et al 2001](http://www.tandfonline.com/doi/abs/10.1198/016214501753382129), Efron used some techniques to create null from the raw data.  One big concern of this approach is whether the created null could successfully remove the effects of interest whereas keep the distortion due to correlation.  Let's take a look.
+
+Suppose in a simplified experiment, we have a data matrix $X_{N \times 2n} = \left\{X_1, \ldots, X_n, X_{n + 1}, \ldots, X_{2n}\right\}$, $n$ columns of which, $\left\{X_1, \ldots, X_n\right\}$, are controls and $n$ columns, $\left\{X_{n + 1}, \ldots, X_{2n}\right\}$, are cases.  We can obtain $N$ $z$ scores, called $z^1$, from this experimental design.
+
+On the other hand, if we re-label case and control, and let $\left\{X_1, \ldots, X_{n/2}, X_{n + 1}, \ldots, X_{3n / 2}\right\}$ be the controls and $\left\{X_{n / 2 + 1}, \ldots, X_{n}, X_{3n / 2 + 1}, \ldots, X_{2n}\right\}$ the cases, we can obtain another $N$ $z$ scores, called $z^0$, from this shuffled experimental design.
+
+Our hope is that $z^0$ will make the effects part in $z^1$ to be $0$, and only keep the correlation-induced inflation or deflation parts.
+
+Here is a way to check this.  Suppose there is no difference between the conditions in cases and controls, then the effects part in $z^1$ should be $0$ anyway.  Therefore, we may check if $z^0$ and $z^1$ have the same empirical distribution distorted by correlation.
+
+```{r, cache = TRUE, message = FALSE}
+library(limma)
+library(edgeR)
+library(qvalue)
+library(ashr)
+r = read.csv("../data/liver.csv")
+r = r[, -(1 : 2)] # remove gene name and description
+#extract top g genes from G by n matrix X of expression
+top_genes_index = function(g, X) {
+  return(order(rowSums(X), decreasing = TRUE)[1 : g])
+}
+lcpm = function (r) {
+  R = colSums(r)
+  t(log2(((t(r) + 0.5) / (R + 1)) * 10^6))
+}
+Y = lcpm(r)
+subset = top_genes_index(10000, Y)
+Y = Y[subset,]
+r = r[subset,]
+```
+
+```{r, cache = TRUE}
+counts_to_z = function (counts, condition) {
+  design = stats::model.matrix(~condition)
+  dgecounts = edgeR::calcNormFactors(edgeR::DGEList(counts = counts, group = condition))
+  v = limma::voom(dgecounts, design, plot = FALSE)
+  lim = limma::lmFit(v)
+  r.ebayes = limma::eBayes(lim)
+  p = r.ebayes$p.value[, 2]
+  t = r.ebayes$t[, 2]
+  z = sign(t) * qnorm(1 - p/2)
+  return (z)
+}
+```
+
+We are looking at $3$ cases with different case-control sample sizes: $n = 2$, $n = 10$, $n = 50$.
+
+## 2 vs 2
+
+```{r, cache = TRUE, echo = FALSE}
+set.seed(777)
+n = 2
+m = 10
+z1 = z0 = list()
+condition = c(rep(0, n), rep(1, n))
+for (i in 1 : m) {
+  counts1 = r[, sample(1 : ncol(r), 2 * n)]
+  counts0 = counts1[, c(seq(1, 2 * n, by = 2), seq(2, 2 * n, by = 2))]
+  z1[[i]] = counts_to_z(counts1, condition)
+  z0[[i]] = counts_to_z(counts0, condition)
+}
+```
+
+```{r, cache = TRUE, echo = FALSE}
+for (i in 1 : m) {
+  z1.hist = hist(z1[[i]], breaks = 100, plot = FALSE)
+  z0.hist = hist(z0[[i]], breaks = 100, plot = FALSE)
+  ymax = max(c(dnorm(0), z1.hist$density, z0.hist$density))
+  xmax = max(c(abs(z1[[i]]), abs(z0[[i]])))
+  par(mfrow = c(1, 2))
+  hist(z1[[i]], breaks = 100, prob = TRUE, xlab = expression(z^1), main = expression(paste("Histogram of ", z^1)), ylim = c(0, ymax), xlim = c(-xmax, xmax))
+  x.seq = seq(-xmax, xmax, 0.01)
+  lines(x.seq, dnorm(x.seq), col = "red")
+  hist(z0[[i]], breaks = 100, prob = TRUE, xlab = expression(z^0), main = expression(paste("Histogram of ", z^0)), ylim = c(0, ymax), xlim = c(-xmax, xmax))
+  lines(x.seq, dnorm(x.seq), col = "red")
+}
+```
+
+## 10 vs 10
+
+```{r, cache = TRUE, echo = FALSE}
+set.seed(777)
+n = 10
+m = 10
+z1 = z0 = list()
+condition = c(rep(0, n), rep(1, n))
+for (i in 1 : m) {
+  counts1 = r[, sample(1 : ncol(r), 2 * n)]
+  counts0 = counts1[, c(seq(1, 2 * n, by = 2), seq(2, 2 * n, by = 2))]
+  z1[[i]] = counts_to_z(counts1, condition)
+  z0[[i]] = counts_to_z(counts0, condition)
+}
+```
+
+```{r, cache = TRUE, echo = FALSE}
+for (i in 1 : m) {
+  z1.hist = hist(z1[[i]], breaks = 100, plot = FALSE)
+  z0.hist = hist(z0[[i]], breaks = 100, plot = FALSE)
+  ymax = max(c(dnorm(0), z1.hist$density, z0.hist$density))
+  xmax = max(c(abs(z1[[i]]), abs(z0[[i]])))
+  par(mfrow = c(1, 2))
+  hist(z1[[i]], breaks = 100, prob = TRUE, xlab = expression(z^1), main = expression(paste("Histogram of ", z^1)), ylim = c(0, ymax), xlim = c(-xmax, xmax))
+  x.seq = seq(-xmax, xmax, 0.01)
+  lines(x.seq, dnorm(x.seq), col = "red")
+  hist(z0[[i]], breaks = 100, prob = TRUE, xlab = expression(z^0), main = expression(paste("Histogram of ", z^0)), ylim = c(0, ymax), xlim = c(-xmax, xmax))
+  lines(x.seq, dnorm(x.seq), col = "red")
+}
+```
+
+## 50 vs 50
+
+```{r, cache = TRUE, echo = FALSE}
+set.seed(777)
+n = 50
+m = 10
+z1 = z0 = list()
+condition = c(rep(0, n), rep(1, n))
+for (i in 1 : m) {
+  counts1 = r[, sample(1 : ncol(r), 2 * n)]
+  counts0 = counts1[, c(seq(1, 2 * n, by = 2), seq(2, 2 * n, by = 2))]
+  z1[[i]] = counts_to_z(counts1, condition)
+  z0[[i]] = counts_to_z(counts0, condition)
+}
+```
+
+```{r, cache = TRUE, echo = FALSE}
+for (i in 1 : m) {
+  z1.hist = hist(z1[[i]], breaks = 100, plot = FALSE)
+  z0.hist = hist(z0[[i]], breaks = 100, plot = FALSE)
+  ymax = max(c(dnorm(0), z1.hist$density, z0.hist$density))
+  xmax = max(c(abs(z1[[i]]), abs(z0[[i]])))
+  par(mfrow = c(1, 2))
+  hist(z1[[i]], breaks = 100, prob = TRUE, xlab = expression(z^1), main = expression(paste("Histogram of ", z^1)), ylim = c(0, ymax), xlim = c(-xmax, xmax))
+  x.seq = seq(-xmax, xmax, 0.01)
+  lines(x.seq, dnorm(x.seq), col = "red")
+  hist(z0[[i]], breaks = 100, prob = TRUE, xlab = expression(z^0), main = expression(paste("Histogram of ", z^0)), ylim = c(0, ymax), xlim = c(-xmax, xmax))
+  lines(x.seq, dnorm(x.seq), col = "red")
+}
+```
+
+
+## Conclusion
+
+Larger sample size doesn't make the empirical distribution of correlated $z$ scores closer to $N\left(0, 1\right)$.
+
+Merely changing the labels of the null data could generate starkly different empirical distributions of $z$ scores, no matter what sample size $n$ is, although as $n$ gets larger, the difference in the empirical distributions of $z^1$ and $z^0$ seems to get smaller.
+
+Therefore, creating null through various resampling schemes is basically impossible for this application.
+
+## Session Information
+
+```{r session-info}
+```
