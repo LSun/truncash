@@ -1,0 +1,244 @@
+---
+title: "Improvement on Implementation with `Rmosek`: Regularization"
+author: "Lei Sun"
+date: 2017-05-09
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+## Introduction
+
+The $w$ optimization problem we hope to solve has two constraints.  If we are not imposing these two constraints, chances are the optimization will be [unstable](gaussian_derivatives_3.html), especially when we don't know $L$ for sure beforehand.  However, these two constraints are hard to be converted directly and strictly to convex or even tractable forms.
+
+$$
+\begin{array}{rl}
+\min\limits_{w} & -\sum\limits_{j = 1}^n\log\left(\sum\limits_{l=1}^Lw_l\left(\sum\limits_{k = 1}^K\hat\pi_k  f_{jkl}\right) + \sum\limits_{k = 1}^K\hat\pi_kf_{jk0}\right) + 
+\sum\limits_{l = 1}^L\lambda_l^w
+\phi
+\left(\left|w_l\right|\right)
+\\
+\text{subject to} & \sum\limits_{l=1}^L w_l \varphi^{(l)}\left(z\right) + \varphi\left(z\right) \geq 0, \forall z\in \mathbb{R}\\
+& w_l \text{ decay reasonably fast.}
+\end{array}
+$$
+
+One observation is that without the constraints, the optimization goes unstable as $\hat w$ get uncontrollably large.  Therefore, a natural idea to replace these two constraints would be to bound, penalize, or regularize $w$, to prevent them from being too large.
+
+On the other hand, as indicated the [theory](gaussian_derivatives.html) and [examples](mosek_reg.html) of good fitting by Gaussian derivatives, $w_l$ is getting smaller as $l$ increases.  Moreover, oftentimes, really small $w_l$ could still make a difference and thus indispensable.  Therefore, although we need to stop $\hat w$ getting too large, we cerntainly don't want to shrink them unnecessarily and unwarrantedly to zero.
+
+Ideally, the goal of $\sum\limits_{l = 1}^L\lambda_l^w \phi \left(\left|w_l\right|\right)$ regularizing $w$ should be to
+
+\begin{enumerate}
+\item automatically choose a good highest order of fitted Gaussian derivatives, that is, to make unnecessary higher order $w_l$'s to be zero;
+\item prevent $w_l$'s to be too large;
+\item make sure $w_l$'s decay as expected;
+\item keep non-zero $w_l$'s, however small in magnitude, non-zero;
+\item keep the convexity of the problem to faciliate the computation.
+\end{enumerate}
+
+## Ideas on $\lambda_l^w$ and $\phi$
+
+Remember that in [theory](gaussian_derivatives.html), if we are writing the random empirical density of the correlated marginally $N\left(0, 1\right)$ random samples as
+
+$$
+f_0\left(z\right) = \varphi\left(z\right) + \sum\limits_{l = 1}^\infty W_k\varphi^{(l)}\left(z\right) \ ,
+$$
+then
+
+$$
+\text{var}\left(W_l\right) = \frac{\alpha_l}{l!} \ ,
+$$
+where
+
+$$
+\alpha_l = \frac{1}{\frac{n\left(n - 1\right)}{2}}\sum_\limits{i < j}\rho_{ij}^l := \bar{\rho_{ij}^l} \ .
+$$
+
+Therefore, naturally $w_l$ should decay somehow in the order of
+
+$$
+\left|w_l\right| \leadsto \sqrt{\text{var}\left(W_l\right)} =
+\frac{\sqrt{\bar{\rho_{ij}^l}}}{\sqrt{l!}} \ .
+$$
+
+### Normalization
+
+The order of decay suggests that we should work with [normalized coefficients](mosek_reg_2.html), so that
+
+$$
+\left|w_l^n\right| = \sqrt{l!}\left|w_l\right| \leadsto 
+\sqrt{\bar{\rho_{ij}^l}} \ .
+$$
+This piece of information on the order of magnitude of the normalized $w_l^n$ provides a hint to determine $\lambda_l^w$, for example,
+
+### Regularizing even orders only
+
+Odd orders of Gaussian derivatives are generally associated with mean shift and skewness of $f_0$, so they are generally very small, but if they are indeed not zero, they are important however they are small.
+
+Meanwhile, when $l$ is odd, $\bar{\rho_{ij}^l}$ could be very small, and not in order of $\bar{\rho^l}$ for some $\rho \in \left(0, 1\right)$, so it's very difficult to come up with a good $\lambda_l^w$ when $l$ is odd.
+
+Therefore, it might be better to leave the odd orders alone and regularize the even orders only.
+
+### Penalty: $l_1$ and $l_2$
+
+Generally speaking, $l_1$ imposes sparsity by shrinking small estimates exactly to zero, which is both good and bad for our case, whereas $l_2$ penalizes large estimates severely but doesn't force exact sparsity, which could also be good or bad.
+
+We'll implement both and see what happens.
+
+### $\lambda_l^w$
+
+$\lambda_l^w$ is determined to help ensure 
+
+$$
+\left|w_l^n\right| = \sqrt{l!}\left|w_l\right| \leadsto 
+\sqrt{\bar{\rho_{ij}^l}} \ ,
+$$
+
+Given $\rho \in \left(0, 1\right)$, for $l_1$ regularization, $\lambda_l^n \sim \lambda / \sqrt{\rho^l}$; for $l_2$ regularization, $\lambda_l^n \sim \lambda / \rho^l$.
+
+### $L$
+
+So far, $L = 9$ has been able to handle all the example we've tried.  Without constraints or regularization, $L = 9$ is usually too large for cases where, say, $L = 4$ is enough, and a larger than necessary $L$ could lead to numerical instability.
+
+Hence, we'll experiment with $L = 12$, assuming it's enough for all the correlation induced distortions in practice, and assuming the regularization could prevent the optimization from going crazy.
+
+## Summary
+
+The $w$ optimization problem becomes
+
+$$
+\begin{array}{rl}
+\min\limits_{w, g} & 
+-\sum\limits_{j = 1}^n
+\log\left(g_j\right) 
++
+\text{Regularization}
+\\
+\text{subject to}
+& Aw + a = g \\
+& g \geq 0\ ,
+\end{array}
+$$
+where $A_{n \times L} = \left[a_1,\ldots, a_L\right]$ and $a$ are computed with normalized Gaussian derivatives and Hermite polynomials.
+
+Let $\lambda > 0$, $\rho \in \left(0, 1\right)$, the regularization term has two forms as follows.
+
+### $l_1$ regularization
+
+$$
+\begin{array}{l}
+\sum\limits_{l = 1}^L\lambda_l^{w^s}\left|w_l^s\right| \ ,\\
+\lambda_l^{w^s} = \begin{cases}
+0, & l \text{ is odd;} \\
+\lambda / \rho^{l/2}, & l \text{ is even.}
+\end{cases}
+\end{array}
+$$
+
+### $l_2$ regularization
+
+$$
+\begin{array}{l}
+\sum\limits_{l = 1}^L \lambda_l^{w^s}{w_l^s}^2 \ ,\\
+\lambda_l^{w^s} = \begin{cases}
+0, & l \text{ is odd;} \\
+\lambda / \rho^{l}, & l \text{ is even.}
+\end{cases}
+\end{array}
+$$
+
+## Dual problem for $l_1$ regularization.
+
+The primal form is
+
+$$
+\begin{array}{rl}
+\min\limits_{w, g} & 
+-\sum\limits_{j = 1}^n
+\log\left(g_j\right) 
++
+\sum\limits_{l = 1}^L\lambda_l^{w^s}\left|w_l^s\right|
+\\
+\text{subject to}
+& Aw + a = g \\
+& g \geq 0\ ,
+\end{array}
+$$
+The dual form is
+
+$$
+\begin{array}{rl}
+\min\limits_{v} & 
+-\sum\limits_{j = 1}^n
+\log\left(v_j\right) 
++ a^Tv - n
+\\
+\text{subject to}
+& -\lambda \leq A^Tv \leq \lambda \\
+& v \geq 0\ .
+\end{array}
+$$
+
+## Dual problem for $l_2$ regularization.
+
+The primal form is
+
+$$
+\begin{array}{rl}
+\min\limits_{w, g} & 
+-\sum\limits_{j = 1}^n
+\log\left(g_j\right) 
++
+\sum\limits_{l = 1}^L\lambda_l^{w^s}{w_l^s}^2
+\\
+\text{subject to}
+& Aw + a = g \\
+& g \geq 0\ ,
+\end{array}
+$$
+The dual form is
+
+$$
+\begin{array}{rl}
+\min\limits_{v} & 
+-\sum\limits_{j = 1}^n
+\log\left(v_j\right) 
++ a^Tv - n
++ \frac14 v^T \left(A \Lambda^{-1} A^T\right)v
+\\
+\text{subject to}
+& a_j^Tv = 0 \  \text{ if }\lambda_j = 0 \ ,\\
+& v \geq 0\ ,
+\end{array}
+$$
+where $\Lambda = \begin{bmatrix}\lambda_1 & & \\ & \ddots & \\ & & \lambda_L   \end{bmatrix}$, and ${\Lambda^{-1}}_{jj} = 0$ when $\lambda_j = 0$.
+
+## Choosing $\lambda$ and $\rho$
+
+Let's start with $\rho = 0.9$ and $\lambda = 0.1$.
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```
