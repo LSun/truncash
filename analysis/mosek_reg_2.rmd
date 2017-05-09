@@ -1,0 +1,142 @@
+---
+title: "Improvement on Implementation with `Rmosek`: Normalization"
+author: "Lei Sun"
+date: 2017-05-09
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+## Introduction
+
+When fitting Gaussian derivatives, [normalization](gaussian_derivatives.html#scaled_and_unscaled_gaussian_derivatives) could potentially increase the parity in the magnitude of the coefficients and thus make the results more accurate.
+
+```{r read data, cache = TRUE}
+data.list = readRDS("../output/z_null_liver_777_select.RDS")
+zscore = data.list[[3]]
+sel.num = length(zscore)
+data.list.index = readRDS("../output/z_null_liver_777_select_index.RDS")
+ord = data.list.index[[3]]$gd.ord
+```
+
+```{r code, cache = TRUE, message = FALSE}
+source("../code/gdash.R")
+library(ashr)
+library(PolynomF)
+x <- polynom()
+H <- polylist(x, - 1 + x^2)
+for(n in 2 : 19)
+  H[[n+1]] <- x * H[[n]] - n * H[[n-1]]
+```
+
+## Correlated null
+
+```{r Rmosek dual fitting, cache = TRUE, echo = FALSE}
+gd.dual = list()
+time.dual = list()
+for (i in 1 : sel.num) {
+  K = ord[i]
+  n = length(zscore[[i]])
+  gd.mat = matrix(0, nrow = n, ncol = K)
+  for (k in 1 : K)
+    gd.mat[, k] = dnorm(zscore[[i]]) * H[[k]](zscore[[i]]) / sqrt(factorial(k))
+  gd.mat = cbind(dnorm(zscore[[i]]), gd.mat)
+  time.dual[[i]] <- system.time(gd.dual[[i]] <- w.mosek(gd.mat, w_prior = rep(0, K)))
+}
+```
+
+```{r Rmosek dual fitting plotting, cache = TRUE, echo = FALSE}
+x.seq = seq(-6, 6, 0.01)
+for (i in 1 : sel.num) {
+  K = ord[i]
+  gd.seq.mat = matrix(0, nrow = length(x.seq), ncol = K)
+  for (k in 1 : K)
+    gd.seq.mat[, k] = dnorm(x.seq) * H[[k]](x.seq) / sqrt(factorial(k))
+  y.seq = gd.seq.mat %*% gd.dual[[i]]$w + dnorm(x.seq)
+  z.hist = hist(zscore[[i]], breaks = 100, plot = FALSE)
+  z.hist.ymax = max(c(z.hist$density, dnorm(0)))
+  cat("Fitted w:", gd.dual[[i]]$w, "\n")
+  cat("Time Cost in Seconds:", time.dual[[i]][1:3], "\n")
+  hist(zscore[[i]], breaks = 100, probability = TRUE, ylim = c(0, z.hist.ymax), main = "Histogram of Correlated Z Scores", xlab = "Correlated Z Scores")
+  lines(x.seq, dnorm(x.seq), col = "red")
+  lines(x.seq, y.seq, col = "blue")
+}
+```
+
+## Signal $+$ correlated error
+
+```{r signal simulation, cache = TRUE, echo = FALSE}
+true.g = ashr::normalmix(pi = c(0.6, 0.3, 0.1), mean = 0, sd = c(0, 2, 4))
+x = seq(-10, 10, 0.01)
+y.true = ashr::mixcdf(true.g, x, lower.tail = TRUE)
+beta <- c(
+  rep(0, 6000),
+  rnorm(3000, 0, 2),
+  rnorm(1000, 0, 4)
+)
+beta <- sample(beta)
+sebetahat <- rep(1, n)
+betahat <- list()
+for (i in 1 : sel.num) {
+  betahat[[i]] = beta + sebetahat * zscore[[i]]
+}
+```
+
+```{r ash signal fitting, cache = TRUE, echo = FALSE}
+ash.signal = list()
+for (i in 1 : sel.num) {
+  ash.signal[[i]] <- ashr::ash(betahat[[i]], 1, mixcompdist = "normal", method = "fdr")
+}
+```
+
+```{r gdash dual signal fitting, cache = TRUE, echo = FALSE}
+time.dual.signal = list()
+gd.dual.signal = list()
+for (i in 1 : sel.num) {
+  time.dual.signal[[i]] <- system.time(gd.dual.signal[[i]] <- gdash(betahat[[i]], sebetahat, gd.ord = ord[i], primal = FALSE, gd.normalized = TRUE, w.lambda = NULL, mixcompdist = "normal", method = "fdr", control = list(maxiter = 1000)))
+}
+```
+
+```{r gdash dual signal plotting, cache = TRUE, echo = FALSE}
+for (i in 1 : sel.num) {
+  cat("Converged:", gd.dual.signal[[i]]$converged, "\n")
+  cat("Number of Iteration:", gd.dual.signal[[i]]$niter, "\n")
+  cat("Time Cost in Seconds:", time.dual.signal[[i]][1:3], "\n")
+  plot(x, y.true, type = "l", ylab = expression(F[hat(g)](x)),
+       main = "CDF of Fitted g")
+  y.gdash = ashr::mixcdf(gd.dual.signal[[i]]$fitted_g, x, lower.tail = TRUE)
+  y.ash = ashr::mixcdf(ash.signal[[i]]$fitted_g, x, lower.tail = TRUE)
+  lines(x, y.ash, col = "red", lty = 2)
+  lines(x, y.gdash, col = "blue")
+  legend("topleft", lty = c(1, 2, 1), col = c("black", "red", "blue"), legend = c("True", "ASH", "GD-ASH"))
+}
+```
+
+## Conclusion
+
+It appears normalization indeed increases the accuracy, *although the computation seems slowing down a little bit?  Not sure.*
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```
