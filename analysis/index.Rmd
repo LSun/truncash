@@ -93,9 +93,14 @@ Under the exchangeability assumption, the goodness of fit of empirical Bayes can
 
 Essentially we hope to tell whether $n$ random samples are uniformly distributed, and the task seems more complicated than what it sounds.  There are multiple ways to do it, and some of them have been absorbed into the `ashr` package.
 
-* [Marginal distribution of correlated null $z$ scores](marginal_z.html)
+* [Marginal distribution of $z$ scores: Correlated null](marginal_z.html)
+* [Marginal distribution of $z$ scores: Correlated non-null](marginal_z_alternative.html)
 
-Take a look at the $z$ scores we've been experimenting with so far and check whether they truly are marginally $N\left(0, 1\right)$.  It's an enhanced version of the simulation on [occurrence of extreme observations](ExtremeOccurrence.html).
+Take a look at the null $z$ scores we've been experimenting with so far and check whether they truly are marginally $N\left(0, 1\right)$.  It's an enhanced version of the simulation on [occurrence of extreme observations](ExtremeOccurrence.html).  The non-null $z$ scores are produced for comparison.
+
+* [Can we create correlated null from the raw data](create_null.html)
+
+This whole project comes from a ubiquitous issue that in the simultaneous inference problem, the deviation from what would be expected under the null can come from both distortion due to correlation and enrichment due to true effects.  Ideally, it would be perfect if we could create controls which keep the distortion by correlation unchanged, but remove the true effects.  Efron in a series of papers (for example, [Efron et al 2001](http://www.tandfonline.com/doi/abs/10.1198/016214501753382129)) suggests to create the null from the raw data by resampling or permutation.  We apply the idea to our data sets, and the results are not promising.
 
 * [Normal means inference with heteroskedastic and correlated noise: Model](ash_gd.html)
 
@@ -106,7 +111,8 @@ The previous investigation is boiled down to a prototypical problem: the classic
 
 `cvxr` is still under active development.  We are moving to the more established `Rmosek`, exploring and experimenting this convex optimization package.
 
-* [Improvement on Implementation with `Rmosek`: Primal and dual](mosek_reg.html)
+* [Improvement on implementation with `Rmosek`: Primal and dual](mosek_reg.html)
+* [Improvement on implementation with `Rmosek`: Normalization](mosek_reg_2.html)
 
 [`ashr`]: https://github.com/stephens999/ashr
 
