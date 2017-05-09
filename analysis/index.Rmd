@@ -107,7 +107,7 @@ This whole project comes from a ubiquitous issue that in the simultaneous infere
 The previous investigation is boiled down to a prototypical problem: the classic normal means inference, but with heteroskedastic and especially correlated noise.  Gaussian derivatives and `ASH` provide a way to tackle it.
 
 * [Implementation by `Rmosek`: Correlated null](Rmosek.html)
-* [Implementation by `Rmosek`: Simulated non-null](gd_ash.html)
+* [Implementation by `Rmosek`: Simulated non-null](gd-ash.html)
 
 `cvxr` is still under active development.  We are moving to the more established `Rmosek`, exploring and experimenting this convex optimization package.
 
