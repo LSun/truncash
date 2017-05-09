@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+<meta name="author" content="Lei Sun" />
+
+<meta name="date" content="2017-05-08" />
+
+<title>Marginal Distribution of z Scores: Alternative</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs && document.readyState && document.readyState === "complete") {
+   window.setTimeout(function() {
+      hljs.initHighlighting();
+   }, 0);
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">truncash</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/LSun/truncash">
+    <span class="fa fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Marginal Distribution of <span class="math inline">\(z\)</span> Scores: Alternative</h1>
+<h4 class="author"><em>Lei Sun</em></h4>
+<h4 class="date"><em>2017-05-08</em></h4>
+
+</div>
+
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+<!-- Update knitr chunk options -->
+<!-- Insert the date the file was last updated -->
+<p><strong>Last updated:</strong> 2017-05-09</p>
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+<p><strong>Code version:</strong> 615c317</p>
+<!-- Add your analysis here -->
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p><a href="marginal_z.html">We’ve seen</a> that when generated from the global null, that is, when the cases and controls have no difference, the <span class="math inline">\(z\)</span> scores’ behavior are what one would expect if simulated from correlated marginally <span class="math inline">\(N\left(0, 1\right)\)</span> random variables.</p>
+<p>But what if the <span class="math inline">\(z\)</span> scores are not simulated from the global null? Are these <span class="math inline">\(z\)</span> scores going to behave significantly different from correlated marginally <span class="math inline">\(N\left(0, 1\right)\)</span> random samples? Let’s take a look at the real data containing true effects.</p>
+<pre class="r"><code>library(limma)
+library(edgeR)
+library(qvalue)
+library(ashr)
+
+#extract top g genes from G by n matrix X of expression
+
+top_genes_index = function (g, X)
+{return(order(rowSums(X), decreasing = TRUE)[1 : g])
+}
+
+lcpm = function (r) {
+  R = colSums(r)
+  t(log2(((t(r) + 0.5) / (R + 1)) * 10^6))
+}
+
+# transform counts to z scores
+# these z scores are marginally N(0, 1) under null
+
+counts_to_z = function (counts, condition) {
+  design = model.matrix(~condition)
+  dgecounts = calcNormFactors(DGEList(counts = counts, group = condition))
+  v = voom(dgecounts, design, plot = FALSE)
+  lim = lmFit(v)
+  r.ebayes = eBayes(lim)
+  p = r.ebayes$p.value[, 2]
+  t = r.ebayes$t[, 2]
+  z = sign(t) * qnorm(1 - p/2)
+  return (z)
+}</code></pre>
+</div>
+<div id="generating-non-null-z-scores-from-real-data" class="section level2">
+<h2>Generating non-null <span class="math inline">\(z\)</span> scores from real data</h2>
+<p>For convenience and without loss of generality, we are using the liver tissue as an anchor in the simulation, and always choose top expressed genes in livers.</p>
+<pre class="r"><code>r.liver = read.csv(&quot;../data/liver.csv&quot;)
+r.liver = r.liver[, -(1 : 2)] # remove gene name and description
+Y = lcpm(r.liver)
+G = 1e4
+subset = top_genes_index(G, Y)
+r.liver = r.liver[subset, ]</code></pre>
+<div id="liver-vs-heart" class="section level3">
+<h3>Liver vs Heart</h3>
+<pre class="r"><code>tissue = &quot;heart&quot;
+r = read.csv(paste0(&quot;../data/&quot;, tissue, &quot;.csv&quot;))
+r = r[, -(1 : 2)] # remove gene name and description
+## choose top expressed genes in liver
+r = r[subset, ]</code></pre>
+<pre class="r"><code>set.seed(777)
+m = 1e3
+n = 5
+z.list = list()
+condition = c(rep(0, n), rep(1, n))
+for (i in 1 : m) {
+  counts = cbind(r.liver[, sample(1 : ncol(r.liver), n)],
+                 r[, sample(1 : ncol(r), n)])
+  z.list[[i]] = counts_to_z(counts, condition)
+}</code></pre>
+<pre class="r"><code>z.mat = matrix(unlist(z.list), nrow = m, byrow = TRUE)
+saveRDS(z.mat, &quot;../output/z_5liver_5heart_777.rds&quot;)</code></pre>
+</div>
+<div id="liver-vs-muscle" class="section level3">
+<h3>Liver vs Muscle</h3>
+<pre class="r"><code>tissue = &quot;muscle&quot;
+r = read.csv(paste0(&quot;../data/&quot;, tissue, &quot;.csv&quot;))
+r = r[, -(1 : 2)] # remove gene name and description
+## choose top expressed genes in liver
+r = r[subset, ]</code></pre>
+<pre class="r"><code>set.seed(777)
+m = 1e3
+n = 5
+z.list = list()
+condition = c(rep(0, n), rep(1, n))
+for (i in 1 : m) {
+  counts = cbind(r.liver[, sample(1 : ncol(r.liver), n)],
+                 r[, sample(1 : ncol(r), n)])
+  z.list[[i]] = counts_to_z(counts, condition)
+}</code></pre>
+<pre class="r"><code>z.mat = matrix(unlist(z.list), nrow = m, byrow = TRUE)
+saveRDS(z.mat, &quot;../output/z_5liver_5muscle_777.rds&quot;)</code></pre>
+</div>
+</div>
+<div id="marginal-distributions-of-correlated-non-null-z-scores" class="section level2">
+<h2>Marginal distributions of correlated non-null <span class="math inline">\(z\)</span> scores</h2>
+<p>Now following the simulations to explore <a href="marginal_z.html">the marginal distributions of the correlated null <span class="math inline">\(z\)</span> scores</a>, we are taking a look at the marginal distributions of the correlated non-null <span class="math inline">\(z\)</span> scores. The main focus is still the number of tail observations.</p>
+</div>
+<div id="liver-vs-heart-1" class="section level2">
+<h2>Liver vs Heart</h2>
+<pre class="r"><code>z.heart = readRDS(&quot;../output/z_5liver_5heart_777.rds&quot;)
+n = ncol(z.heart)
+m = nrow(z.heart)</code></pre>
+<div id="row-wise" class="section level3">
+<h3>Row-wise</h3>
+<p><img src="figure/marginal_z_alternative.rmd/plot%20row%20wise%20tail%20liver%20v%20heart-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20row%20wise%20tail%20liver%20v%20heart-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20row%20wise%20tail%20liver%20v%20heart-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20row%20wise%20tail%20liver%20v%20heart-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20row%20wise%20tail%20liver%20v%20heart-5.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20row%20wise%20tail%20liver%20v%20heart-6.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20row%20wise%20tail%20liver%20v%20heart-7.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20row%20wise%20tail%20liver%20v%20heart-8.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20row%20wise%20tail%20liver%20v%20heart-9.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20row%20wise%20tail%20liver%20v%20heart-10.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20row%20wise%20tail%20liver%20v%20heart-11.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20row%20wise%20tail%20liver%20v%20heart-12.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20row%20wise%20tail%20liver%20v%20heart-13.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20row%20wise%20tail%20liver%20v%20heart-14.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20row%20wise%20tail%20liver%20v%20heart-15.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20row%20wise%20tail%20liver%20v%20heart-16.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20row%20wise%20tail%20liver%20v%20heart-17.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20row%20wise%20tail%20liver%20v%20heart-18.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20row%20wise%20tail%20liver%20v%20heart-19.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20row%20wise%20tail%20liver%20v%20heart-20.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20row%20wise%20tail%20liver%20v%20heart-21.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="column-wise" class="section level3">
+<h3>Column-wise</h3>
+<p><img src="figure/marginal_z_alternative.rmd/plot%20column%20wise%20tail%20liver%20v%20heart-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20column%20wise%20tail%20liver%20v%20heart-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20column%20wise%20tail%20liver%20v%20heart-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20column%20wise%20tail%20liver%20v%20heart-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20column%20wise%20tail%20liver%20v%20heart-5.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20column%20wise%20tail%20liver%20v%20heart-6.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20column%20wise%20tail%20liver%20v%20heart-7.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20column%20wise%20tail%20liver%20v%20heart-8.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20column%20wise%20tail%20liver%20v%20heart-9.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20column%20wise%20tail%20liver%20v%20heart-10.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20column%20wise%20tail%20liver%20v%20heart-11.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20column%20wise%20tail%20liver%20v%20heart-12.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20column%20wise%20tail%20liver%20v%20heart-13.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20column%20wise%20tail%20liver%20v%20heart-14.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20column%20wise%20tail%20liver%20v%20heart-15.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20column%20wise%20tail%20liver%20v%20heart-16.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20column%20wise%20tail%20liver%20v%20heart-17.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="liver-vs-muscle-1" class="section level2">
+<h2>Liver vs Muscle</h2>
+<pre class="r"><code>z.muscle = readRDS(&quot;../output/z_5liver_5muscle_777.rds&quot;)
+n = ncol(z.muscle)
+m = nrow(z.muscle)</code></pre>
+<div id="row-wise-1" class="section level3">
+<h3>Row-wise</h3>
+<p><img src="figure/marginal_z_alternative.rmd/plot%20row%20wise%20tail%20liver%20v%20muscle-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20row%20wise%20tail%20liver%20v%20muscle-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20row%20wise%20tail%20liver%20v%20muscle-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20row%20wise%20tail%20liver%20v%20muscle-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20row%20wise%20tail%20liver%20v%20muscle-5.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20row%20wise%20tail%20liver%20v%20muscle-6.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20row%20wise%20tail%20liver%20v%20muscle-7.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20row%20wise%20tail%20liver%20v%20muscle-8.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20row%20wise%20tail%20liver%20v%20muscle-9.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20row%20wise%20tail%20liver%20v%20muscle-10.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20row%20wise%20tail%20liver%20v%20muscle-11.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20row%20wise%20tail%20liver%20v%20muscle-12.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20row%20wise%20tail%20liver%20v%20muscle-13.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20row%20wise%20tail%20liver%20v%20muscle-14.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20row%20wise%20tail%20liver%20v%20muscle-15.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20row%20wise%20tail%20liver%20v%20muscle-16.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20row%20wise%20tail%20liver%20v%20muscle-17.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20row%20wise%20tail%20liver%20v%20muscle-18.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20row%20wise%20tail%20liver%20v%20muscle-19.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20row%20wise%20tail%20liver%20v%20muscle-20.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20row%20wise%20tail%20liver%20v%20muscle-21.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="column-wise-1" class="section level3">
+<h3>Column-wise</h3>
+<p><img src="figure/marginal_z_alternative.rmd/plot%20column%20wise%20tail%20liver%20v%20muscle-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20column%20wise%20tail%20liver%20v%20muscle-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20column%20wise%20tail%20liver%20v%20muscle-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20column%20wise%20tail%20liver%20v%20muscle-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20column%20wise%20tail%20liver%20v%20muscle-5.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20column%20wise%20tail%20liver%20v%20muscle-6.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20column%20wise%20tail%20liver%20v%20muscle-7.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20column%20wise%20tail%20liver%20v%20muscle-8.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20column%20wise%20tail%20liver%20v%20muscle-9.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20column%20wise%20tail%20liver%20v%20muscle-10.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20column%20wise%20tail%20liver%20v%20muscle-11.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20column%20wise%20tail%20liver%20v%20muscle-12.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20column%20wise%20tail%20liver%20v%20muscle-13.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20column%20wise%20tail%20liver%20v%20muscle-14.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20column%20wise%20tail%20liver%20v%20muscle-15.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20column%20wise%20tail%20liver%20v%20muscle-16.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot%20column%20wise%20tail%20liver%20v%20muscle-17.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="conclusion" class="section level2">
+<h2>Conclusion</h2>
+<p>As expected, the empirical distribution and the indicated marginal distribution of the correlated non-null <span class="math inline">\(z\)</span> scores are starkly different from <a href="marginal_z.html">those of the correlated null ones</a>.</p>
+<p>Particular interesting are the column-wise plots. The distribution of the number of tail observations is not only not close to normal, not close to what would be expected under correlated marginally <span class="math inline">\(N\left(0, 1\right)\)</span>, but also not even unimodal, not even peaked at <span class="math inline">\(m\alpha\)</span> when <span class="math inline">\(\alpha \leq0.5\)</span> or <span class="math inline">\(m\left(1-\alpha\right)\)</span> when <span class="math inline">\(\alpha\geq0.5\)</span>. It suggests that there are indeed plenty of true signals, which make the marginal distribution of the <span class="math inline">\(z\)</span> scores for a certain gene often not centered at <span class="math inline">\(0\)</span>.</p>
+</div>
+<div id="session-information" class="section level2">
+<h2>Session information</h2>
+<!-- Insert the session information into the document -->
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 3.3.3 (2017-03-06)
+Platform: x86_64-apple-darwin13.4.0 (64-bit)
+Running under: macOS Sierra 10.12.4
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] ashr_2.1-10  qvalue_2.4.2 edgeR_3.14.0 limma_3.28.5
+
+loaded via a namespace (and not attached):
+ [1] Rcpp_0.12.10      knitr_1.15.1      magrittr_1.5     
+ [4] MASS_7.3-45       splines_3.3.3     pscl_1.4.9       
+ [7] doParallel_1.0.10 munsell_0.4.3     lattice_0.20-34  
+[10] SQUAREM_2016.10-1 colorspace_1.2-6  foreach_1.4.3    
+[13] stringr_1.2.0     plyr_1.8.3        tools_3.3.3      
+[16] parallel_3.3.3    grid_3.3.3        gtable_0.2.0     
+[19] git2r_0.18.0      iterators_1.0.8   htmltools_0.3.5  
+[22] yaml_2.1.14       rprojroot_1.2     digest_0.6.11    
+[25] reshape2_1.4.1    ggplot2_2.1.0     codetools_0.2-15 
+[28] evaluate_0.10     rmarkdown_1.3     stringi_1.1.2    
+[31] scales_0.4.0      backports_1.0.5   truncnorm_1.0-7  </code></pre>
+</div>
+
+<hr>
+<p>
+    This <a href="http://rmarkdown.rstudio.com">R Markdown</a> site was created with <a href="https://github.com/jdblischak/workflowr">workflowr</a>
+</p>
+<hr>
+
+<!-- To enable disqus, uncomment the section below and provide your disqus_shortname -->
+
+<!-- disqus
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'rmarkdown'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+-->
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -289,9 +289,14 @@ $(document).ready(function () {
 </ul>
 <p>Essentially we hope to tell whether <span class="math inline">\(n\)</span> random samples are uniformly distributed, and the task seems more complicated than what it sounds. There are multiple ways to do it, and some of them have been absorbed into the <code>ashr</code> package.</p>
 <ul>
-<li><a href="marginal_z.html">Marginal distribution of correlated null <span class="math inline">\(z\)</span> scores</a></li>
+<li><a href="marginal_z.html">Marginal distribution of <span class="math inline">\(z\)</span> scores: Correlated null</a></li>
+<li><a href="marginal_z_alternative.html">Marginal distribution of <span class="math inline">\(z\)</span> scores: Correlated non-null</a></li>
 </ul>
-<p>Take a look at the <span class="math inline">\(z\)</span> scores we’ve been experimenting with so far and check whether they truly are marginally <span class="math inline">\(N\left(0, 1\right)\)</span>. It’s an enhanced version of the simulation on <a href="ExtremeOccurrence.html">occurrence of extreme observations</a>.</p>
+<p>Take a look at the null <span class="math inline">\(z\)</span> scores we’ve been experimenting with so far and check whether they truly are marginally <span class="math inline">\(N\left(0, 1\right)\)</span>. It’s an enhanced version of the simulation on <a href="ExtremeOccurrence.html">occurrence of extreme observations</a>. The non-null <span class="math inline">\(z\)</span> scores are produced for comparison.</p>
+<ul>
+<li><a href="create_null.html">Can we create correlated null from the raw data</a></li>
+</ul>
+<p>This whole project comes from a ubiquitous issue that in the simultaneous inference problem, the deviation from what would be expected under the null can come from both distortion due to correlation and enrichment due to true effects. Ideally, it would be perfect if we could create controls which keep the distortion by correlation unchanged, but remove the true effects. Efron in a series of papers (for example, <a href="http://www.tandfonline.com/doi/abs/10.1198/016214501753382129">Efron et al 2001</a>) suggests to create the null from the raw data by resampling or permutation. We apply the idea to our data sets, and the results are not promising.</p>
 <ul>
 <li><a href="ash_gd.html">Normal means inference with heteroskedastic and correlated noise: Model</a></li>
 </ul>
@@ -302,7 +307,8 @@ $(document).ready(function () {
 </ul>
 <p><code>cvxr</code> is still under active development. We are moving to the more established <code>Rmosek</code>, exploring and experimenting this convex optimization package.</p>
 <ul>
-<li><a href="mosek_reg.html">Improvement on Implementation with <code>Rmosek</code>: Primal and dual</a></li>
+<li><a href="mosek_reg.html">Improvement on implementation with <code>Rmosek</code>: Primal and dual</a></li>
+<li><a href="mosek_reg_2.html">Improvement on implementation with <code>Rmosek</code>: Normalization</a></li>
 </ul>
 <!-- The goal of this new template is to simplify the setup and maintenance of a research website. -->
 <!-- Specifically, -->

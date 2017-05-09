@@ -11,9 +11,9 @@
 
 <meta name="author" content="Lei Sun" />
 
-<meta name="date" content="2017-02-03" />
+<meta name="date" content="2017-05-09" />
 
-<title>truncash on Simulated Correlated Null</title>
+<title>Improvement on Implementation with Rmosek: Normalization</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -302,24 +302,90 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore"><code>truncash</code> on Simulated Correlated Null</h1>
+<h1 class="title toc-ignore">Improvement on Implementation with <code>Rmosek</code>: Normalization</h1>
 <h4 class="author"><em>Lei Sun</em></h4>
-<h4 class="date"><em>2017-02-03</em></h4>
+<h4 class="date"><em>2017-05-09</em></h4>
 
 </div>
 
 
-<p><strong>Last updated:</strong> 2017-02-03</p>
-<p><strong>Code version:</strong> 066c544</p>
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+<!-- Update knitr chunk options -->
+<!-- Insert the date the file was last updated -->
+<p><strong>Last updated:</strong> 2017-05-09</p>
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+<p><strong>Code version:</strong> 85b0795</p>
+<!-- Add your analysis here -->
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
+<p>When fitting Gaussian derivatives, <a href="gaussian_derivatives.html#scaled_and_unscaled_gaussian_derivatives">normalization</a> could potentially increase the parity in the magnitude of the coefficients and thus make the results more accurate.</p>
+<pre class="r"><code>data.list = readRDS(&quot;../output/z_null_liver_777_select.RDS&quot;)
+zscore = data.list[[3]]
+sel.num = length(zscore)
+data.list.index = readRDS(&quot;../output/z_null_liver_777_select_index.RDS&quot;)
+ord = data.list.index[[3]]$gd.ord</code></pre>
+<pre class="r"><code>source(&quot;../code/gdash.R&quot;)
+library(ashr)
+library(PolynomF)
+x &lt;- polynom()
+H &lt;- polylist(x, - 1 + x^2)
+for(n in 2 : 19)
+  H[[n+1]] &lt;- x * H[[n]] - n * H[[n-1]]</code></pre>
+</div>
+<div id="correlated-null" class="section level2">
+<h2>Correlated null</h2>
+<pre><code>Fitted w: -0.03642797 0.2788315 0.02632224 -0.106871 
+Time Cost in Seconds: 0.492 0.022 0.493 </code></pre>
+<p><img src="figure/mosek_reg_2.rmd/Rmosek%20dual%20fitting%20plotting-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Fitted w: 0.03361434 1.037918 -0.3782364 0.9186735 -0.6135029 0.6083007 -0.5077214 0.2384846 -0.2000794 
+Time Cost in Seconds: 0.522 0.013 0.46 </code></pre>
+<p><img src="figure/mosek_reg_2.rmd/Rmosek%20dual%20fitting%20plotting-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Fitted w: 0.02273596 1.301977 0.05448238 0.8574552 -0.1466924 0.09679719 -0.3403967 -0.1284122 -0.1752019 
+Time Cost in Seconds: 0.527 0.01 0.437 </code></pre>
+<p><img src="figure/mosek_reg_2.rmd/Rmosek%20dual%20fitting%20plotting-3.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Fitted w: 0.04544396 -0.1800044 0.02158272 0.04857491 
+Time Cost in Seconds: 0.491 0.009 0.371 </code></pre>
+<p><img src="figure/mosek_reg_2.rmd/Rmosek%20dual%20fitting%20plotting-4.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Fitted w: 0.006084177 0.5623754 -0.02229827 0.1278911 
+Time Cost in Seconds: 0.357 0.006 0.377 </code></pre>
+<p><img src="figure/mosek_reg_2.rmd/Rmosek%20dual%20fitting%20plotting-5.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="signal-correlated-error" class="section level2">
+<h2>Signal <span class="math inline">\(+\)</span> correlated error</h2>
+<pre><code>Converged: TRUE 
+Number of Iteration: 21 
+Time Cost in Seconds: 38.654 2.382 38.811 </code></pre>
+<p><img src="figure/mosek_reg_2.rmd/gdash%20dual%20signal%20plotting-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Converged: TRUE 
+Number of Iteration: 24 
+Time Cost in Seconds: 65.451 4.351 58.666 </code></pre>
+<p><img src="figure/mosek_reg_2.rmd/gdash%20dual%20signal%20plotting-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Converged: TRUE 
+Number of Iteration: 21 
+Time Cost in Seconds: 53.677 3.877 53.751 </code></pre>
+<p><img src="figure/mosek_reg_2.rmd/gdash%20dual%20signal%20plotting-3.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Converged: TRUE 
+Number of Iteration: 27 
+Time Cost in Seconds: 59.707 3.056 38.881 </code></pre>
+<p><img src="figure/mosek_reg_2.rmd/gdash%20dual%20signal%20plotting-4.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Converged: TRUE 
+Number of Iteration: 12 
+Time Cost in Seconds: 30.248 1.343 23.311 </code></pre>
+<p><img src="figure/mosek_reg_2.rmd/gdash%20dual%20signal%20plotting-5.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="conclusion" class="section level2">
+<h2>Conclusion</h2>
+<p>It appears normalization indeed increases the accuracy, <em>although the computation seems slowing down a little bit? Not sure.</em></p>
 </div>
 <div id="session-information" class="section level2">
-<h2>Session Information</h2>
+<h2>Session information</h2>
+<!-- Insert the session information into the document -->
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 3.3.2 (2016-10-31)
+<pre><code>R version 3.3.3 (2017-03-06)
 Platform: x86_64-apple-darwin13.4.0 (64-bit)
-Running under: macOS Sierra 10.12.3
+Running under: macOS Sierra 10.12.4
 
 locale:
 [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
@@ -328,10 +394,10 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 loaded via a namespace (and not attached):
- [1] backports_1.0.5 magrittr_1.5    rprojroot_1.2   tools_3.3.2    
- [5] htmltools_0.3.5 yaml_2.1.14     Rcpp_0.12.9     stringi_1.1.2  
- [9] rmarkdown_1.3   knitr_1.15.1    git2r_0.18.0    stringr_1.1.0  
-[13] digest_0.6.11   workflowr_0.3.0 evaluate_0.10  </code></pre>
+ [1] backports_1.0.5 magrittr_1.5    rprojroot_1.2   tools_3.3.3    
+ [5] htmltools_0.3.5 yaml_2.1.14     Rcpp_0.12.10    stringi_1.1.2  
+ [9] rmarkdown_1.3   knitr_1.15.1    git2r_0.18.0    stringr_1.2.0  
+[13] digest_0.6.11   evaluate_0.10  </code></pre>
 </div>
 
 <hr>
