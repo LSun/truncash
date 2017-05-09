@@ -1,5 +1,5 @@
 ---
-title: "Marginal Distribution of $z$ Scores"
+title: "Marginal Distribution of $z$ Scores: Null"
 author: "Lei Sun"
 date: 2017-04-25
 output: html_document
@@ -208,7 +208,13 @@ for (alpha in alpha.vec.col) {
 }
 ```
 
+## Conclusion
 
+The empirical distribution and the indicated marginal distribution of the correlated null $z$ scores are behaving not different from the expectation.
+
+Row-wise, the number of tail observations averages to what would be expected from correlated marginally $N\left(0, 1\right)$ random samples, validating Prof. Stein's intuition.
+
+Column-wise, the distribution of the number of tail observations is closer to normal, closer to what would be expected under corelated marginally $N\left(0, 1\right)$.  Moreover, the distribution seems unimodal, and peaked at $m\alpha$ when $\alpha \leq0.5$ or $m\left(1-\alpha\right)$ when $\alpha\geq0.5$.  It suggests that the marginal distribution of the null $z$ scores for a certain gene is usually centered at $0$, and more often than not, close to $N\left(0, 1\right)$.
 
 ## Session information
 
