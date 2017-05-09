@@ -1,5 +1,5 @@
 ---
-title: "Improvement on Implementation with `Rmosek`"
+title: "Improvement on Implementation with `Rmosek`: Primal and Dual"
 author: "Lei Sun"
 date: 2017-05-07
 output: html_document
@@ -65,13 +65,15 @@ Recall that our [biconvex optimization problem](ash_gd.html#optimization_problem
 
 $$
 \begin{array}{rl}
-\min\limits_{\pi,w} & -\sum\limits_{j = 1}^n\log\left(\sum\limits_{k = 1}^K\sum\limits_{l=1}^L\pi_k w_l f_{jkl} + \sum\limits_{k = 1}^K\pi_kf_{jk0}\right) - \sum\limits_{k = 1}^K\left(\lambda_k^\pi - 1\right)\log\pi_k + \sum\limits_{l = 1}^L\lambda_l^wpen\left(\left|w_l\right|\right)
+\min\limits_{\pi,w} & -\sum\limits_{j = 1}^n\log\left(\sum\limits_{k = 1}^K\sum\limits_{l=1}^L\pi_k w_l f_{jkl} + \sum\limits_{k = 1}^K\pi_kf_{jk0}\right) - \sum\limits_{k = 1}^K\left(\lambda_k^\pi - 1\right)\log\pi_k + \sum\limits_{l = 1}^L\lambda_l^w\phi\left(\left|w_l\right|\right)
 \\
 \text{subject to} & \sum\limits_{k = 1}^K\pi_k = 1\\
 & \sum\limits_{l=1}^L w_l \varphi^{(l)}\left(z\right) + \varphi\left(z\right) \geq 0, \forall z\in \mathbb{R}\\
-& w_l \text{ decay reasonably fast.}
+& w_l \text{ decay reasonably fast,}
 \end{array}
 $$
+where $- \sum\limits_{k = 1}^K\left(\lambda_k^\pi - 1\right)\log\pi_k$ and $+ \sum\limits_{l = 1}^L\lambda_l^w\phi\left(\left|w_l\right|\right)$ are to regularize $\pi_k$ and $w_l$, respectively.
+
 This problem can be solved iteratively.  Starting with an initial value, each step two convex optimization problems are solved.
 
 With a given $\hat w$, $\hat\pi$ is solved by
@@ -89,15 +91,18 @@ Meanwhile, with a given $\hat\pi$, the optimization problem to obtain $\hat w$ b
 
 $$
 \begin{array}{rl}
-\min\limits_{w} & -\sum\limits_{j = 1}^n\log\left(\sum\limits_{l=1}^Lw_l\left(\sum\limits_{k = 1}^K\hat\pi_k  f_{jkl}\right) + \sum\limits_{k = 1}^K\hat\pi_kf_{jk0}\right) + \sum\limits_{l = 1}^L\lambda_l^wpen\left(\left|w_l\right|\right)
+\min\limits_{w} & -\sum\limits_{j = 1}^n\log\left(\sum\limits_{l=1}^Lw_l\left(\sum\limits_{k = 1}^K\hat\pi_k  f_{jkl}\right) + \sum\limits_{k = 1}^K\hat\pi_kf_{jk0}\right) + 
+\sum\limits_{l = 1}^L\lambda_l^w
+\phi
+\left(\left|w_l\right|\right)
 \\
 \text{subject to} & \sum\limits_{l=1}^L w_l \varphi^{(l)}\left(z\right) + \varphi\left(z\right) \geq 0, \forall z\in \mathbb{R}\\
 & w_l \text{ decay reasonably fast.}
 \end{array}
 $$
-The two constraints are important to prevent [numerical instability](gaussian_derivatives_3.html).  Yet they are not readily manifested as convex.  Ideally, the regularization $\sum\limits_{l = 1}^L\lambda_l^wpen\left(\left|w_l\right|\right)$ would be able to capture the essence of these two constaints, and at the same time maintain the convexity.  Different ideas will be explored.
+The two constraints are important to prevent [numerical instability](gaussian_derivatives_3.html).  Yet they are not readily manifested as convex.  Ideally, the regularization $\sum\limits_{l = 1}^L\lambda_l^w\phi\left(\left|w_l\right|\right)$ would be able to capture the essence of these two constaints, and at the same time maintain the convexity.  Different ideas will be explored.
 
-In this part, we'll mainly work on the "basic form" of the $w$ optimization problem; that is, the optimization problem without regularization $+ \sum\limits_{l = 1}^L\lambda_l^wpen\left(\left|w_l\right|\right)$.
+In this part, we'll mainly work on the "basic form" of the $w$ optimization problem; that is, the optimization problem without regularization $\sum\limits_{l = 1}^L\lambda_l^w\phi\left(\left|w_l\right|\right)$.
 
 In the following, we'll take a look at the basic form in its primal and dual formulations, optimized by `w.mosek()` and `w.mosek.primal` functions.  First, they are applied to the correlated null, and their performance can be compared with [the previous implementation](gaussian_derivatives_2.html) by `cvxr`.  Then, they are applied to the simulated non-null data sets, and the results are compared with those obtained by `ASH`, as well as the truth.
 
@@ -297,6 +302,7 @@ for (i in 1 : sel.num) {
 
 Implementation by `Rmosek` can fully reproduce the results obtained by `cvxr`.  Moreover, the dual form gives the same results as the primal dorm does, with only a fraction of time.
 
+It seems hopeful that we'll find a key to successfully tackle correlation in simultaneous inference, which has eluded Prof. Brad Efron for more than a decade.
 
 ## Session information
 
