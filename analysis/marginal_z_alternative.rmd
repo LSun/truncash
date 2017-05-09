@@ -1,0 +1,312 @@
+---
+title: "Marginal Distribution of $z$ Scores: Alternative"
+author: "Lei Sun"
+date: 2017-05-08
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+## Introduction
+
+[We've seen](marginal_z.html) that when generated from the global null, that is, when the cases and controls have no difference, the $z$ scores' behavior are what one would expect if simulated from correlated marginally $N\left(0, 1\right)$ random variables.
+
+But what if the $z$ scores are not simulated from the global null?  Are these $z$ scores going to behave significantly different from correlated marginally $N\left(0, 1\right)$ random samples?  Let's take a look at the real data containing true effects.
+
+```{r functions}
+library(limma)
+library(edgeR)
+library(qvalue)
+library(ashr)
+
+#extract top g genes from G by n matrix X of expression
+
+top_genes_index = function (g, X)
+{return(order(rowSums(X), decreasing = TRUE)[1 : g])
+}
+
+lcpm = function (r) {
+  R = colSums(r)
+  t(log2(((t(r) + 0.5) / (R + 1)) * 10^6))
+}
+
+# transform counts to z scores
+# these z scores are marginally N(0, 1) under null
+
+counts_to_z = function (counts, condition) {
+  design = model.matrix(~condition)
+  dgecounts = calcNormFactors(DGEList(counts = counts, group = condition))
+  v = voom(dgecounts, design, plot = FALSE)
+  lim = lmFit(v)
+  r.ebayes = eBayes(lim)
+  p = r.ebayes$p.value[, 2]
+  t = r.ebayes$t[, 2]
+  z = sign(t) * qnorm(1 - p/2)
+  return (z)
+}
+```
+
+## Generating non-null $z$ scores from real data
+
+For convenience and without loss of generality, we are using the liver tissue as an anchor in the simulation, and always choose top expressed genes in livers.
+
+```{r choose genes, cache = TRUE}
+r.liver = read.csv("../data/liver.csv")
+r.liver = r.liver[, -(1 : 2)] # remove gene name and description
+Y = lcpm(r.liver)
+G = 1e4
+subset = top_genes_index(G, Y)
+r.liver = r.liver[subset, ]
+```
+
+### Liver vs Heart
+
+```{r heart data, cache = TRUE}
+tissue = "heart"
+r = read.csv(paste0("../data/", tissue, ".csv"))
+r = r[, -(1 : 2)] # remove gene name and description
+## choose top expressed genes in liver
+r = r[subset, ]
+```
+
+```{r liver v heart z, cache = TRUE}
+set.seed(777)
+m = 1e3
+n = 5
+z.list = list()
+condition = c(rep(0, n), rep(1, n))
+for (i in 1 : m) {
+  counts = cbind(r.liver[, sample(1 : ncol(r.liver), n)],
+                 r[, sample(1 : ncol(r), n)])
+  z.list[[i]] = counts_to_z(counts, condition)
+}
+```
+
+```{r save liver v heart z, cache = TRUE}
+z.mat = matrix(unlist(z.list), nrow = m, byrow = TRUE)
+saveRDS(z.mat, "../output/z_5liver_5heart_777.rds")
+```
+
+### Liver vs Muscle
+
+```{r muscle data, cache = TRUE}
+tissue = "muscle"
+r = read.csv(paste0("../data/", tissue, ".csv"))
+r = r[, -(1 : 2)] # remove gene name and description
+## choose top expressed genes in liver
+r = r[subset, ]
+```
+
+```{r liver v muscle z, cache = TRUE}
+set.seed(777)
+m = 1e3
+n = 5
+z.list = list()
+condition = c(rep(0, n), rep(1, n))
+for (i in 1 : m) {
+  counts = cbind(r.liver[, sample(1 : ncol(r.liver), n)],
+                 r[, sample(1 : ncol(r), n)])
+  z.list[[i]] = counts_to_z(counts, condition)
+}
+```
+
+```{r save liver v muscle z, cache = TRUE}
+z.mat = matrix(unlist(z.list), nrow = m, byrow = TRUE)
+saveRDS(z.mat, "../output/z_5liver_5muscle_777.rds")
+```
+
+## Marginal distributions of correlated non-null $z$ scores
+
+Now following the simulations to explore [the marginal distributions of the correlated null $z$ scores](marginal_z.html), we are taking a look at the marginal distributions of the correlated non-null $z$ scores.  The main focus is still the number of tail observations.
+
+```{r tail number function, cache = TRUE, echo = FALSE}
+tail.num = function(x, alpha) {
+  num = ifelse(alpha <= 0.5,
+               sum(as.numeric(x) <= qnorm(alpha)),
+               sum(as.numeric(x) >= qnorm(alpha))
+        ) 
+}
+```
+
+## Liver vs Heart
+
+```{r read in liver v heart}
+z.heart = readRDS("../output/z_5liver_5heart_777.rds")
+n = ncol(z.heart)
+m = nrow(z.heart)
+```
+
+### Row-wise
+
+```{r compute row wise tail liver v heart, cache = TRUE, echo = FALSE}
+alpha.vec.row = c(0.0001, 0.0005, 0.001, 0.005, 0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99, 0.995, 0.999, 0.9995, 0.9999)
+tail.row = c()
+for (alpha in alpha.vec.row) {
+  tail.row = cbind(
+    tail.row,
+    apply(z.heart, 1, tail.num, alpha = alpha)
+  )
+}
+colnames(tail.row) = alpha.vec.row
+```
+
+```{r plot row wise tail liver v heart, cache = TRUE, echo = FALSE}
+alpha.vec.row = colnames(tail.row)
+for (alpha in alpha.vec.row) {
+  alpha.adj = ifelse(as.numeric(alpha) <= 0.5, as.numeric(alpha), 1 - as.numeric(alpha))
+  plot(table(tail.row[, alpha]), 
+       xlim = range(c(n * alpha.adj, tail.row[, alpha])),
+       xlab = bquote(R[.(alpha)]^i),
+       ylab = "Frequencies")
+  if (as.numeric(alpha) <= 0.5) {
+    title(bquote(paste("Liver vs Heart: ", bar(R)[.(alpha)] == .(mean(tail.row[, alpha])), ", ", n %*% alpha == .(n * alpha.adj))))
+  } else {
+    title(bquote(paste("Liver vs Heart: ", bar(R)[.(alpha)] == .(mean(tail.row[, alpha])), ", ", n %*% (1 - alpha) == .(n * alpha.adj))))
+  }
+  abline(v = alpha.adj * n, col = "red")
+  range.alpha.row = range(c(n * alpha.adj, tail.row[, alpha]))
+  expt.alpha.row = dbinom(0 : range.alpha.row[2], n, prob = alpha.adj) * m
+  lines(0 : range.alpha.row[2], expt.alpha.row, col = "blue")
+}
+```
+
+### Column-wise
+
+```{r compute column wise tail liver v heart, cache = TRUE, echo = FALSE}
+alpha.vec.col = c(0.001, 0.005, 0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99, 0.995, 0.999)
+tail.col = c()
+for (alpha in alpha.vec.col) {
+  tail.col = cbind(
+    tail.col,
+    apply(z.heart, 2, tail.num, alpha = alpha)
+  )
+}
+colnames(tail.col) = alpha.vec.col
+```
+
+```{r plot column wise tail liver v heart, cache = TRUE, echo = FALSE}
+alpha.vec.col = colnames(tail.col)
+for (alpha in alpha.vec.col) {
+  alpha.adj = ifelse(as.numeric(alpha) <= 0.5, as.numeric(alpha), 1 - as.numeric(alpha))
+  plot(table(tail.col[, alpha]),
+       xlim = range(c(m * alpha.adj, tail.col[, alpha])),
+       xlab = bquote(C[.(alpha)]^i),
+       ylab = "Frequencies")
+  if (as.numeric(alpha) <= 0.5) {
+    title(bquote(paste("Liver vs Heart: ", bar(C)[.(alpha)] == .(mean(tail.col[, alpha])), ", ", m %*% alpha == .(m * alpha.adj))))
+  } else {
+    title(bquote(paste("Liver vs Heart: ", bar(C)[.(alpha)] == .(mean(tail.col[, alpha])), ", ", m %*% (1 - alpha) == .(m * alpha.adj))))
+  }
+  abline(v = alpha.adj * m, col = "red")
+  range.alpha.col = range(c(m * alpha.adj, tail.col[, alpha]))
+  expt.alpha.col = dbinom(0 : range.alpha.col[2], m, prob = alpha.adj) * n
+  lines(0 : range.alpha.col[2], expt.alpha.col, col = "blue")
+}
+```
+
+## Liver vs Muscle
+
+```{r read in liver v muscle}
+z.muscle = readRDS("../output/z_5liver_5muscle_777.rds")
+n = ncol(z.muscle)
+m = nrow(z.muscle)
+```
+
+### Row-wise
+
+```{r compute row wise tail liver v muscle, cache = TRUE, echo = FALSE}
+alpha.vec.row = c(0.0001, 0.0005, 0.001, 0.005, 0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99, 0.995, 0.999, 0.9995, 0.9999)
+tail.row = c()
+for (alpha in alpha.vec.row) {
+  tail.row = cbind(
+    tail.row,
+    apply(z.muscle, 1, tail.num, alpha = alpha)
+  )
+}
+colnames(tail.row) = alpha.vec.row
+```
+
+```{r plot row wise tail liver v muscle, cache = TRUE, echo = FALSE}
+alpha.vec.row = colnames(tail.row)
+for (alpha in alpha.vec.row) {
+  alpha.adj = ifelse(as.numeric(alpha) <= 0.5, as.numeric(alpha), 1 - as.numeric(alpha))
+  plot(table(tail.row[, alpha]), 
+       xlim = range(c(n * alpha.adj, tail.row[, alpha])),
+       xlab = bquote(R[.(alpha)]^i),
+       ylab = "Frequencies")
+  if (as.numeric(alpha) <= 0.5) {
+    title(bquote(paste("Liver vs Muscle: ", bar(R)[.(alpha)] == .(mean(tail.row[, alpha])), ", ", n %*% alpha == .(n * alpha.adj))))
+  } else {
+    title(bquote(paste("Liver vs Muscle: ", bar(R)[.(alpha)] == .(mean(tail.row[, alpha])), ", ", n %*% (1 - alpha) == .(n * alpha.adj))))
+  }
+  abline(v = alpha.adj * n, col = "red")
+  range.alpha.row = range(c(n * alpha.adj, tail.row[, alpha]))
+  expt.alpha.row = dbinom(0 : range.alpha.row[2], n, prob = alpha.adj) * m
+  lines(0 : range.alpha.row[2], expt.alpha.row, col = "blue")
+}
+```
+
+### Column-wise
+
+```{r compute column wise tail liver v muscle, cache = TRUE, echo = FALSE}
+alpha.vec.col = c(0.001, 0.005, 0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99, 0.995, 0.999)
+tail.col = c()
+for (alpha in alpha.vec.col) {
+  tail.col = cbind(
+    tail.col,
+    apply(z.muscle, 2, tail.num, alpha = alpha)
+  )
+}
+colnames(tail.col) = alpha.vec.col
+```
+
+```{r plot column wise tail liver v muscle, cache = TRUE, echo = FALSE}
+alpha.vec.col = colnames(tail.col)
+for (alpha in alpha.vec.col) {
+  alpha.adj = ifelse(as.numeric(alpha) <= 0.5, as.numeric(alpha), 1 - as.numeric(alpha))
+  plot(table(tail.col[, alpha]),
+       xlim = range(c(m * alpha.adj, tail.col[, alpha])),
+       xlab = bquote(C[.(alpha)]^i),
+       ylab = "Frequencies")
+  if (as.numeric(alpha) <= 0.5) {
+    title(bquote(paste("Liver vs Muscle: ", bar(C)[.(alpha)] == .(mean(tail.col[, alpha])), ", ", m %*% alpha == .(m * alpha.adj))))
+  } else {
+    title(bquote(paste("Liver vs Muscle: ", bar(C)[.(alpha)] == .(mean(tail.col[, alpha])), ", ", m %*% (1 - alpha) == .(m * alpha.adj))))
+  }
+  abline(v = alpha.adj * m, col = "red")
+  range.alpha.col = range(c(m * alpha.adj, tail.col[, alpha]))
+  expt.alpha.col = dbinom(0 : range.alpha.col[2], m, prob = alpha.adj) * n
+  lines(0 : range.alpha.col[2], expt.alpha.col, col = "blue")
+}
+```
+
+## Conclusion
+
+As expected, the empirical distribution and the indicated marginal distribution of the correlated non-null $z$ scores are starkly different from [those of the correlated null ones](marginal_z.html).
+
+Particular interesting are the column-wise plots.  The distribution of the number of tail observations is not only not close to normal, not close to what would be expected under correlated marginally $N\left(0, 1\right)$, but also not even unimodal, not even peaked at $m\alpha$ when $\alpha \leq0.5$ or $m\left(1-\alpha\right)$ when $\alpha\geq0.5$.  It suggests that there are indeed plenty of true signals, which make the marginal distribution of the $z$ scores for a certain gene often not centered at $0$.
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```
