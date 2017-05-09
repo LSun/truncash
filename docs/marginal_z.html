@@ -13,7 +13,7 @@
 
 <meta name="date" content="2017-04-25" />
 
-<title>Marginal Distribution of z Scores</title>
+<title>Marginal Distribution of z Scores: Null</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -302,7 +302,7 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Marginal Distribution of <span class="math inline">\(z\)</span> Scores</h1>
+<h1 class="title toc-ignore">Marginal Distribution of <span class="math inline">\(z\)</span> Scores: Null</h1>
 <h4 class="author"><em>Lei Sun</em></h4>
 <h4 class="date"><em>2017-04-25</em></h4>
 
@@ -313,10 +313,10 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2017-05-05</p>
+<p><strong>Last updated:</strong> 2017-05-09</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 8206370</p>
+<p><strong>Code version:</strong> 6264529</p>
 <!-- Add your analysis here -->
 <p><strong>This simulation can be seen as an enhanced version of <a href="ExtremeOccurrence.html">a previous simulation</a>.</strong></p>
 <div id="introduction" class="section level2">
@@ -356,6 +356,12 @@ z.sim = matrix(rnorm(m * n), nrow = m, ncol = n)</code></pre>
 <h3>Independent case: column wise</h3>
 <p><img src="figure/marginal_z.rmd/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-9-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-9-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-9-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-9-5.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-9-6.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-9-7.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-9-8.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-9-9.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-9-10.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-9-11.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-9-12.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-9-13.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-9-14.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-9-15.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-9-16.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-9-17.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
+</div>
+<div id="conclusion" class="section level2">
+<h2>Conclusion</h2>
+<p>The empirical distribution and the indicated marginal distribution of the correlated null <span class="math inline">\(z\)</span> scores are behaving not different from the expectation.</p>
+<p>Row-wise, the number of tail observations averages to what would be expected from correlated marginally <span class="math inline">\(N\left(0, 1\right)\)</span> random samples, validating Prof. Stein’s intuition.</p>
+<p>Column-wise, the distribution of the number of tail observations is closer to normal, closer to what would be expected under corelated marginally <span class="math inline">\(N\left(0, 1\right)\)</span>. Moreover, the distribution seems unimodal, and peaked at <span class="math inline">\(m\alpha\)</span> when <span class="math inline">\(\alpha \leq0.5\)</span> or <span class="math inline">\(m\left(1-\alpha\right)\)</span> when <span class="math inline">\(\alpha\geq0.5\)</span>. It suggests that the marginal distribution of the null <span class="math inline">\(z\)</span> scores for a certain gene is usually centered at <span class="math inline">\(0\)</span>, and more often than not, close to <span class="math inline">\(N\left(0, 1\right)\)</span>.</p>
 </div>
 <div id="session-information" class="section level2">
 <h2>Session information</h2>
