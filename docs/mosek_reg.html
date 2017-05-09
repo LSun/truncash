@@ -13,7 +13,7 @@
 
 <meta name="date" content="2017-05-07" />
 
-<title>Improvement on Implementation with Rmosek</title>
+<title>Improvement on Implementation with Rmosek: Primal and Dual</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -302,7 +302,7 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Improvement on Implementation with <code>Rmosek</code></h1>
+<h1 class="title toc-ignore">Improvement on Implementation with <code>Rmosek</code>: Primal and Dual</h1>
 <h4 class="author"><em>Lei Sun</em></h4>
 <h4 class="date"><em>2017-05-07</em></h4>
 
@@ -313,10 +313,10 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2017-05-08</p>
+<p><strong>Last updated:</strong> 2017-05-09</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 6bac69e</p>
+<p><strong>Code version:</strong> 1df916a</p>
 <!-- Add your analysis here -->
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
@@ -331,13 +331,14 @@ ord &lt;- c(4, 9, 9, 4, 4)</code></pre>
 <p>Recall that our <a href="ash_gd.html#optimization_problem">biconvex optimization problem</a> is as follows.</p>
 <p><span class="math display">\[
 \begin{array}{rl}
-\min\limits_{\pi,w} &amp; -\sum\limits_{j = 1}^n\log\left(\sum\limits_{k = 1}^K\sum\limits_{l=1}^L\pi_k w_l f_{jkl} + \sum\limits_{k = 1}^K\pi_kf_{jk0}\right) - \sum\limits_{k = 1}^K\left(\lambda_k^\pi - 1\right)\log\pi_k + \sum\limits_{l = 1}^L\lambda_l^wpen\left(\left|w_l\right|\right)
+\min\limits_{\pi,w} &amp; -\sum\limits_{j = 1}^n\log\left(\sum\limits_{k = 1}^K\sum\limits_{l=1}^L\pi_k w_l f_{jkl} + \sum\limits_{k = 1}^K\pi_kf_{jk0}\right) - \sum\limits_{k = 1}^K\left(\lambda_k^\pi - 1\right)\log\pi_k + \sum\limits_{l = 1}^L\lambda_l^w\phi\left(\left|w_l\right|\right)
 \\
 \text{subject to} &amp; \sum\limits_{k = 1}^K\pi_k = 1\\
 &amp; \sum\limits_{l=1}^L w_l \varphi^{(l)}\left(z\right) + \varphi\left(z\right) \geq 0, \forall z\in \mathbb{R}\\
-&amp; w_l \text{ decay reasonably fast.}
+&amp; w_l \text{ decay reasonably fast,}
 \end{array}
-\]</span> This problem can be solved iteratively. Starting with an initial value, each step two convex optimization problems are solved.</p>
+\]</span> where <span class="math inline">\(- \sum\limits_{k = 1}^K\left(\lambda_k^\pi - 1\right)\log\pi_k\)</span> and <span class="math inline">\(+ \sum\limits_{l = 1}^L\lambda_l^w\phi\left(\left|w_l\right|\right)\)</span> are to regularize <span class="math inline">\(\pi_k\)</span> and <span class="math inline">\(w_l\)</span>, respectively.</p>
+<p>This problem can be solved iteratively. Starting with an initial value, each step two convex optimization problems are solved.</p>
 <p>With a given <span class="math inline">\(\hat w\)</span>, <span class="math inline">\(\hat\pi\)</span> is solved by</p>
 <p><span class="math display">\[
 \begin{array}{rl}
@@ -349,13 +350,16 @@ ord &lt;- c(4, 9, 9, 4, 4)</code></pre>
 <p>Meanwhile, with a given <span class="math inline">\(\hat\pi\)</span>, the optimization problem to obtain <span class="math inline">\(\hat w\)</span> becomes</p>
 <p><span class="math display">\[
 \begin{array}{rl}
-\min\limits_{w} &amp; -\sum\limits_{j = 1}^n\log\left(\sum\limits_{l=1}^Lw_l\left(\sum\limits_{k = 1}^K\hat\pi_k  f_{jkl}\right) + \sum\limits_{k = 1}^K\hat\pi_kf_{jk0}\right) + \sum\limits_{l = 1}^L\lambda_l^wpen\left(\left|w_l\right|\right)
+\min\limits_{w} &amp; -\sum\limits_{j = 1}^n\log\left(\sum\limits_{l=1}^Lw_l\left(\sum\limits_{k = 1}^K\hat\pi_k  f_{jkl}\right) + \sum\limits_{k = 1}^K\hat\pi_kf_{jk0}\right) + 
+\sum\limits_{l = 1}^L\lambda_l^w
+\phi
+\left(\left|w_l\right|\right)
 \\
 \text{subject to} &amp; \sum\limits_{l=1}^L w_l \varphi^{(l)}\left(z\right) + \varphi\left(z\right) \geq 0, \forall z\in \mathbb{R}\\
 &amp; w_l \text{ decay reasonably fast.}
 \end{array}
-\]</span> The two constraints are important to prevent <a href="gaussian_derivatives_3.html">numerical instability</a>. Yet they are not readily manifested as convex. Ideally, the regularization <span class="math inline">\(\sum\limits_{l = 1}^L\lambda_l^wpen\left(\left|w_l\right|\right)\)</span> would be able to capture the essence of these two constaints, and at the same time maintain the convexity. Different ideas will be explored.</p>
-<p>In this part, we’ll mainly work on the “basic form” of the <span class="math inline">\(w\)</span> optimization problem; that is, the optimization problem without regularization <span class="math inline">\(+ \sum\limits_{l = 1}^L\lambda_l^wpen\left(\left|w_l\right|\right)\)</span>.</p>
+\]</span> The two constraints are important to prevent <a href="gaussian_derivatives_3.html">numerical instability</a>. Yet they are not readily manifested as convex. Ideally, the regularization <span class="math inline">\(\sum\limits_{l = 1}^L\lambda_l^w\phi\left(\left|w_l\right|\right)\)</span> would be able to capture the essence of these two constaints, and at the same time maintain the convexity. Different ideas will be explored.</p>
+<p>In this part, we’ll mainly work on the “basic form” of the <span class="math inline">\(w\)</span> optimization problem; that is, the optimization problem without regularization <span class="math inline">\(\sum\limits_{l = 1}^L\lambda_l^w\phi\left(\left|w_l\right|\right)\)</span>.</p>
 <p>In the following, we’ll take a look at the basic form in its primal and dual formulations, optimized by <code>w.mosek()</code> and <code>w.mosek.primal</code> functions. First, they are applied to the correlated null, and their performance can be compared with <a href="gaussian_derivatives_2.html">the previous implementation</a> by <code>cvxr</code>. Then, they are applied to the simulated non-null data sets, and the results are compared with those obtained by <code>ASH</code>, as well as the truth.</p>
 </div>
 <div id="basic-form-primal" class="section level2">
@@ -484,6 +488,7 @@ Time Cost in Seconds: 27.247 1.446 15.392 </code></pre>
 <div id="conclusion" class="section level2">
 <h2>Conclusion</h2>
 <p>Implementation by <code>Rmosek</code> can fully reproduce the results obtained by <code>cvxr</code>. Moreover, the dual form gives the same results as the primal dorm does, with only a fraction of time.</p>
+<p>It seems hopeful that we’ll find a key to successfully tackle correlation in simultaneous inference, which has eluded Prof. Brad Efron for more than a decade.</p>
 </div>
 <div id="session-information" class="section level2">
 <h2>Session information</h2>
