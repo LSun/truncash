@@ -69,6 +69,7 @@ An implicit key question of this inquiry is: what's the behavior of $z$ scores u
 * [Fitting empirical null with Gaussian derivatives: Examples](gaussian_derivatives_2.html)
 * [Fitting empirical null with Gaussian derivatives: Numerical issues](gaussian_derivatives_3.html)
 * [Fitting empirical null with Gaussian derivatives: Large correlations](gaussian_derivatives_4.html)
+* [Fitting empirical null with Gaussian derivatives: Delta function](gd_delta.html)
 
 Inspired by [Schwartzman 2010](http://amstat.tandfonline.com/doi/abs/10.1198/jasa.2010.tm10237), we experiment a new way to tackle "empirical null."
 
@@ -114,6 +115,8 @@ The previous investigation is boiled down to a prototypical problem: the classic
 * [Improvement on implementation with `Rmosek`: Primal and dual](mosek_reg.html)
 * [Improvement on implementation with `Rmosek`: Normalization](mosek_reg_2.html)
 * [Improvement on implementation with `Rmosek`: Regularization](mosek_reg_3.html)
+
+* [Gaussian derivative coefficients $w$ optimization with regularization: Null](mosek_reg_4.html)
 
 [`ashr`]: https://github.com/stephens999/ashr
 
