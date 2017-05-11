@@ -1,0 +1,242 @@
+---
+title: "Regularization of $w$: Null"
+author: "Lei Sun"
+date: 2017-05-09
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+## Introduction
+
+We are using a regularization term on $w$ which is
+
+$$
+\sum\limits_{l = 1}^L\lambda_l\left|w_l\right| \ ,
+$$
+where
+
+$$
+\lambda_l =
+\begin{cases}
+0 & l \text{ is odd;} \\
+\lambda / \rho^{l/2}, \ \ \ \  \lambda >0, \ \rho\in\left(0, 1\right) & l \text{ is even.}
+\end{cases}
+$$
+
+This regularization is meant to tackle multiple issues at once, including to restrict the number of Gaussian derivatives, to prevent overfitting, to stop the algorithm going crazy and unstable, and to generate non-negative empirical densities of the correlated null.
+
+We are not regularizing the odd order coefficients [because](mosek_reg_3.html#regularizing_even_orders_only) they are generally small but non-negligible.  Furthermore, unlike the even order ones, we don't have a clear idea how $\text{var}\left(W_l^s\right) = \bar{\rho_{ij}^l}$ roughly decays with respect to $l$.
+
+```{r, echo = FALSE}
+data = readRDS("../output/z_null_liver_777_select.RDS")
+data.index = readRDS("../output/z_null_liver_777_select_index.RDS")
+```
+
+```{r, message = FALSE, echo = FALSE}
+source("../code/gdash.R")
+```
+
+```{r, cache = TRUE, echo = FALSE}
+F.mat = function (z, L) {
+  hermite = Hermite(L)
+  gd.norm = function (z, l) {
+  return(dnorm(z) * hermite[[l]](z) / sqrt(factorial(l)))
+}
+  F.mat = matrix(0, nrow = length(z), ncol = L)
+  for (i in 1 : L) {
+    F.mat[, i] = gd.norm(z, i)
+  }
+  F.mat = cbind(dnorm(z), F.mat)
+  return(F.mat)
+}
+
+CorNullw = function (z, L, lambda, rho) {
+  w.lambda = lambda / sqrt(rho^(1 : L))
+  w.lambda[seq(1, L, by = 2)] = 0
+  Fz = F.mat(z, L)
+  fit = w.mosek(Fz, w_prior = w.lambda)
+  z.hist = hist(z, breaks = 100, plot = FALSE)
+  ymax = max(c(z.hist$density, dnorm(0)))
+  what = c(1, fit$w)
+  cat("Unnormalized w:\n")
+  cat(rbind(paste(0 : L, ":"), paste(what / sqrt(factorial(0 : L)), ";")), "\n")
+  cat("Normalized w:\n")
+  cat(rbind(paste(0 : L, ":"), paste(what, ";")), "\n")
+  hist(z, breaks = 100, prob = TRUE, xlab = "", main = "", ylim = c(0, ymax))
+  return(c(1, fit$w))
+}
+
+CorNullDen = function (Fx, w) {
+  return(Fx %*% w)
+}
+
+CorNullPlot = function (data.name, L, lambda, rho) {
+  data.set = data[[data.name]]
+  data.set.index = data.index[[data.name]]
+  for (i in 1 : length(data.set)) {
+    cat("Number of False Discoveries by BH at FDR = 0.05:",
+        data.set.index$fd.FDR0.05.bh[i], ";\n")
+    cat("Number of False Discoveries by ASH at lfsr = 0.05:",
+        data.set.index$fd.lfsr0.05.ash[i], ";\n")
+    cat("pihat0 estimated by ASH:",
+        data.set.index$pihat0.ash[i], ";\n")
+    w = CorNullw(data.set[[i]], L, lambda, rho)
+    y = CorNullDen(Fx, w)
+    lines(x, dnorm(x), col = "red")
+    lines(x, y, col = "blue")
+  }
+}
+```
+
+There are three tuning parameters in this regularization scheme, $L$, the highest order of Gaussian derivative to fit, $\lambda$, a general (global) regularization parameter, and $\rho$, a specific (local) shrinkage parameter to control the decaying rate of $w_l$.  We are setting $L = 10$ and $\rho = 0.5$, and try different choices of $\lambda$.
+
+```{r}
+L = 10
+rho = 0.5
+```
+
+```{r, cache = TRUE, echo = FALSE}
+x = seq(-10, 10, 0.01)
+Fx = F.mat(x, L)
+```
+
+We are using four different kinds of data sets of correlated nulls simulated from the real GTEx/Liver data.  The first, called "typical," are [data sets well studied and documented](gaussian_derivatives_2.html) for being fitted by Gaussian derivatives.  The second, called "hostile," are data sets that are very unfriendly to both `BH`'s FDR-controlling procedure and `ASH` in terms of its estimated $\hat\pi_0$.  The third, called "friendly," on the contrary, are data sets that are very friendly to both `BH` and `ASH`, whose empirical distributions are yet not necessarily close to $N\left(0, 1\right)$.  Finally, the fourth, called "iid," are independent random $N\left(0, 1\right)$ samples.
+
+The hope is for all four data sets, this regularization scheme could automatically reach a variety of goals and give a sufficiently good fit.
+
+## Typical
+
+The results of these data sets can be compared with previous documentation with known optimal Gaussian derivative orders, such as [here](gaussian_derivatives_2.html), [here](mosek_reg.html#correlated_null7), and [here](mosek_reg_2.html#correlated_null).
+
+### No regularization: $\lambda = 0$
+
+```{r, cache = TRUE}
+CorNullPlot("typical", L, lambda = 0, rho)
+```
+
+### $\lambda = 1$
+
+```{r, cache = TRUE}
+CorNullPlot("typical", L, lambda = 1, rho)
+```
+
+### $\lambda = 10$
+
+```{r, cache = TRUE}
+CorNullPlot("typical", L, lambda = 10, rho)
+```
+
+### $\lambda = 100$
+
+```{r, cache = TRUE}
+CorNullPlot("typical", L, lambda = 100, rho)
+```
+
+## Hostile
+
+All "hostile" data sets are inflated.
+
+### No regularization: $\lambda = 0$
+
+```{r, cache = TRUE}
+CorNullPlot("hostile", L, lambda = 0, rho)
+```
+
+### $\lambda = 1$
+
+```{r, cache = TRUE}
+CorNullPlot("hostile", L, lambda = 1, rho)
+```
+
+### $\lambda = 10$
+
+```{r, cache = TRUE}
+CorNullPlot("hostile", L, lambda = 10, rho)
+```
+
+### $\lambda = 100$
+
+```{r, cache = TRUE}
+CorNullPlot("hostile", L, lambda = 100, rho)
+```
+
+## Friendly
+
+A good part of "friendly" data sets are deflated.
+
+### No regularization: $\lambda = 0$
+
+```{r, cache = TRUE}
+CorNullPlot("friendly", L, lambda = 0, rho)
+```
+
+### $\lambda = 1$
+
+```{r, cache = TRUE}
+CorNullPlot("friendly", L, lambda = 1, rho)
+```
+
+### $\lambda = 10$
+
+```{r, cache = TRUE}
+CorNullPlot("friendly", L, lambda = 10, rho)
+```
+
+### $\lambda = 100$
+
+```{r, cache = TRUE}
+CorNullPlot("friendly", L, lambda = 100, rho)
+```
+
+## IID
+
+### No regularization: $\lambda = 0$
+
+```{r, cache = TRUE}
+CorNullPlot("iid", L, lambda = 0, rho)
+```
+
+### $\lambda = 1$
+
+```{r, cache = TRUE}
+CorNullPlot("iid", L, lambda = 1, rho)
+```
+
+### $\lambda = 10$
+
+```{r, cache = TRUE}
+CorNullPlot("iid", L, lambda = 10, rho)
+```
+
+### $\lambda = 100$
+
+```{r, cache = TRUE}
+CorNullPlot("iid", L, lambda = 100, rho)
+```
+
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```
