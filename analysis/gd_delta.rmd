@@ -1,0 +1,181 @@
+---
+title: "Approximating the Delta function by Gaussian Derivatives"
+author: "Lei Sun"
+date: 2017-05-10
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+## Introduction
+
+[Theoretically](gaussian_derivatives_4.html), the Dirac delta function $\delta_z$ can be approximated by infinite orders of Gaussian derivatives as follows,
+
+$$
+\delta_z = \sum\limits_{l = 0}^\infty \frac{1}{\sqrt{l!}}h_l\left(z\right) 
+\left(\frac{1}{\sqrt{l!}}h_l\left(x\right)\varphi(x)\right) \ .
+$$
+Previously with the `EQL::hermite` function, it takes a very long time to evaluate an Hermite polynomial of a high degree, yet the `PolynomF` package provides a computationally efficient way to check if higher order Gaussian derivatives indeed approximate $\delta_z$ at any $z$.
+
+With finite $L$, we are looking at
+
+$$
+f_L\left(x\right) := 
+\sum\limits_{l = 0}^L
+\frac{1}{\sqrt{l!}}h_l\left(z\right)
+\left(
+\frac{1}{\sqrt{l!}}h_l\left(x\right)
+\varphi\left(x\right)
+\right)
+$$
+and
+
+$$
+F_L\left(x\right) := \Phi\left(x\right) - 
+\sum\limits_{l = 1}^L
+\frac{1}{\sqrt{l}}
+\frac{1}{\sqrt{l!}}h_l\left(z\right) 
+\left(
+\frac{1}{\sqrt{\left(l - 1\right)!}}h_{l - 1}\left(x\right)\varphi\left(x\right)\right) \ .
+$$
+Given any $z$, $f_L$ should get closer to $\delta_z$ and $F_L$ to the $0$-$1$ step function, as $L\to\infty$.
+
+```{r, message = FALSE, cache = TRUE, echo = FALSE}
+source("../code/gdash.R")
+```
+
+```{r, cache = TRUE, echo = FALSE}
+## Give a n \times {L + 1} matrix of normalized gaussian derivatives evaluated at the n-vector z
+F.mat = function (z, L) {
+  hermite = Hermite(L)
+  gd.norm = function (z, l) {
+  return(dnorm(z) * hermite[[l]](z) / sqrt(factorial(l)))
+}
+  F.mat = matrix(0, nrow = length(z), ncol = L)
+  for (i in 1 : L) {
+    F.mat[, i] = gd.norm(z, i)
+  }
+  F.mat = cbind(dnorm(z), F.mat)
+  return(F.mat)
+}
+
+hz = function (z, L) {
+  hermite = Hermite(L)
+  hz = c()
+  for (l in 1 : L) {
+    hz[l] = hermite[[l]](z) / sqrt(factorial(l))
+  }
+  hz = c(1, hz)
+}
+
+fL = function(z, x, L) {
+  F.mat.x = F.mat(x, L)
+  w = hz(z, L)
+  return(F.mat.x %*% w)
+}
+
+FL = function(z, x, L) {
+  F.mat.x = F.mat(x, L - 1)
+  w = hz(z, L)[-1] / sqrt(1 : L)
+  return(pnorm(x) - F.mat.x %*% w)
+}
+
+L.plot = function(z, fun, x.seq, L.seq, col.0 = "red", col.Inf = "black") {
+  Fun = match.fun(fun)
+  y.seq = list()
+  for (l in 1 : length(L.seq)) {
+    y.seq[[l]] = Fun(z, x.seq, L.seq[l])
+  }
+  ymax = max(unlist(y.seq))
+  ymin = min(unlist(y.seq))
+  plot(x.seq, x.seq, type = "n", xlab = "x", ylim = c(ymin, ymax), main = "", ylab = "")
+  col = grDevices::colorRampPalette(c(col.0, col.inf))(length(L.seq) + 2)[-c(1, length(L.seq) + 2)]
+  for (l in 1 : length(L.seq)) {
+    lines(x.seq, y.seq[[l]], col = col[l])
+  }
+  if (fun == "fL") {
+    title(main = bquote(paste("Approximating ", delta[.(z)], " with L Gaussian Derivatives")), ylab = expression(f[L](x)))
+    segments(min(x.seq), 0, max(x.seq), 0, col = col.inf, lty = 2)
+    segments(z, 0, z, ymax * 10, col = col.inf, lty = 2)
+    lines(x.seq, dnorm(x.seq), col = col.0, lty = 2)
+  } else if (fun == "FL") {
+    title(main = bquote(paste("Approximating ", F[delta[.(z)]], " with L Gaussian Derivatives")), ylab = expression(F[L](x)))
+    segments(min(x.seq), 0, z, 0, col = col.inf, lty = 2)
+    segments(z, 0, z, 1, col = col.inf, lty = 2)
+    segments(z, 1, max(x.seq), 1, col = col.inf, lty = 2)
+    lines(x.seq, pnorm(x.seq), col = col.0, lty = 2)
+  }
+  legend("topleft",
+         lty = c(2, rep(1, length(L.seq)), 2),
+         col = c(col.0, col, col.inf),
+         legend = paste("L =", c(0, L.seq, Inf)),
+         ncol = 2, cex = 0.75
+         )
+}
+```
+
+```{r, cache = TRUE, echo = FALSE}
+x.seq = seq(-6, 6, 0.01)
+L.seq = seq(0, 100, by = 20)[-1]
+col.0 = "red"
+col.inf = "black"
+```
+
+## $z = -2$
+
+```{r, cache = TRUE, echo = FALSE}
+z = -2
+L.plot(z, fun = "fL", x.seq, L.seq)
+L.plot(z, fun = "FL", x.seq, L.seq)
+```
+
+## $z = 0$
+
+```{r, cache = TRUE, echo = FALSE}
+z = 0
+L.plot(z, fun = "fL", x.seq, L.seq)
+L.plot(z, fun = "FL", x.seq, L.seq)
+```
+
+## $z = 4$
+
+```{r, cache = TRUE, echo = FALSE}
+z = 4
+L.plot(z, fun = "fL", x.seq, L.seq)
+L.plot(z, fun = "FL", x.seq, L.seq)
+```
+
+## $z = 6$
+
+Numerical instability.
+
+```{r, cache = TRUE, echo = FALSE}
+z = 6
+L.plot(z, fun = "fL", x.seq = seq(-2, 10, 0.01), L.seq)
+L.plot(z, fun = "FL", x.seq = seq(-2, 10, 0.01), L.seq)
+```
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```
