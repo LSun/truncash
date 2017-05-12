@@ -1,0 +1,79 @@
+---
+title: "`plot_diagnostic` in `ashr`"
+author: "Lei Sun"
+date: 2017-05-12
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+```{r}
+library(ashr)
+```
+
+```{r, cache = TRUE}
+set.seed(777)
+x = rnorm(100)
+qqnorm(x)
+qqline(x)
+y = runif(100)
+qqnorm(y)
+qqline(y)
+```
+
+```{r, cache = TRUE}
+beta = runif(10000)
+betahat = beta + rnorm(10000)
+fit = ash(betahat, 1, mixcompdist = "normal", method = "fdr")
+plot_diagnostic(fit)
+
+par(mfrow = c(2, 2))
+fit = ash(rnorm(10000), 1, mixcompdist = "normal", method = "fdr")
+plot_diagnostic(fit, breaks = 100)
+
+beta = sample(c(rnorm(5000, 1.5, 1), rnorm(5000, -1.5, 1)))
+betahat = beta + rnorm(10000)
+fit = ash(betahat, 1, mixcompdist = "normal", method = "fdr")
+plot_diagnostic(fit, breaks = 100)
+```
+
+```{r}
+z = readRDS("../output/z_null_liver_777_select.RDS")
+z = z$typical[[5]]
+hist(z, breaks = 100, prob = TRUE, xlab = "Correlated N(0, 1) Z Scores", ylim = c(0, dnorm(0)), main = "Histogram of Correlated Z Scores")
+lines(seq(-6, 6, 0.01), dnorm(seq(-6, 6, 0.01)), col = "red")
+
+hist(z, breaks = 100, prob = TRUE, xlab = "Correlated N(0, 1) Z Scores", ylim = c(0, 0.1), main = "Histogram of Correlated Z Scores: Left Tail", xlim = c(-5, -2.5))
+lines(seq(-6, 6, 0.01), dnorm(seq(-6, 6, 0.01)), col = "red")
+```
+
+```{r}
+library(ashr)
+fit = ashr::ash(z, 1, mixcompdist = "normal", method = "fdr")
+plot_diagnostic(fit, breaks = 100)
+```
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```
