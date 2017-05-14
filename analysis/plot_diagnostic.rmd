@@ -26,9 +26,16 @@ knitr::read_chunk("chunks.R")
 
 <!-- Add your analysis here -->
 
+## Introduction
+
+This file documents some simulations done for a May 12, 2017, NHS presentation on the diagnostic plots for ASH implemented by `ashr::plot_diagnostic()`.
+
 ```{r}
 library(ashr)
+library(qvalue)
 ```
+
+## The concept of a Q-Q plot
 
 ```{r, cache = TRUE}
 set.seed(777)
@@ -39,6 +46,8 @@ y = runif(100)
 qqnorm(y)
 qqline(y)
 ```
+
+## Diagnostic plots for `ASH` applied to different data sets
 
 ```{r, cache = TRUE}
 beta = runif(10000)
@@ -56,19 +65,31 @@ fit = ash(betahat, 1, mixcompdist = "normal", method = "fdr")
 plot_diagnostic(fit, breaks = 100)
 ```
 
+## The peculiarities of the correlated null
+
 ```{r}
 z = readRDS("../output/z_null_liver_777_select.RDS")
 z = z$typical[[5]]
+
 hist(z, breaks = 100, prob = TRUE, xlab = "Correlated N(0, 1) Z Scores", ylim = c(0, dnorm(0)), main = "Histogram of Correlated Z Scores")
 lines(seq(-6, 6, 0.01), dnorm(seq(-6, 6, 0.01)), col = "red")
 
 hist(z, breaks = 100, prob = TRUE, xlab = "Correlated N(0, 1) Z Scores", ylim = c(0, 0.1), main = "Histogram of Correlated Z Scores: Left Tail", xlim = c(-5, -2.5))
 lines(seq(-6, 6, 0.01), dnorm(seq(-6, 6, 0.01)), col = "red")
+
+pval = (1 - pnorm(abs(z))) * 2
+q = qvalue(pval)
+hist(pval, breaks = 100, main = "Histogram of Correlated Z Scores' p-values", xlab = "p-values", prob = TRUE)
+abline(h = q$pi0, col = "red", lty = 2)
+legend("topright", lty = 2, col = "red", expression(paste(hat(pi)[0], " by qvalue")))
 ```
+
+## Diagnostic plots for `ASH` applied to the correlated null.
 
 ```{r}
 library(ashr)
 fit = ashr::ash(z, 1, mixcompdist = "normal", method = "fdr")
+par(mfrow = c(2, 2))
 plot_diagnostic(fit, breaks = 100)
 ```
 
