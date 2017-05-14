@@ -91,6 +91,7 @@ Under the exchangeability assumption, the goodness of fit of empirical Bayes can
 
 * [Diagnostic Plots for Uniformity](diagnostic_plot_2.html)
 * [Diagnostic Plots for `ASH`](diagnostic_ash.html)
+* [`ashr::plot_diagnostic()` in `ashr`](plot_diagnostic.html)
 
 Essentially we hope to tell whether $n$ random samples are uniformly distributed, and the task seems more complicated than what it sounds.  There are multiple ways to do it, and some of them have been absorbed into the `ashr` package.
 
@@ -116,7 +117,11 @@ The previous investigation is boiled down to a prototypical problem: the classic
 * [Improvement on implementation with `Rmosek`: Normalization](mosek_reg_2.html)
 * [Improvement on implementation with `Rmosek`: Regularization](mosek_reg_3.html)
 
-* [Gaussian derivative coefficients $w$ optimization with regularization: Null](mosek_reg_4.html)
+* [Regularized Gaussian Derivatives & `ASH`: Null](mosek_reg_4.html)
+* [Regularized Gaussian Derivatives & `ASH`: Alternative & homoscedastic](mosek_reg_5.html)
+* [Regularized Gaussian Derivatives & `ASH`: Alternative & Heteroskedastic](mosek_reg_6.html)
+
+
 
 [`ashr`]: https://github.com/stephens999/ashr
 
