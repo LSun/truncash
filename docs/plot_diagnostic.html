@@ -313,12 +313,19 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2017-05-12</p>
+<p><strong>Last updated:</strong> 2017-05-14</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> fd54c84</p>
+<p><strong>Code version:</strong> 370acc9</p>
 <!-- Add your analysis here -->
-<pre class="r"><code>library(ashr)</code></pre>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>This file documents some simulations done for a May 12, 2017, NHS presentation on the diagnostic plots for ASH implemented by <code>ashr::plot_diagnostic()</code>.</p>
+<pre class="r"><code>library(ashr)
+library(qvalue)</code></pre>
+</div>
+<div id="the-concept-of-a-q-q-plot" class="section level2">
+<h2>The concept of a Q-Q plot</h2>
 <pre class="r"><code>set.seed(777)
 x = rnorm(100)
 qqnorm(x)
@@ -328,6 +335,9 @@ qqline(x)</code></pre>
 qqnorm(y)
 qqline(y)</code></pre>
 <p><img src="figure/plot_diagnostic.rmd/unnamed-chunk-2-2.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="diagnostic-plots-for-ash-applied-to-different-data-sets" class="section level2">
+<h2>Diagnostic plots for <code>ASH</code> applied to different data sets</h2>
 <pre class="r"><code>beta = runif(10000)
 betahat = beta + rnorm(10000)
 fit = ash(betahat, 1, mixcompdist = &quot;normal&quot;, method = &quot;fdr&quot;)
@@ -354,24 +364,36 @@ plot_diagnostic(fit, breaks = 100)</code></pre>
 <pre><code>Press [enter] to see next plot</code></pre>
 <pre><code>Press [enter] to see next plot</code></pre>
 <p><img src="figure/plot_diagnostic.rmd/unnamed-chunk-3-6.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="the-peculiarities-of-the-correlated-null" class="section level2">
+<h2>The peculiarities of the correlated null</h2>
 <pre class="r"><code>z = readRDS(&quot;../output/z_null_liver_777_select.RDS&quot;)
 z = z$typical[[5]]
+
 hist(z, breaks = 100, prob = TRUE, xlab = &quot;Correlated N(0, 1) Z Scores&quot;, ylim = c(0, dnorm(0)), main = &quot;Histogram of Correlated Z Scores&quot;)
 lines(seq(-6, 6, 0.01), dnorm(seq(-6, 6, 0.01)), col = &quot;red&quot;)</code></pre>
 <p><img src="figure/plot_diagnostic.rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>hist(z, breaks = 100, prob = TRUE, xlab = &quot;Correlated N(0, 1) Z Scores&quot;, ylim = c(0, 0.1), main = &quot;Histogram of Correlated Z Scores: Left Tail&quot;, xlim = c(-5, -2.5))
 lines(seq(-6, 6, 0.01), dnorm(seq(-6, 6, 0.01)), col = &quot;red&quot;)</code></pre>
 <p><img src="figure/plot_diagnostic.rmd/unnamed-chunk-4-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>pval = (1 - pnorm(abs(z))) * 2
+q = qvalue(pval)
+hist(pval, breaks = 100, main = &quot;Histogram of Correlated Z Scores&#39; p-values&quot;, xlab = &quot;p-values&quot;, prob = TRUE)
+abline(h = q$pi0, col = &quot;red&quot;, lty = 2)
+legend(&quot;topright&quot;, lty = 2, col = &quot;red&quot;, expression(paste(hat(pi)[0], &quot; by qvalue&quot;)))</code></pre>
+<p><img src="figure/plot_diagnostic.rmd/unnamed-chunk-4-3.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="diagnostic-plots-for-ash-applied-to-the-correlated-null." class="section level2">
+<h2>Diagnostic plots for <code>ASH</code> applied to the correlated null.</h2>
 <pre class="r"><code>library(ashr)
 fit = ashr::ash(z, 1, mixcompdist = &quot;normal&quot;, method = &quot;fdr&quot;)
+par(mfrow = c(2, 2))
 plot_diagnostic(fit, breaks = 100)</code></pre>
+<pre><code>Press [enter] to see next plot</code></pre>
+<pre><code>Press [enter] to see next plot</code></pre>
+<pre><code>Press [enter] to see next plot</code></pre>
 <p><img src="figure/plot_diagnostic.rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre><code>Press [enter] to see next plot</code></pre>
-<p><img src="figure/plot_diagnostic.rmd/unnamed-chunk-5-2.png" width="672" style="display: block; margin: auto;" /></p>
-<pre><code>Press [enter] to see next plot</code></pre>
-<p><img src="figure/plot_diagnostic.rmd/unnamed-chunk-5-3.png" width="672" style="display: block; margin: auto;" /></p>
-<pre><code>Press [enter] to see next plot</code></pre>
-<p><img src="figure/plot_diagnostic.rmd/unnamed-chunk-5-4.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
 <div id="session-information" class="section level2">
 <h2>Session information</h2>
 <!-- Insert the session information into the document -->
@@ -387,19 +409,22 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] ashr_2.1-10
+[1] qvalue_2.4.2 ashr_2.1-10 
 
 loaded via a namespace (and not attached):
  [1] Rcpp_0.12.10      knitr_1.15.1      magrittr_1.5     
- [4] REBayes_0.62      MASS_7.3-45       doParallel_1.0.10
- [7] pscl_1.4.9        SQUAREM_2016.10-1 lattice_0.20-34  
-[10] foreach_1.4.3     stringr_1.2.0     tools_3.3.3      
-[13] parallel_3.3.3    grid_3.3.3        git2r_0.18.0     
-[16] htmltools_0.3.5   iterators_1.0.8   assertthat_0.1   
-[19] yaml_2.1.14       rprojroot_1.2     digest_0.6.11    
-[22] Matrix_1.2-8      codetools_0.2-15  evaluate_0.10    
-[25] rmarkdown_1.3     stringi_1.1.2     Rmosek_7.1.3     
-[28] backports_1.0.5   truncnorm_1.0-7  </code></pre>
+ [4] REBayes_0.62      splines_3.3.3     MASS_7.3-45      
+ [7] munsell_0.4.3     doParallel_1.0.10 pscl_1.4.9       
+[10] colorspace_1.2-6  SQUAREM_2016.10-1 lattice_0.20-34  
+[13] foreach_1.4.3     plyr_1.8.3        stringr_1.2.0    
+[16] tools_3.3.3       parallel_3.3.3    grid_3.3.3       
+[19] gtable_0.2.0      git2r_0.18.0      htmltools_0.3.5  
+[22] iterators_1.0.8   assertthat_0.1    yaml_2.1.14      
+[25] rprojroot_1.2     digest_0.6.11     Matrix_1.2-8     
+[28] reshape2_1.4.1    ggplot2_2.1.0     codetools_0.2-15 
+[31] evaluate_0.10     rmarkdown_1.3     stringi_1.1.2    
+[34] Rmosek_7.1.3      scales_0.4.0      backports_1.0.5  
+[37] truncnorm_1.0-7  </code></pre>
 </div>
 
 <hr>
