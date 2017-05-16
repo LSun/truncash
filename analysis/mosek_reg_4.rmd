@@ -1,5 +1,5 @@
 ---
-title: "Regularization of $w$: Null"
+title: "Regularized Gaussian Derivatives: Correlated Null N(0, 1) Z Scores"
 author: "Lei Sun"
 date: 2017-05-09
 output: html_document
