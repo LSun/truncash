@@ -117,9 +117,9 @@ The previous investigation is boiled down to a prototypical problem: the classic
 * [Improvement on implementation with `Rmosek`: Normalization](mosek_reg_2.html)
 * [Improvement on implementation with `Rmosek`: Regularization](mosek_reg_3.html)
 
-* [Regularized Gaussian Derivatives & `ASH`: Null](mosek_reg_4.html)
-* [Regularized Gaussian Derivatives & `ASH`: Alternative & homoscedastic](mosek_reg_5.html)
-* [Regularized Gaussian Derivatives & `ASH`: Alternative & Heteroskedastic](mosek_reg_6.html)
+* [Regularized Gaussian Derivatives: Correlated Null](mosek_reg_4.html)
+* [Regularized Gaussian Derivatives & `ASH`: Simulated True Effects with Homoscedastic Correlated Noises](mosek_reg_5.html)
+* [Regularized Gaussian Derivatives & `ASH`: Simulated True Effects with Heteroskedastic Correlated Noises](mosek_reg_6.html)
 
 
 
