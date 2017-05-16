@@ -1,0 +1,413 @@
+---
+title: "Regularization of $w$: Simulated True Effects with Homoscedastic Correlated Noises"
+author: "Lei Sun"
+date: 2017-05-11
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+## Introduction
+
+Similar to [previous simulations](mosek_reg_4.html), where correlated null $z$ scores are fitted by $10$ Gaussian derivatives with regularization, we are now [fitting data sets simulated with correlated noise and true signals](ash_gd.html) by both `ASH` and Gaussian derivatives **using the same regularization** and see what happens.
+
+## The model
+
+$$
+\begin{array}{c}
+\beta_j \sim g = \sum\limits_{k=0}^K\pi_kg_k \ ;\\
+g \text{ is unimodal} \ ; \\
+\hat\beta_j | \beta_j, \hat s_j = \beta_j + \hat s_jz_j \ ;\\
+z_j \sim N(0, 1) \text{, marginally} \ ; \\
+z_j \text{ correlated} \ .
+\end{array}
+$$
+## Fitting the model
+
+$$
+\begin{array}{rl}
+\min\limits_{\pi,w} & -\sum\limits_{j = 1}^n\log
+\left(\sum\limits_{k = 0}^K\sum\limits_{l=1}^L\pi_k w_l f_{jkl} + \sum\limits_{k = 0}^K\pi_kf_{jk0}\right)
+- \sum\limits_{k = 0}^K\left(\lambda_k^\pi - 1\right)\log\left(\pi_k\right)
++ \sum\limits_{l = 1}^L\lambda_l^w\left|w_l\right|
+\\
+\text{subject to} & \sum\limits_{k = 0}^K\pi_k = 1 \ ;\\
+& \pi_k \geq 0 \ .\\
+\end{array}
+$$
+where $f_{jkl}$ [have an analytic form](ash_gd.html#optimization_problem) for both $g_k$ being normal and uniform, and **should be normalized**.
+
+### Uniform mixture prior
+
+$$
+\begin{array}{rrcl}
+&\beta_j &\sim & \sum_k \pi_k \text{ Unif }[a_k, b_k]\\
+\Rightarrow & f_{jkl} &= &
+\displaystyle\frac{\varphi^{(l-1)}\left(\frac{\hat\beta_j-a_k}{\hat s_j}\right) - \varphi^{(l-1)}\left(\frac{\hat\beta_j-b_k}{\hat s_j}\right)}{\sqrt{l!}\left(b_k - a_k\right)} \ .
+\end{array}
+$$
+
+### Normal mixture prior
+
+$$
+\begin{array}{rrcl}
+&\beta_j &\sim & \sum_k \pi_k N\left(\mu_k, \sigma_k^2\right) \\
+\Rightarrow & f_{jkl} &= &
+\displaystyle\frac{\hat s_j^l}{\sqrt{l!}\left(\sqrt{\sigma_k^2 + \hat s_j^2}\right)^{l+1}}
+\varphi^{(l)}\left(\frac{
+\hat\beta_j - \mu_k
+}{
+\sqrt{\sigma_k^2 + \hat s_j^2}
+}\right) \ .
+\end{array}
+$$
+
+
+In the following simulation, the parameters are set in the following way.
+
+1. $K$ is chosen by the default function in `ashr`.
+2. The prior mixture always include a point mass at $0$; that is, $g_0 = \delta_0$.
+3. The estimate of $g$ is biased against underestimating $\hat\pi_0$, by setting $\lambda_0^\pi = 10$, $\lambda_k^\pi = 1$, $k \geq 1$.  The previous two are implemented by setting **`method = "fdr"`**.
+4. Only even-order $w_l$ are regularized, and the odd-order $w_l$ are encouraged to decay in the order of $\rho^{l / 2}$, for some $\rho\in\left(0, 1\right)$.  **For even orders, $\lambda_l^w = \lambda / \rho^{l / 2}$; for odd orders, $\lambda_l^w = 0$.**
+5. The parameters are set as **$L = 10$, $\lambda = 10$, $\rho = 0.5$**.
+
+```{r, message = FALSE}
+library(ashr)
+source("../code/gdash.R")
+```
+
+```{r, echo = FALSE}
+sample.g = function (g, n) {
+  UseMethod("sample.g")
+}
+
+sample.g.normalmix = function (g, n) {
+  K = length(g$pi)
+  beta = list()
+  for (i in 1 : K) {
+    beta[[i]] = rnorm(round(n * g$pi[i]), g$mean[i], g$sd[i])
+  }
+  return(list(beta = sample(unlist(beta)), mixcompdist = "normal"))
+}
+
+sample.g.unimix = function(g, n) {
+  K = length(g$pi)
+  beta = list()
+  for (i in 1 : K) {
+    beta[[i]] = runif(round(n * g$pi[i]), g$a[i], g$b[i])
+  }
+  return(list(beta = sample(unlist(beta)), mixcompdist = "uniform"))
+}
+
+se.fun = function (n, method) {
+  if (method == "constant") {
+    sebetahat = rep(1, n)
+  } else {
+    sebetahat = sqrt(rchisq(n, df = 1))
+  }
+}
+
+AltPlot = function (z.list, z.index, label, g, se, L, lambda, rho) {
+  x.range = max(c(2 * g$sd, 4))
+  x.plot = seq(-x.range, x.range, 0.01)
+  y.true = ashr::mixcdf(g, x.plot)
+  data.set.num = length(z.list[[label]])
+  for (i in 1 : data.set.num) {
+    z = z.list[[label]][[i]]
+    effect = sample.g(g, length(z))
+    beta = effect$beta[1 : length(z)]
+    sebetahat = se.fun(length(z), se)
+    betahat = beta + sebetahat * z
+    fit.ash = ashr::ash(betahat, sebetahat, mixcompdist = effect$mixcompdist, method = "fdr")
+    gdash.time <- system.time(fit.gdash <- gdash(betahat, sebetahat,
+                      mixcompdist = effect$mixcompdist,
+                      gd.ord = L, w.lambda = lambda, w.rho = rho,
+                      gd.normalized = TRUE, primal = FALSE,
+                      method = "fdr"))
+    y.ash = ashr::mixcdf(fit.ash$fitted_g, x.plot)
+    y.gdash = ashr::mixcdf(fit.gdash$fitted_g, x.plot)
+    cat("Data Set", z.index[[label]]$set[i], ";\n")
+    cat("For the Correlated Null Z Scores Only:\n")
+    cat("Number of False Discoveries by BH at FDR = 0.05:", z.index[[label]]$fd.FDR0.05.bh[i], ";\n")
+    cat("Number of False Discoveries by ASH at lfsr <= 0.05:", z.index[[label]]$fd.lfsr0.05.ash[i], ";\n")
+    cat("pihat0 by ASH:", z.index[[label]]$pihat0.ash[i], ";\n")
+    cat("Number of iterations:", fit.gdash$niter, ";\n")
+    cat("Converged:", fit.gdash$converged, ";\n")
+    cat("Time:", gdash.time[3], "Seconds;\n")
+    cat("Normalized w:", rbind(paste(0 : L, "-"), paste(round(fit.gdash$w, 5), ";")), "\n")
+    plot(x.plot, y.true, type = "l", xlab = expression(beta), ylab = expression(hat(G)(beta)), main = expression(paste(hat(G), ": CDF of ", hat(g))))
+    lines(x.plot, y.ash, lty = 2, col = "red")
+    lines(x.plot, y.gdash, col = "blue")
+    legend("topleft", lty = c(1, 2, 1), col = c("black", "red", "blue"), legend = c("True", "ASH", "GD-ASH"))
+  }
+}
+```
+
+```{r}
+L = 10
+lambda = 10
+rho = 0.5
+```
+
+## The data
+
+The data are simulated on top of the real correlated null $z$ scores in three steps.
+
+1. The true signals $\beta_j$ are simulated from four kinds of $g$, the global null $g_n$, small effects $g_s$, medium effects $g_m$, and large effects $g_l$.
+
+$$
+\begin{array}{rcl}
+g_n &=& \delta_0\\
+g_s &=& 0.6\delta_0 + 0.3N\left(0, 1\right) + 0.1N\left(0, 2^2\right)\\
+g_m &=& 0.6\delta_0 + 0.3N\left(0, 2\right) + 0.1N\left(0, 4^2\right)\\
+g_l &=& 0.6\delta_0 + 0.3N\left(0, 3\right) + 0.1N\left(0, 6^2\right)\\
+\end{array}
+$$
+
+```{r}
+g.null = normalmix(pi = 1, mean = 0, sd = 0)
+g.s.n = normalmix(pi = c(0.6, 0.3, 0.1), mean = 0, sd = c(0, 1, 2))
+g.m.n = normalmix(pi = c(0.6, 0.3, 0.1), mean = 0, sd = c(0, 2, 4))
+g.l.n = normalmix(pi = c(0.6, 0.3, 0.1), mean = 0, sd = c(0, 3, 6))
+```
+
+2. $\hat s_j^2$ are either constant $1$ or simulated from $\chi_1^2$.  Right now we are only working on the **homoscedastic $\hat s_j^2 \equiv 1$** case.
+
+```{r}
+se = "constant"
+```
+
+3. With selected data sets of correlated null $z$ scores, obtain **$\hat\beta_j = \beta_j + \hat s_j z_j$**.  These selected data sets are put into [four categories](mosek_reg_4.html): typical, hostile, friendly, iid.
+
+Now we are fitting the model to these data sets, which contain simulated, known true signals, as well as noises with real, unknown correlations.
+
+```{r}
+z.list = readRDS("../output/z_null_liver_777_select.RDS")
+z.index = readRDS("../output/z_null_liver_777_select_index.RDS")
+```
+
+## Category I: Typical
+
+```{r}
+label = "typical"
+```
+
+### Global null $g_n$
+
+```{r}
+g = g.null
+```
+
+```{r, cache = TRUE, echo = FALSE}
+set.seed(10)
+AltPlot(z.list, z.index, label, g, se, L, lambda, rho)
+```
+
+### Small effects $g_s$
+
+```{r}
+g = g.s.n
+```
+
+```{r, cache = TRUE, echo = FALSE}
+set.seed(11)
+AltPlot(z.list, z.index, label, g, se, L, lambda, rho)
+```
+
+### Medium effects $g_m$
+
+```{r}
+g = g.m.n
+```
+
+```{r, cache = TRUE, echo = FALSE}
+set.seed(12)
+AltPlot(z.list, z.index, label, g, se, L, lambda, rho)
+```
+
+### Large effects $g_l$
+
+```{r}
+g = g.l.n
+```
+
+```{r, cache = TRUE, echo = FALSE}
+set.seed(13)
+AltPlot(z.list, z.index, label, g, se, L, lambda, rho)
+```
+
+## Category II: Hostile
+
+```{r}
+label = "hostile"
+```
+
+### Global null $g_n$
+
+```{r}
+g = g.null
+```
+
+```{r, cache = TRUE, echo = FALSE}
+set.seed(20)
+AltPlot(z.list, z.index, label, g, se, L, lambda, rho)
+```
+
+### Small effects $g_s$
+
+```{r}
+g = g.s.n
+```
+
+```{r, cache = TRUE, echo = FALSE}
+set.seed(21)
+AltPlot(z.list, z.index, label, g, se, L, lambda, rho)
+```
+
+### Medium effects $g_m$
+
+```{r}
+g = g.m.n
+```
+
+```{r, cache = TRUE, echo = FALSE}
+set.seed(22)
+AltPlot(z.list, z.index, label, g, se, L, lambda, rho)
+```
+
+### Large effects $g_l$
+
+```{r}
+g = g.l.n
+```
+
+```{r, cache = TRUE, echo = FALSE}
+set.seed(23)
+AltPlot(z.list, z.index, label, g, se, L, lambda, rho)
+```
+
+
+## Category III: Friendly
+
+```{r}
+label = "friendly"
+```
+
+### Global null $g_n$
+
+```{r}
+g = g.null
+```
+
+```{r, cache = TRUE, echo = FALSE}
+set.seed(30)
+AltPlot(z.list, z.index, label, g, se, L, lambda, rho)
+```
+
+### Small effects $g_s$
+
+```{r}
+g = g.s.n
+```
+
+```{r, cache = TRUE, echo = FALSE}
+set.seed(31)
+AltPlot(z.list, z.index, label, g, se, L, lambda, rho)
+```
+
+### Medium effects $g_m$
+
+```{r}
+g = g.m.n
+```
+
+```{r, cache = TRUE, echo = FALSE}
+set.seed(32)
+AltPlot(z.list, z.index, label, g, se, L, lambda, rho)
+```
+
+### Large effects $g_l$
+
+```{r}
+g = g.l.n
+```
+
+```{r, cache = TRUE, echo = FALSE}
+set.seed(33)
+AltPlot(z.list, z.index, label, g, se, L, lambda, rho)
+```
+
+## Category III: iid
+
+```{r}
+label = "iid"
+```
+
+### Global null $g_n$
+
+```{r}
+g = g.null
+```
+
+```{r, echo = FALSE, cache = TRUE}
+set.seed(40)
+AltPlot(z.list, z.index, label, g, se, L, lambda, rho)
+```
+
+### Small effects $g_s$
+
+```{r}
+g = g.s.n
+```
+
+```{r, cache = TRUE, echo = FALSE}
+set.seed(41)
+AltPlot(z.list, z.index, label, g, se, L, lambda, rho)
+```
+
+### Medium effects $g_m$
+
+```{r}
+g = g.m.n
+```
+
+```{r, cache = TRUE, echo = FALSE}
+set.seed(42)
+AltPlot(z.list, z.index, label, g, se, L, lambda, rho)
+```
+
+### Large effects $g_l$
+
+```{r}
+g = g.l.n
+```
+
+```{r, cache = TRUE, echo = FALSE}
+set.seed(43)
+AltPlot(z.list, z.index, label, g, se, L, lambda, rho)
+```
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```
