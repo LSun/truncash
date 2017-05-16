@@ -1,5 +1,5 @@
 ---
-title: "Regularization of $w$: Simulated True Effects with Homoscedastic Correlated Noises"
+title: "Regularized Gaussian Derivatives & `ASH`: Simulated True Effects with Homoscedastic Correlated Noises"
 author: "Lei Sun"
 date: 2017-05-11
 output: html_document
