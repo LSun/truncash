@@ -1,0 +1,301 @@
+---
+title: "Fitting $N\\left(0, \\sigma^2\\right)$ with Gaussian Derivatives"
+author: "Lei Sun"
+date: 2017-05-16
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+
+```{r, message = FALSE, echo = FALSE}
+library(PolynomF)
+source("../code/gdash.R")
+
+w.std.2n = function(n, sigma2) {
+  return(exp((sum(log(seq(1, 2 * n - 1, by = 2))) - sum(log(seq(2, 2 * n, by = 2)))) / 2) * (sigma2 - 1)^n)
+}
+
+w.std = function(n, sigma2) {
+  w = rep(0, 2 * n)
+  for (i in 1 : n) {
+    w[2 * i] = w.std.2n(i, sigma2)
+  }
+  w = c(1, w)
+  return(w)
+}
+
+Hermite = function (order) {
+  x <- PolynomF::polynom()
+  H <- PolynomF::polylist(x, - 1 + x^2)
+  if (order >= 3) {
+    for(n in 2 : (order - 1))
+      H[[n+1]] <- x * H[[n]] - n * H[[n-1]]
+  }
+  return(H)
+}
+
+gd.std.mat = function(x, order) {
+  hermite = Hermite(order)
+  gd.mat = matrix(0, nrow = length(x), ncol = order)
+  for (j in 1 : order) {
+    gd.mat[, j] = hermite[[j]](x) * dnorm(x) * (-1)^j / sqrt(factorial(j))
+  }
+  gd.mat = cbind(dnorm(x), gd.mat)
+}
+
+gaussian.plot = function (sigma2, order) {
+  x.plot = seq(-max(5, 3 * sqrt(sigma2)), max(5, 3 * sqrt(sigma2)), length = 1e3)
+  w.nmlz = w.std(order / 2, sigma2)
+  y.gd.plot = gd.std.mat(x.plot, order) %*% w.nmlz
+  x = rnorm(1e4, 0, sqrt(sigma2))
+  x.hist = hist(x, breaks = 20, plot = FALSE)
+  y.lim = c(0, max(c(x.hist$density * 1.05, dnorm(x.plot, 0, sqrt(sigma2)), dnorm(x.plot))))
+  cat("Normalized w: ", rbind(paste(0 : order, "~"), paste(round(w.nmlz, 5), ";")), "\n")
+  hist(x, breaks = 100, prob = TRUE,
+       xlim = c(-3 * sqrt(2), 3 * sqrt(2)), ylim = y.lim,
+       xlab = expression(paste(N(0, sigma^2), " Independent Samples")),
+       main = bquote(paste(sigma^2 == .(sigma2), ", ", N == .(order)))
+       )
+  lines(x.plot, y.gd.plot, col = "blue")
+  lines(x.plot, dnorm(x.plot, 0, sqrt(sigma2)), lty = 2)
+  lines(x.plot, dnorm(x.plot), col = "red", lty = 2)
+  legend("topleft", lty = c(2, 1, 2), col = c("black", "blue", "red"), legend = c("True", paste("N =", order), "N(0, 1)"))
+  invisible(w.nmlz)
+}
+```
+
+
+## Introduction
+
+We know the empirical distribution of a number of correlated null $N\left(0, 1\right)$ $z$ scores can be approximated by Gaussian derivatives at least theoretically.  Now we want to know if the $N\left(0, \sigma^2\right)$ density can also be approximated by Gaussian derivatives.  The question is important because it is related to the identifiability between the correlated null and true signals using the tool of Gaussian derivatives.
+
+The same question was investigated for [small $\sigma^2$](alternative.html) and [large $\sigma^2$](alternative2.html).  But these investigations was *empirical*, in the sense that we are fitting the Gaussian derivatives to a large number of independent samples simulated from $N\left(0, \sigma^2\right)$. Now we are doing that **theoretically**.
+
+## Hermite moments
+
+If a probability density function (pdf) $f\left(x\right)$ can be approximated by normalized Gaussian derivatives, we should have
+
+$$
+f\left(x\right) = w_0\varphi\left(x\right) + w_1\varphi^{(1)}\left(x\right) + w_2\frac{1}{\sqrt{2!}}\varphi^{(2)}\left(x\right) + \cdots + w_n\frac{1}{\sqrt{n!}}\varphi^{(n)}\left(x\right) + \cdots \ .
+$$
+Using the fact that Hermite polynomials are orthonormal with respect to the Gaussian kernel and normalizing constants, we have
+
+$$
+\int_{\mathbb{R}}
+\frac{1}{\sqrt{m!}}
+h_m\left(x\right) \frac{1}{\sqrt{n!}}\varphi^{(n)}\left(x\right)dx = \left(-1\right)^n\delta_{mn} \ .
+$$
+Therefore, when using Gaussian derivatives to decompose a pdf $f$, the coefficients $w_n$ can be obtained by
+
+$$
+w_n = \left(-1\right)^n \int \frac{1}{\sqrt{n!}} h_n(x) f(x) dx = \frac{\left(-1\right)^n}{\sqrt{n!}} E_f\left[h_n\left(x\right)\right] \ .
+$$
+Since $h_n$ is a degree $n$ polynomials, $E_f\left[h_n\left(x\right)\right]$ is essentially a linear combination of relevant moments up to order $n$, denoted as $E\left[x^i\right]$.  For example, here are the first several $E_f\left[h_n\left(x\right)\right]$.
+
+$$
+\begin{array}{rclcl}
+E_f\left[h_0\left(x\right)\right] &=& E_f\left[1\right] &=& 1 \\
+E_f\left[h_1\left(x\right)\right] &=& E_f\left[x\right] &=& E\left[x\right] \\
+E_f\left[h_2\left(x\right)\right] &=& E_f\left[x^2 - 1\right] &=& E\left[x^2\right] - 1\\
+E_f\left[h_3\left(x\right)\right] &=& E_f\left[x^3 - 3x\right] &=& E\left[x^3\right] - 3 E\left[x\right]\\
+E_f\left[h_4\left(x\right)\right] &=& E_f\left[x^4 - 6x^2 + 3\right] &=& E\left[x^4\right] - 6 E\left[x^2\right] + 3\\
+E_f\left[h_5\left(x\right)\right] &=& E_f\left[x^5 - 10x^3 + 15x\right] &=& E\left[x^5\right] - 10 E\left[x^3\right] + 15 E\left[x\right]\\
+E_f\left[h_6\left(x\right)\right] &=& E_f\left[x^6 - 15x^4 + 45x^2 - 15\right] &=& E\left[x^6\right] - 15 E\left[x^4\right] + 45E\left[x^2\right] - 15\\
+\end{array}
+$$
+Some call these "Hermite moments."
+
+## When $f = N\left(0, \sigma^2\right)$: General results
+
+When $f = N\left(0, \sigma^2\right)$, we can write all Hermite moments out analytically.  After algebra, it turns out they can be written as
+
+$$
+E_f\left[h_n\left(x\right)\right] =
+\begin{cases}
+0 & n \text{ is odd}\\
+\left(n - 1\right)!! \left(\sigma^2 - 1\right)^{n / 2} & n \text{ is even}
+\end{cases} \ ,
+$$
+where $\left(n - 1\right)!!$ is the [double factorial](https://en.wikipedia.org/wiki/Double_factorial).
+
+Hence, if we want to express the pdf of $N\left(0, \sigma^2\right)$ in terms of normalized Gaussian derivatives, the coefficient
+
+$$
+w_n =
+\begin{cases}
+0 & n \text{ is odd}\\
+\frac{\left(n - 1\right)!!}{\sqrt{n!}}\left(\sigma^2 - 1\right)^{n / 2}
+=\sqrt{\frac{\left(n - 1\right)!!}{n!!}}\left(\sigma^2 - 1\right)^{n / 2}
+& n \text{ is even}
+\end{cases} \ .
+$$
+From now on we will only pay attention to the even-order coefficients $w_n = \sqrt{\frac{\left(n - 1\right)!!}{n!!}}\left(\sigma^2 - 1\right)^{n / 2} := U_n\left(\sigma^2 - 1\right)^{n / 2}$, where the sequence $U_n := \sqrt{\frac{\left(n - 1\right)!!}{n!!}}$.  Note that this sequence $U_n$ is interesting.  [It can be proved](https://math.stackexchange.com/questions/584456/limit-of-a-fraction-of-double-factorials) that it's going to zero as $n\to\infty$.  Actually it can be [written in another way](https://en.wikipedia.org/wiki/Double_factorial#Additional_identities)
+
+$$
+\int_{0}^{\frac\pi2} \sin^nx dx = \int_{0}^{\frac\pi2} \cos^nx dx  = \frac\pi2U_n^2 \ .
+$$
+However, this sequence decays slowly.  In particular, it doesn't decay exponentially, as seen in the following plots.
+
+```{r, echo = FALSE, cache = TRUE}
+w <- w.std(5e3, 2)
+```
+
+```{r, echo = FALSE}
+ind <- seq(1, length(w), by = 2)
+w <- w[seq(1, length(w), by = 2)]
+plot(ind, w, xlab = "Even Order Index", ylab = expression(U[n]), main = expression(paste("The Decay of ", U[n])), ylim = c(0, 1), type = "l")
+plot(ind, log(w), xlab = "Even Order Index", ylab = expression(log(U[n])), main = expression(paste("The Decay of ", log(U[n]))), type = "l")
+```
+
+**Therefore, when $\sigma^2 > 2$, $w_n$ is exploding!**  It means theoretially we cannot actually fit $N\left(0, \sigma^2\right)$ with Gaussian derivatives when $\sigma^2 > 2$.
+
+It has multiple implications.  First, it shows why people usually say Gaussian derivatives can only fit a density that's close enough to Gaussian, especially, a density whose variance is too "inflated" compared with the standard normal.  Therefore, the fact that in many case, the correlated null can be satisfactorily fitted by Gaussian derivatives tells us the inflation caused by correlation is indeed peculiar.
+
+On the other hand, when $0 < \sigma^2 < 2$, that is, $\left|\sigma^2 - 1\right| < 1$, $w_n$ decays exponentially.  It means that we are able to satisfactorily fit $N\left(0, \sigma^2\right)$ with a limited number of Gaussian derivatives such that
+
+$$
+f_N\left(x\right) = \varphi\left(x\right) + \sum\limits_{n = 1}^N w_n\frac{1}{\sqrt{n!}}\varphi^{(n)}\left(x\right) \approx N\left(0, \sigma^2\right) = \frac{1}{\sigma}\varphi\left(\frac{x}{\sigma}\right)  \ .
+$$
+
+It also means that when the correlated null looks like $N\left(0, \sigma^2\right)$ with $\sigma^2\in\left(1, 2\right]$ (small inflation) or $\sigma^2\in\left(0, 1\right)$ (deflation), it's hard to identify whether the inflation or deflation is caused by correlation or true effects.
+
+## When $f = N\left(0, \sqrt{2}^2\right)$ in particular
+
+That's why in previous empirical investigations, we found that we [could fit $N\left(0, \sqrt{2}^2\right)$ relatively well](alternative.html), but [could not fit when $\sigma^2 > 2$](alternative2.html).
+
+Actually, **$N\left(0, \sqrt{2}^2\right)$ is a singularly interesting case**.  This case corresponds to when we have $N\left(0, 1\right)$ signal and $N\left(0, 1\right)$ independent noise, hence $SNR = 0$.  Theoretically the density curve can be fitted when the odd-order coefficients are $0$ and the even-order ones are $U_n = \sqrt{\frac{\left(n - 1\right)!!}{n!!}}$.
+
+However, since $U_n$ is not decaying fast enough, the re-constructed curve using a limited number of Gaussian derivatives doesn't look good.  Meanwhile, if we truly have many random samples from $N\left(0, \sqrt{2}^2\right)$, we can fit the data using Gaussian derivatives, and the estimated coefficients $\hat w$ usually give a better fit, as [seen previously](alternative.html).
+
+Here we plot the fitted curve using first $N = 10, 50, 100$ orders of Gaussian derivatives, compared with the true $N\left(0, \sqrt{2}^2\right)$ density and the curve estimated from random samples using $L = 10$ Gaussian derivatives.
+
+```{r, echo = FALSE}
+set.seed(777)
+sigma2 = 2
+order = 100
+x.plot = seq(-4 * sqrt(sigma2), 4 * sqrt(sigma2), length = 1e3)
+w.nmlz = w.std(order / 2, sigma2)
+gd.mat = gd.std.mat(x.plot, order)
+y.gd.plot.100 = gd.mat %*% w.nmlz
+y.gd.plot.50 = gd.mat[, 1:51] %*% w.nmlz[1:51]
+y.gd.plot.10 = gd.mat[, 1:11] %*% w.nmlz[1:11]
+x = rnorm(1e4, 0, sqrt(sigma2))
+gd.mat.x = gd.std.mat(x, 10)
+x.hist = hist(x, breaks = 20, plot = FALSE)
+y.lim = c(0, max(c(x.hist$density * 1.05, dnorm(x, 0, sqrt(sigma2)))))
+w.est = w.mosek(gd.mat.x, w_prior = NULL)
+y.est.plot = gd.mat[, 1:11] %*% c(1, w.est$w)
+hist(x, breaks = 100, prob = TRUE, ylim = y.lim,
+     xlab = expression(paste(N(0, sqrt(2)^2), " Independent Samples")),
+     main = expression(sigma^2 == 2)
+     )
+lines(x.plot, y.gd.plot.100, col = "purple")
+lines(x.plot, y.gd.plot.50, col = "blue")
+lines(x.plot, y.gd.plot.10, col = "green")
+lines(x.plot, y.est.plot, col = "red")
+lines(x.plot, dnorm(x.plot, 0, sqrt(sigma2)), lty = 3)
+legend("topleft", lty = 1, col = c("green", "blue", "purple"), c("N = 10", "N = 50", "N = 100"))
+legend("topright", lty = c(2, 1), col = c("black", "red"), c("True", "L = 10"))
+```
+
+## $0 < \sigma^2 < 2$: Multiple examples
+
+
+### $\sigma^2 = 0.2$, $N = 40$
+
+```{r, cache = TRUE, echo = FALSE}
+set.seed(777)
+sigma2 = 0.2
+order = 40
+w.nmlz = gaussian.plot(sigma2, order)
+```
+
+### $\sigma^2 = 0.5$, $N = 14$
+
+```{r, cache = TRUE, echo = FALSE}
+set.seed(777)
+sigma2 = 0.5
+order = 14
+w.nmlz = gaussian.plot(sigma2, order)
+```
+
+### $\sigma^2 = 0.8$, $N = 6$
+
+```{r, cache = TRUE, echo = FALSE}
+set.seed(777)
+sigma2 = 0.8
+order = 6
+w.nmlz = gaussian.plot(sigma2, order)
+```
+
+### $\sigma^2 = 1.2$, $N = 6$
+
+```{r, cache = TRUE, echo = FALSE}
+set.seed(777)
+sigma2 = 1.2
+order = 6
+w.nmlz = gaussian.plot(sigma2, order)
+```
+
+### $\sigma^2 = 1.5$, $N = 14$
+
+```{r, cache = TRUE, echo = FALSE}
+set.seed(777)
+sigma2 = 1.5
+order = 14
+w.nmlz = gaussian.plot(sigma2, order)
+```
+
+### $\sigma^2 = 1.8$, $N = 40$
+
+```{r, cache = TRUE, echo = FALSE}
+set.seed(777)
+sigma2 = 1.8
+order = 40
+w.nmlz = gaussian.plot(sigma2, order)
+```
+
+## Another special case: $\sigma^2 = 0$
+
+When $\sigma^2 = 0$, $f = N\left(0, 0\right) = \delta_0$.  In this case,
+
+$$
+w_n =
+\begin{cases}
+0 & n \text{ is odd}\\
+\sqrt{\frac{\left(n - 1\right)!!}{n!!}}\left(-1\right)^{n / 2}
+& n \text{ is even}
+\end{cases}
+$$
+is equivalent to what we've [obtained previously](gaussian_derivatives_4.html#extreme_case:_(rho_{ij}_equiv_1))
+
+$$
+w_n = \frac{1}{\sqrt{n!}}h_n\left(0\right) \ .
+$$
+The performance can be seen [here](gd_delta.html#(z_=_0)).
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```
