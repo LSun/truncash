@@ -1,0 +1,342 @@
+---
+title: "Regularized Gaussian Derivatives & `ASH`: Simulated True Effects with Heteroskedastic Correlated Noises"
+author: "Lei Sun"
+date: 2017-05-14
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+## Introduction
+
+Similar to [previous simulations](mosek_reg_4.html), where correlated null $z$ scores are fitted by $10$ Gaussian derivatives with regularization, we are now [fitting data sets simulated with correlated noise and true signals](ash_gd.html) by both `ASH` and Gaussian derivatives using the same regularization and see what happens.
+
+The study is almost exactly the same as [the previous one](mosek_reg_5.html), **the single only change being that this time, the correlated noise is heteroskedastic**.  That is, $\hat s_j$ are not constant; in this simulation, they are simulated such that $\log\hat s_j \sim \text{Uniform}\left[\log0.1, \log10\right]$.
+
+```{r, message = FALSE}
+library(ashr)
+source("../code/gdash.R")
+```
+
+```{r, echo = FALSE}
+sample.g = function (g, n) {
+  UseMethod("sample.g")
+}
+
+sample.g.normalmix = function (g, n) {
+  K = length(g$pi)
+  beta = list()
+  for (i in 1 : K) {
+    beta[[i]] = rnorm(ceiling(n * g$pi[i]), g$mean[i], g$sd[i])
+  }
+  return(list(beta = sample(unlist(beta)), mixcompdist = "normal"))
+}
+
+sample.g.unimix = function(g, n) {
+  K = length(g$pi)
+  beta = list()
+  for (i in 1 : K) {
+    beta[[i]] = runif(ceiling(n * g$pi[i]), g$a[i], g$b[i])
+  }
+  return(list(beta = sample(unlist(beta)), mixcompdist = "uniform"))
+}
+
+se.fun = function (n, method) {
+  if (method == "constant") {
+    sebetahat = rep(1, n)
+  } else {
+    sebetahat = exp(runif(n, log(0.1), log(10)))
+  }
+}
+
+AltPlot = function (z.list, z.index, label, g, se, L, lambda, rho, maxiter) {
+  x.range = max(c(2 * g$sd, 4))
+  x.plot = seq(-x.range, x.range, 0.01)
+  y.true = ashr::mixcdf(g, x.plot)
+  data.set.num = length(z.list[[label]])
+  for (i in 1 : data.set.num) {
+    z = z.list[[label]][[i]]
+    effect = sample.g(g, length(z))
+    beta = effect$beta[1 : length(z)]
+    sebetahat = se.fun(length(z), se)
+    betahat = beta + sebetahat * z
+    fit.ash = ashr::ash(betahat, sebetahat, mixcompdist = effect$mixcompdist, method = "fdr")
+    if (missing(maxiter)) {
+      control = list(maxiter = 50)
+    } else {
+      control = list(maxiter = maxiter)
+    }
+    gdash.time <- system.time(fit.gdash <- gdash(betahat, sebetahat,
+                      mixcompdist = effect$mixcompdist,
+                      gd.ord = L, w.lambda = lambda, w.rho = rho,
+                      gd.normalized = TRUE, primal = FALSE,
+                      method = "fdr", control = control))
+    y.ash = ashr::mixcdf(fit.ash$fitted_g, x.plot)
+    y.gdash = ashr::mixcdf(fit.gdash$fitted_g, x.plot)
+    cat("Data Set", z.index[[label]]$set[i], ";\n")
+    cat("For the Correlated Null Z Scores Only:\n")
+    cat("Number of False Discoveries by BH at FDR = 0.05:", z.index[[label]]$fd.FDR0.05.bh[i], ";\n")
+    cat("Number of False Discoveries by ASH at lfsr <= 0.05:", z.index[[label]]$fd.lfsr0.05.ash[i], ";\n")
+    cat("pihat0 by ASH:", z.index[[label]]$pihat0.ash[i], ";\n")
+    z.hist = hist(z, breaks = 100, plot = FALSE)
+    hist(z, breaks = 100, prob = TRUE, ylim = c(0, max(c(dnorm(0), max(z.hist$density)))), xlab = "Correlated N(0, 1) Noise", main = "Histogram of the Correlated N(0, 1) Noise")
+    lines(x.plot, dnorm(x.plot), col = "red")
+    cat("Number of iterations:", fit.gdash$niter, ";\n")
+    cat("Converged:", fit.gdash$converged, ";\n")
+    cat("Time:", gdash.time[3], "Seconds;\n")
+    cat("Normalized w:", rbind(paste(0 : L, "-"), paste(round(fit.gdash$w, 5), ";")), "\n")
+    plot(x.plot, y.true, type = "l", lty = 2, ylim = c(0, 1), xlab = expression(beta), ylab = expression(hat(G)(beta)), main = expression(paste(hat(G), ": CDF of ", hat(g))))
+    lines(x.plot, y.ash, lty = 2, col = "red")
+    lines(x.plot, y.gdash, col = "blue")
+    legend("topleft", lty = c(2, 2, 1), col = c("black", "red", "blue"), legend = c("True", "ASH", "GD-ASH"))
+  }
+}
+```
+
+```{r}
+L = 10
+lambda = 10
+rho = 0.5
+```
+
+```{r}
+g.null = normalmix(pi = 1, mean = 0, sd = 0)
+g.s.n = normalmix(pi = c(0.6, 0.3, 0.1), mean = 0, sd = c(0, 1, 2))
+g.m.n = normalmix(pi = c(0.6, 0.3, 0.1), mean = 0, sd = c(0, 2, 4))
+g.l.n = normalmix(pi = c(0.6, 0.3, 0.1), mean = 0, sd = c(0, 3, 6))
+```
+
+```{r}
+se = "heteroskedasticity"
+```
+
+```{r}
+z.list = readRDS("../output/z_null_liver_777_select.RDS")
+z.index = readRDS("../output/z_null_liver_777_select_index.RDS")
+```
+
+## Category I: Typical
+
+```{r}
+label = "typical"
+```
+
+### Global null $g_n$
+
+```{r}
+g = g.null
+```
+
+```{r, cache = TRUE, echo = FALSE}
+set.seed(10)
+AltPlot(z.list, z.index, label, g, se, L, lambda, rho)
+```
+
+### Small effects $g_s$
+
+```{r}
+g = g.s.n
+```
+
+```{r, cache = TRUE, echo = FALSE}
+set.seed(11)
+AltPlot(z.list, z.index, label, g, se, L, lambda, rho)
+```
+
+### Medium effects $g_m$
+
+```{r}
+g = g.m.n
+```
+
+```{r, cache = TRUE, echo = FALSE}
+set.seed(12)
+AltPlot(z.list, z.index, label, g, se, L, lambda, rho)
+```
+
+### Large effects $g_l$
+
+```{r}
+g = g.l.n
+```
+
+```{r, cache = TRUE, echo = FALSE}
+set.seed(13)
+AltPlot(z.list, z.index, label, g, se, L, lambda, rho)
+```
+
+## Category II: Hostile
+
+```{r}
+label = "hostile"
+```
+
+### Global null $g_n$
+
+```{r}
+g = g.null
+```
+
+```{r, cache = TRUE, echo = FALSE}
+set.seed(20)
+AltPlot(z.list, z.index, label, g, se, L, lambda, rho)
+```
+
+### Small effects $g_s$
+
+```{r}
+g = g.s.n
+```
+
+```{r, cache = TRUE, echo = FALSE}
+set.seed(21)
+AltPlot(z.list, z.index, label, g, se, L, lambda, rho)
+```
+
+### Medium effects $g_m$
+
+```{r}
+g = g.m.n
+```
+
+```{r, cache = TRUE, echo = FALSE}
+set.seed(22)
+AltPlot(z.list, z.index, label, g, se, L, lambda, rho)
+```
+
+### Large effects $g_l$
+
+```{r}
+g = g.l.n
+```
+
+```{r, cache = TRUE, echo = FALSE}
+set.seed(23)
+AltPlot(z.list, z.index, label, g, se, L, lambda, rho)
+```
+
+
+## Category III: Friendly
+
+```{r}
+label = "friendly"
+```
+
+### Global null $g_n$
+
+```{r}
+g = g.null
+```
+
+```{r, cache = TRUE, echo = FALSE}
+set.seed(30)
+AltPlot(z.list, z.index, label, g, se, L, lambda, rho)
+```
+
+### Small effects $g_s$
+
+```{r}
+g = g.s.n
+```
+
+```{r, cache = TRUE, echo = FALSE}
+set.seed(31)
+AltPlot(z.list, z.index, label, g, se, L, lambda, rho)
+```
+
+### Medium effects $g_m$
+
+```{r}
+g = g.m.n
+```
+
+```{r, cache = TRUE, echo = FALSE}
+set.seed(32)
+AltPlot(z.list, z.index, label, g, se, L, lambda, rho)
+```
+
+### Large effects $g_l$
+
+```{r}
+g = g.l.n
+```
+
+```{r, cache = TRUE, echo = FALSE}
+set.seed(33)
+AltPlot(z.list, z.index, label, g, se, L, lambda, rho)
+```
+
+## Category III: iid
+
+```{r}
+label = "iid"
+```
+
+### Global null $g_n$
+
+```{r}
+g = g.null
+```
+
+```{r, echo = FALSE, cache = TRUE}
+set.seed(40)
+AltPlot(z.list, z.index, label, g, se, L, lambda, rho)
+```
+
+### Small effects $g_s$
+
+```{r}
+g = g.s.n
+```
+
+```{r, cache = TRUE, echo = FALSE}
+set.seed(41)
+AltPlot(z.list, z.index, label, g, se, L, lambda, rho)
+```
+
+### Medium effects $g_m$
+
+```{r}
+g = g.m.n
+```
+
+```{r, cache = TRUE, echo = FALSE}
+set.seed(42)
+AltPlot(z.list, z.index, label, g, se, L, lambda, rho)
+```
+
+### Large effects $g_l$
+
+```{r}
+g = g.l.n
+```
+
+```{r, cache = TRUE, echo = FALSE}
+set.seed(43)
+AltPlot(z.list, z.index, label, g, se, L, lambda, rho)
+```
+
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```
