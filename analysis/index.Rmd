@@ -117,11 +117,13 @@ The previous investigation is boiled down to a prototypical problem: the classic
 * [Improvement on implementation with `Rmosek`: Normalization](mosek_reg_2.html)
 * [Improvement on implementation with `Rmosek`: Regularization](mosek_reg_3.html)
 
+Several ways are explored to make fitting Gaussian derivatives more efficient and accurate.
+
 * [Regularized Gaussian Derivatives: Correlated Null](mosek_reg_4.html)
 * [Regularized Gaussian Derivatives & `ASH`: Simulated True Effects with Homoscedastic Correlated Noises](mosek_reg_5.html)
 * [Regularized Gaussian Derivatives & `ASH`: Simulated True Effects with Heteroskedastic Correlated Noises](mosek_reg_6.html)
 
-
+Fitting the corrrelated null with Gaussian derivatives has two constraints: non-negativity and orderly decay, and both are intractable.  We are using $L_1$ regularization to try to solve both.
 
 [`ashr`]: https://github.com/stephens999/ashr
 
