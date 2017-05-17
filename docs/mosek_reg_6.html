@@ -1,0 +1,3230 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+<meta name="author" content="Lei Sun" />
+
+<meta name="date" content="2017-05-14" />
+
+<title>Regularized Gaussian Derivatives &amp; ASH: Simulated True Effects with Heteroskedastic Correlated Noises</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs && document.readyState && document.readyState === "complete") {
+   window.setTimeout(function() {
+      hljs.initHighlighting();
+   }, 0);
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">truncash</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/LSun/truncash">
+    <span class="fa fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Regularized Gaussian Derivatives &amp; <code>ASH</code>: Simulated True Effects with Heteroskedastic Correlated Noises</h1>
+<h4 class="author"><em>Lei Sun</em></h4>
+<h4 class="date"><em>2017-05-14</em></h4>
+
+</div>
+
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+<!-- Update knitr chunk options -->
+<!-- Insert the date the file was last updated -->
+<p><strong>Last updated:</strong> 2017-05-17</p>
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R package git2r is installed -->
+<p><strong>Code version:</strong> a475d92</p>
+<!-- Add your analysis here -->
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>Similar to <a href="mosek_reg_4.html">previous simulations</a>, where correlated null <span class="math inline">\(z\)</span> scores are fitted by <span class="math inline">\(10\)</span> Gaussian derivatives with regularization, we are now <a href="ash_gd.html">fitting data sets simulated with correlated noise and true signals</a> by both <code>ASH</code> and Gaussian derivatives using the same regularization and see what happens.</p>
+<p>The study is almost exactly the same as <a href="mosek_reg_5.html">the previous one</a>, <strong>the single only change being that this time, the correlated noise is heteroskedastic</strong>. That is, <span class="math inline">\(\hat s_j\)</span> are not constant; in this simulation, they are simulated such that <span class="math inline">\(\log\hat s_j \sim \text{Uniform}\left[\log0.1, \log10\right]\)</span>.</p>
+<pre class="r"><code>library(ashr)
+source(&quot;../code/gdash.R&quot;)</code></pre>
+<pre class="r"><code>L = 10
+lambda = 10
+rho = 0.5</code></pre>
+<pre class="r"><code>g.null = normalmix(pi = 1, mean = 0, sd = 0)
+g.s.n = normalmix(pi = c(0.6, 0.3, 0.1), mean = 0, sd = c(0, 1, 2))
+g.m.n = normalmix(pi = c(0.6, 0.3, 0.1), mean = 0, sd = c(0, 2, 4))
+g.l.n = normalmix(pi = c(0.6, 0.3, 0.1), mean = 0, sd = c(0, 3, 6))</code></pre>
+<pre class="r"><code>se = &quot;heteroskedasticity&quot;</code></pre>
+<pre class="r"><code>z.list = readRDS(&quot;../output/z_null_liver_777_select.RDS&quot;)
+z.index = readRDS(&quot;../output/z_null_liver_777_select_index.RDS&quot;)</code></pre>
+</div>
+<div id="category-i-typical" class="section level2">
+<h2>Category I: Typical</h2>
+<pre class="r"><code>label = &quot;typical&quot;</code></pre>
+<div id="global-null-g_n" class="section level3">
+<h3>Global null <span class="math inline">\(g_n\)</span></h3>
+<pre class="r"><code>g = g.null</code></pre>
+<pre><code>Data Set 32 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 3 ;
+pihat0 by ASH: 0.184423 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 2 ;
+Converged: TRUE ;
+Time: 11.225 Seconds;
+Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-9-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 327 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 489 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1446 ;
+pihat0 by ASH: 0.1522796 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-9-3.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 10 ;
+Converged: TRUE ;
+Time: 38.226 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.05016 ; 2 - 0.95618 ; 3 - -0.2777 ; 4 - 0.62473 ; 5 - -0.33374 ; 6 - 0.16868 ; 7 - -0.15111 ; 8 - 0 ; 9 - -0.02117 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-9-4.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 355 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 639 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 2300 ;
+pihat0 by ASH: 0.04750946 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-9-5.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 22 ;
+Converged: TRUE ;
+Time: 86.409 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.01984 ; 2 - 1.24198 ; 3 - 0.05376 ; 4 - 0.71746 ; 5 - -0.12445 ; 6 - 0.06859 ; 7 - -0.29586 ; 8 - -0.02461 ; 9 - -0.14978 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-9-6.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 483 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 1 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 0.9998824 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-9-7.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 2 ;
+Converged: TRUE ;
+Time: 7.019 Seconds;
+Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-9-8.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 778 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 1 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 357 ;
+pihat0 by ASH: 0.07619716 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-9-9.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 51 ;
+Converged: FALSE ;
+Time: 188.714 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.00353 ; 2 - 0.54491 ; 3 - -0.04708 ; 4 - 0.08909 ; 5 - -0.04501 ; 6 - -0.02457 ; 7 - -0.02038 ; 8 - 0 ; 9 - -0.01978 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-9-10.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="small-effects-g_s" class="section level3">
+<h3>Small effects <span class="math inline">\(g_s\)</span></h3>
+<pre class="r"><code>g = g.s.n</code></pre>
+<pre><code>Data Set 32 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 3 ;
+pihat0 by ASH: 0.184423 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 52.588 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.02575 ; 2 - 0.26909 ; 3 - 0.02446 ; 4 - -0.10285 ; 5 - -0.02308 ; 6 - 0 ; 7 - -0.04142 ; 8 - 0 ; 9 - -0.04776 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-11-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 327 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 489 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1446 ;
+pihat0 by ASH: 0.1522796 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-11-3.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 40.319 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.04643 ; 2 - 0.94137 ; 3 - -0.26839 ; 4 - 0.53014 ; 5 - -0.31731 ; 6 - 0.06686 ; 7 - -0.11808 ; 8 - 0 ; 9 - -0.01081 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-11-4.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 355 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 639 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 2300 ;
+pihat0 by ASH: 0.04750946 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-11-5.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 32.789 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.01025 ; 2 - 1.217 ; 3 - 0.0104 ; 4 - 0.61171 ; 5 - -0.14679 ; 6 - 1e-05 ; 7 - -0.20289 ; 8 - 0 ; 9 - -0.05751 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-11-6.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 483 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 1 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 0.9998824 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-11-7.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 13 ;
+Converged: TRUE ;
+Time: 44.561 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.04727 ; 2 - -0.18711 ; 3 - 0.07235 ; 4 - 0.02597 ; 5 - 0.01644 ; 6 - -0.03144 ; 7 - 0.00852 ; 8 - 0 ; 9 - -0.04731 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-11-8.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 778 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 1 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 357 ;
+pihat0 by ASH: 0.07619716 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-11-9.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 12 ;
+Converged: TRUE ;
+Time: 45.548 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.01796 ; 2 - 0.5132 ; 3 - 0.01891 ; 4 - 0.00866 ; 5 - 0.16879 ; 6 - -0.07283 ; 7 - 0.3488 ; 8 - 0 ; 9 - 0.24132 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-11-10.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="medium-effects-g_m" class="section level3">
+<h3>Medium effects <span class="math inline">\(g_m\)</span></h3>
+<pre class="r"><code>g = g.m.n</code></pre>
+<pre><code>Data Set 32 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 3 ;
+pihat0 by ASH: 0.184423 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 28.927 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.02569 ; 2 - 0.27102 ; 3 - 0.08428 ; 4 - -0.10746 ; 5 - 0.17263 ; 6 - 0 ; 7 - 0.18222 ; 8 - 0 ; 9 - 0.01997 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-13-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 327 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 489 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1446 ;
+pihat0 by ASH: 0.1522796 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-13-3.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 32.012 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.05876 ; 2 - 0.88155 ; 3 - -0.29075 ; 4 - 0.4277 ; 5 - -0.40084 ; 6 - 1e-05 ; 7 - -0.22873 ; 8 - 0 ; 9 - -0.03909 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-13-4.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 355 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 639 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 2300 ;
+pihat0 by ASH: 0.04750946 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-13-5.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 7 ;
+Converged: TRUE ;
+Time: 23.131 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.01917 ; 2 - 1.2006 ; 3 - 0.10039 ; 4 - 0.61318 ; 5 - -0.01411 ; 6 - 1e-05 ; 7 - -0.20106 ; 8 - 0 ; 9 - -0.1185 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-13-6.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 483 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 1 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 0.9998824 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-13-7.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 11 ;
+Converged: TRUE ;
+Time: 36.738 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.04751 ; 2 - -0.21417 ; 3 - -0.03231 ; 4 - -1e-05 ; 5 - -0.14269 ; 6 - -0.06672 ; 7 - -0.16554 ; 8 - 0 ; 9 - -0.12164 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-13-8.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 778 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 1 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 357 ;
+pihat0 by ASH: 0.07619716 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-13-9.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 12 ;
+Converged: TRUE ;
+Time: 82.136 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.00568 ; 2 - 0.56109 ; 3 - -0.00644 ; 4 - 0.09462 ; 5 - 0.08251 ; 6 - 0 ; 7 - 0.20056 ; 8 - 0 ; 9 - 0.11947 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-13-10.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="large-effects-g_l" class="section level3">
+<h3>Large effects <span class="math inline">\(g_l\)</span></h3>
+<pre class="r"><code>g = g.l.n</code></pre>
+<pre><code>Data Set 32 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 3 ;
+pihat0 by ASH: 0.184423 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 28.07 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.04577 ; 2 - 0.26791 ; 3 - -0.01712 ; 4 - -0.11676 ; 5 - -0.10617 ; 6 - 1e-05 ; 7 - -0.11222 ; 8 - 0 ; 9 - -0.07787 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-15-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 327 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 489 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1446 ;
+pihat0 by ASH: 0.1522796 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-15-3.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 11 ;
+Converged: TRUE ;
+Time: 34.351 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.03867 ; 2 - 0.89771 ; 3 - -0.34104 ; 4 - 0.44976 ; 5 - -0.43264 ; 6 - 3e-05 ; 7 - -0.20261 ; 8 - -1e-05 ; 9 - -0.05654 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-15-4.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 355 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 639 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 2300 ;
+pihat0 by ASH: 0.04750946 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-15-5.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 8 ;
+Converged: TRUE ;
+Time: 38.134 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.02004 ; 2 - 1.1793 ; 3 - 0.02238 ; 4 - 0.58091 ; 5 - -0.24019 ; 6 - 1e-05 ; 7 - -0.48185 ; 8 - -1e-05 ; 9 - -0.20133 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-15-6.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 483 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 1 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 0.9998824 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-15-7.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 16 ;
+Converged: TRUE ;
+Time: 55.966 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.03216 ; 2 - -0.2142 ; 3 - 0.0667 ; 4 - 6e-05 ; 5 - 0.00907 ; 6 - -0.02549 ; 7 - -0.03655 ; 8 - 0 ; 9 - -0.06861 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-15-8.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 778 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 1 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 357 ;
+pihat0 by ASH: 0.07619716 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-15-9.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 26 ;
+Converged: TRUE ;
+Time: 78.291 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.00061 ; 2 - 0.55405 ; 3 - -0.03913 ; 4 - 0.11267 ; 5 - -0.07383 ; 6 - -1e-05 ; 7 - -0.04363 ; 8 - 0 ; 9 - 0.00339 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-15-10.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="category-ii-hostile" class="section level2">
+<h2>Category II: Hostile</h2>
+<pre class="r"><code>label = &quot;hostile&quot;</code></pre>
+<div id="global-null-g_n-1" class="section level3">
+<h3>Global null <span class="math inline">\(g_n\)</span></h3>
+<pre class="r"><code>g = g.null</code></pre>
+<pre><code>Data Set 355 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 639 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 2300 ;
+pihat0 by ASH: 0.04750946 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-18-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 51 ;
+Converged: FALSE ;
+Time: 189.879 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.01983 ; 2 - 1.2292 ; 3 - 0.05494 ; 4 - 0.6768 ; 5 - -0.11792 ; 6 - 0.03277 ; 7 - -0.28506 ; 8 - -0.02591 ; 9 - -0.14264 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-18-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 23 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 408 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 2448 ;
+pihat0 by ASH: 0.03139009 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-18-3.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 2 ;
+Converged: TRUE ;
+Time: 7.614 Seconds;
+Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-18-4.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 122 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 331 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1822 ;
+pihat0 by ASH: 0.04301549 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-18-5.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 2 ;
+Converged: TRUE ;
+Time: 6.838 Seconds;
+Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-18-6.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 749 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 114 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1685 ;
+pihat0 by ASH: 0.02583276 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-18-7.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 2 ;
+Converged: TRUE ;
+Time: 7.177 Seconds;
+Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-18-8.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 724 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 79 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1814 ;
+pihat0 by ASH: 0.01606004 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-18-9.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 2 ;
+Converged: TRUE ;
+Time: 7.428 Seconds;
+Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-18-10.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 56 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 35 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1137 ;
+pihat0 by ASH: 0.04829662 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-18-11.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 51 ;
+Converged: FALSE ;
+Time: 231.585 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.01422 ; 2 - 0.84415 ; 3 - 0.13227 ; 4 - 0.30738 ; 5 - 0.18469 ; 6 - 0 ; 7 - 0.03516 ; 8 - 0 ; 9 - -0.05314 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-18-12.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 840 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 28 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1653 ;
+pihat0 by ASH: 0.02316832 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-18-13.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 2 ;
+Converged: TRUE ;
+Time: 8.737 Seconds;
+Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-18-14.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 858 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 16 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1506 ;
+pihat0 by ASH: 0.05110069 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-18-15.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 2 ;
+Converged: TRUE ;
+Time: 8.312 Seconds;
+Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-18-16.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 771 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 12 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 795 ;
+pihat0 by ASH: 0.04316169 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-18-17.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 2 ;
+Converged: TRUE ;
+Time: 9.229 Seconds;
+Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-18-18.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 389 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 11 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1028 ;
+pihat0 by ASH: 0.03156173 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-18-19.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 50 ;
+Converged: FALSE ;
+Time: 219.546 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.01064 ; 2 - 0.80072 ; 3 - 0.19566 ; 4 - 0.22862 ; 5 - 0.15806 ; 6 - -0.03261 ; 7 - -0.00031 ; 8 - 0 ; 9 - -0.0033 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-18-20.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 485 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 9 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 614 ;
+pihat0 by ASH: 0.04794909 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-18-21.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 2 ;
+Converged: TRUE ;
+Time: 7.945 Seconds;
+Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-18-22.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 77 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 7 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1307 ;
+pihat0 by ASH: 0.05151585 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-18-23.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 8 ;
+Converged: TRUE ;
+Time: 31.632 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.0259 ; 2 - 0.87864 ; 3 - 0.3604 ; 4 - 0.32876 ; 5 - 0.2319 ; 6 - 0 ; 7 - -0.16261 ; 8 - 0 ; 9 - -0.14356 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-18-24.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 984 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 7 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 689 ;
+pihat0 by ASH: 0.04567195 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-18-25.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 51 ;
+Converged: FALSE ;
+Time: 227.751 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.01268 ; 2 - 0.66967 ; 3 - 0.09662 ; 4 - 0.08831 ; 5 - 0.03504 ; 6 - -0.06662 ; 7 - -0.05847 ; 8 - 0 ; 9 - -0.07254 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-18-26.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 360 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 6 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1392 ;
+pihat0 by ASH: 0.0308234 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-18-27.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 2 ;
+Converged: TRUE ;
+Time: 10.729 Seconds;
+Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-18-28.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 522 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 4 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1149 ;
+pihat0 by ASH: 0.02083846 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-18-29.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 25 ;
+Converged: TRUE ;
+Time: 90.942 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.00827 ; 2 - 0.82342 ; 3 - -0.05818 ; 4 - -0.00257 ; 5 - -0.12033 ; 6 - -0.21587 ; 7 - -0.13892 ; 8 - 0.01452 ; 9 - -0.11108 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-18-30.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 22 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 1 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 508 ;
+pihat0 by ASH: 0.03271534 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-18-31.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 2 ;
+Converged: TRUE ;
+Time: 12.427 Seconds;
+Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-18-32.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 269 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 1 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 662 ;
+pihat0 by ASH: 0.02787007 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-18-33.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 2 ;
+Converged: TRUE ;
+Time: 15.367 Seconds;
+Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-18-34.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 403 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 1 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 227 ;
+pihat0 by ASH: 0.0531628 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-18-35.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 2 ;
+Converged: TRUE ;
+Time: 10.676 Seconds;
+Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-18-36.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 923 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 1 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1340 ;
+pihat0 by ASH: 0.03239883 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-18-37.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 2 ;
+Converged: TRUE ;
+Time: 10.279 Seconds;
+Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-18-38.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 3 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 193 ;
+pihat0 by ASH: 0.0465218 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-18-39.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 2 ;
+Converged: TRUE ;
+Time: 9.052 Seconds;
+Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-18-40.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="small-effects-g_s-1" class="section level3">
+<h3>Small effects <span class="math inline">\(g_s\)</span></h3>
+<pre class="r"><code>g = g.s.n</code></pre>
+<pre><code>Data Set 355 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 639 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 2300 ;
+pihat0 by ASH: 0.04750946 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-20-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 8 ;
+Converged: TRUE ;
+Time: 30.88 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.02733 ; 2 - 1.21831 ; 3 - 0.06885 ; 4 - 0.61724 ; 5 - -0.00753 ; 6 - 1e-05 ; 7 - -0.00526 ; 8 - -1e-05 ; 9 - 0.037 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-20-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 23 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 408 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 2448 ;
+pihat0 by ASH: 0.03139009 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-20-3.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 34.966 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.01015 ; 2 - 1.29628 ; 3 - 0.08509 ; 4 - 0.65691 ; 5 - 0.07244 ; 6 - 0 ; 7 - -0.09476 ; 8 - 0 ; 9 - -0.05269 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-20-4.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 122 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 331 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1822 ;
+pihat0 by ASH: 0.04301549 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-20-5.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 32.747 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.01413 ; 2 - 1.05056 ; 3 - -0.27106 ; 4 - 0.50484 ; 5 - -0.25027 ; 6 - 0 ; 7 - -0.08203 ; 8 - 0 ; 9 - -0.01101 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-20-6.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 749 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 114 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1685 ;
+pihat0 by ASH: 0.02583276 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-20-7.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 34.58 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.04303 ; 2 - 1.01229 ; 3 - -0.00828 ; 4 - 0.37868 ; 5 - -0.02648 ; 6 - 0 ; 7 - 0.06348 ; 8 - 0 ; 9 - 0.05942 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-20-8.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 724 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 79 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1814 ;
+pihat0 by ASH: 0.01606004 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-20-9.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 8 ;
+Converged: TRUE ;
+Time: 32.557 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.03671 ; 2 - 1.0706 ; 3 - 0.14453 ; 4 - 0.42414 ; 5 - 0.27119 ; 6 - -0.00268 ; 7 - 0.3584 ; 8 - 0 ; 9 - 0.1656 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-20-10.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 56 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 35 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1137 ;
+pihat0 by ASH: 0.04829662 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-20-11.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 7 ;
+Converged: TRUE ;
+Time: 42.063 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.01277 ; 2 - 0.82711 ; 3 - 0.13108 ; 4 - 0.30512 ; 5 - 0.22718 ; 6 - -1e-05 ; 7 - 0.12462 ; 8 - 0 ; 9 - 0.0096 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-20-12.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 840 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 28 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1653 ;
+pihat0 by ASH: 0.02316832 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-20-13.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 7 ;
+Converged: TRUE ;
+Time: 28.484 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.03585 ; 2 - 1.02697 ; 3 - -0.00449 ; 4 - 0.39933 ; 5 - -0.31014 ; 6 - -1e-05 ; 7 - -0.36651 ; 8 - 0 ; 9 - -0.0976 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-20-14.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 858 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 16 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1506 ;
+pihat0 by ASH: 0.05110069 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-20-15.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 7 ;
+Converged: TRUE ;
+Time: 23.374 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.04085 ; 2 - 0.98202 ; 3 - -0.09845 ; 4 - 0.36419 ; 5 - -0.0884 ; 6 - 0 ; 7 - -0.03491 ; 8 - 0 ; 9 - -0.00643 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-20-16.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 771 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 12 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 795 ;
+pihat0 by ASH: 0.04316169 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-20-17.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 29.666 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.04117 ; 2 - 0.68813 ; 3 - 0.13672 ; 4 - 0.06468 ; 5 - 0.33179 ; 6 - -0.09935 ; 7 - 0.34032 ; 8 - 0 ; 9 - 0.17877 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-20-18.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 389 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 11 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1028 ;
+pihat0 by ASH: 0.03156173 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-20-19.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 7 ;
+Converged: TRUE ;
+Time: 21.716 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.02586 ; 2 - 0.79686 ; 3 - 0.23617 ; 4 - 0.24689 ; 5 - 0.22291 ; 6 - 0 ; 7 - 0.11239 ; 8 - 0 ; 9 - 0.07542 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-20-20.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 485 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 9 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 614 ;
+pihat0 by ASH: 0.04794909 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-20-21.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 26.646 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.01992 ; 2 - 0.67862 ; 3 - 0.06354 ; 4 - 0.11245 ; 5 - -0.06842 ; 6 - -0.06771 ; 7 - -0.3139 ; 8 - 0 ; 9 - -0.20064 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-20-22.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 77 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 7 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1307 ;
+pihat0 by ASH: 0.05151585 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-20-23.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 45.979 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.01525 ; 2 - 0.86216 ; 3 - 0.31238 ; 4 - 0.30511 ; 5 - 0.09585 ; 6 - 0 ; 7 - -0.29033 ; 8 - 0 ; 9 - -0.16671 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-20-24.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 984 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 7 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 689 ;
+pihat0 by ASH: 0.04567195 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-20-25.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 33.458 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.02086 ; 2 - 0.65154 ; 3 - 0.08049 ; 4 - 0.10376 ; 5 - -0.06465 ; 6 - -0.00956 ; 7 - -0.23013 ; 8 - 0 ; 9 - -0.15155 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-20-26.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 360 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 6 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1392 ;
+pihat0 by ASH: 0.0308234 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-20-27.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 27.12 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.05079 ; 2 - 0.92116 ; 3 - 0.16182 ; 4 - 0.15438 ; 5 - 0.23256 ; 6 - -0.12371 ; 7 - 0.04937 ; 8 - 0 ; 9 - -0.03768 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-20-28.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 522 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 4 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1149 ;
+pihat0 by ASH: 0.02083846 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-20-29.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 7 ;
+Converged: TRUE ;
+Time: 23.311 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.01783 ; 2 - 0.81908 ; 3 - -0.11666 ; 4 - -1e-05 ; 5 - -0.19744 ; 6 - -0.21896 ; 7 - -0.22814 ; 8 - 0 ; 9 - -0.17064 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-20-30.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 22 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 1 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 508 ;
+pihat0 by ASH: 0.03271534 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-20-31.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 27.133 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.01439 ; 2 - 0.60935 ; 3 - 0.07122 ; 4 - 0.02919 ; 5 - -0.02408 ; 6 - -0.03606 ; 7 - -0.13222 ; 8 - 0 ; 9 - -0.06968 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-20-32.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 269 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 1 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 662 ;
+pihat0 by ASH: 0.02787007 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-20-33.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 10 ;
+Converged: TRUE ;
+Time: 29.89 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.0319 ; 2 - 0.68016 ; 3 - -0.05035 ; 4 - 0 ; 5 - 0.24935 ; 6 - -0.14568 ; 7 - 0.41018 ; 8 - 0 ; 9 - 0.1359 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-20-34.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 403 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 1 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 227 ;
+pihat0 by ASH: 0.0531628 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-20-35.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 28.086 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.00114 ; 2 - 0.53181 ; 3 - -0.07748 ; 4 - -0.1965 ; 5 - -0.15361 ; 6 - -0.16073 ; 7 - -0.23902 ; 8 - 0 ; 9 - -0.12921 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-20-36.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 923 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 1 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1340 ;
+pihat0 by ASH: 0.03239883 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-20-37.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 29.423 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.02388 ; 2 - 0.90653 ; 3 - 0.19131 ; 4 - 0.20235 ; 5 - 0.14819 ; 6 - -0.09689 ; 7 - -0.0837 ; 8 - 0 ; 9 - -0.12117 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-20-38.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 3 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 193 ;
+pihat0 by ASH: 0.0465218 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-20-39.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 27.395 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.02577 ; 2 - 0.48693 ; 3 - 0.20297 ; 4 - -0.01878 ; 5 - 0.07887 ; 6 - -1e-05 ; 7 - -0.02108 ; 8 - 0 ; 9 - 0.03032 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-20-40.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="medium-effects-g_m-1" class="section level3">
+<h3>Medium effects <span class="math inline">\(g_m\)</span></h3>
+<pre class="r"><code>g = g.m.n</code></pre>
+<pre><code>Data Set 355 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 639 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 2300 ;
+pihat0 by ASH: 0.04750946 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-22-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 8 ;
+Converged: TRUE ;
+Time: 25.149 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.00742 ; 2 - 1.1749 ; 3 - 0.03835 ; 4 - 0.5591 ; 5 - -0.1126 ; 6 - 0 ; 7 - -0.31054 ; 8 - -1e-05 ; 9 - -0.19373 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-22-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 23 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 408 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 2448 ;
+pihat0 by ASH: 0.03139009 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-22-3.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 26.046 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.00632 ; 2 - 1.28769 ; 3 - 0.0353 ; 4 - 0.66171 ; 5 - -0.063 ; 6 - 0 ; 7 - -0.27308 ; 8 - 0 ; 9 - -0.16247 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-22-4.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 122 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 331 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1822 ;
+pihat0 by ASH: 0.04301549 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-22-5.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 7 ;
+Converged: TRUE ;
+Time: 22.228 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.0135 ; 2 - 1.06734 ; 3 - -0.31841 ; 4 - 0.51222 ; 5 - -0.46115 ; 6 - 0 ; 7 - -0.40263 ; 8 - -1e-05 ; 9 - -0.23457 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-22-6.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 749 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 114 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1685 ;
+pihat0 by ASH: 0.02583276 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-22-7.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 51 ;
+Converged: FALSE ;
+Time: 154.233 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.05073 ; 2 - 1.01832 ; 3 - -0.00939 ; 4 - 0.39389 ; 5 - -0.1153 ; 6 - 0 ; 7 - -0.11893 ; 8 - 0 ; 9 - -0.03808 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-22-8.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 724 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 79 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1814 ;
+pihat0 by ASH: 0.01606004 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-22-9.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 42.727 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.02736 ; 2 - 1.10549 ; 3 - 0.10649 ; 4 - 0.46513 ; 5 - 0.07473 ; 6 - 0 ; 7 - 0.00743 ; 8 - 0 ; 9 - -0.02026 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-22-10.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 56 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 35 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1137 ;
+pihat0 by ASH: 0.04829662 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-22-11.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 7 ;
+Converged: TRUE ;
+Time: 25.795 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.02133 ; 2 - 0.84438 ; 3 - 0.14593 ; 4 - 0.31391 ; 5 - 0.17258 ; 6 - 0 ; 7 - 0.07917 ; 8 - 0 ; 9 - -0.00346 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-22-12.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 840 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 28 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1653 ;
+pihat0 by ASH: 0.02316832 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-22-13.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 7 ;
+Converged: TRUE ;
+Time: 29.846 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.06562 ; 2 - 1.00354 ; 3 - 0.02349 ; 4 - 0.3389 ; 5 - -0.09845 ; 6 - -0.0561 ; 7 - 0.00741 ; 8 - 0 ; 9 - 0.14495 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-22-14.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 858 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 16 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1506 ;
+pihat0 by ASH: 0.05110069 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-22-15.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 36.69 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.04018 ; 2 - 0.96386 ; 3 - -0.06114 ; 4 - 0.312 ; 5 - -0.02404 ; 6 - -1e-05 ; 7 - 0.02535 ; 8 - 0 ; 9 - 0.0536 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-22-16.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 771 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 12 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 795 ;
+pihat0 by ASH: 0.04316169 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-22-17.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 28.698 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.04299 ; 2 - 0.71495 ; 3 - 0.03085 ; 4 - 0.16386 ; 5 - 0.06736 ; 6 - -0.00015 ; 7 - -0.03882 ; 8 - 0 ; 9 - -0.06233 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-22-18.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 389 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 11 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1028 ;
+pihat0 by ASH: 0.03156173 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-22-19.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 27.441 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.00403 ; 2 - 0.76911 ; 3 - 0.22856 ; 4 - 0.18941 ; 5 - 0.31326 ; 6 - -0.02907 ; 7 - 0.20318 ; 8 - 0 ; 9 - 0.08145 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-22-20.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 485 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 9 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 614 ;
+pihat0 by ASH: 0.04794909 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-22-21.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 10 ;
+Converged: TRUE ;
+Time: 30 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.00289 ; 2 - 0.68198 ; 3 - 0.16888 ; 4 - 0.1591 ; 5 - 0.20918 ; 6 - -0.00029 ; 7 - 0.04417 ; 8 - 0 ; 9 - 0.03341 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-22-22.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 77 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 7 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1307 ;
+pihat0 by ASH: 0.05151585 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-22-23.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 28.732 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.03587 ; 2 - 0.88593 ; 3 - 0.38909 ; 4 - 0.33529 ; 5 - 0.29048 ; 6 - -1e-05 ; 7 - -0.06775 ; 8 - 0 ; 9 - -0.09286 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-22-24.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 984 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 7 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 689 ;
+pihat0 by ASH: 0.04567195 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-22-25.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 11 ;
+Converged: TRUE ;
+Time: 34.466 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.02317 ; 2 - 0.63533 ; 3 - 0.08864 ; 4 - 0.07067 ; 5 - -0.06729 ; 6 - -0.03355 ; 7 - -0.18268 ; 8 - 0 ; 9 - -0.09976 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-22-26.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 360 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 6 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1392 ;
+pihat0 by ASH: 0.0308234 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-22-27.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 28.01 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.05702 ; 2 - 0.92845 ; 3 - 0.14885 ; 4 - 0.1633 ; 5 - 0.0725 ; 6 - -0.14504 ; 7 - -0.28862 ; 8 - 0 ; 9 - -0.27099 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-22-28.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 522 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 4 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1149 ;
+pihat0 by ASH: 0.02083846 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-22-29.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 8 ;
+Converged: TRUE ;
+Time: 27.347 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.01845 ; 2 - 0.83243 ; 3 - 0.00994 ; 4 - 1e-05 ; 5 - 0.00365 ; 6 - -0.20851 ; 7 - -0.0369 ; 8 - 0 ; 9 - -0.07692 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-22-30.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 22 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 1 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 508 ;
+pihat0 by ASH: 0.03271534 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-22-31.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 27.693 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.00756 ; 2 - 0.6155 ; 3 - 0.06321 ; 4 - 0.00021 ; 5 - 0.0347 ; 6 - -0.0606 ; 7 - 0.01512 ; 8 - 0 ; 9 - 0.03714 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-22-32.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 269 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 1 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 662 ;
+pihat0 by ASH: 0.02787007 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-22-33.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 8 ;
+Converged: TRUE ;
+Time: 25.91 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.03309 ; 2 - 0.65525 ; 3 - -0.0321 ; 4 - 0 ; 5 - 0.20707 ; 6 - -0.09989 ; 7 - 0.3002 ; 8 - 0 ; 9 - 0.07872 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-22-34.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 403 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 1 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 227 ;
+pihat0 by ASH: 0.0531628 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-22-35.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 7 ;
+Converged: TRUE ;
+Time: 24.624 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.00288 ; 2 - 0.56678 ; 3 - -0.072 ; 4 - -0.00017 ; 5 - -0.01764 ; 6 - -2e-05 ; 7 - -0.02216 ; 8 - 1e-05 ; 9 - -0.00143 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-22-36.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 923 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 1 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1340 ;
+pihat0 by ASH: 0.03239883 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-22-37.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 10 ;
+Converged: TRUE ;
+Time: 31.823 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.04008 ; 2 - 0.87928 ; 3 - 0.15209 ; 4 - 0.1628 ; 5 - 0.11858 ; 6 - -0.09506 ; 7 - -0.10049 ; 8 - 0 ; 9 - -0.1322 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-22-38.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 3 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 193 ;
+pihat0 by ASH: 0.0465218 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-22-39.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 8 ;
+Converged: TRUE ;
+Time: 24.988 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.02878 ; 2 - 0.50013 ; 3 - 0.17142 ; 4 - 0 ; 5 - 0.08596 ; 6 - -1e-05 ; 7 - 0.01389 ; 8 - 0 ; 9 - 0.0669 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-22-40.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="large-effects-g_l-1" class="section level3">
+<h3>Large effects <span class="math inline">\(g_l\)</span></h3>
+<pre class="r"><code>g = g.l.n</code></pre>
+<pre><code>Data Set 355 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 639 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 2300 ;
+pihat0 by ASH: 0.04750946 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-24-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 7 ;
+Converged: TRUE ;
+Time: 21.62 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.02457 ; 2 - 1.20145 ; 3 - 0.11542 ; 4 - 0.59648 ; 5 - 0.03517 ; 6 - 0 ; 7 - -0.08605 ; 8 - 0 ; 9 - -0.00917 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-24-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 23 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 408 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 2448 ;
+pihat0 by ASH: 0.03139009 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-24-3.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 6 ;
+Converged: TRUE ;
+Time: 20.337 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.02728 ; 2 - 1.29483 ; 3 - 0.16861 ; 4 - 0.64549 ; 5 - 0.39472 ; 6 - 0 ; 7 - 0.4567 ; 8 - 0 ; 9 - 0.24256 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-24-4.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 122 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 331 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1822 ;
+pihat0 by ASH: 0.04301549 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-24-5.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 7 ;
+Converged: TRUE ;
+Time: 24.171 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.00848 ; 2 - 1.05208 ; 3 - -0.21345 ; 4 - 0.51701 ; 5 - 0.00208 ; 6 - 0 ; 7 - 0.27875 ; 8 - 0 ; 9 - 0.16665 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-24-6.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 749 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 114 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1685 ;
+pihat0 by ASH: 0.02583276 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-24-7.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 7 ;
+Converged: TRUE ;
+Time: 22.77 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.03699 ; 2 - 0.98097 ; 3 - 0.00028 ; 4 - 0.37055 ; 5 - 0.01914 ; 6 - -1e-05 ; 7 - 0.15752 ; 8 - 0 ; 9 - 0.13096 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-24-8.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 724 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 79 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1814 ;
+pihat0 by ASH: 0.01606004 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-24-9.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 7 ;
+Converged: TRUE ;
+Time: 24.403 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.01461 ; 2 - 1.07359 ; 3 - 0.02148 ; 4 - 0.4216 ; 5 - -0.11933 ; 6 - -3e-05 ; 7 - -0.17524 ; 8 - 0 ; 9 - -0.08195 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-24-10.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 56 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 35 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1137 ;
+pihat0 by ASH: 0.04829662 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-24-11.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 8 ;
+Converged: TRUE ;
+Time: 38.121 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.02844 ; 2 - 0.82914 ; 3 - 0.21897 ; 4 - 0.25202 ; 5 - 0.52513 ; 6 - -1e-05 ; 7 - 0.59598 ; 8 - 0 ; 9 - 0.3105 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-24-12.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 840 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 28 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1653 ;
+pihat0 by ASH: 0.02316832 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-24-13.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 8 ;
+Converged: TRUE ;
+Time: 35.091 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.0231 ; 2 - 1.00962 ; 3 - 0.07382 ; 4 - 0.38514 ; 5 - -0.10434 ; 6 - -0.02401 ; 7 - -0.10944 ; 8 - 0 ; 9 - -0.0048 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-24-14.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 858 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 16 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1506 ;
+pihat0 by ASH: 0.05110069 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-24-15.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 46.264 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.02515 ; 2 - 0.9507 ; 3 - -0.0165 ; 4 - 0.33068 ; 5 - 0.25327 ; 6 - -1e-05 ; 7 - 0.54486 ; 8 - 0 ; 9 - 0.39215 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-24-16.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 771 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 12 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 795 ;
+pihat0 by ASH: 0.04316169 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-24-17.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 50 ;
+Converged: FALSE ;
+Time: 227.64 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.02823 ; 2 - 0.70289 ; 3 - 0.06976 ; 4 - 0.16358 ; 5 - 0.0598 ; 6 - -4e-05 ; 7 - -0.10093 ; 8 - 0 ; 9 - -0.07765 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-24-18.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 389 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 11 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1028 ;
+pihat0 by ASH: 0.03156173 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-24-19.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 37.795 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.00823 ; 2 - 0.79806 ; 3 - 0.15352 ; 4 - 0.25493 ; 5 - 0.11387 ; 6 - -3e-05 ; 7 - 0.06062 ; 8 - 0 ; 9 - 0.09129 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-24-20.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 485 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 9 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 614 ;
+pihat0 by ASH: 0.04794909 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-24-21.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 11 ;
+Converged: TRUE ;
+Time: 44.426 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.02195 ; 2 - 0.66497 ; 3 - 0.10589 ; 4 - 0.14036 ; 5 - 0.08526 ; 6 - -2e-05 ; 7 - -0.09157 ; 8 - 0 ; 9 - -0.03688 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-24-22.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 77 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 7 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1307 ;
+pihat0 by ASH: 0.05151585 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-24-23.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 35.309 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.01835 ; 2 - 0.89401 ; 3 - 0.32923 ; 4 - 0.31577 ; 5 - 0.1709 ; 6 - -1e-05 ; 7 - -0.20603 ; 8 - 0 ; 9 - -0.15559 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-24-24.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 984 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 7 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 689 ;
+pihat0 by ASH: 0.04567195 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-24-25.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 12 ;
+Converged: TRUE ;
+Time: 56.156 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.00704 ; 2 - 0.65769 ; 3 - 0.12187 ; 4 - 0.13763 ; 5 - 0.19948 ; 6 - -0.00399 ; 7 - 0.24631 ; 8 - 0 ; 9 - 0.15873 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-24-26.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 360 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 6 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1392 ;
+pihat0 by ASH: 0.0308234 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-24-27.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 34 ;
+Converged: TRUE ;
+Time: 135.923 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.03501 ; 2 - 0.946 ; 3 - 0.13124 ; 4 - 0.17912 ; 5 - 0.18478 ; 6 - -0.08199 ; 7 - 0.0252 ; 8 - 0 ; 9 - -0.01429 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-24-28.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 522 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 4 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1149 ;
+pihat0 by ASH: 0.02083846 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-24-29.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 7 ;
+Converged: TRUE ;
+Time: 28.216 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.02299 ; 2 - 0.80554 ; 3 - -0.11476 ; 4 - 2e-05 ; 5 - -0.20238 ; 6 - -0.2036 ; 7 - -0.27398 ; 8 - 1e-05 ; 9 - -0.2109 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-24-30.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 22 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 1 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 508 ;
+pihat0 by ASH: 0.03271534 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-24-31.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 50 ;
+Converged: FALSE ;
+Time: 211.079 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.05043 ; 2 - 0.62324 ; 3 - 0.20784 ; 4 - 0.02513 ; 5 - 0.20208 ; 6 - -0.00475 ; 7 - 0.08438 ; 8 - 0 ; 9 - 0.00885 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-24-32.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 269 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 1 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 662 ;
+pihat0 by ASH: 0.02787007 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-24-33.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 12 ;
+Converged: TRUE ;
+Time: 49.86 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.03229 ; 2 - 0.67436 ; 3 - -0.12467 ; 4 - 0.00016 ; 5 - 0.08979 ; 6 - -0.09407 ; 7 - 0.15491 ; 8 - 1e-05 ; 9 - -0.03937 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-24-34.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 403 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 1 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 227 ;
+pihat0 by ASH: 0.0531628 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-24-35.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 38.732 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.00858 ; 2 - 0.57502 ; 3 - -0.03135 ; 4 - -0.01869 ; 5 - 0.09885 ; 6 - -0.00492 ; 7 - 0.10922 ; 8 - 1e-05 ; 9 - 0.02825 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-24-36.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 923 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 1 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 1340 ;
+pihat0 by ASH: 0.03239883 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-24-37.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 11 ;
+Converged: TRUE ;
+Time: 40.403 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.01213 ; 2 - 0.88364 ; 3 - 0.19767 ; 4 - 0.20511 ; 5 - 0.29348 ; 6 - -0.05474 ; 7 - 0.18946 ; 8 - 0 ; 9 - 0.10193 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-24-38.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 3 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 193 ;
+pihat0 by ASH: 0.0465218 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-24-39.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 8 ;
+Converged: TRUE ;
+Time: 27.381 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.01747 ; 2 - 0.49731 ; 3 - 0.16981 ; 4 - -0.00865 ; 5 - 0.05473 ; 6 - 0 ; 7 - -0.05558 ; 8 - 0 ; 9 - -0.05276 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-24-40.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="category-iii-friendly" class="section level2">
+<h2>Category III: Friendly</h2>
+<pre class="r"><code>label = &quot;friendly&quot;</code></pre>
+<div id="global-null-g_n-2" class="section level3">
+<h3>Global null <span class="math inline">\(g_n\)</span></h3>
+<pre class="r"><code>g = g.null</code></pre>
+<pre><code>Data Set 4 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 2 ;
+Converged: TRUE ;
+Time: 7.297 Seconds;
+Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 5 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-3.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 2 ;
+Converged: TRUE ;
+Time: 7.59 Seconds;
+Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-4.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 7 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-5.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 15 ;
+Converged: TRUE ;
+Time: 56.923 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.03756 ; 2 - -0.18656 ; 3 - -0.2151 ; 4 - -0.02795 ; 5 - -0.35555 ; 6 - -0.0259 ; 7 - -0.50307 ; 8 - -1e-05 ; 9 - -0.19223 ; 10 - 0.01455 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-6.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 8 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-7.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 2 ;
+Converged: TRUE ;
+Time: 9.177 Seconds;
+Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-8.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 9 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-9.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 2 ;
+Converged: TRUE ;
+Time: 9.061 Seconds;
+Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-10.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 12 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-11.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 18 ;
+Converged: TRUE ;
+Time: 67.365 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.02453 ; 2 - -0.12569 ; 3 - -0.03245 ; 4 - -1e-05 ; 5 - 0.0316 ; 6 - -0.00912 ; 7 - -0.01477 ; 8 - 0 ; 9 - 0.04101 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-12.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 13 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-13.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 2 ;
+Converged: TRUE ;
+Time: 7.482 Seconds;
+Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-14.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 14 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-15.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 2 ;
+Converged: TRUE ;
+Time: 7.256 Seconds;
+Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-16.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 16 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-17.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 2 ;
+Converged: TRUE ;
+Time: 8.664 Seconds;
+Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-18.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 17 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-19.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 20 ;
+Converged: TRUE ;
+Time: 76.28 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.76287 ; 2 - -1.19262 ; 3 - -4.30452 ; 4 - -2.60437 ; 5 - -9.42024 ; 6 - -2.63669 ; 7 - -9.66218 ; 8 - -1e-05 ; 9 - -3.84037 ; 10 - 1.11814 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-20.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 18 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-21.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 2 ;
+Converged: TRUE ;
+Time: 9.361 Seconds;
+Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-22.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 25 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-23.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 2 ;
+Converged: TRUE ;
+Time: 8.477 Seconds;
+Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-24.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 28 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-25.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 50 ;
+Converged: FALSE ;
+Time: 196.043 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.02036 ; 2 - 0.01112 ; 3 - -0.01625 ; 4 - -0.03594 ; 5 - 0.05427 ; 6 - -0.00027 ; 7 - 0.04467 ; 8 - 0 ; 9 - 0.07489 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-26.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 30 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-27.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 2 ;
+Converged: TRUE ;
+Time: 8.077 Seconds;
+Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-28.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 34 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-29.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 4 ;
+Converged: TRUE ;
+Time: 17.6 Seconds;
+Normalized w: 0 - 1 ; 1 - 10.27184 ; 2 - -10.18687 ; 3 - 50.28846 ; 4 - -25.22947 ; 5 - 99.40296 ; 6 - -22.33557 ; 7 - 90.85871 ; 8 - 0 ; 9 - 31.91919 ; 10 - 6.40972 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-30.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 35 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-31.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 16 ;
+Converged: TRUE ;
+Time: 64.282 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.07801 ; 2 - -0.301 ; 3 - 0.23948 ; 4 - 0 ; 5 - 0.79201 ; 6 - -0.13945 ; 7 - 0.88856 ; 8 - -0.05737 ; 9 - 0.52975 ; 10 - 1e-05 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-32.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 36 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-33.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 3 ;
+Converged: TRUE ;
+Time: 11.679 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.00968 ; 2 - -0.20432 ; 3 - -0.02669 ; 4 - 0.05863 ; 5 - -0.00299 ; 6 - 0 ; 7 - -0.02348 ; 8 - 0 ; 9 - -0.01608 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-34.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 38 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-35.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 12 ;
+Converged: TRUE ;
+Time: 43.242 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.00793 ; 2 - -0.23924 ; 3 - 0.05211 ; 4 - 0 ; 5 - 0.17929 ; 6 - -0.12376 ; 7 - 0.16472 ; 8 - -0.01176 ; 9 - 0.05726 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-36.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 42 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-37.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 2 ;
+Converged: TRUE ;
+Time: 9.36 Seconds;
+Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-38.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 43 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-39.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 2 ;
+Converged: TRUE ;
+Time: 12.638 Seconds;
+Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-40.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 45 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-41.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 2 ;
+Converged: TRUE ;
+Time: 9.275 Seconds;
+Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-42.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 46 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-43.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 2 ;
+Converged: TRUE ;
+Time: 7.414 Seconds;
+Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-44.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 47 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-45.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 2 ;
+Converged: TRUE ;
+Time: 8.697 Seconds;
+Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-46.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 49 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-47.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 50 ;
+Converged: FALSE ;
+Time: 182.928 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.08034 ; 2 - -0.13614 ; 3 - -0.00464 ; 4 - 0.00606 ; 5 - -0.14996 ; 6 - -1e-05 ; 7 - -0.15664 ; 8 - -0.00472 ; 9 - -0.09367 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-48.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 52 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-49.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 2 ;
+Converged: TRUE ;
+Time: 7.392 Seconds;
+Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-50.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 53 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-51.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 2 ;
+Converged: TRUE ;
+Time: 8.536 Seconds;
+Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-52.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 54 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-53.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 2 ;
+Converged: TRUE ;
+Time: 8.179 Seconds;
+Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-27-54.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="small-effects-g_s-2" class="section level3">
+<h3>Small effects <span class="math inline">\(g_s\)</span></h3>
+<pre class="r"><code>g = g.s.n</code></pre>
+<pre><code>Data Set 4 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 29.384 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.02697 ; 2 - -0.08617 ; 3 - 0.04502 ; 4 - -0.08724 ; 5 - -0.01799 ; 6 - 0 ; 7 - 0.00211 ; 8 - -0.00622 ; 9 - -0.03559 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 5 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-3.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 37.295 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.0036 ; 2 - -0.15213 ; 3 - -0.02875 ; 4 - -1e-05 ; 5 - -0.0694 ; 6 - 1e-05 ; 7 - -0.11811 ; 8 - -2e-05 ; 9 - -0.11035 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-4.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 7 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-5.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 26.547 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.00061 ; 2 - -0.17585 ; 3 - -0.03522 ; 4 - -2e-05 ; 5 - 0.04533 ; 6 - 0 ; 7 - -0.04106 ; 8 - 0 ; 9 - 0.00652 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-6.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 8 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-7.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 51 ;
+Converged: FALSE ;
+Time: 157.389 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.04707 ; 2 - -0.27925 ; 3 - -0.08873 ; 4 - 0.104 ; 5 - -0.08832 ; 6 - -0.07568 ; 7 - -0.1938 ; 8 - 0 ; 9 - -0.09211 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-8.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 9 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-9.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 27.333 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.02626 ; 2 - -0.01323 ; 3 - -0.03788 ; 4 - -0.11898 ; 5 - -0.09862 ; 6 - 0.03164 ; 7 - -0.19453 ; 8 - -1e-05 ; 9 - -0.12877 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-10.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 12 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-11.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 50 ;
+Converged: FALSE ;
+Time: 160.959 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.03395 ; 2 - -0.11058 ; 3 - -0.07126 ; 4 - -7e-05 ; 5 - -0.08358 ; 6 - -1e-05 ; 7 - -0.19917 ; 8 - 0 ; 9 - -0.10977 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-12.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 13 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-13.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 51 ;
+Converged: FALSE ;
+Time: 152.73 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.0039 ; 2 - -0.05115 ; 3 - -0.04678 ; 4 - -0.01927 ; 5 - 0.02371 ; 6 - 0.02018 ; 7 - -0.0119 ; 8 - 0 ; 9 - -0.00265 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-14.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 14 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-15.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 12 ;
+Converged: TRUE ;
+Time: 36.069 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.00062 ; 2 - -0.13294 ; 3 - 0.13107 ; 4 - -1e-05 ; 5 - 0.19992 ; 6 - -0.00101 ; 7 - 0.18346 ; 8 - 0 ; 9 - 0.06667 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-16.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 16 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-17.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 27.111 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.01244 ; 2 - -0.16069 ; 3 - -0.01803 ; 4 - 0.03751 ; 5 - -0.04052 ; 6 - -1e-05 ; 7 - -0.07173 ; 8 - 0 ; 9 - -0.06445 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-18.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 17 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-19.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 26.788 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.01831 ; 2 - -0.26251 ; 3 - -0.05612 ; 4 - 0.01082 ; 5 - -0.10489 ; 6 - 0 ; 7 - -0.2839 ; 8 - 0 ; 9 - -0.18626 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-20.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 18 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-21.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 10 ;
+Converged: TRUE ;
+Time: 31.67 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.0317 ; 2 - -0.18972 ; 3 - 0.10395 ; 4 - -0.00903 ; 5 - 0.15424 ; 6 - 1e-05 ; 7 - 0.23264 ; 8 - -0.00555 ; 9 - 0.11299 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-22.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 25 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-23.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 11 ;
+Converged: TRUE ;
+Time: 34.005 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.00618 ; 2 - -0.38792 ; 3 - 0.0395 ; 4 - -0.02014 ; 5 - 0.10323 ; 6 - -0.20869 ; 7 - 0.21854 ; 8 - 0 ; 9 - 0.10097 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-24.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 28 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-25.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 8 ;
+Converged: TRUE ;
+Time: 26.423 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.01795 ; 2 - -6e-05 ; 3 - -0.00998 ; 4 - -0.04228 ; 5 - 0.05659 ; 6 - 0 ; 7 - 0.01977 ; 8 - 0 ; 9 - 0.04081 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-26.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 30 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-27.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 32.843 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.02108 ; 2 - -0.09273 ; 3 - -0.02235 ; 4 - -0.05636 ; 5 - 0.04878 ; 6 - 0.03282 ; 7 - -0.0656 ; 8 - -0.02442 ; 9 - -0.01179 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-28.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 34 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-29.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 8 ;
+Converged: TRUE ;
+Time: 26.134 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.00955 ; 2 - -0.14701 ; 3 - 0.08512 ; 4 - 0.02973 ; 5 - -0.00343 ; 6 - 0 ; 7 - 0.0813 ; 8 - -0.00735 ; 9 - 0.06405 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-30.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 35 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-31.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 11 ;
+Converged: TRUE ;
+Time: 34.864 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.03482 ; 2 - -0.25342 ; 3 - -0.06246 ; 4 - 0.09427 ; 5 - 0.0305 ; 6 - 0 ; 7 - -0.04555 ; 8 - 0 ; 9 - 0.02632 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-32.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 36 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-33.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 34.327 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.00941 ; 2 - -0.20561 ; 3 - -0.02836 ; 4 - 0.07003 ; 5 - 0.02226 ; 6 - 0 ; 7 - -0.01871 ; 8 - 0 ; 9 - 0.00161 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-34.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 38 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-35.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 12 ;
+Converged: TRUE ;
+Time: 38.739 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.00758 ; 2 - -0.23458 ; 3 - 0.00339 ; 4 - -0.00074 ; 5 - 0.0296 ; 6 - -0.03923 ; 7 - 0.00515 ; 8 - 2e-05 ; 9 - -0.03953 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-36.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 42 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-37.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 10 ;
+Converged: TRUE ;
+Time: 31.387 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.04356 ; 2 - -0.29514 ; 3 - 0.01742 ; 4 - 0.09158 ; 5 - -0.00643 ; 6 - -0.07076 ; 7 - 0.01294 ; 8 - 0 ; 9 - 0.01104 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-38.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 43 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-39.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 10 ;
+Converged: TRUE ;
+Time: 30.687 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.01502 ; 2 - -0.29149 ; 3 - 0.01783 ; 4 - 0.0524 ; 5 - 0.02451 ; 6 - -0.12227 ; 7 - 0.076 ; 8 - 0 ; 9 - 0.05162 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-40.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 45 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-41.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 29.233 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.01691 ; 2 - -0.22227 ; 3 - -0.00353 ; 4 - 0.05467 ; 5 - 0.00308 ; 6 - -0.04807 ; 7 - 0.03201 ; 8 - 0 ; 9 - 0.04418 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-42.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 46 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-43.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 28.02 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.00748 ; 2 - -0.08118 ; 3 - 0.04417 ; 4 - -0.02831 ; 5 - -0.03482 ; 6 - 0 ; 7 - 0.07612 ; 8 - 0 ; 9 - 0.06103 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-44.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 47 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-45.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 10 ;
+Converged: TRUE ;
+Time: 31.226 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.08036 ; 2 - -0.185 ; 3 - 0.0409 ; 4 - -3e-05 ; 5 - 0.2692 ; 6 - -0.0588 ; 7 - 0.23001 ; 8 - 0 ; 9 - 0.1292 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-46.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 49 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-47.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 28.934 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.07443 ; 2 - -0.1345 ; 3 - 0.04262 ; 4 - -1e-05 ; 5 - -0.04205 ; 6 - 0 ; 7 - -0.01739 ; 8 - 0 ; 9 - -0.0338 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-48.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 52 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-49.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 28.642 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.07777 ; 2 - -0.00668 ; 3 - -0.0621 ; 4 - -0.10854 ; 5 - -0.23762 ; 6 - 0 ; 7 - -0.26885 ; 8 - 0 ; 9 - -0.19325 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-50.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 53 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-51.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 28.331 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.00746 ; 2 - -0.03489 ; 3 - 0.03509 ; 4 - -0.0507 ; 5 - 0.10789 ; 6 - 0.0187 ; 7 - 0.14264 ; 8 - 0 ; 9 - 0.04542 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-52.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 54 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-53.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 10 ;
+Converged: TRUE ;
+Time: 33.207 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.01019 ; 2 - -0.18076 ; 3 - -0.08851 ; 4 - 0.03176 ; 5 - -0.25727 ; 6 - 0 ; 7 - -0.34485 ; 8 - -1e-05 ; 9 - -0.22822 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-29-54.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="medium-effects-g_m-2" class="section level3">
+<h3>Medium effects <span class="math inline">\(g_m\)</span></h3>
+<pre class="r"><code>g = g.m.n</code></pre>
+<pre><code>Data Set 4 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 26.03 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.01941 ; 2 - -0.09792 ; 3 - 0.09261 ; 4 - -0.10413 ; 5 - 0.24631 ; 6 - 1e-05 ; 7 - 0.46056 ; 8 - 0 ; 9 - 0.26038 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 5 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-3.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 11 ;
+Converged: TRUE ;
+Time: 30.755 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.02245 ; 2 - -0.17138 ; 3 - -0.18255 ; 4 - -0.01257 ; 5 - -0.40232 ; 6 - 1e-05 ; 7 - -0.51773 ; 8 - 0 ; 9 - -0.32398 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-4.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 7 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-5.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 11 ;
+Converged: TRUE ;
+Time: 32.301 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.01335 ; 2 - -0.17909 ; 3 - -0.09077 ; 4 - -0.00043 ; 5 - -0.08474 ; 6 - 0 ; 7 - -0.17255 ; 8 - 0 ; 9 - -0.01499 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-6.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 8 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-7.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 27.134 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.05841 ; 2 - -0.29744 ; 3 - -0.02468 ; 4 - 0.1043 ; 5 - 0.09854 ; 6 - -0.05048 ; 7 - 0.11487 ; 8 - 0 ; 9 - 0.0673 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-8.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 9 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-9.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 26.754 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.02409 ; 2 - -0.00172 ; 3 - 0.02397 ; 4 - -0.08975 ; 5 - 0.09806 ; 6 - 0.02258 ; 7 - 0.0582 ; 8 - -2e-05 ; 9 - -0.00109 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-10.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 12 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-11.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 25.951 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.01411 ; 2 - -0.13393 ; 3 - 0.05339 ; 4 - -0.00806 ; 5 - 0.24125 ; 6 - 0 ; 7 - 0.24362 ; 8 - 0 ; 9 - 0.18145 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-12.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 13 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-13.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 8 ;
+Converged: TRUE ;
+Time: 24.393 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.01757 ; 2 - -0.06226 ; 3 - 0.05521 ; 4 - -0.03883 ; 5 - 0.2841 ; 6 - 0 ; 7 - 0.30512 ; 8 - 0 ; 9 - 0.16881 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-14.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 14 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-15.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 12 ;
+Converged: TRUE ;
+Time: 34.1 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.03445 ; 2 - -0.11685 ; 3 - -0.04252 ; 4 - -0.00295 ; 5 - -0.26793 ; 6 - 0 ; 7 - -0.36838 ; 8 - 0 ; 9 - -0.20715 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-16.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 16 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-17.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 26.462 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.0023 ; 2 - -0.17504 ; 3 - -0.09291 ; 4 - 0.03906 ; 5 - -0.30645 ; 6 - -0.00476 ; 7 - -0.38668 ; 8 - 0 ; 9 - -0.231 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-18.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 17 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-19.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 27.073 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.02115 ; 2 - -0.25456 ; 3 - -0.01423 ; 4 - 0.01914 ; 5 - 0.09939 ; 6 - 0 ; 7 - 0.17351 ; 8 - 0 ; 9 - 0.17332 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-20.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 18 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-21.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 12 ;
+Converged: TRUE ;
+Time: 36.347 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.05952 ; 2 - -0.19509 ; 3 - -0.02389 ; 4 - -0.03795 ; 5 - -0.28616 ; 6 - 0.00034 ; 7 - -0.34673 ; 8 - -1e-05 ; 9 - -0.17382 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-22.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 25 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-23.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 26.325 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.01859 ; 2 - -0.32771 ; 3 - 0.00261 ; 4 - 0.08801 ; 5 - -0.0458 ; 6 - -0.10592 ; 7 - -0.0263 ; 8 - 0 ; 9 - -0.03443 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-24.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 28 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-25.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 26.432 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.00958 ; 2 - 0.01001 ; 3 - -0.02937 ; 4 - -0.03175 ; 5 - 0.01101 ; 6 - 0 ; 7 - 0.00886 ; 8 - 0 ; 9 - 0.05868 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-26.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 30 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-27.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 27.398 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.02193 ; 2 - -0.06771 ; 3 - -0.00899 ; 4 - -0.0035 ; 5 - 0.10268 ; 6 - 0.11616 ; 7 - 0.02445 ; 8 - 0 ; 9 - 0.04784 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-28.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 34 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-29.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 10 ;
+Converged: TRUE ;
+Time: 30.279 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.02283 ; 2 - -0.17466 ; 3 - 0.08832 ; 4 - 0.01797 ; 5 - -0.03584 ; 6 - 0 ; 7 - 0.00764 ; 8 - 0 ; 9 - 0.00873 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-30.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 35 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-31.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 12 ;
+Converged: TRUE ;
+Time: 35.58 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.02855 ; 2 - -0.25726 ; 3 - -0.03344 ; 4 - 0.04399 ; 5 - 0.09778 ; 6 - -0.02073 ; 7 - 0.06149 ; 8 - 0 ; 9 - 0.10502 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-32.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 36 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-33.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 50 ;
+Converged: FALSE ;
+Time: 145.628 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.01333 ; 2 - -0.20619 ; 3 - -0.00724 ; 4 - 0.06501 ; 5 - 0.00763 ; 6 - 0 ; 7 - 0.0523 ; 8 - 0 ; 9 - 0.05855 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-34.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 38 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-35.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 11 ;
+Converged: TRUE ;
+Time: 33.042 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.01882 ; 2 - -0.214 ; 3 - -0.10397 ; 4 - 0.07203 ; 5 - -0.22392 ; 6 - -0.01574 ; 7 - -0.34232 ; 8 - 0 ; 9 - -0.20023 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-36.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 42 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-37.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 12 ;
+Converged: TRUE ;
+Time: 37.557 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.03643 ; 2 - -0.3258 ; 3 - 0.02098 ; 4 - 0.08614 ; 5 - 0.06324 ; 6 - -0.09265 ; 7 - 0.12022 ; 8 - 0 ; 9 - 0.10535 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-38.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 43 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-39.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 10 ;
+Converged: TRUE ;
+Time: 29.358 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.00566 ; 2 - -0.27607 ; 3 - 0.01313 ; 4 - 0.08051 ; 5 - -0.05081 ; 6 - -0.04584 ; 7 - -0.05831 ; 8 - 0 ; 9 - -0.03524 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-40.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 45 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-41.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 26.678 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.01459 ; 2 - -0.25043 ; 3 - 0.06755 ; 4 - 0.02927 ; 5 - 0.23919 ; 6 - -0.06952 ; 7 - 0.38208 ; 8 - 0 ; 9 - 0.25212 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-42.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 46 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-43.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 26.697 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.00208 ; 2 - -0.05418 ; 3 - 0.05875 ; 4 - -0.01434 ; 5 - 0.03465 ; 6 - 0.0627 ; 7 - 0.15235 ; 8 - 0 ; 9 - 0.1037 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-44.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 47 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-45.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 27.135 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.06185 ; 2 - -0.13433 ; 3 - -0.08392 ; 4 - 0.04694 ; 5 - -0.01868 ; 6 - -0.01478 ; 7 - -0.04749 ; 8 - 0 ; 9 - 0.00261 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-46.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 49 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-47.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 26.635 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.05555 ; 2 - -0.12173 ; 3 - 0.15021 ; 4 - -2e-05 ; 5 - 0.25577 ; 6 - 0 ; 7 - 0.34852 ; 8 - 0 ; 9 - 0.16783 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-48.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 52 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-49.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 27.249 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.08029 ; 2 - -0.03632 ; 3 - 0.01117 ; 4 - -0.11705 ; 5 - -0.05843 ; 6 - 0 ; 7 - 0.01867 ; 8 - 0 ; 9 - -0.01383 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-50.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 53 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-51.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 27.054 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.0268 ; 2 - -0.04325 ; 3 - -0.0559 ; 4 - -0.08308 ; 5 - -0.12191 ; 6 - 0 ; 7 - -0.18064 ; 8 - 0 ; 9 - -0.11049 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-52.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 54 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-53.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 14 ;
+Converged: TRUE ;
+Time: 40.668 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.02748 ; 2 - -0.1807 ; 3 - -0.02209 ; 4 - 0.0069 ; 5 - -0.10242 ; 6 - -2e-05 ; 7 - -0.10688 ; 8 - 0 ; 9 - -0.07449 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-31-54.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="large-effects-g_l-2" class="section level3">
+<h3>Large effects <span class="math inline">\(g_l\)</span></h3>
+<pre class="r"><code>g = g.l.n</code></pre>
+<pre><code>Data Set 4 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 12 ;
+Converged: TRUE ;
+Time: 33.289 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.00796 ; 2 - -0.0793 ; 3 - 0.09892 ; 4 - -0.07011 ; 5 - 0.17741 ; 6 - 0.01064 ; 7 - 0.31407 ; 8 - -1e-05 ; 9 - 0.15516 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 5 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-3.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 7 ;
+Converged: TRUE ;
+Time: 20.409 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.02063 ; 2 - -0.15279 ; 3 - 0.04306 ; 4 - -0.01088 ; 5 - 0.08356 ; 6 - 1e-04 ; 7 - 0.07921 ; 8 - -1e-05 ; 9 - -0.01545 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-4.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 7 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-5.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 27.407 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.0091 ; 2 - -0.19973 ; 3 - -0.0263 ; 4 - -0.03722 ; 5 - 0.07004 ; 6 - 3e-05 ; 7 - -0.00995 ; 8 - -1e-05 ; 9 - 0.04223 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-6.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 8 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-7.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 26.511 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.04784 ; 2 - -0.29898 ; 3 - -0.09752 ; 4 - 0.10277 ; 5 - -0.13101 ; 6 - -0.05436 ; 7 - -0.20097 ; 8 - 0 ; 9 - -0.07085 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-8.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 9 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-9.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 15 ;
+Converged: TRUE ;
+Time: 42.578 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.03607 ; 2 - 0.00696 ; 3 - -0.06342 ; 4 - -0.13965 ; 5 - -0.15855 ; 6 - 0.00012 ; 7 - -0.33635 ; 8 - -1e-05 ; 9 - -0.24562 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-10.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 12 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-11.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 25.925 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.02091 ; 2 - -0.11681 ; 3 - -0.0113 ; 4 - 1e-05 ; 5 - 0.05751 ; 6 - 0 ; 7 - -0.00587 ; 8 - 0 ; 9 - 0.05582 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-12.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 13 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-13.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 10 ;
+Converged: TRUE ;
+Time: 29.842 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.00312 ; 2 - -0.08906 ; 3 - -0.03794 ; 4 - -0.05732 ; 5 - -0.01787 ; 6 - 0.00019 ; 7 - -0.08555 ; 8 - 0 ; 9 - -0.01831 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-14.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 14 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-15.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 14 ;
+Converged: TRUE ;
+Time: 40.55 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.02082 ; 2 - -0.1265 ; 3 - 0.01527 ; 4 - 0.01321 ; 5 - -0.08247 ; 6 - 0 ; 7 - -0.13006 ; 8 - 0 ; 9 - -0.07296 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-16.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 16 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-17.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 27.2 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.0096 ; 2 - -0.17053 ; 3 - 0.00647 ; 4 - 0.03917 ; 5 - -0.02533 ; 6 - 0 ; 7 - 0.0046 ; 8 - 0 ; 9 - 0.01689 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-18.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 17 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-19.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 13 ;
+Converged: TRUE ;
+Time: 37.788 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.01956 ; 2 - -0.27107 ; 3 - 0.02713 ; 4 - -3e-05 ; 5 - 0.16174 ; 6 - 1e-05 ; 7 - 0.05572 ; 8 - -1e-05 ; 9 - 0.03615 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-20.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 18 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-21.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 11 ;
+Converged: TRUE ;
+Time: 32.578 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.02931 ; 2 - -0.17879 ; 3 - 0.07784 ; 4 - -0.00483 ; 5 - 0.09913 ; 6 - 1e-04 ; 7 - 0.20138 ; 8 - -1e-05 ; 9 - 0.12581 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-22.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 25 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-23.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 12 ;
+Converged: TRUE ;
+Time: 35.026 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.01479 ; 2 - -0.31814 ; 3 - 0.02506 ; 4 - 0.11567 ; 5 - -0.01559 ; 6 - -0.08783 ; 7 - -0.09164 ; 8 - 0 ; 9 - -0.17135 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-24.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 28 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-25.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 26.484 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.00633 ; 2 - 0.00327 ; 3 - -0.06198 ; 4 - -0.03324 ; 5 - -0.05406 ; 6 - -1e-05 ; 7 - -0.09236 ; 8 - 0 ; 9 - 0.01136 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-26.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 30 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-27.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 27.064 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.00638 ; 2 - -0.05955 ; 3 - 0.05105 ; 4 - -0.00014 ; 5 - 0.19991 ; 6 - 0.1369 ; 7 - 0.15374 ; 8 - -3e-05 ; 9 - 0.15315 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-28.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 34 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-29.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 26.808 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.01015 ; 2 - -0.14982 ; 3 - 0.14299 ; 4 - 0.01389 ; 5 - 0.11928 ; 6 - 1e-05 ; 7 - 0.25983 ; 8 - -0.02016 ; 9 - 0.17827 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-30.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 35 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-31.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 12 ;
+Converged: TRUE ;
+Time: 34.483 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.04508 ; 2 - -0.26895 ; 3 - -0.02427 ; 4 - 0.11731 ; 5 - 0.03682 ; 6 - -1e-05 ; 7 - -0.06731 ; 8 - 0 ; 9 - -0.02762 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-32.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 36 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-33.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 12 ;
+Converged: TRUE ;
+Time: 36.311 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.01404 ; 2 - -0.22653 ; 3 - -0.05271 ; 4 - 0.03946 ; 5 - -0.08775 ; 6 - 0 ; 7 - -0.11045 ; 8 - 0 ; 9 - -0.05619 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-34.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 38 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-35.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 12 ;
+Converged: TRUE ;
+Time: 35.051 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.00716 ; 2 - -0.21889 ; 3 - 0.00409 ; 4 - 0.06365 ; 5 - -0.01446 ; 6 - -1e-05 ; 7 - -0.12458 ; 8 - 0 ; 9 - -0.08735 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-36.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 42 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-37.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 12 ;
+Converged: TRUE ;
+Time: 34.135 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.0405 ; 2 - -0.30562 ; 3 - 0.0031 ; 4 - 0.11855 ; 5 - 0.02163 ; 6 - -0.03638 ; 7 - 0.03595 ; 8 - 0 ; 9 - 0.03479 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-38.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 43 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-39.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 26.978 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.00419 ; 2 - -0.26647 ; 3 - 0.08123 ; 4 - 0.09285 ; 5 - 0.17617 ; 6 - -0.02967 ; 7 - 0.23986 ; 8 - 0 ; 9 - 0.14232 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-40.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 45 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-41.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 12 ;
+Converged: TRUE ;
+Time: 34.468 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.01603 ; 2 - -0.21107 ; 3 - 0.0049 ; 4 - 0.07877 ; 5 - -0.04377 ; 6 - -5e-05 ; 7 - 0.03035 ; 8 - 0 ; 9 - 0.03785 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-42.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 46 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-43.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 27.562 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.01677 ; 2 - -0.07158 ; 3 - 0.04516 ; 4 - -0.01453 ; 5 - -0.01997 ; 6 - 7e-05 ; 7 - 0.07691 ; 8 - -1e-05 ; 9 - 0.02733 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-44.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 47 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-45.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 12 ;
+Converged: TRUE ;
+Time: 35.524 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.03746 ; 2 - -0.17492 ; 3 - -0.22242 ; 4 - 0.02125 ; 5 - -0.37814 ; 6 - -0.04699 ; 7 - -0.54732 ; 8 - 1e-05 ; 9 - -0.30088 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-46.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 49 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-47.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 26.463 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.05214 ; 2 - -0.133 ; 3 - 0.09487 ; 4 - -3e-05 ; 5 - 0.11597 ; 6 - 0 ; 7 - 0.17387 ; 8 - 0 ; 9 - 0.10032 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-48.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 52 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-49.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 11 ;
+Converged: TRUE ;
+Time: 31.901 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.06652 ; 2 - -0.01126 ; 3 - -0.01502 ; 4 - -0.10009 ; 5 - -0.12327 ; 6 - 2e-05 ; 7 - -0.05724 ; 8 - 0 ; 9 - -0.02188 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-50.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 53 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-51.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 8 ;
+Converged: TRUE ;
+Time: 24.018 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.0084 ; 2 - -0.03127 ; 3 - 0.09346 ; 4 - -0.05372 ; 5 - 0.21367 ; 6 - 3e-05 ; 7 - 0.27748 ; 8 - -1e-05 ; 9 - 0.12642 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-52.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set 54 ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-53.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 28.799 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.01399 ; 2 - -0.19167 ; 3 - -0.03216 ; 4 - 0.04623 ; 5 - -0.08046 ; 6 - 1e-05 ; 7 - -0.09197 ; 8 - 0 ; 9 - -0.06879 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-33-54.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="category-iii-iid" class="section level2">
+<h2>Category III: iid</h2>
+<pre class="r"><code>label = &quot;iid&quot;</code></pre>
+<div id="global-null-g_n-3" class="section level3">
+<h3>Global null <span class="math inline">\(g_n\)</span></h3>
+<pre class="r"><code>g = g.null</code></pre>
+<pre><code>Data Set NA ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 0.9902233 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-36-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 2 ;
+Converged: TRUE ;
+Time: 6.933 Seconds;
+Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-36-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set NA ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-36-3.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 2 ;
+Converged: TRUE ;
+Time: 7.468 Seconds;
+Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-36-4.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set NA ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-36-5.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 2 ;
+Converged: TRUE ;
+Time: 6.987 Seconds;
+Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-36-6.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set NA ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 0.9980103 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-36-7.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 31.49 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.00178 ; 2 - -0.01341 ; 3 - 0.00225 ; 4 - -2e-05 ; 5 - 0.00742 ; 6 - 0.02341 ; 7 - -0.01511 ; 8 - 0 ; 9 - -0.03693 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-36-8.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set NA ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 0.9984696 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-36-9.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 2 ;
+Converged: TRUE ;
+Time: 8.431 Seconds;
+Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-36-10.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set NA ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-36-11.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 2 ;
+Converged: TRUE ;
+Time: 8.214 Seconds;
+Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-36-12.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set NA ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-36-13.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 2 ;
+Converged: TRUE ;
+Time: 7.015 Seconds;
+Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-36-14.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set NA ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 1 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 0.9978326 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-36-15.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 2 ;
+Converged: TRUE ;
+Time: 7.423 Seconds;
+Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-36-16.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set NA ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-36-17.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 17 ;
+Converged: TRUE ;
+Time: 54.537 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.00729 ; 2 - 0.00219 ; 3 - -0.00755 ; 4 - -0.02212 ; 5 - -0.00534 ; 6 - -0.00568 ; 7 - 0.00027 ; 8 - 0 ; 9 - -0.00822 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-36-18.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set NA ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-36-19.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 2 ;
+Converged: TRUE ;
+Time: 7.593 Seconds;
+Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-36-20.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="small-effects-g_s-3" class="section level3">
+<h3>Small effects <span class="math inline">\(g_s\)</span></h3>
+<pre class="r"><code>g = g.s.n</code></pre>
+<pre><code>Data Set NA ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 0.9902233 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-38-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 51 ;
+Converged: FALSE ;
+Time: 159.193 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.00972 ; 2 - 0.01592 ; 3 - -0.01831 ; 4 - 0.02134 ; 5 - -0.03808 ; 6 - -0.00021 ; 7 - -0.08736 ; 8 - 0 ; 9 - -0.06258 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-38-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set NA ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-38-3.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 8 ;
+Converged: TRUE ;
+Time: 24.02 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.00774 ; 2 - 0 ; 3 - 0.01397 ; 4 - -0.00325 ; 5 - 0.01863 ; 6 - -8e-05 ; 7 - 0.06806 ; 8 - 0 ; 9 - 0.01891 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-38-4.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set NA ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-38-5.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 30.884 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.00443 ; 2 - 0.01133 ; 3 - -0.01115 ; 4 - 0.00011 ; 5 - -0.02217 ; 6 - -0.02121 ; 7 - -0.04808 ; 8 - 0 ; 9 - -0.00288 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-38-6.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set NA ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 0.9980103 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-38-7.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 12 ;
+Converged: TRUE ;
+Time: 35.313 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.00577 ; 2 - -0.00157 ; 3 - 0.02763 ; 4 - -0.00529 ; 5 - 0.06693 ; 6 - 0 ; 7 - 0.05901 ; 8 - 0 ; 9 - 0.04406 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-38-8.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set NA ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 0.9984696 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-38-9.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 31.386 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.01275 ; 2 - -0.01062 ; 3 - -0.05309 ; 4 - -0.00379 ; 5 - -0.14261 ; 6 - -1e-05 ; 7 - -0.20661 ; 8 - 0 ; 9 - -0.12354 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-38-10.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set NA ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-38-11.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 27.618 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.00532 ; 2 - -0.00559 ; 3 - -0.04424 ; 4 - -0.00384 ; 5 - -0.11503 ; 6 - 0 ; 7 - -0.20308 ; 8 - 0 ; 9 - -0.15158 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-38-12.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set NA ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-38-13.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 11 ;
+Converged: TRUE ;
+Time: 32.444 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.0056 ; 2 - -0.00995 ; 3 - 0.00262 ; 4 - 0.01611 ; 5 - 0.00829 ; 6 - -2e-05 ; 7 - 0.0317 ; 8 - 0 ; 9 - 0.01237 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-38-14.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set NA ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 1 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 0.9978326 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-38-15.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 10 ;
+Converged: TRUE ;
+Time: 32.734 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.02275 ; 2 - 0.02535 ; 3 - -0.00308 ; 4 - -2e-04 ; 5 - 0.03509 ; 6 - -0.01564 ; 7 - 0.0101 ; 8 - 1e-05 ; 9 - -0.00916 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-38-16.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set NA ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-38-17.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 7 ;
+Converged: TRUE ;
+Time: 21.306 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.02528 ; 2 - 0.0154 ; 3 - -0.05329 ; 4 - 0 ; 5 - -0.14189 ; 6 - 0 ; 7 - -0.17585 ; 8 - 0 ; 9 - -0.12598 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-38-18.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set NA ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-38-19.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 25.936 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.00014 ; 2 - -0.01092 ; 3 - -0.00509 ; 4 - -0.0228 ; 5 - -0.01964 ; 6 - 0 ; 7 - -0.04713 ; 8 - 0 ; 9 - 0.00686 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-38-20.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="medium-effects-g_m-3" class="section level3">
+<h3>Medium effects <span class="math inline">\(g_m\)</span></h3>
+<pre class="r"><code>g = g.m.n</code></pre>
+<pre><code>Data Set NA ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 0.9902233 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-40-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 27.585 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.01229 ; 2 - 0.00189 ; 3 - -0.05392 ; 4 - 0.00061 ; 5 - -0.0846 ; 6 - -2e-05 ; 7 - -0.13514 ; 8 - 0 ; 9 - -0.08317 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-40-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set NA ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-40-3.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 25.854 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.01732 ; 2 - -0.01042 ; 3 - -0.01884 ; 4 - -1e-05 ; 5 - -0.04387 ; 6 - 0 ; 7 - -0.0638 ; 8 - 0 ; 9 - -0.08034 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-40-4.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set NA ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-40-5.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 8 ;
+Converged: TRUE ;
+Time: 23.768 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.00754 ; 2 - -3e-05 ; 3 - -0.04572 ; 4 - 0 ; 5 - -0.19056 ; 6 - 0 ; 7 - -0.32217 ; 8 - 0 ; 9 - -0.19086 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-40-6.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set NA ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 0.9980103 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-40-7.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 8 ;
+Converged: TRUE ;
+Time: 25.442 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.00802 ; 2 - -1e-05 ; 3 - 0.05303 ; 4 - -0.01123 ; 5 - 0.20188 ; 6 - 0 ; 7 - 0.26207 ; 8 - 0 ; 9 - 0.12331 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-40-8.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set NA ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 0.9984696 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-40-9.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 7 ;
+Converged: TRUE ;
+Time: 20.647 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.0179 ; 2 - -3e-05 ; 3 - -0.04622 ; 4 - 3e-05 ; 5 - -0.14 ; 6 - -7e-05 ; 7 - -0.1561 ; 8 - 0 ; 9 - -0.06006 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-40-10.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set NA ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-40-11.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 12 ;
+Converged: TRUE ;
+Time: 35.867 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.00298 ; 2 - -0.01017 ; 3 - 0.02342 ; 4 - -0.01978 ; 5 - 0.04449 ; 6 - 0 ; 7 - 0.05481 ; 8 - 0 ; 9 - -0.02524 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-40-12.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set NA ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-40-13.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 27.367 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.01922 ; 2 - -0.00663 ; 3 - 0.01218 ; 4 - 1e-05 ; 5 - 0.03378 ; 6 - -1e-05 ; 7 - 0.02554 ; 8 - 0 ; 9 - 0.04878 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-40-14.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set NA ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 1 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 0.9978326 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-40-15.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 27.665 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.00498 ; 2 - 0.01847 ; 3 - -0.05122 ; 4 - -0.00011 ; 5 - -0.13304 ; 6 - -1e-05 ; 7 - -0.20343 ; 8 - 0 ; 9 - -0.12496 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-40-16.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set NA ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-40-17.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 26.827 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.00806 ; 2 - 0.01769 ; 3 - 0.0524 ; 4 - -0.00018 ; 5 - 0.13184 ; 6 - -1e-05 ; 7 - 0.17885 ; 8 - 0 ; 9 - 0.11019 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-40-18.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set NA ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-40-19.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 26.753 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.01121 ; 2 - -0.00387 ; 3 - -0.05389 ; 4 - -0.00665 ; 5 - -0.04402 ; 6 - 0 ; 7 - -0.10466 ; 8 - 0 ; 9 - -0.05914 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-40-20.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="large-effects-g_l-3" class="section level3">
+<h3>Large effects <span class="math inline">\(g_l\)</span></h3>
+<pre class="r"><code>g = g.l.n</code></pre>
+<pre><code>Data Set NA ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 0.9902233 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-42-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 15 ;
+Converged: TRUE ;
+Time: 43.467 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.01839 ; 2 - -0.00032 ; 3 - 0.09314 ; 4 - 0 ; 5 - 0.19834 ; 6 - -4e-05 ; 7 - 0.2042 ; 8 - 0 ; 9 - 0.08528 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-42-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set NA ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-42-3.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 11 ;
+Converged: TRUE ;
+Time: 31.709 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.02364 ; 2 - -0.02307 ; 3 - 0.01521 ; 4 - 1e-05 ; 5 - -0.0081 ; 6 - 0 ; 7 - 0.00948 ; 8 - 0 ; 9 - -0.00869 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-42-4.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set NA ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-42-5.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 10 ;
+Converged: TRUE ;
+Time: 29.211 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.0015 ; 2 - -0.0268 ; 3 - -0.02439 ; 4 - -0.00232 ; 5 - -0.00941 ; 6 - 0 ; 7 - 0.00458 ; 8 - 0 ; 9 - -0.00472 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-42-6.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set NA ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 0.9980103 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-42-7.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 26.742 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.00826 ; 2 - -0.00764 ; 3 - 0.12995 ; 4 - -0.00304 ; 5 - 0.38969 ; 6 - 1e-05 ; 7 - 0.48392 ; 8 - 0 ; 9 - 0.21674 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-42-8.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set NA ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 0.9984696 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-42-9.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 8 ;
+Converged: TRUE ;
+Time: 24.538 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.02741 ; 2 - -0.00017 ; 3 - -0.06593 ; 4 - 0.00516 ; 5 - -0.1322 ; 6 - -6e-05 ; 7 - -0.13942 ; 8 - 0 ; 9 - -0.06092 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-42-10.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set NA ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-42-11.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 8 ;
+Converged: TRUE ;
+Time: 24.177 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.00956 ; 2 - -0.00018 ; 3 - 0.0401 ; 4 - -2e-05 ; 5 - 0.10534 ; 6 - 0 ; 7 - 0.14952 ; 8 - 0 ; 9 - 0.05002 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-42-12.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set NA ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-42-13.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 27.673 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.0171 ; 2 - 2e-05 ; 3 - 0.05994 ; 4 - -6e-05 ; 5 - 0.13578 ; 6 - 0 ; 7 - 0.18185 ; 8 - 0 ; 9 - 0.08413 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-42-14.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set NA ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 1 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 0.9978326 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-42-15.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 10 ;
+Converged: TRUE ;
+Time: 29.798 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.01862 ; 2 - -1e-04 ; 3 - -0.02873 ; 4 - 0.00366 ; 5 - -0.05922 ; 6 - -2e-05 ; 7 - -0.02447 ; 8 - 0 ; 9 - 0.01949 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-42-16.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set NA ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-42-17.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 27.344 Seconds;
+Normalized w: 0 - 1 ; 1 - 0.00388 ; 2 - -0.00179 ; 3 - 0.08376 ; 4 - -0.03129 ; 5 - 0.24864 ; 6 - -2e-05 ; 7 - 0.37804 ; 8 - 1e-05 ; 9 - 0.21539 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-42-18.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Data Set NA ;
+For the Correlated Null Z Scores Only:
+Number of False Discoveries by BH at FDR = 0.05: 0 ;
+Number of False Discoveries by ASH at lfsr &lt;= 0.05: 0 ;
+pihat0 by ASH: 1 ;</code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-42-19.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Number of iterations: 9 ;
+Converged: TRUE ;
+Time: 27.819 Seconds;
+Normalized w: 0 - 1 ; 1 - -0.01308 ; 2 - 0.00069 ; 3 - 0.03228 ; 4 - -5e-05 ; 5 - 0.06777 ; 6 - 0 ; 7 - -0.01114 ; 8 - 0 ; 9 - -0.04016 ; 10 - 0 ; </code></pre>
+<p><img src="figure/mosek_reg_6.rmd/unnamed-chunk-42-20.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="session-information" class="section level2">
+<h2>Session information</h2>
+<!-- Insert the session information into the document -->
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 3.3.3 (2017-03-06)
+Platform: x86_64-apple-darwin13.4.0 (64-bit)
+Running under: macOS Sierra 10.12.4
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] Rmosek_7.1.3      PolynomF_0.94     cvxr_0.0.0.9009   REBayes_0.62     
+[5] Matrix_1.2-8      SQUAREM_2016.10-1 EQL_1.0-0         ttutils_1.0-1    
+[9] ashr_2.1-12      
+
+loaded via a namespace (and not attached):
+ [1] Rcpp_0.12.10      knitr_1.15.1      magrittr_1.5     
+ [4] MASS_7.3-45       doParallel_1.0.10 pscl_1.4.9       
+ [7] lattice_0.20-34   foreach_1.4.3     stringr_1.2.0    
+[10] tools_3.3.3       parallel_3.3.3    grid_3.3.3       
+[13] git2r_0.18.0      htmltools_0.3.5   iterators_1.0.8  
+[16] yaml_2.1.14       rprojroot_1.2     digest_0.6.11    
+[19] codetools_0.2-15  evaluate_0.10     rmarkdown_1.3    
+[22] stringi_1.1.2     backports_1.0.5   truncnorm_1.0-7  </code></pre>
+</div>
+
+<hr>
+<p>
+    This <a href="http://rmarkdown.rstudio.com">R Markdown</a> site was created with <a href="https://github.com/jdblischak/workflowr">workflowr</a>
+</p>
+<hr>
+
+<!-- To enable disqus, uncomment the section below and provide your disqus_shortname -->
+
+<!-- disqus
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'rmarkdown'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+-->
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
