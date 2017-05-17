@@ -82,6 +82,10 @@ In Gaussian derivatives decomposition, weights $W_k$ and especially [normalized 
 
 Both true effects and correlation can distort the empirical distribution away from the standard normal $N(0, 1)$, and Gaussian derivatives are presumably able to fit both.  Therefore, is there a way to let Gaussian derivatives with [a reasonable number of reasonable weights](gaussian_derivatives_5.html#weight_constraints) automatically identify correlated null from true effects?  It works well when effects are *not too small* right now.
 
+* [Fitting $N\left(0, \sigma^2\right)$ with Gaussian derivatives](fitting_normal.html)
+
+Continuing from the empirical studies above, we are looking at why $N\left(0, \sigma^2\right)$ when $\sigma^2$ is small can be satisfactorily fitted by a limited number of Gaussian derivatives.
+
 * [Diagnostic plots for `ASH`](diagnostic_plot.html)
 * [Diagnostic plots for `ASH` on correlated null](diagnostic_correlated_z.html)
 * [Diagnostic plots for `ASH` on correlated null: `BH` vs $\hat\pi_0$](diagnostic_correlated_z_2.html)

@@ -205,6 +205,8 @@ x.hist = hist(x, breaks = 20, plot = FALSE)
 y.lim = c(0, max(c(x.hist$density * 1.05, dnorm(x, 0, sqrt(sigma2)))))
 w.est = w.mosek(gd.mat.x, w_prior = NULL)
 y.est.plot = gd.mat[, 1:11] %*% c(1, w.est$w)
+cat("Estimated Normalized w: ", rbind(paste(0 : 10, "~"), paste(round(c(1, w.est$w) * (-1)^(0 : 10), 5), ";")), "\n")
+cat("Theoretical Normalized w: ", rbind(paste(0 : 10, "~"), paste(round(w.nmlz[1 : 11], 5), ";")), "...\n")
 hist(x, breaks = 100, prob = TRUE, ylim = y.lim,
      xlab = expression(paste(N(0, sqrt(2)^2), " Independent Samples")),
      main = expression(sigma^2 == 2)
