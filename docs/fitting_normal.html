@@ -316,7 +316,7 @@ shared across the workflowr files. -->
 <p><strong>Last updated:</strong> 2017-05-17</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 4dab9a4</p>
+<p><strong>Code version:</strong> 055f9f0</p>
 <!-- Add your analysis here -->
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
@@ -387,6 +387,8 @@ f_N\left(x\right) = \varphi\left(x\right) + \sum\limits_{n = 1}^N w_n\frac{1}{\s
 <p>Actually, <strong><span class="math inline">\(N\left(0, \sqrt{2}^2\right)\)</span> is a singularly interesting case</strong>. This case corresponds to when we have <span class="math inline">\(N\left(0, 1\right)\)</span> signal and <span class="math inline">\(N\left(0, 1\right)\)</span> independent noise, hence <span class="math inline">\(SNR = 0\)</span>. Theoretically the density curve can be fitted when the odd-order coefficients are <span class="math inline">\(0\)</span> and the even-order ones are <span class="math inline">\(U_n = \sqrt{\frac{\left(n - 1\right)!!}{n!!}}\)</span>.</p>
 <p>However, since <span class="math inline">\(U_n\)</span> is not decaying fast enough, the re-constructed curve using a limited number of Gaussian derivatives doesn’t look good. Meanwhile, if we truly have many random samples from <span class="math inline">\(N\left(0, \sqrt{2}^2\right)\)</span>, we can fit the data using Gaussian derivatives, and the estimated coefficients <span class="math inline">\(\hat w\)</span> usually give a better fit, as <a href="alternative.html">seen previously</a>.</p>
 <p>Here we plot the fitted curve using first <span class="math inline">\(N = 10, 50, 100\)</span> orders of Gaussian derivatives, compared with the true <span class="math inline">\(N\left(0, \sqrt{2}^2\right)\)</span> density and the curve estimated from random samples using <span class="math inline">\(L = 10\)</span> Gaussian derivatives.</p>
+<pre><code>Estimated Normalized w:  0 ~ 1 ; 1 ~ -0.0126 ; 2 ~ 0.72013 ; 3 ~ -0.01709 ; 4 ~ 0.6782 ; 5 ~ 0.01241 ; 6 ~ 0.62481 ; 7 ~ 0.03822 ; 8 ~ 0.4004 ; 9 ~ 0.00207 ; 10 ~ 0.11385 ; </code></pre>
+<pre><code>Theoretical Normalized w:  0 ~ 1 ; 1 ~ 0 ; 2 ~ 0.70711 ; 3 ~ 0 ; 4 ~ 0.61237 ; 5 ~ 0 ; 6 ~ 0.55902 ; 7 ~ 0 ; 8 ~ 0.52291 ; 9 ~ 0 ; 10 ~ 0.49608 ; ...</code></pre>
 <p><img src="figure/fitting_normal.rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="sigma2-2-multiple-examples" class="section level2">
