@@ -190,7 +190,7 @@ g.m.n = normalmix(pi = c(0.6, 0.3, 0.1), mean = 0, sd = c(0, 2, 4))
 g.l.n = normalmix(pi = c(0.6, 0.3, 0.1), mean = 0, sd = c(0, 3, 6))
 ```
 
-2. $\hat s_j^2$ are either constant $1$ or simulated from $\chi_1^2$.  Right now we are only working on the **homoscedastic $\hat s_j^2 \equiv 1$** case.
+2. $\hat s_j^2$ are either constant $1$ or randomly simulated from a distribution.  Right now we are only working on the **homoscedastic $\hat s_j^2 \equiv 1$** case.
 
 ```{r}
 se = "constant"
