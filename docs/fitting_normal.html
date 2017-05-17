@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+<meta name="author" content="Lei Sun" />
+
+<meta name="date" content="2017-05-16" />
+
+<title>Fitting N\left(0, \sigma^2\right) with Gaussian Derivatives</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs && document.readyState && document.readyState === "complete") {
+   window.setTimeout(function() {
+      hljs.initHighlighting();
+   }, 0);
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">truncash</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/LSun/truncash">
+    <span class="fa fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Fitting <span class="math inline">\(N\left(0, \sigma^2\right)\)</span> with Gaussian Derivatives</h1>
+<h4 class="author"><em>Lei Sun</em></h4>
+<h4 class="date"><em>2017-05-16</em></h4>
+
+</div>
+
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+<!-- Update knitr chunk options -->
+<!-- Insert the date the file was last updated -->
+<p><strong>Last updated:</strong> 2017-05-17</p>
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+<p><strong>Code version:</strong> 4dab9a4</p>
+<!-- Add your analysis here -->
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>We know the empirical distribution of a number of correlated null <span class="math inline">\(N\left(0, 1\right)\)</span> <span class="math inline">\(z\)</span> scores can be approximated by Gaussian derivatives at least theoretically. Now we want to know if the <span class="math inline">\(N\left(0, \sigma^2\right)\)</span> density can also be approximated by Gaussian derivatives. The question is important because it is related to the identifiability between the correlated null and true signals using the tool of Gaussian derivatives.</p>
+<p>The same question was investigated for <a href="alternative.html">small <span class="math inline">\(\sigma^2\)</span></a> and <a href="alternative2.html">large <span class="math inline">\(\sigma^2\)</span></a>. But these investigations was <em>empirical</em>, in the sense that we are fitting the Gaussian derivatives to a large number of independent samples simulated from <span class="math inline">\(N\left(0, \sigma^2\right)\)</span>. Now we are doing that <strong>theoretically</strong>.</p>
+</div>
+<div id="hermite-moments" class="section level2">
+<h2>Hermite moments</h2>
+<p>If a probability density function (pdf) <span class="math inline">\(f\left(x\right)\)</span> can be approximated by normalized Gaussian derivatives, we should have</p>
+<p><span class="math display">\[
+f\left(x\right) = w_0\varphi\left(x\right) + w_1\varphi^{(1)}\left(x\right) + w_2\frac{1}{\sqrt{2!}}\varphi^{(2)}\left(x\right) + \cdots + w_n\frac{1}{\sqrt{n!}}\varphi^{(n)}\left(x\right) + \cdots \ .
+\]</span> Using the fact that Hermite polynomials are orthonormal with respect to the Gaussian kernel and normalizing constants, we have</p>
+<p><span class="math display">\[
+\int_{\mathbb{R}}
+\frac{1}{\sqrt{m!}}
+h_m\left(x\right) \frac{1}{\sqrt{n!}}\varphi^{(n)}\left(x\right)dx = \left(-1\right)^n\delta_{mn} \ .
+\]</span> Therefore, when using Gaussian derivatives to decompose a pdf <span class="math inline">\(f\)</span>, the coefficients <span class="math inline">\(w_n\)</span> can be obtained by</p>
+<p><span class="math display">\[
+w_n = \left(-1\right)^n \int \frac{1}{\sqrt{n!}} h_n(x) f(x) dx = \frac{\left(-1\right)^n}{\sqrt{n!}} E_f\left[h_n\left(x\right)\right] \ .
+\]</span> Since <span class="math inline">\(h_n\)</span> is a degree <span class="math inline">\(n\)</span> polynomials, <span class="math inline">\(E_f\left[h_n\left(x\right)\right]\)</span> is essentially a linear combination of relevant moments up to order <span class="math inline">\(n\)</span>, denoted as <span class="math inline">\(E\left[x^i\right]\)</span>. For example, here are the first several <span class="math inline">\(E_f\left[h_n\left(x\right)\right]\)</span>.</p>
+<p><span class="math display">\[
+\begin{array}{rclcl}
+E_f\left[h_0\left(x\right)\right] &amp;=&amp; E_f\left[1\right] &amp;=&amp; 1 \\
+E_f\left[h_1\left(x\right)\right] &amp;=&amp; E_f\left[x\right] &amp;=&amp; E\left[x\right] \\
+E_f\left[h_2\left(x\right)\right] &amp;=&amp; E_f\left[x^2 - 1\right] &amp;=&amp; E\left[x^2\right] - 1\\
+E_f\left[h_3\left(x\right)\right] &amp;=&amp; E_f\left[x^3 - 3x\right] &amp;=&amp; E\left[x^3\right] - 3 E\left[x\right]\\
+E_f\left[h_4\left(x\right)\right] &amp;=&amp; E_f\left[x^4 - 6x^2 + 3\right] &amp;=&amp; E\left[x^4\right] - 6 E\left[x^2\right] + 3\\
+E_f\left[h_5\left(x\right)\right] &amp;=&amp; E_f\left[x^5 - 10x^3 + 15x\right] &amp;=&amp; E\left[x^5\right] - 10 E\left[x^3\right] + 15 E\left[x\right]\\
+E_f\left[h_6\left(x\right)\right] &amp;=&amp; E_f\left[x^6 - 15x^4 + 45x^2 - 15\right] &amp;=&amp; E\left[x^6\right] - 15 E\left[x^4\right] + 45E\left[x^2\right] - 15\\
+\end{array}
+\]</span> Some call these “Hermite moments.”</p>
+</div>
+<div id="when-f-nleft0-sigma2right-general-results" class="section level2">
+<h2>When <span class="math inline">\(f = N\left(0, \sigma^2\right)\)</span>: General results</h2>
+<p>When <span class="math inline">\(f = N\left(0, \sigma^2\right)\)</span>, we can write all Hermite moments out analytically. After algebra, it turns out they can be written as</p>
+<p><span class="math display">\[
+E_f\left[h_n\left(x\right)\right] =
+\begin{cases}
+0 &amp; n \text{ is odd}\\
+\left(n - 1\right)!! \left(\sigma^2 - 1\right)^{n / 2} &amp; n \text{ is even}
+\end{cases} \ ,
+\]</span> where <span class="math inline">\(\left(n - 1\right)!!\)</span> is the <a href="https://en.wikipedia.org/wiki/Double_factorial">double factorial</a>.</p>
+<p>Hence, if we want to express the pdf of <span class="math inline">\(N\left(0, \sigma^2\right)\)</span> in terms of normalized Gaussian derivatives, the coefficient</p>
+<p><span class="math display">\[
+w_n =
+\begin{cases}
+0 &amp; n \text{ is odd}\\
+\frac{\left(n - 1\right)!!}{\sqrt{n!}}\left(\sigma^2 - 1\right)^{n / 2}
+=\sqrt{\frac{\left(n - 1\right)!!}{n!!}}\left(\sigma^2 - 1\right)^{n / 2}
+&amp; n \text{ is even}
+\end{cases} \ .
+\]</span> From now on we will only pay attention to the even-order coefficients <span class="math inline">\(w_n = \sqrt{\frac{\left(n - 1\right)!!}{n!!}}\left(\sigma^2 - 1\right)^{n / 2} := U_n\left(\sigma^2 - 1\right)^{n / 2}\)</span>, where the sequence <span class="math inline">\(U_n := \sqrt{\frac{\left(n - 1\right)!!}{n!!}}\)</span>. Note that this sequence <span class="math inline">\(U_n\)</span> is interesting. <a href="https://math.stackexchange.com/questions/584456/limit-of-a-fraction-of-double-factorials">It can be proved</a> that it’s going to zero as <span class="math inline">\(n\to\infty\)</span>. Actually it can be <a href="https://en.wikipedia.org/wiki/Double_factorial#Additional_identities">written in another way</a></p>
+<p><span class="math display">\[
+\int_{0}^{\frac\pi2} \sin^nx dx = \int_{0}^{\frac\pi2} \cos^nx dx  = \frac\pi2U_n^2 \ .
+\]</span> However, this sequence decays slowly. In particular, it doesn’t decay exponentially, as seen in the following plots.</p>
+<p><img src="figure/fitting_normal.rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/fitting_normal.rmd/unnamed-chunk-3-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p><strong>Therefore, when <span class="math inline">\(\sigma^2 &gt; 2\)</span>, <span class="math inline">\(w_n\)</span> is exploding!</strong> It means theoretially we cannot actually fit <span class="math inline">\(N\left(0, \sigma^2\right)\)</span> with Gaussian derivatives when <span class="math inline">\(\sigma^2 &gt; 2\)</span>.</p>
+<p>It has multiple implications. First, it shows why people usually say Gaussian derivatives can only fit a density that’s close enough to Gaussian, especially, a density whose variance is too “inflated” compared with the standard normal. Therefore, the fact that in many case, the correlated null can be satisfactorily fitted by Gaussian derivatives tells us the inflation caused by correlation is indeed peculiar.</p>
+<p>On the other hand, when <span class="math inline">\(0 &lt; \sigma^2 &lt; 2\)</span>, that is, <span class="math inline">\(\left|\sigma^2 - 1\right| &lt; 1\)</span>, <span class="math inline">\(w_n\)</span> decays exponentially. It means that we are able to satisfactorily fit <span class="math inline">\(N\left(0, \sigma^2\right)\)</span> with a limited number of Gaussian derivatives such that</p>
+<p><span class="math display">\[
+f_N\left(x\right) = \varphi\left(x\right) + \sum\limits_{n = 1}^N w_n\frac{1}{\sqrt{n!}}\varphi^{(n)}\left(x\right) \approx N\left(0, \sigma^2\right) = \frac{1}{\sigma}\varphi\left(\frac{x}{\sigma}\right)  \ .
+\]</span></p>
+<p>It also means that when the correlated null looks like <span class="math inline">\(N\left(0, \sigma^2\right)\)</span> with <span class="math inline">\(\sigma^2\in\left(1, 2\right]\)</span> (small inflation) or <span class="math inline">\(\sigma^2\in\left(0, 1\right)\)</span> (deflation), it’s hard to identify whether the inflation or deflation is caused by correlation or true effects.</p>
+</div>
+<div id="when-f-nleft0-sqrt22right-in-particular" class="section level2">
+<h2>When <span class="math inline">\(f = N\left(0, \sqrt{2}^2\right)\)</span> in particular</h2>
+<p>That’s why in previous empirical investigations, we found that we <a href="alternative.html">could fit <span class="math inline">\(N\left(0, \sqrt{2}^2\right)\)</span> relatively well</a>, but <a href="alternative2.html">could not fit when <span class="math inline">\(\sigma^2 &gt; 2\)</span></a>.</p>
+<p>Actually, <strong><span class="math inline">\(N\left(0, \sqrt{2}^2\right)\)</span> is a singularly interesting case</strong>. This case corresponds to when we have <span class="math inline">\(N\left(0, 1\right)\)</span> signal and <span class="math inline">\(N\left(0, 1\right)\)</span> independent noise, hence <span class="math inline">\(SNR = 0\)</span>. Theoretically the density curve can be fitted when the odd-order coefficients are <span class="math inline">\(0\)</span> and the even-order ones are <span class="math inline">\(U_n = \sqrt{\frac{\left(n - 1\right)!!}{n!!}}\)</span>.</p>
+<p>However, since <span class="math inline">\(U_n\)</span> is not decaying fast enough, the re-constructed curve using a limited number of Gaussian derivatives doesn’t look good. Meanwhile, if we truly have many random samples from <span class="math inline">\(N\left(0, \sqrt{2}^2\right)\)</span>, we can fit the data using Gaussian derivatives, and the estimated coefficients <span class="math inline">\(\hat w\)</span> usually give a better fit, as <a href="alternative.html">seen previously</a>.</p>
+<p>Here we plot the fitted curve using first <span class="math inline">\(N = 10, 50, 100\)</span> orders of Gaussian derivatives, compared with the true <span class="math inline">\(N\left(0, \sqrt{2}^2\right)\)</span> density and the curve estimated from random samples using <span class="math inline">\(L = 10\)</span> Gaussian derivatives.</p>
+<p><img src="figure/fitting_normal.rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="sigma2-2-multiple-examples" class="section level2">
+<h2><span class="math inline">\(0 &lt; \sigma^2 &lt; 2\)</span>: Multiple examples</h2>
+<div id="sigma2-0.2-n-40" class="section level3">
+<h3><span class="math inline">\(\sigma^2 = 0.2\)</span>, <span class="math inline">\(N = 40\)</span></h3>
+<pre><code>Normalized w:  0 ~ 1 ; 1 ~ 0 ; 2 ~ -0.56569 ; 3 ~ 0 ; 4 ~ 0.39192 ; 5 ~ 0 ; 6 ~ -0.28622 ; 7 ~ 0 ; 8 ~ 0.21418 ; 9 ~ 0 ; 10 ~ -0.16255 ; 11 ~ 0 ; 12 ~ 0.12451 ; 13 ~ 0 ; 14 ~ -0.09598 ; 15 ~ 0 ; 16 ~ 0.07435 ; 17 ~ 0 ; 18 ~ -0.0578 ; 19 ~ 0 ; 20 ~ 0.04507 ; 21 ~ 0 ; 22 ~ -0.03523 ; 23 ~ 0 ; 24 ~ 0.02759 ; 25 ~ 0 ; 26 ~ -0.02164 ; 27 ~ 0 ; 28 ~ 0.017 ; 29 ~ 0 ; 30 ~ -0.01337 ; 31 ~ 0 ; 32 ~ 0.01053 ; 33 ~ 0 ; 34 ~ -0.0083 ; 35 ~ 0 ; 36 ~ 0.00655 ; 37 ~ 0 ; 38 ~ -0.00517 ; 39 ~ 0 ; 40 ~ 0.00408 ; </code></pre>
+<p><img src="figure/fitting_normal.rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="sigma2-0.5-n-14" class="section level3">
+<h3><span class="math inline">\(\sigma^2 = 0.5\)</span>, <span class="math inline">\(N = 14\)</span></h3>
+<pre><code>Normalized w:  0 ~ 1 ; 1 ~ 0 ; 2 ~ -0.35355 ; 3 ~ 0 ; 4 ~ 0.15309 ; 5 ~ 0 ; 6 ~ -0.06988 ; 7 ~ 0 ; 8 ~ 0.03268 ; 9 ~ 0 ; 10 ~ -0.0155 ; 11 ~ 0 ; 12 ~ 0.00742 ; 13 ~ 0 ; 14 ~ -0.00358 ; </code></pre>
+<p><img src="figure/fitting_normal.rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="sigma2-0.8-n-6" class="section level3">
+<h3><span class="math inline">\(\sigma^2 = 0.8\)</span>, <span class="math inline">\(N = 6\)</span></h3>
+<pre><code>Normalized w:  0 ~ 1 ; 1 ~ 0 ; 2 ~ -0.14142 ; 3 ~ 0 ; 4 ~ 0.02449 ; 5 ~ 0 ; 6 ~ -0.00447 ; </code></pre>
+<p><img src="figure/fitting_normal.rmd/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="sigma2-1.2-n-6" class="section level3">
+<h3><span class="math inline">\(\sigma^2 = 1.2\)</span>, <span class="math inline">\(N = 6\)</span></h3>
+<pre><code>Normalized w:  0 ~ 1 ; 1 ~ 0 ; 2 ~ 0.14142 ; 3 ~ 0 ; 4 ~ 0.02449 ; 5 ~ 0 ; 6 ~ 0.00447 ; </code></pre>
+<p><img src="figure/fitting_normal.rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="sigma2-1.5-n-14" class="section level3">
+<h3><span class="math inline">\(\sigma^2 = 1.5\)</span>, <span class="math inline">\(N = 14\)</span></h3>
+<pre><code>Normalized w:  0 ~ 1 ; 1 ~ 0 ; 2 ~ 0.35355 ; 3 ~ 0 ; 4 ~ 0.15309 ; 5 ~ 0 ; 6 ~ 0.06988 ; 7 ~ 0 ; 8 ~ 0.03268 ; 9 ~ 0 ; 10 ~ 0.0155 ; 11 ~ 0 ; 12 ~ 0.00742 ; 13 ~ 0 ; 14 ~ 0.00358 ; </code></pre>
+<p><img src="figure/fitting_normal.rmd/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="sigma2-1.8-n-40" class="section level3">
+<h3><span class="math inline">\(\sigma^2 = 1.8\)</span>, <span class="math inline">\(N = 40\)</span></h3>
+<pre><code>Normalized w:  0 ~ 1 ; 1 ~ 0 ; 2 ~ 0.56569 ; 3 ~ 0 ; 4 ~ 0.39192 ; 5 ~ 0 ; 6 ~ 0.28622 ; 7 ~ 0 ; 8 ~ 0.21418 ; 9 ~ 0 ; 10 ~ 0.16255 ; 11 ~ 0 ; 12 ~ 0.12451 ; 13 ~ 0 ; 14 ~ 0.09598 ; 15 ~ 0 ; 16 ~ 0.07435 ; 17 ~ 0 ; 18 ~ 0.0578 ; 19 ~ 0 ; 20 ~ 0.04507 ; 21 ~ 0 ; 22 ~ 0.03523 ; 23 ~ 0 ; 24 ~ 0.02759 ; 25 ~ 0 ; 26 ~ 0.02164 ; 27 ~ 0 ; 28 ~ 0.017 ; 29 ~ 0 ; 30 ~ 0.01337 ; 31 ~ 0 ; 32 ~ 0.01053 ; 33 ~ 0 ; 34 ~ 0.0083 ; 35 ~ 0 ; 36 ~ 0.00655 ; 37 ~ 0 ; 38 ~ 0.00517 ; 39 ~ 0 ; 40 ~ 0.00408 ; </code></pre>
+<p><img src="figure/fitting_normal.rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="another-special-case-sigma2-0" class="section level2">
+<h2>Another special case: <span class="math inline">\(\sigma^2 = 0\)</span></h2>
+<p>When <span class="math inline">\(\sigma^2 = 0\)</span>, <span class="math inline">\(f = N\left(0, 0\right) = \delta_0\)</span>. In this case,</p>
+<p><span class="math display">\[
+w_n =
+\begin{cases}
+0 &amp; n \text{ is odd}\\
+\sqrt{\frac{\left(n - 1\right)!!}{n!!}}\left(-1\right)^{n / 2}
+&amp; n \text{ is even}
+\end{cases}
+\]</span> is equivalent to what we’ve <a href="gaussian_derivatives_4.html#extreme_case:_(rho_%7Bij%7D_equiv_1)">obtained previously</a></p>
+<p><span class="math display">\[
+w_n = \frac{1}{\sqrt{n!}}h_n\left(0\right) \ .
+\]</span> The performance can be seen <a href="gd_delta.html#(z_=_0)">here</a>.</p>
+</div>
+<div id="session-information" class="section level2">
+<h2>Session information</h2>
+<!-- Insert the session information into the document -->
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 3.3.3 (2017-03-06)
+Platform: x86_64-apple-darwin13.4.0 (64-bit)
+Running under: macOS Sierra 10.12.4
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] Rmosek_7.1.3      cvxr_0.0.0.9009   REBayes_0.62      Matrix_1.2-8     
+[5] SQUAREM_2016.10-1 EQL_1.0-0         ttutils_1.0-1     PolynomF_0.94    
+
+loaded via a namespace (and not attached):
+ [1] Rcpp_0.12.10    lattice_0.20-34 digest_0.6.11   rprojroot_1.2  
+ [5] MASS_7.3-45     grid_3.3.3      backports_1.0.5 git2r_0.18.0   
+ [9] magrittr_1.5    evaluate_0.10   stringi_1.1.2   rmarkdown_1.3  
+[13] tools_3.3.3     stringr_1.2.0   yaml_2.1.14     htmltools_0.3.5
+[17] knitr_1.15.1   </code></pre>
+</div>
+
+<hr>
+<p>
+    This <a href="http://rmarkdown.rstudio.com">R Markdown</a> site was created with <a href="https://github.com/jdblischak/workflowr">workflowr</a>
+</p>
+<hr>
+
+<!-- To enable disqus, uncomment the section below and provide your disqus_shortname -->
+
+<!-- disqus
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'rmarkdown'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+-->
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
