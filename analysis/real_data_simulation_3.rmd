@@ -1,0 +1,235 @@
+---
+title: "Real Data with Simulated Signals: Part II"
+author: "Lei Sun"
+date: 2017-05-20
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+## Introduction
+
+We are comparing our method with `ASH` and [`SVA`](http://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.0030161).
+
+```{r packages, message = FALSE, cache = TRUE}
+library(ashr)
+library(edgeR)
+library(limma)
+library(seqgendiff)
+library(sva)
+library(pROC)
+```
+
+```{r gd-ash, message = FALSE, cache = TRUE}
+source("../code/gdash.R")
+```
+
+```{r functions, echo = FALSE, cache = TRUE}
+counts_to_summary = function (counts, design) {
+  dgecounts = calcNormFactors(DGEList(counts = counts, group = design[, 2]))
+  v = voom(dgecounts, design, plot = FALSE)
+  lim = lmFit(v)
+  r.ebayes = eBayes(lim)
+  p = r.ebayes$p.value[, 2]
+  t = r.ebayes$t[, 2]
+  z = sign(t) * qnorm(1 - p/2)
+  betahat = lim$coefficients[,2]
+  sebetahat = betahat / z
+  return (list(betahat = betahat, sebetahat = sebetahat))
+}
+
+## copied from David's code
+sva <- function(Y, X, num_sv) {
+    trash <- capture.output(sva_out <- sva::sva(dat = t(Y), mod = X, n.sv = num_sv))
+    X.sv <- cbind(X, sva_out$sv)
+    lim <- limma::lmFit(object = t(Y), design = X.sv)
+    r.ebayes = eBayes(lim)
+    p = r.ebayes$p.value[, 2]
+    t = r.ebayes$t[, 2]
+    z = sign(t) * qnorm(1 - p/2)
+    betahat = lim$coefficients[,2]
+    sebetahat = betahat / z
+    return(list(betahat = betahat, sebetahat = sebetahat,
+                pvalues = p))
+}
+
+one_simulation = function (mat, nsamp, ngene, pi0, sd) {
+  dat.count = seqgendiff::poisthin(mat, nsamp = nsamp, ngene = ngene, gselect = "max", signal_params = list(mean = 0, sd = sd), prop_null = pi0)
+  dat.summary = counts_to_summary(t(dat.count$Y), dat.count$X)
+  betahat = dat.summary$betahat
+  sebetahat = dat.summary$sebetahat
+  beta = dat.count$beta
+  fit.gdash = gdash(betahat, sebetahat)
+  fit.ash.gdash = ash(betahat, sebetahat, fixg = TRUE, g = fit.gdash$fitted_g)
+  fit.ash = ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+  Y <- log2(dat.count$Y + 1)
+  num.sv = sva::num.sv(dat = t(Y), mod = dat.count$X)
+  fit.sva = sva(Y, dat.count$X, num.sv)
+  fit.ash.sva = ash(fit.sva$betahat, fit.sva$sebetahat, mixcompdist = "normal", method = "fdr")
+  p.sva = fit.sva$pvalues
+  return(list(beta = beta, fit.gdash = fit.gdash, fit.ash.gdash = fit.ash.gdash, fit.ash = fit.ash, fit.ash.sva = fit.ash.sva, p.sva = p.sva))
+}
+
+N_simulations = function (N, mat, nsamp, ngene, pi0, sd) {
+  beta.list = list()
+  gdash.list = list()
+  ash.gdash.list = list()
+  ash.list = list()
+  ash.sva.list = list()
+  p.sva.list = list()
+  for (i in 1 : N) {
+    one_sim = one_simulation(mat, nsamp, ngene, pi0, sd)
+    beta.list[[i]] = one_sim$beta
+    gdash.list[[i]] = one_sim$fit.gdash
+    ash.gdash.list[[i]] = one_sim$fit.ash.gdash
+    ash.list[[i]] = one_sim$fit.ash
+    ash.sva.list[[i]] = one_sim$fit.ash.sva
+    p.sva.list[[i]] = one_sim$p.sva
+  }
+  return(list(beta = beta.list, fit.gdash = gdash.list, fit.ash.gdash = ash.gdash.list, fit.ash = ash.list, fit.ash.sva = ash.sva.list, p.sva = p.sva.list))
+}
+
+comp.plot = function (gdash.comp, N, pi0) {
+  pihat0.ash = pihat0.gdash = pihat0.sva = mse.ash = mse.gdash = mse.sva = auc.ash = auc.gdash = auc.sva = c()
+  for (i in 1 : N) {
+    pihat0.ash[i] = ashr::get_pi0(gdash.comp$fit.ash[[i]])
+    pihat0.gdash[i] = ashr::get_pi0(gdash.comp$fit.ash.gdash[[i]])
+    pihat0.sva[i] = ashr::get_pi0(gdash.comp$fit.ash.sva[[i]])
+    mse.ash[i] = mean((ashr::get_pm(gdash.comp$fit.ash[[i]]) - gdash.comp$beta[[i]])^2)
+    mse.gdash[i] = mean((ashr::get_pm(gdash.comp$fit.ash.gdash[[i]]) - gdash.comp$beta[[i]])^2)
+    mse.sva[i] = mean((ashr::get_pm(gdash.comp$fit.ash.sva[[i]]) - gdash.comp$beta[[i]])^2)
+    response = (gdash.comp$beta[[i]] != 0)
+    auc.ash[i] = pROC::roc(response, ashr::get_lfsr(gdash.comp$fit.ash[[i]]))$auc
+    auc.gdash[i] = pROC::roc(response, ashr::get_lfsr(gdash.comp$fit.ash.gdash[[i]]))$auc
+    auc.sva[i] = pROC::roc(response, ashr::get_lfsr(gdash.comp$fit.ash.sva[[i]]))$auc
+}
+  method.names = c("ASH", "GD-ASH", "SVA + ASH")
+  boxplot(pihat0.ash, pihat0.gdash, pihat0.sva, names = method.names, main = expression(hat(pi)[0]), ylab = expression(hat(pi)[0]))
+  abline(h = pi0, col = "red", lty = 2)
+  boxplot(mse.ash, mse.gdash, mse.sva, names = method.names, main = "Mean Squared Error", ylab = "MSE")
+  boxplot(auc.ash, auc.gdash, auc.sva, names = method.names, main = "Area under the ROC Curve", ylab = "AUC")
+}
+```
+
+Artefactual effects $\pi_0\delta_0 + \left(1 - \pi_0\right)N\left(0, \sigma^2\right)$ are added to the real GTEx data.
+
+```{r data, cache = TRUE}
+mat = read.csv("../data/liver.csv")
+```
+
+```{r, echo = FALSE}
+mat = mat[, -(1:2)]
+mat = t(mat)
+```
+
+We are using $10K$ genes, $5$ v $5$ experimental design, and $100$ independent simulation trials.
+
+```{r gdash comparison, cache = TRUE}
+ngene = 1e4
+nsamp = 10
+N = 100
+```
+
+## Setting 1: $\pi_0 = 0.5$, $\sigma^2 = 1$
+
+```{r gdash comparison 1, cache = TRUE}
+pi0 = 0.5
+sd = 1
+set.seed(777)
+system.time(gdash.comp <- N_simulations(N, mat, nsamp, ngene, pi0, sd))
+```
+
+```{r plotting 1, cache = TRUE, echo = FALSE}
+comp.plot(gdash.comp, N, pi0)
+```
+
+## Setting 2: $\pi_0 = 0.9$, $\sigma^2 = 1$
+
+```{r gdash comparison 2, cache = TRUE}
+pi0 = 0.9
+sd = 1
+set.seed(777)
+system.time(gdash.comp <- N_simulations(N, mat, nsamp, ngene, pi0, sd))
+```
+
+```{r plotting 2, cache = TRUE, echo = FALSE}
+comp.plot(gdash.comp, N, pi0)
+```
+
+## Setting 3: $\pi_0 = 0.5$, $\sigma^2 = 2$
+
+```{r gdash comparison 3, cache = TRUE}
+pi0 = 0.5
+sd = sqrt(2)
+set.seed(777)
+system.time(gdash.comp <- N_simulations(N, mat, nsamp, ngene, pi0, sd))
+```
+
+```{r plotting 3, cache = TRUE, echo = FALSE}
+comp.plot(gdash.comp, N, pi0)
+```
+
+## Setting 4: $\pi_0 = 0.9$, $\sigma^2 = 2$
+
+```{r gdash comparison 4, cache = TRUE}
+pi0 = 0.9
+sd = sqrt(2)
+set.seed(777)
+system.time(gdash.comp <- N_simulations(N, mat, nsamp, ngene, pi0, sd))
+```
+
+```{r plotting 4, cache = TRUE, echo = FALSE}
+comp.plot(gdash.comp, N, pi0)
+```
+
+## Setting 5: $\pi_0 = 0.5$, $\sigma^2 = 3$
+
+```{r gdash comparison 5, cache = TRUE}
+pi0 = 0.5
+sd = sqrt(3)
+set.seed(777)
+system.time(gdash.comp <- N_simulations(N, mat, nsamp, ngene, pi0, sd))
+```
+
+```{r plotting 5, cache = TRUE, echo = FALSE}
+comp.plot(gdash.comp, N, pi0)
+```
+
+## Setting 6: $\pi_0 = 0.9$, $\sigma^2 = 3$
+
+```{r gdash comparison 6, cache = TRUE}
+pi0 = 0.9
+sd = sqrt(3)
+set.seed(777)
+system.time(gdash.comp <- N_simulations(N, mat, nsamp, ngene, pi0, sd))
+```
+
+```{r plotting 6, cache = TRUE, echo = FALSE}
+comp.plot(gdash.comp, N, pi0)
+```
+
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```

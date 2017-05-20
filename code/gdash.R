@@ -5,7 +5,7 @@ require(cvxr)
 require(PolynomF)
 require(Rmosek)
 
-gdash = function (betahat, sebetahat, gd.ord, primal = TRUE, gd.normalized = FALSE, w.lambda = 1, w.rho = 0.5, mixcompdist = "normal", method = "fdr", control = list()) {
+gdash = function (betahat, sebetahat, gd.ord = 10, primal = FALSE, gd.normalized = TRUE, w.lambda = 10, w.rho = 0.5, mixcompdist = "normal", method = "fdr", control = list(maxiter = 50)) {
   if (method == "fdr") {
     sd = c(0, autoselect.mixsd(betahat, sebetahat, mult = sqrt(2)))
     pi_prior = c(10, rep(1, length(sd) - 1))

@@ -1,0 +1,216 @@
+---
+title: "Real Data with Simulated Signals: Part I"
+author: "Lei Sun"
+date: 2017-05-18
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+```{r packages, message = FALSE}
+library(ashr)
+library(edgeR)
+library(limma)
+library(qvalue)
+library(seqgendiff)
+library(sva)
+library(cate)
+```
+
+```{r gd-ash, message = FALSE}
+source("../code/gdash.R")
+```
+
+```{r functions, echo = FALSE}
+counts_to_summary = function (counts, design) {
+  dgecounts = calcNormFactors(DGEList(counts = counts, group = design[, 2]))
+  v = voom(dgecounts, design, plot = FALSE)
+  lim = lmFit(v)
+  r.ebayes = eBayes(lim)
+  p = r.ebayes$p.value[, 2]
+  t = r.ebayes$t[, 2]
+  z = sign(t) * qnorm(1 - p/2)
+  betahat = lim$coefficients[,2]
+  sebetahat = betahat / z
+  return (list(betahat = betahat, sebetahat = sebetahat))
+}
+
+one_simulation = function (mat, nsamp, pi0, sd) {
+  dat.count = seqgendiff::poisthin(mat, nsamp = nsamp, ngene = 1e3, gselect = "max", signal_params = list(mean = 0, sd = sd), prop_null = pi0)
+  dat.summary = counts_to_summary(t(dat.count$Y), dat.count$X)
+  betahat = dat.summary$betahat
+  sebetahat = dat.summary$sebetahat
+  beta = dat.count$beta
+  fit.gdash = gdash(betahat, sebetahat)
+  fit.ash.gdash = ash(betahat, sebetahat, fixg = TRUE, g = fit.gdash$fitted_g)
+  fit.ash = ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+  Y <- log2(dat.count$Y + 1)
+  X <- as.data.frame(dat.count$X)
+  names(X) <- c("Intercept", "Treatment")
+  mout <- vicar::mouthwash(Y = Y, X = dat.count$X, cov_of_interest = 2)
+  sva::num.sv(dat = t(Y), mod = dat.count$X)
+  cate::est.confounder.num(~Treatment, X.data = X, Y = Y)
+  mout$pi0
+  get_pi0(fit.gdash)
+  get_pi0(fit.ash)
+  return(list(fit.gdash = fit.gdash, fit.ash.gdash = fit.ash.gdash, fit.ash = fit.ash, beta = beta))
+}
+
+N_simulations = function (N, mat, nsamp, pi0, sd) {
+  gdash.list = list()
+  ash.gdash.list = list()
+  ash.list = list()
+  beta.list = list()
+  for (i in 1 : N) {
+    one_sim = one_simulation(mat, nsamp, pi0, sd)
+    beta.list[[i]] = one_sim$beta
+    gdash.list[[i]] = one_sim$fit.gdash
+    ash.gdash.list[[i]] = one_sim$fit.ash.gdash
+    ash.list[[i]] = one_sim$fit.ash
+  }
+  return(list(fit.gdash = gdash.list, fit.ash.gdash = ash.gdash.list, fit.ash = ash.list, beta = beta.list))
+}
+```
+
+
+## Introduction
+
+Using David's package `seqgendiff`, we are adding artefactual signals to the real GTEx Liver RNA-seq data.
+
+```{r data, cache = TRUE}
+mat = read.csv("../data/liver.csv")
+```
+
+The true signal comes from a mixture distribution
+
+$$
+g\left(\beta\right) = \pi_0\delta_0 + \left(1 - \pi_0\right)N\left(0, \sigma^2\right)
+$$
+The simulated data matrices are then fed into `edgeR`, `limma` pipeline.  In the following simulations, we always use $5$ vs $5$.
+
+```{r, echo = FALSE}
+mat = mat[, -(1:2)]
+mat = t(mat)
+```
+
+## Case 1: $\pi_0 = 0.9$, $\sigma^2 = 1$.
+
+```{r gdash v ash, cache = TRUE}
+N = 100
+nsamp = 10
+pi0 = 0.9
+sd = 1
+system.time(ashvgdash <- N_simulations(N, mat, nsamp, pi0, sd))
+```
+
+```{r, cache = TRUE, echo = FALSE}
+pihat0.gdash = pihat0.ash = c()
+mse.gdash = mse.ash = c()
+for (i in 1 : N) {
+  pihat0.gdash[i] = ashvgdash$fit.gdash[[i]]$fitted_g$pi[1]
+  pihat0.ash[i] = ashvgdash$fit.ash[[i]]$fitted_g$pi[1]
+  mse.gdash[i] = mean((get_pm(ashvgdash$fit.ash.gdash[[i]]) - ashvgdash$beta[[i]])^2)
+  mse.ash[i] = mean((get_pm(ashvgdash$fit.ash[[i]]) - ashvgdash$beta[[i]])^2)
+}
+boxplot(pihat0.gdash, pihat0.ash, names = c("GD-ASH", "ASH"), ylab = expression(hat(pi)[0]), main = expression(hat(pi)[0]))
+abline(h = pi0, col = "red", lty = 2)
+boxplot(mse.gdash, mse.ash, names = c("GD-ASH", "ASH"), ylab = "MSE", main = "MSE")
+```
+
+## Case 2: $\pi_0 = 0.9$, $\sigma^2 = 4$
+
+```{r gdash v ash 2, cache = TRUE}
+N = 100
+nsamp = 10
+pi0 = 0.9
+sd = 2
+system.time(ashvgdash <- N_simulations(N, mat, nsamp, pi0, sd))
+```
+
+```{r, cache = TRUE, echo = FALSE}
+pihat0.gdash = pihat0.ash = c()
+mse.gdash = mse.ash = c()
+for (i in 1 : N) {
+  pihat0.gdash[i] = ashvgdash$fit.gdash[[i]]$fitted_g$pi[1]
+  pihat0.ash[i] = ashvgdash$fit.ash[[i]]$fitted_g$pi[1]
+  mse.gdash[i] = mean((get_pm(ashvgdash$fit.ash.gdash[[i]]) - ashvgdash$beta[[i]])^2)
+  mse.ash[i] = mean((get_pm(ashvgdash$fit.ash[[i]]) - ashvgdash$beta[[i]])^2)
+}
+boxplot(pihat0.gdash, pihat0.ash, names = c("GD-ASH", "ASH"), ylab = expression(hat(pi)[0]), main = expression(hat(pi)[0]))
+abline(h = pi0, col = "red", lty = 2)
+boxplot(mse.gdash, mse.ash, names = c("GD-ASH", "ASH"), ylab = "MSE", main = "MSE")
+```
+
+## Case 3: $\pi_0 = 0.5$, $\sigma^2 = 4$
+
+```{r gdash v ash 3, cache = TRUE}
+N = 100
+nsamp = 10
+pi0 = 0.5
+sd = 2
+system.time(ashvgdash <- N_simulations(N, mat, nsamp, pi0, sd))
+```
+
+```{r, cache = TRUE, echo = FALSE}
+pihat0.gdash = pihat0.ash = c()
+mse.gdash = mse.ash = c()
+for (i in 1 : N) {
+  pihat0.gdash[i] = ashvgdash$fit.gdash[[i]]$fitted_g$pi[1]
+  pihat0.ash[i] = ashvgdash$fit.ash[[i]]$fitted_g$pi[1]
+  mse.gdash[i] = mean((get_pm(ashvgdash$fit.ash.gdash[[i]]) - ashvgdash$beta[[i]])^2)
+  mse.ash[i] = mean((get_pm(ashvgdash$fit.ash[[i]]) - ashvgdash$beta[[i]])^2)
+}
+boxplot(pihat0.gdash, pihat0.ash, names = c("GD-ASH", "ASH"), ylab = expression(hat(pi)[0]), main = expression(hat(pi)[0]))
+abline(h = pi0, col = "red", lty = 2)
+boxplot(mse.gdash, mse.ash, names = c("GD-ASH", "ASH"), ylab = "MSE", main = "MSE")
+```
+
+## Case 4: $\pi_0 = 0.9$, $\sigma^2 = 9$
+
+```{r gdash v ash 4, cache = TRUE}
+N = 100
+nsamp = 10
+pi0 = 0.9
+sd = 3
+system.time(ashvgdash <- N_simulations(N, mat, nsamp, pi0, sd))
+```
+
+```{r, cache = TRUE, echo = FALSE}
+pihat0.gdash = pihat0.ash = c()
+mse.gdash = mse.ash = c()
+for (i in 1 : N) {
+  pihat0.gdash[i] = ashvgdash$fit.gdash[[i]]$fitted_g$pi[1]
+  pihat0.ash[i] = ashvgdash$fit.ash[[i]]$fitted_g$pi[1]
+  mse.gdash[i] = mean((get_pm(ashvgdash$fit.ash.gdash[[i]]) - ashvgdash$beta[[i]])^2)
+  mse.ash[i] = mean((get_pm(ashvgdash$fit.ash[[i]]) - ashvgdash$beta[[i]])^2)
+}
+boxplot(pihat0.gdash, pihat0.ash, names = c("GD-ASH", "ASH"), ylab = expression(hat(pi)[0]), main = expression(hat(pi)[0]))
+abline(h = pi0, col = "red", lty = 2)
+boxplot(mse.gdash, mse.ash, names = c("GD-ASH", "ASH"), ylab = "MSE", main = "MSE")
+```
+
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```
