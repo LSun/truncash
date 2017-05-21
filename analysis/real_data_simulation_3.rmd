@@ -1,5 +1,5 @@
 ---
-title: "Real Data with Simulated Signals: Part II"
+title: "Real Data with Simulated Signals: Part III"
 author: "Lei Sun"
 date: 2017-05-20
 output: html_document
@@ -149,20 +149,7 @@ nsamp = 10
 N = 100
 ```
 
-## Setting 1: $\pi_0 = 0.5$, $\sigma^2 = 1$
-
-```{r gdash comparison 1, cache = TRUE}
-pi0 = 0.5
-sd = 1
-set.seed(777)
-system.time(gdash.comp <- N_simulations(N, mat, nsamp, ngene, pi0, sd))
-```
-
-```{r plotting 1, cache = TRUE, echo = FALSE}
-comp.plot(gdash.comp, N, pi0)
-```
-
-## Setting 2: $\pi_0 = 0.9$, $\sigma^2 = 1$
+## Setting 1: $\pi_0 = 0.9$, $\sigma^2 = 1$
 
 ```{r gdash comparison 2, cache = TRUE}
 pi0 = 0.9
@@ -175,20 +162,7 @@ system.time(gdash.comp <- N_simulations(N, mat, nsamp, ngene, pi0, sd))
 comp.plot(gdash.comp, N, pi0)
 ```
 
-## Setting 3: $\pi_0 = 0.5$, $\sigma^2 = 2$
-
-```{r gdash comparison 3, cache = TRUE}
-pi0 = 0.5
-sd = sqrt(2)
-set.seed(777)
-system.time(gdash.comp <- N_simulations(N, mat, nsamp, ngene, pi0, sd))
-```
-
-```{r plotting 3, cache = TRUE, echo = FALSE}
-comp.plot(gdash.comp, N, pi0)
-```
-
-## Setting 4: $\pi_0 = 0.9$, $\sigma^2 = 2$
+## Setting 2: $\pi_0 = 0.9$, $\sigma^2 = 2$
 
 ```{r gdash comparison 4, cache = TRUE}
 pi0 = 0.9
@@ -201,20 +175,7 @@ system.time(gdash.comp <- N_simulations(N, mat, nsamp, ngene, pi0, sd))
 comp.plot(gdash.comp, N, pi0)
 ```
 
-## Setting 5: $\pi_0 = 0.5$, $\sigma^2 = 3$
-
-```{r gdash comparison 5, cache = TRUE}
-pi0 = 0.5
-sd = sqrt(3)
-set.seed(777)
-system.time(gdash.comp <- N_simulations(N, mat, nsamp, ngene, pi0, sd))
-```
-
-```{r plotting 5, cache = TRUE, echo = FALSE}
-comp.plot(gdash.comp, N, pi0)
-```
-
-## Setting 6: $\pi_0 = 0.9$, $\sigma^2 = 3$
+## Setting 3: $\pi_0 = 0.9$, $\sigma^2 = 3$
 
 ```{r gdash comparison 6, cache = TRUE}
 pi0 = 0.9
