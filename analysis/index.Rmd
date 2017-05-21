@@ -104,7 +104,7 @@ Essentially we hope to tell whether $n$ random samples are uniformly distributed
 
 Take a look at the null $z$ scores we've been experimenting with so far and check whether they truly are marginally $N\left(0, 1\right)$.  It's an enhanced version of the simulation on [occurrence of extreme observations](ExtremeOccurrence.html).  The non-null $z$ scores are produced for comparison.
 
-* [Can we create correlated null from the raw data](create_null.html)
+* [Can we create correlated null from the raw data?](create_null.html)
 
 This whole project comes from a ubiquitous issue that in the simultaneous inference problem, the deviation from what would be expected under the null can come from both distortion due to correlation and enrichment due to true effects.  Ideally, it would be perfect if we could create controls which keep the distortion by correlation unchanged, but remove the true effects.  Efron in a series of papers (for example, [Efron et al 2001](http://www.tandfonline.com/doi/abs/10.1198/016214501753382129)) suggests to create the null from the raw data by resampling or permutation.  We apply the idea to our data sets, and the results are not promising.
 
@@ -128,6 +128,12 @@ Several ways are explored to make fitting Gaussian derivatives more efficient an
 * [Regularized Gaussian Derivatives & `ASH`: Simulated True Effects with Heteroskedastic Correlated Noises](mosek_reg_6.html)
 
 Fitting the corrrelated null with Gaussian derivatives has two constraints: non-negativity and orderly decay, and both are intractable.  We are using $L_1$ regularization to try to solve both.
+
+* [Simulated Signals Added to Real Data: Part 1](real_data_simulation.html)
+* [Simulated Signals Added to Real Data: Part 2](real_data_simulation_2.html)
+* [Simulated Signals Added to Real Data: Part 3](real_data_simulation_3.html)
+
+Using the `seqgendiff` pipeline developed by [David](http://dcgerard.github.io/), [Mengyin](https://github.com/mengyin), and Matthew, we are adding simulated $\pi_0\delta_0 + \left(1 - \pi0\right)N\left(0, \sigma^2\right)$ signals to GTEx/Liver RNA-seq expression matrix, and compare our method with `ASH` and [`SVA`](http://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.0030161).
 
 [`ashr`]: https://github.com/stephens999/ashr
 
