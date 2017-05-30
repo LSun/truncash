@@ -318,13 +318,13 @@ for (i in 1 : m) {
 }
 ```
 
-```{r zero q-cali plotting, cache = TRUE, echo = FALSE}
+```{r zero average fdp, cache = TRUE, echo = FALSE}
 plot(fdr.list, fdr.list, type = "n",
-     xlim = c(0, 1), ylim = c(0, 1), xlab = "Nominal False Discovery Rate", ylab = "Empirical False Discovery Proportion", main = "Calibration of q values")
-lines(fdr.list, fdp.ash[[17]], col = "green")
-lines(fdr.list, fdp.gdash[[17]], col = "blue")
-lines(fdr.list, fdp.qvalue[[17]], col = "yellow")
-lines(fdr.list, fdp.BH[[17]])
+     xlim = c(0, 1), ylim = c(0, 1), xlab = "Nominal False Discovery Rate", ylab = "Average False Discovery Proportion", main = "Calibration of pFDR")
+lines(fdr.list, colMeans(matrix(unlist(fdp.ash), nrow = m, byrow = TRUE)), col = "green")
+lines(fdr.list, colMeans(matrix(unlist(fdp.gdash), nrow = m, byrow = TRUE)), col = "blue")
+lines(fdr.list, colMeans(matrix(unlist(fdp.qvalue), nrow = m, byrow = TRUE)), col = "yellow")
+lines(fdr.list, colMeans(matrix(unlist(fdp.BH), nrow = m, byrow = TRUE)))
 abline(0, 1, lty = 2, col = "red")
 legend("topleft", lty = 1, col = c("green", "blue", "yellow", "black"), c("ASH", "GD-ASH", "qvalue", "BH"))
 ```
@@ -345,26 +345,11 @@ for (i in 1 : m) {
 }
 ```
 
-```{r zero fsp gdash-ash, cache = TRUE, echo = FALSE, eval = FALSE}
-K = (fsr.list <= 0.5)
-fsp.ash.diff = fsp.gdash.diff = c()
-for (i in 1 : m) {
-  fsp.ash.diff[i] = mean(abs(fsp.ash[[i]][1 : K] - fsr.list[1 : K]))
-  fsp.gdash.diff[i] = mean(abs(fsp.gdash[[i]][1 : K] - fsr.list[1 : K]))
-}
-boxplot(fsp.ash.diff, fsp.gdash.diff, 
-        names = c("ASH", "GD-ASH"),
-        ylab = expression("FSP - FSR")
-)
-plot(fsp.ash.diff, fsp.gdash.diff, xlim = range(fsp.ash.diff, fsp.gdash.diff), ylim = range(fsp.ash.diff, fsp.gdash.diff), xlab = "ASH", ylab = "GD-ASH")
-abline(0, 1, lty = 2, col = "red")
-```
-
-```{r zero fsp plotting, cache = TRUE, echo = FALSE}
+```{r zero average fsp, cache = TRUE, echo = FALSE}
 plot(fsr.list, fsr.list, type = "n",
-     xlim = c(0, 1), ylim = c(0, 1), xlab = "Nominal False Sign Rate", ylab = "Empirical False Sign Proportion", main = "Calibration of S values")
-lines(fsr.list, fsp.ash[[17]], col = "green")
-lines(fsr.list, fsp.gdash[[17]], col = "blue")
+     xlim = c(0, 1), ylim = c(0, 1), xlab = "Nominal False Discovery Rate", ylab = "Average False Sign Proportion", main = "Calibration of S values")
+lines(fsr.list, colMeans(matrix(unlist(fsp.ash), nrow = m, byrow = TRUE)), col = "green")
+lines(fsr.list, colMeans(matrix(unlist(fsp.gdash), nrow = m, byrow = TRUE)), col = "blue")
 abline(0, 1, lty = 2, col = "red")
 legend("topleft", lty = 1, col = c("green", "blue"), c("ASH", "GD-ASH"))
 ```
@@ -514,17 +499,6 @@ for (i in 1 : m) {
 }
 ```
 
-```{r small q-cali plotting, cache = TRUE, echo = FALSE}
-plot(fdr.list, fdr.list, type = "n",
-     xlim = c(0, 1), ylim = c(0, 1), xlab = "Nominal False Discovery Rate", ylab = "Empirical False Discovery Proportion", main = "Calibration of q values")
-lines(fdr.list, fdp.ash[[17]], col = "green")
-lines(fdr.list, fdp.gdash[[17]], col = "blue")
-lines(fdr.list, fdp.qvalue[[17]], col = "yellow")
-lines(fdr.list, fdp.BH[[17]])
-abline(0, 1, lty = 2, col = "red")
-legend("topleft", lty = 1, col = c("green", "blue", "yellow"), c("ASH", "GD-ASH", "qvalue"))
-```
-
 ```{r small fsp, cache = TRUE, echo = FALSE}
 fsp = function (FSR, true, observation, predictor) {
   discovery = predictor <= FSR
@@ -541,11 +515,22 @@ for (i in 1 : m) {
 }
 ```
 
-```{r small fsp plotting, cache = TRUE, echo = FALSE}
+```{r small average fdp, cache = TRUE, echo = FALSE}
+plot(fdr.list, fdr.list, type = "n",
+     xlim = c(0, 1), ylim = c(0, 1), xlab = "Nominal False Discovery Rate", ylab = "Average False Discovery Proportion", main = "Calibration of pFDR")
+lines(fdr.list, colMeans(matrix(unlist(fdp.ash), nrow = m, byrow = TRUE)), col = "green")
+lines(fdr.list, colMeans(matrix(unlist(fdp.gdash), nrow = m, byrow = TRUE)), col = "blue")
+lines(fdr.list, colMeans(matrix(unlist(fdp.qvalue), nrow = m, byrow = TRUE)), col = "yellow")
+lines(fdr.list, colMeans(matrix(unlist(fdp.BH), nrow = m, byrow = TRUE)))
+abline(0, 1, lty = 2, col = "red")
+legend("topleft", lty = 1, col = c("green", "blue", "yellow", "black"), c("ASH", "GD-ASH", "qvalue", "BH"))
+```
+
+```{r small average fsp, cache = TRUE, echo = FALSE}
 plot(fsr.list, fsr.list, type = "n",
-     xlim = c(0, 1), ylim = c(0, 1), xlab = "Nominal False Sign Rate", ylab = "Empirical False Sign Proportion", main = "Calibration of S values")
-lines(fsr.list, fsp.ash[[17]], col = "green")
-lines(fsr.list, fsp.gdash[[17]], col = "blue")
+     xlim = c(0, 1), ylim = c(0, 1), xlab = "Nominal False Discovery Rate", ylab = "Average False Sign Proportion", main = "Calibration of S values")
+lines(fsr.list, colMeans(matrix(unlist(fsp.ash), nrow = m, byrow = TRUE)), col = "green")
+lines(fsr.list, colMeans(matrix(unlist(fsp.gdash), nrow = m, byrow = TRUE)), col = "blue")
 abline(0, 1, lty = 2, col = "red")
 legend("topleft", lty = 1, col = c("green", "blue"), c("ASH", "GD-ASH"))
 ```
@@ -689,17 +674,6 @@ for (i in 1 : m) {
 }
 ```
 
-```{r medium q-cali plotting, cache = TRUE, echo = FALSE}
-plot(fdr.list, fdr.list, type = "n",
-     xlim = c(0, 1), ylim = c(0, 1), xlab = "Nominal False Discovery Rate", ylab = "Empirical False Discovery Proportion", main = "Calibration of q values")
-lines(fdr.list, fdp.ash[[17]], col = "green")
-lines(fdr.list, fdp.gdash[[17]], col = "blue")
-lines(fdr.list, fdp.qvalue[[17]], col = "yellow")
-lines(fdr.list, fdp.BH[[17]])
-abline(0, 1, lty = 2, col = "red")
-legend("topleft", lty = 1, col = c("green", "blue", "yellow"), c("ASH", "GD-ASH", "qvalue"))
-```
-
 ```{r medium fsp, cache = TRUE, echo = FALSE}
 fsp = function (FSR, true, observation, predictor) {
   discovery = predictor <= FSR
@@ -716,11 +690,22 @@ for (i in 1 : m) {
 }
 ```
 
-```{r medium fsp plotting, cache = TRUE, echo = FALSE}
+```{r medium average fdp, cache = TRUE, echo = FALSE}
+plot(fdr.list, fdr.list, type = "n",
+     xlim = c(0, 1), ylim = c(0, 1), xlab = "Nominal False Discovery Rate", ylab = "Average False Discovery Proportion", main = "Calibration of pFDR")
+lines(fdr.list, colMeans(matrix(unlist(fdp.ash), nrow = m, byrow = TRUE)), col = "green")
+lines(fdr.list, colMeans(matrix(unlist(fdp.gdash), nrow = m, byrow = TRUE)), col = "blue")
+lines(fdr.list, colMeans(matrix(unlist(fdp.qvalue), nrow = m, byrow = TRUE)), col = "yellow")
+lines(fdr.list, colMeans(matrix(unlist(fdp.BH), nrow = m, byrow = TRUE)))
+abline(0, 1, lty = 2, col = "red")
+legend("topleft", lty = 1, col = c("green", "blue", "yellow", "black"), c("ASH", "GD-ASH", "qvalue", "BH"))
+```
+
+```{r medium average fsp, cache = TRUE, echo = FALSE}
 plot(fsr.list, fsr.list, type = "n",
-     xlim = c(0, 1), ylim = c(0, 1), xlab = "Nominal False Sign Rate", ylab = "Empirical False Sign Proportion", main = "Calibration of S values")
-lines(fsr.list, fsp.ash[[17]], col = "green")
-lines(fsr.list, fsp.gdash[[17]], col = "blue")
+     xlim = c(0, 1), ylim = c(0, 1), xlab = "Nominal False Discovery Rate", ylab = "Average False Sign Proportion", main = "Calibration of S values")
+lines(fsr.list, colMeans(matrix(unlist(fsp.ash), nrow = m, byrow = TRUE)), col = "green")
+lines(fsr.list, colMeans(matrix(unlist(fsp.gdash), nrow = m, byrow = TRUE)), col = "blue")
 abline(0, 1, lty = 2, col = "red")
 legend("topleft", lty = 1, col = c("green", "blue"), c("ASH", "GD-ASH"))
 ```
@@ -870,17 +855,6 @@ for (i in 1 : m) {
 }
 ```
 
-```{r big q-cali plotting, cache = TRUE, echo = FALSE}
-plot(fdr.list, fdr.list, type = "n",
-     xlim = c(0, 1), ylim = c(0, 1), xlab = "Nominal False Discovery Rate", ylab = "Empirical False Discovery Proportion", main = "Calibration of q values")
-lines(fdr.list, fdp.ash[[17]], col = "green")
-lines(fdr.list, fdp.gdash[[17]], col = "blue")
-lines(fdr.list, fdp.qvalue[[17]], col = "yellow")
-lines(fdr.list, fdp.BH[[17]])
-abline(0, 1, lty = 2, col = "red")
-legend("topleft", lty = 1, col = c("green", "blue", "yellow"), c("ASH", "GD-ASH", "qvalue"))
-```
-
 ```{r big fsp, cache = TRUE, echo = FALSE}
 fsp = function (FSR, true, observation, predictor) {
   discovery = predictor <= FSR
@@ -897,11 +871,22 @@ for (i in 1 : m) {
 }
 ```
 
-```{r big fsp plotting, cache = TRUE, echo = FALSE}
+```{r big average fdp, cache = TRUE, echo = FALSE}
+plot(fdr.list, fdr.list, type = "n",
+     xlim = c(0, 1), ylim = c(0, 1), xlab = "Nominal False Discovery Rate", ylab = "Average False Discovery Proportion", main = "Calibration of pFDR")
+lines(fdr.list, colMeans(matrix(unlist(fdp.ash), nrow = m, byrow = TRUE)), col = "green")
+lines(fdr.list, colMeans(matrix(unlist(fdp.gdash), nrow = m, byrow = TRUE)), col = "blue")
+lines(fdr.list, colMeans(matrix(unlist(fdp.qvalue), nrow = m, byrow = TRUE)), col = "yellow")
+lines(fdr.list, colMeans(matrix(unlist(fdp.BH), nrow = m, byrow = TRUE)))
+abline(0, 1, lty = 2, col = "red")
+legend("topleft", lty = 1, col = c("green", "blue", "yellow", "black"), c("ASH", "GD-ASH", "qvalue", "BH"))
+```
+
+```{r big average fsp, cache = TRUE, echo = FALSE}
 plot(fsr.list, fsr.list, type = "n",
-     xlim = c(0, 1), ylim = c(0, 1), xlab = "Nominal False Sign Rate", ylab = "Empirical False Sign Proportion", main = "Calibration of S values")
-lines(fsr.list, fsp.ash[[17]], col = "green")
-lines(fsr.list, fsp.gdash[[17]], col = "blue")
+     xlim = c(0, 1), ylim = c(0, 1), xlab = "Nominal False Discovery Rate", ylab = "Average False Sign Proportion", main = "Calibration of S values")
+lines(fsr.list, colMeans(matrix(unlist(fsp.ash), nrow = m, byrow = TRUE)), col = "green")
+lines(fsr.list, colMeans(matrix(unlist(fsp.gdash), nrow = m, byrow = TRUE)), col = "blue")
 abline(0, 1, lty = 2, col = "red")
 legend("topleft", lty = 1, col = c("green", "blue"), c("ASH", "GD-ASH"))
 ```
