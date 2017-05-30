@@ -1,0 +1,799 @@
+---
+title: "Simulation with Realistic Standard Error"
+author: "Lei Sun"
+date: 2017-05-27
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+```{r packages, message = FALSE, cache = TRUE}
+library(ashr)
+library(edgeR)
+library(limma)
+library(pROC)
+```
+
+```{r script, message = FALSE, cache = TRUE}
+source("../code/gdash.R")
+```
+
+```{r functions, include = FALSE, cache = TRUE}
+## selection top expressed genes
+top_genes_index = function (ngene, data) {return(order(rowSums(data), decreasing = TRUE)[1 : ngene])}
+
+lcpm = function(data) {R = colSums(data); t(log2(((t(data) + 0.5) / (R + 1)) * 10^6))}
+
+top_gene_selection = function (ngene, data) {
+  Y = lcpm(data)
+  subset = top_genes_index(ngene, data)
+  data = data[subset, ]
+  return(list(data = data, ngene = ngene))
+}
+
+## Generate realistic correlated z and sebetahat
+counts_to_summary = function (counts, design) {
+  dgecounts = calcNormFactors(DGEList(counts = counts, group = design[, 2]))
+  v = voom(dgecounts, design, plot = FALSE)
+  lim = lmFit(v)
+  r.ebayes = eBayes(lim)
+  p = r.ebayes$p.value[, 2]
+  t = r.ebayes$t[, 2]
+  z = sign(t) * qnorm(1 - p/2)
+  betahat = lim$coefficients[,2]
+  sebetahat = betahat / z
+  return (list(betahat = betahat, sebetahat = sebetahat, z = z))
+}
+
+## produce simulated true signals beta
+sample.g = function (g, n) {
+  UseMethod("sample.g")
+}
+
+sample.g.normalmix = function (g, n) {
+  K = length(g$pi)
+  beta = list()
+  for (i in 1 : K) {
+    beta[[i]] = rnorm(ceiling(n * g$pi[i]), g$mean[i], g$sd[i])
+  }
+  return(list(beta = sample(unlist(beta)), mixcompdist = "normal"))
+}
+
+sample.g.unimix = function(g, n) {
+  K = length(g$pi)
+  beta = list()
+  for (i in 1 : K) {
+    beta[[i]] = runif(ceiling(n * g$pi[i]), g$a[i], g$b[i])
+  }
+  return(list(beta = sample(unlist(beta)), mixcompdist = "uniform"))
+}
+```
+
+## Read in data
+
+```{r count data}
+data = readRDS("../data/liver.rds")
+ngene = 1e4
+data = top_gene_selection(ngene, data)$data
+```
+
+## Global Null
+
+$$
+g \equiv 0 \ .
+$$
+
+```{r null, cache = TRUE, echo = FALSE}
+set.seed(777)
+m = 300
+nsample = 5
+fit.ash = fit.gdash = g = beta = betahat = z = sebetahat = time.ash = fit.qvalue = time.qvalue = p = BH = time.gdash = time.gdash.ash = fit.gdash.ash = list()
+for(i in 1 : m){
+  counts = data[, sample(ncol(data), 2 * nsample)]
+  condition = c(rep(0, nsample), rep(1, nsample))
+  design = model.matrix(~condition)
+  summary = counts_to_summary(counts, design)
+  zhat = as.vector(summary$betahat)
+  sebetahat[[i]] = as.vector(summary$sebetahat)
+  z[[i]] = as.vector(summary$z)
+  betahat[[i]] = sebetahat[[i]] * z[[i]]
+  p[[i]] = (1 - pnorm(abs(betahat[[i]] / sebetahat[[i]]))) * 2
+  time.qvalue[[i]] <- system.time(fit.qvalue[[i]] <- qvalue::qvalue(p[[i]]))
+  time.ash[[i]] <- system.time(fit.ash[[i]] <- ashr::ash(betahat[[i]], sebetahat[[i]], mixcompdist = "normal", method = "fdr"))
+  time.gdash[[i]] <- system.time(fit.gdash[[i]] <- gdash(betahat[[i]], sebetahat[[i]]))
+  time.gdash.ash[[i]] <- system.time(fit.gdash.ash[[i]] <- ashr::ash(betahat[[i]], sebetahat[[i]], fixg = TRUE, g = fit.gdash[[i]]$fitted_g))
+  BH[[i]] <- p.adjust(p[[i]], method = "BH")
+}
+```
+
+```{r null plotting, cache = TRUE, echo = FALSE}
+pi0 = 1
+
+## pi0
+pi0.ash = pi0.gdash = pi0.qvalue = c()
+for (i in 1 : m) {
+  pi0.ash[i] = fit.ash[[i]]$fitted_g$pi[1]
+  pi0.gdash[i] = fit.gdash[[i]]$fitted_g$pi[1]
+  pi0.qvalue[i] = fit.qvalue[[i]]$pi0
+}
+
+par(mfrow = c(1, 2))
+## boxplot
+boxplot(pi0.ash, pi0.gdash, pi0.qvalue, ylim = c(0, 1), names = c("ASH", "GD-ASH", "qvalue"), ylab = expression(hat(pi)[0]), main = expression(hat(pi)[0]), las = 2)
+abline(h = pi0, lty = 2, col = "red")
+
+## scatterplot
+pi0.ash.diff = pi0.ash - pi0
+pi0.gdash.diff = pi0.gdash - pi0
+plot(pi0.ash.diff, pi0.gdash.diff, xlim = range(pi0.ash.diff, pi0.gdash.diff), ylim = range(pi0.ash.diff, pi0.gdash.diff),
+     xlab = expression(hat(pi)[0](ASH) - pi[0](True)),
+     ylab = expression(hat(pi)[0]("GD-ASH") - pi[0](True)),
+     main = expression(paste(hat(pi)[0], ": GD-ASH vs ASH"))
+     )
+points(0, 0, pch = 19, col = "red")
+abline(h = 0, lty = 2, col = "red")
+abline(v = 0, lty = 2, col = "red")
+abline(0, 1, lty = 2, col = "red")
+
+## MSE
+mse.mle = mse.ash = mse.gdash = c()
+for (i in 1 : m) {
+  mse.mle[i] = mean((betahat[[i]])^2)
+  mse.ash[i] = mean((ashr::get_pm(fit.ash[[i]]))^2)
+  mse.gdash[i] = mean((ashr::get_pm(fit.gdash.ash[[i]]))^2)
+}
+
+par(mfrow = c(1, 2))
+## boxplot
+boxplot(mse.mle, mse.ash, mse.gdash,
+        ylim = c(0, max(mse.ash, mse.gdash)),
+        names = c("MLE", "ASH", "GD-ASH"),
+        ylab = "MSE",
+        main = expression("MSE of Posterior Mean"),
+        las = 2
+        )
+
+## scatterplot
+plot(mse.ash, mse.gdash, xlab = "MSE(ASH)", ylab = "MSE(GD-ASH)", main = expression("MSE: GD-ASH vs ASH"),
+     xlim = range(mse.ash, mse.gdash),
+     ylim = range(mse.ash, mse.gdash)
+     )
+abline(0, 1, col = "red", lty = 2)
+```
+
+## SNR = 0
+
+$$
+g = 0.6\delta_0 + 0.3N\left(0, \sigma^2\right) + 0.1N\left(0, \left(2.65\sigma\right)^2\right) \ .
+$$
+
+```{r zero SNR, cache = TRUE, echo = FALSE}
+set.seed(777)
+m = 300
+nsample = 5
+fit.ash = fit.gdash = g = beta = betahat = z = sebetahat = time.ash = fit.qvalue = time.qvalue = p = BH = time.gdash = time.gdash.ash = fit.gdash.ash = list()
+for(i in 1 : m){
+  counts = data[, sample(ncol(data), 2 * nsample)]
+  condition = c(rep(0, nsample), rep(1, nsample))
+  design = model.matrix(~condition)
+  summary = counts_to_summary(counts, design)
+  zhat = as.vector(summary$betahat)
+  sebetahat[[i]] = as.vector(summary$sebetahat)
+  z[[i]] = as.vector(summary$z)
+  sigma1 = sqrt(mean(sebetahat[[i]]^2))
+  sigma2 = sqrt(7) * sigma1
+  g[[i]] = ashr::normalmix(pi = c(0.6, 0.3, 0.1), mean = 0, sd = c(0, sigma1, sigma2))
+  beta[[i]] = sample.g(g[[i]], nrow(data))$beta
+  betahat[[i]] = beta[[i]] + sebetahat[[i]] * z[[i]]
+  p[[i]] = (1 - pnorm(abs(betahat[[i]] / sebetahat[[i]]))) * 2
+  time.qvalue[[i]] <- system.time(fit.qvalue[[i]] <- qvalue::qvalue(p[[i]]))
+  time.ash[[i]] <- system.time(fit.ash[[i]] <- ashr::ash(betahat[[i]], sebetahat[[i]], mixcompdist = "normal", method = "fdr"))
+  time.gdash[[i]] <- system.time(fit.gdash[[i]] <- gdash(betahat[[i]], sebetahat[[i]]))
+  time.gdash.ash[[i]] <- system.time(fit.gdash.ash[[i]] <- ashr::ash(betahat[[i]], sebetahat[[i]], fixg = TRUE, g = fit.gdash[[i]]$fitted_g))
+  BH[[i]] <- p.adjust(p[[i]], method = "BH")
+}
+```
+
+```{r zero plotting, cache = TRUE, echo = FALSE}
+pi0 = 0.6
+
+## pi0
+pi0.ash = pi0.gdash = pi0.qvalue = c()
+for (i in 1 : m) {
+  pi0.ash[i] = fit.ash[[i]]$fitted_g$pi[1]
+  pi0.gdash[i] = fit.gdash[[i]]$fitted_g$pi[1]
+  pi0.qvalue[i] = fit.qvalue[[i]]$pi0
+}
+
+par(mfrow = c(1, 2))
+## boxplot
+boxplot(pi0.ash, pi0.gdash, pi0.qvalue, ylim = c(0, 1), names = c("ASH", "GD-ASH", "qvalue"), ylab = expression(hat(pi)[0]), main = expression(hat(pi)[0]), las = 2)
+abline(h = pi0, lty = 2, col = "red")
+
+## scatterplot
+pi0.ash.diff = pi0.ash - pi0
+pi0.gdash.diff = pi0.gdash - pi0
+plot(pi0.ash.diff, pi0.gdash.diff, xlim = range(pi0.ash.diff, pi0.gdash.diff), ylim = range(pi0.ash.diff, pi0.gdash.diff),
+     xlab = expression(hat(pi)[0](ASH) - pi[0](True)),
+     ylab = expression(hat(pi)[0]("GD-ASH") - pi[0](True)),
+     main = expression(paste(hat(pi)[0], ": GD-ASH vs ASH"))
+     )
+points(0, 0, pch = 19, col = "red")
+abline(h = 0, lty = 2, col = "red")
+abline(v = 0, lty = 2, col = "red")
+abline(0, 1, lty = 2, col = "red")
+
+## MSE
+mse.mle = mse.ash = mse.gdash = c()
+for (i in 1 : m) {
+  mse.mle[i] = mean((betahat[[i]])^2)
+  mse.ash[i] = mean((ashr::get_pm(fit.ash[[i]]))^2)
+  mse.gdash[i] = mean((ashr::get_pm(fit.gdash.ash[[i]]))^2)
+}
+
+par(mfrow = c(1, 2))
+## boxplot
+boxplot(mse.mle, mse.ash, mse.gdash,
+        ylim = c(0, max(mse.ash, mse.gdash)),
+        names = c("MLE", "ASH", "GD-ASH"),
+        ylab = "MSE",
+        main = expression("MSE of Posterior Mean"),
+        las = 2
+        )
+
+## scatterplot
+plot(mse.ash, mse.gdash, xlab = "MSE(ASH)", ylab = "MSE(GD-ASH)", main = expression("MSE: GD-ASH vs ASH"),
+     xlim = range(mse.ash, mse.gdash),
+     ylim = range(mse.ash, mse.gdash)
+     )
+abline(0, 1, col = "red", lty = 2)
+```
+
+```{r zero auc, cache = TRUE, echo = FALSE}
+## AUC
+auc.ash = auc.gdash = auc.qvalue = auc.pvalue = c()
+for (i in 1 : m) {
+  response = as.numeric(beta[[i]] != 0)
+  auc.ash[i] = pROC::roc(response, ashr::get_lfdr(fit.ash[[i]]))$auc
+  auc.gdash[i] = pROC::roc(response, ashr::get_lfdr(fit.gdash.ash[[i]]))$auc
+  auc.qvalue[i] = pROC::roc(response, fit.qvalue[[i]]$lfdr)$auc
+  auc.pvalue[i] = pROC::roc(response, p[[i]])$auc
+}
+```
+
+```{r zero auc BH, cache = TRUE, echo = FALSE}
+auc.BH = c()
+for (i in 1 : m) {
+  response = as.numeric(beta[[i]] != 0)
+  auc.BH[i] = pROC::roc(response, BH[[i]])$auc
+}
+```
+
+```{r zero auc plotting, cache = TRUE, echo = FALSE}
+par(mfrow = c(1, 2))
+## boxplot
+boxplot(auc.pvalue, auc.ash, auc.gdash, auc.qvalue, auc.BH, names = c("p-value", "ASH", "GD-ASH", "qvalue", "BH"), ylim = c(0, 1), ylab = "AUC", main = expression("Area Under the ROC Curve"), las = 2)
+abline(h = 0.5, lty = 2, col = "red")
+legend("bottom", lty = 2, col = "red", "AUC = 0.5 baseline")
+
+## scatterplot
+plot(auc.ash, auc.gdash, xlab = "AUC(ASH)", ylab = "AUC(GD-ASH)", main = expression("AUC: GD-ASH vs ASH"), xlim = range(auc.ash, auc.gdash), ylim = range(auc.ash, auc.gdash))
+abline(0, 1, col = "red", lty = 2)
+```
+
+```{r zero q-cali, cache = TRUE, echo = FALSE}
+fdp = function (FDR, response, predictor) {
+  return(1 - mean(response[predictor <= FDR]))
+}
+fdp.ash = fdp.gdash = fdp.qvalue = fdp.BH = list()
+fdr.list = seq(0, 1, 0.001)
+for (i in 1 : m) {
+  response = (beta[[i]] != 0)
+  qvalue.ash = ashr::get_qvalue(fit.ash[[i]])
+  qvalue.gdash = ashr::get_qvalue(fit.gdash.ash[[i]])
+  qvalue.qvalue = fit.qvalue[[i]]$qvalues
+  fdp.ash[[i]] = sapply(fdr.list, fdp, response = response, predictor = qvalue.ash)
+  fdp.gdash[[i]] = sapply(fdr.list, fdp, response = response, predictor = qvalue.gdash)
+  fdp.qvalue[[i]] = sapply(fdr.list, fdp, response = response, qvalue.qvalue)
+  fdp.BH[[i]] = sapply(fdr.list, fdp, response = response, BH[[i]])
+}
+```
+
+```{r zero q-cali plotting, cache = TRUE, echo = FALSE}
+plot(fdr.list, fdr.list, type = "n",
+     xlim = c(0, 1), ylim = c(0, 1), xlab = "Nominal False Discovery Rate", ylab = "Empirical False Discovery Proportion", main = "Calibration of q values")
+lines(fdr.list, fdp.ash[[77]], col = "green")
+lines(fdr.list, fdp.gdash[[77]], col = "blue")
+lines(fdr.list, fdp.qvalue[[77]], col = "yellow")
+lines(fdr.list, fdp.BH[[77]])
+abline(0, 1, lty = 2, col = "red")
+legend("topleft", lty = 1, col = c("green", "blue", "yellow"), c("ASH", "GD-ASH", "qvalue"))
+```
+
+## SNR = 2
+
+$$
+g = 0.6\delta_0 + 0.3N\left(0, \sigma^2\right) + 0.1N\left(0, \left(3.58\sigma\right)^2\right) \ .
+$$
+
+```{r small SNR, cache = TRUE, echo = FALSE}
+set.seed(777)
+m = 300
+nsample = 5
+fit.ash = fit.gdash = g = beta = betahat = z = sebetahat = time.ash = fit.qvalue = time.qvalue = p = BH = time.gdash = list()
+k = sqrt((10^0.2 - 0.3) * 10)
+for(i in 1 : m){
+  counts = data[, sample(ncol(data), 2 * nsample)]
+  condition = c(rep(0, nsample), rep(1, nsample))
+  design = model.matrix(~condition)
+  summary = counts_to_summary(counts, design)
+  zhat = as.vector(summary$betahat)
+  sebetahat[[i]] = as.vector(summary$sebetahat)
+  z[[i]] = as.vector(summary$z)
+  sigma1 = sqrt(mean(sebetahat[[i]]^2))
+  sigma2 = k * sqrt(mean(sebetahat[[i]]^2))
+  g[[i]] = ashr::normalmix(pi = c(0.6, 0.3, 0.1), mean = 0, sd = c(0, sigma1, sigma2))
+  beta[[i]] = sample.g(g[[i]], nrow(data))$beta
+  betahat[[i]] = beta[[i]] + sebetahat[[i]] * z[[i]]
+  p[[i]] = (1 - pnorm(abs(betahat[[i]] / sebetahat[[i]]))) * 2
+  time.qvalue[[i]] <- system.time(fit.qvalue[[i]] <- qvalue::qvalue(p[[i]]))
+  time.ash[[i]] <- system.time(fit.ash[[i]] <- ashr::ash(betahat[[i]], sebetahat[[i]], mixcompdist = "normal", method = "fdr"))
+  time.gdash[[i]] <- system.time(fit.gdash[[i]] <- gdash(betahat[[i]], sebetahat[[i]]))
+  BH[[i]] <- p.adjust(p[[i]], method = "BH")
+}
+```
+
+```{r small SNR gdash, cache = TRUE, echo = FALSE}
+time.gdash.ash = fit.gdash.ash = list()
+for (i in 1 : m) {
+  time.gdash.ash[[i]] <- system.time(fit.gdash.ash[[i]] <- ashr::ash(betahat[[i]], sebetahat[[i]], fixg = TRUE, g = fit.gdash[[i]]$fitted_g))
+}
+```
+
+```{r small plotting, cache = TRUE, echo = FALSE}
+pi0 = 0.6
+
+## pi0
+pi0.ash = pi0.gdash = pi0.qvalue = c()
+for (i in 1 : m) {
+  pi0.ash[i] = fit.ash[[i]]$fitted_g$pi[1]
+  pi0.gdash[i] = fit.gdash[[i]]$fitted_g$pi[1]
+  pi0.qvalue[i] = fit.qvalue[[i]]$pi0
+}
+
+par(mfrow = c(1, 2))
+## boxplot
+boxplot(pi0.ash, pi0.gdash, pi0.qvalue, ylim = c(0, 1), names = c("ASH", "GD-ASH", "qvalue"), ylab = expression(hat(pi)[0]), main = expression(hat(pi)[0]), las = 2)
+abline(h = pi0, lty = 2, col = "red")
+
+## scatterplot
+pi0.ash.diff = pi0.ash - pi0
+pi0.gdash.diff = pi0.gdash - pi0
+plot(pi0.ash.diff, pi0.gdash.diff, xlim = range(pi0.ash.diff, pi0.gdash.diff), ylim = range(pi0.ash.diff, pi0.gdash.diff),
+     xlab = expression(hat(pi)[0](ASH) - pi[0](True)),
+     ylab = expression(hat(pi)[0]("GD-ASH") - pi[0](True)),
+     main = expression(paste(hat(pi)[0], ": GD-ASH vs ASH"))
+     )
+points(0, 0, pch = 19, col = "red")
+abline(h = 0, lty = 2, col = "red")
+abline(v = 0, lty = 2, col = "red")
+abline(0, 1, lty = 2, col = "red")
+
+## MSE
+mse.mle = mse.ash = mse.gdash = c()
+for (i in 1 : m) {
+  mse.mle[i] = mean((betahat[[i]])^2)
+  mse.ash[i] = mean((ashr::get_pm(fit.ash[[i]]))^2)
+  mse.gdash[i] = mean((ashr::get_pm(fit.gdash.ash[[i]]))^2)
+}
+
+par(mfrow = c(1, 2))
+## boxplot
+boxplot(mse.mle, mse.ash, mse.gdash,
+        ylim = c(0, max(mse.ash, mse.gdash)),
+        names = c("MLE", "ASH", "GD-ASH"),
+        ylab = "MSE",
+        main = expression("MSE of Posterior Mean"),
+        las = 2
+        )
+
+## scatterplot
+plot(mse.ash, mse.gdash, xlab = "MSE(ASH)", ylab = "MSE(GD-ASH)", main = expression("MSE: GD-ASH vs ASH"),
+     xlim = range(mse.ash, mse.gdash),
+     ylim = range(mse.ash, mse.gdash)
+     )
+abline(0, 1, col = "red", lty = 2)
+```
+
+```{r small auc, cache = TRUE, echo = FALSE}
+## AUC
+auc.ash = auc.gdash = auc.qvalue = auc.pvalue = c()
+for (i in 1 : m) {
+  response = as.numeric(beta[[i]] != 0)
+  auc.ash[i] = pROC::roc(response, ashr::get_lfdr(fit.ash[[i]]))$auc
+  auc.gdash[i] = pROC::roc(response, ashr::get_lfdr(fit.gdash.ash[[i]]))$auc
+  auc.qvalue[i] = pROC::roc(response, fit.qvalue[[i]]$lfdr)$auc
+  auc.pvalue[i] = pROC::roc(response, p[[i]])$auc
+}
+```
+
+```{r small auc BH, cache = TRUE, echo = FALSE}
+auc.BH = c()
+for (i in 1 : m) {
+  response = as.numeric(beta[[i]] != 0)
+  auc.BH[i] = pROC::roc(response, BH[[i]])$auc
+}
+```
+
+```{r small auc plotting, cache = TRUE, echo = FALSE}
+par(mfrow = c(1, 2))
+## boxplot
+boxplot(auc.pvalue, auc.ash, auc.gdash, auc.qvalue, auc.BH, names = c("p-value", "ASH", "GD-ASH", "qvalue", "BH"), ylim = c(0, 1), ylab = "AUC", main = expression("Area Under the ROC Curve"), las = 2)
+abline(h = 0.5, lty = 2, col = "red")
+legend("bottom", lty = 2, col = "red", "AUC = 0.5 baseline")
+
+## scatterplot
+plot(auc.ash, auc.gdash, xlab = "AUC(ASH)", ylab = "AUC(GD-ASH)", main = expression("AUC: GD-ASH vs ASH"), xlim = range(auc.ash, auc.gdash), ylim = range(auc.ash, auc.gdash))
+abline(0, 1, col = "red", lty = 2)
+```
+
+```{r small q-cali, cache = TRUE, echo = FALSE}
+fdp = function (FDR, response, predictor) {
+  return(1 - mean(response[predictor <= FDR]))
+}
+fdp.ash = fdp.gdash = fdp.qvalue = fdp.BH = list()
+fdr.list = seq(0, 1, 0.001)
+for (i in 1 : m) {
+  response = (beta[[i]] != 0)
+  qvalue.ash = ashr::get_qvalue(fit.ash[[i]])
+  qvalue.gdash = ashr::get_qvalue(fit.gdash.ash[[i]])
+  qvalue.qvalue = fit.qvalue[[i]]$qvalues
+  fdp.ash[[i]] = sapply(fdr.list, fdp, response = response, predictor = qvalue.ash)
+  fdp.gdash[[i]] = sapply(fdr.list, fdp, response = response, predictor = qvalue.gdash)
+  fdp.qvalue[[i]] = sapply(fdr.list, fdp, response = response, qvalue.qvalue)
+  fdp.BH[[i]] = sapply(fdr.list, fdp, response = response, BH[[i]])
+}
+```
+
+```{r small q-cali plotting, cache = TRUE, echo = FALSE}
+plot(fdr.list, fdr.list, type = "n",
+     xlim = c(0, 1), ylim = c(0, 1), xlab = "Nominal False Discovery Rate", ylab = "Empirical False Discovery Proportion", main = "Calibration of q values")
+lines(fdr.list, fdp.ash[[77]], col = "green")
+lines(fdr.list, fdp.gdash[[77]], col = "blue")
+lines(fdr.list, fdp.qvalue[[77]], col = "yellow")
+lines(fdr.list, fdp.BH[[77]])
+abline(0, 1, lty = 2, col = "red")
+legend("topleft", lty = 1, col = c("green", "blue", "yellow"), c("ASH", "GD-ASH", "qvalue"))
+```
+
+
+## SNR = 5
+
+$$
+g = 0.6\delta_0 + 0.3N\left(0, \left(2\sigma\right)^2\right) + 0.1N\left(0, \left(4.43\sigma\right)^2\right) \ .
+$$
+
+```{r medium SNR, cache = TRUE, echo = FALSE}
+set.seed(777)
+m = 300
+nsample = 5
+fit.ash = fit.gdash = g = beta = betahat = z = sebetahat = time.ash = fit.qvalue = time.qvalue = p = BH = time.gdash = time.gdash.ash = fit.gdash.ash = list()
+k = sqrt((10^0.5 - 1.2) * 10)
+for(i in 1 : m){
+  counts = data[, sample(ncol(data), 2 * nsample)]
+  condition = c(rep(0, nsample), rep(1, nsample))
+  design = model.matrix(~condition)
+  summary = counts_to_summary(counts, design)
+  zhat = as.vector(summary$betahat)
+  sebetahat[[i]] = as.vector(summary$sebetahat)
+  z[[i]] = as.vector(summary$z)
+  sigma1 = 2 * sqrt(mean(sebetahat[[i]]^2))
+  sigma2 = k * sqrt(mean(sebetahat[[i]]^2))
+  g[[i]] = ashr::normalmix(pi = c(0.6, 0.3, 0.1), mean = 0, sd = c(0, sigma1, sigma2))
+  beta[[i]] = sample.g(g[[i]], nrow(data))$beta
+  betahat[[i]] = beta[[i]] + sebetahat[[i]] * z[[i]]
+  p[[i]] = (1 - pnorm(abs(betahat[[i]] / sebetahat[[i]]))) * 2
+  time.qvalue[[i]] <- system.time(fit.qvalue[[i]] <- qvalue::qvalue(p[[i]]))
+  time.ash[[i]] <- system.time(fit.ash[[i]] <- ashr::ash(betahat[[i]], sebetahat[[i]], mixcompdist = "normal", method = "fdr"))
+  time.gdash[[i]] <- system.time(fit.gdash[[i]] <- gdash(betahat[[i]], sebetahat[[i]]))
+  time.gdash.ash[[i]] <- system.time(fit.gdash.ash[[i]] <- ashr::ash(betahat[[i]], sebetahat[[i]], fixg = TRUE, g = fit.gdash[[i]]$fitted_g))
+  BH[[i]] <- p.adjust(p[[i]], method = "BH")
+}
+```
+
+```{r medium plotting, cache = TRUE, echo = FALSE}
+pi0 = 0.6
+
+## pi0
+pi0.ash = pi0.gdash = pi0.qvalue = c()
+for (i in 1 : m) {
+  pi0.ash[i] = fit.ash[[i]]$fitted_g$pi[1]
+  pi0.gdash[i] = fit.gdash[[i]]$fitted_g$pi[1]
+  pi0.qvalue[i] = fit.qvalue[[i]]$pi0
+}
+
+par(mfrow = c(1, 2))
+## boxplot
+boxplot(pi0.ash, pi0.gdash, pi0.qvalue, ylim = c(0, 1), names = c("ASH", "GD-ASH", "qvalue"), ylab = expression(hat(pi)[0]), main = expression(hat(pi)[0]), las = 2)
+abline(h = pi0, lty = 2, col = "red")
+
+## scatterplot
+pi0.ash.diff = pi0.ash - pi0
+pi0.gdash.diff = pi0.gdash - pi0
+plot(pi0.ash.diff, pi0.gdash.diff, xlim = range(pi0.ash.diff, pi0.gdash.diff), ylim = range(pi0.ash.diff, pi0.gdash.diff),
+     xlab = expression(hat(pi)[0](ASH) - pi[0](True)),
+     ylab = expression(hat(pi)[0]("GD-ASH") - pi[0](True)),
+     main = expression(paste(hat(pi)[0], ": GD-ASH vs ASH"))
+     )
+points(0, 0, pch = 19, col = "red")
+abline(h = 0, lty = 2, col = "red")
+abline(v = 0, lty = 2, col = "red")
+abline(0, 1, lty = 2, col = "red")
+
+## MSE
+mse.mle = mse.ash = mse.gdash = c()
+for (i in 1 : m) {
+  mse.mle[i] = mean((betahat[[i]])^2)
+  mse.ash[i] = mean((ashr::get_pm(fit.ash[[i]]))^2)
+  mse.gdash[i] = mean((ashr::get_pm(fit.gdash.ash[[i]]))^2)
+}
+
+par(mfrow = c(1, 2))
+## boxplot
+boxplot(mse.mle, mse.ash, mse.gdash,
+        ylim = c(0, max(mse.ash, mse.gdash)),
+        names = c("MLE", "ASH", "GD-ASH"),
+        ylab = "MSE",
+        main = expression("MSE of Posterior Mean"),
+        las = 2
+        )
+
+## scatterplot
+plot(mse.ash, mse.gdash, xlab = "MSE(ASH)", ylab = "MSE(GD-ASH)", main = expression("MSE: GD-ASH vs ASH"),
+     xlim = range(mse.ash, mse.gdash),
+     ylim = range(mse.ash, mse.gdash)
+     )
+abline(0, 1, col = "red", lty = 2)
+```
+
+```{r medium auc, cache = TRUE, echo = FALSE}
+## AUC
+auc.ash = auc.gdash = auc.qvalue = auc.pvalue = c()
+for (i in 1 : m) {
+  response = as.numeric(beta[[i]] != 0)
+  auc.ash[i] = pROC::roc(response, ashr::get_lfdr(fit.ash[[i]]))$auc
+  auc.gdash[i] = pROC::roc(response, ashr::get_lfdr(fit.gdash.ash[[i]]))$auc
+  auc.qvalue[i] = pROC::roc(response, fit.qvalue[[i]]$lfdr)$auc
+  auc.pvalue[i] = pROC::roc(response, p[[i]])$auc
+}
+```
+
+```{r medium auc BH, cache = TRUE, echo = FALSE}
+auc.BH = c()
+for (i in 1 : m) {
+  response = as.numeric(beta[[i]] != 0)
+  auc.BH[i] = pROC::roc(response, BH[[i]])$auc
+}
+```
+
+```{r medium auc plotting, cache = TRUE, echo = FALSE}
+par(mfrow = c(1, 2))
+## boxplot
+boxplot(auc.pvalue, auc.ash, auc.gdash, auc.qvalue, auc.BH, names = c("p-value", "ASH", "GD-ASH", "qvalue", "BH"), ylim = c(0, 1), ylab = "AUC", main = expression("Area Under the ROC Curve"), las = 2)
+abline(h = 0.5, lty = 2, col = "red")
+legend("bottom", lty = 2, col = "red", "AUC = 0.5 baseline")
+
+## scatterplot
+plot(auc.ash, auc.gdash, xlab = "AUC(ASH)", ylab = "AUC(GD-ASH)", main = expression("AUC: GD-ASH vs ASH"), xlim = range(auc.ash, auc.gdash), ylim = range(auc.ash, auc.gdash))
+abline(0, 1, col = "red", lty = 2)
+```
+
+```{r medium q-cali, cache = TRUE, echo = FALSE}
+fdp = function (FDR, response, predictor) {
+  return(1 - mean(response[predictor <= FDR]))
+}
+fdp.ash = fdp.gdash = fdp.qvalue = fdp.BH = list()
+fdr.list = seq(0, 1, 0.001)
+for (i in 1 : m) {
+  response = (beta[[i]] != 0)
+  qvalue.ash = ashr::get_qvalue(fit.ash[[i]])
+  qvalue.gdash = ashr::get_qvalue(fit.gdash.ash[[i]])
+  qvalue.qvalue = fit.qvalue[[i]]$qvalues
+  fdp.ash[[i]] = sapply(fdr.list, fdp, response = response, predictor = qvalue.ash)
+  fdp.gdash[[i]] = sapply(fdr.list, fdp, response = response, predictor = qvalue.gdash)
+  fdp.qvalue[[i]] = sapply(fdr.list, fdp, response = response, qvalue.qvalue)
+  fdp.BH[[i]] = sapply(fdr.list, fdp, response = response, BH[[i]])
+}
+```
+
+```{r medium q-cali plotting, cache = TRUE, echo = FALSE}
+plot(fdr.list, fdr.list, type = "n",
+     xlim = c(0, 1), ylim = c(0, 1), xlab = "Nominal False Discovery Rate", ylab = "Empirical False Discovery Proportion", main = "Calibration of q values")
+lines(fdr.list, fdp.ash[[77]], col = "green")
+lines(fdr.list, fdp.gdash[[77]], col = "blue")
+lines(fdr.list, fdp.qvalue[[77]], col = "yellow")
+lines(fdr.list, fdp.BH[[77]])
+abline(0, 1, lty = 2, col = "red")
+legend("topleft", lty = 1, col = c("green", "blue", "yellow"), c("ASH", "GD-ASH", "qvalue"))
+```
+
+## SNR = 10
+
+$$
+g = 0.6\delta_0 + 0.3N\left(0, \left(3\sigma\right)^2\right) + 0.1N\left(0, \left(8.54\sigma\right)^2\right) \ .
+$$
+
+```{r big SNR, cache = TRUE, echo = FALSE}
+set.seed(777)
+m = 300
+nsample = 5
+fit.ash = fit.gdash = g = beta = betahat = z = sebetahat = time.ash = fit.qvalue = time.qvalue = p = BH = time.gdash = list()
+k = sqrt((10 - 0.3 * 9) * 10)
+for(i in 1 : m){
+  counts = data[, sample(ncol(data), 2 * nsample)]
+  condition = c(rep(0, nsample), rep(1, nsample))
+  design = model.matrix(~condition)
+  summary = counts_to_summary(counts, design)
+  zhat = as.vector(summary$betahat)
+  sebetahat[[i]] = as.vector(summary$sebetahat)
+  z[[i]] = as.vector(summary$z)
+  sigma1 = 3 * sqrt(mean(sebetahat[[i]]^2))
+  sigma2 = k * sqrt(mean(sebetahat[[i]]^2))
+  g[[i]] = ashr::normalmix(pi = c(0.6, 0.3, 0.1), mean = 0, sd = c(0, sigma1, sigma2))
+  beta[[i]] = sample.g(g[[i]], nrow(data))$beta
+  betahat[[i]] = beta[[i]] + sebetahat[[i]] * z[[i]]
+  p[[i]] = (1 - pnorm(abs(betahat[[i]] / sebetahat[[i]]))) * 2
+  time.qvalue[[i]] <- system.time(fit.qvalue[[i]] <- qvalue::qvalue(p[[i]]))
+  time.ash[[i]] <- system.time(fit.ash[[i]] <- ashr::ash(betahat[[i]], sebetahat[[i]], mixcompdist = "normal", method = "fdr"))
+  time.gdash[[i]] <- system.time(fit.gdash[[i]] <- gdash(betahat[[i]], sebetahat[[i]]))
+  BH[[i]] <- p.adjust(p[[i]], method = "BH")
+}
+```
+
+```{r big SNR gdash, cache = TRUE, echo = FALSE}
+time.gdash.ash = fit.gdash.ash = list()
+for (i in 1 : m) {
+  time.gdash.ash[[i]] <- system.time(fit.gdash.ash[[i]] <- ashr::ash(betahat[[i]], sebetahat[[i]], fixg = TRUE, g = fit.gdash[[i]]$fitted_g))
+}
+```
+
+```{r big plotting, cache = TRUE, echo = FALSE}
+pi0 = 0.6
+
+## pi0
+pi0.ash = pi0.gdash = pi0.qvalue = c()
+for (i in 1 : m) {
+  pi0.ash[i] = fit.ash[[i]]$fitted_g$pi[1]
+  pi0.gdash[i] = fit.gdash[[i]]$fitted_g$pi[1]
+  pi0.qvalue[i] = fit.qvalue[[i]]$pi0
+}
+
+par(mfrow = c(1, 2))
+## boxplot
+boxplot(pi0.ash, pi0.gdash, pi0.qvalue, ylim = c(0, 1), names = c("ASH", "GD-ASH", "qvalue"), ylab = expression(hat(pi)[0]), main = expression(hat(pi)[0]), las = 2)
+abline(h = pi0, lty = 2, col = "red")
+
+## scatterplot
+pi0.ash.diff = pi0.ash - pi0
+pi0.gdash.diff = pi0.gdash - pi0
+plot(pi0.ash.diff, pi0.gdash.diff, xlim = range(pi0.ash.diff, pi0.gdash.diff), ylim = range(pi0.ash.diff, pi0.gdash.diff),
+     xlab = expression(hat(pi)[0](ASH) - pi[0](True)),
+     ylab = expression(hat(pi)[0]("GD-ASH") - pi[0](True)),
+     main = expression(paste(hat(pi)[0], ": GD-ASH vs ASH"))
+     )
+points(0, 0, pch = 19, col = "red")
+abline(h = 0, lty = 2, col = "red")
+abline(v = 0, lty = 2, col = "red")
+abline(0, 1, lty = 2, col = "red")
+
+## MSE
+mse.mle = mse.ash = mse.gdash = c()
+for (i in 1 : m) {
+  mse.mle[i] = mean((betahat[[i]])^2)
+  mse.ash[i] = mean((ashr::get_pm(fit.ash[[i]]))^2)
+  mse.gdash[i] = mean((ashr::get_pm(fit.gdash.ash[[i]]))^2)
+}
+
+par(mfrow = c(1, 2))
+## boxplot
+boxplot(mse.mle, mse.ash, mse.gdash,
+        ylim = c(0, max(mse.ash, mse.gdash)),
+        names = c("MLE", "ASH", "GD-ASH"),
+        ylab = "MSE",
+        main = expression("MSE of Posterior Mean"),
+        las = 2
+        )
+
+## scatterplot
+plot(mse.ash, mse.gdash, xlab = "MSE(ASH)", ylab = "MSE(GD-ASH)", main = expression("MSE: GD-ASH vs ASH"),
+     xlim = range(mse.ash, mse.gdash),
+     ylim = range(mse.ash, mse.gdash)
+     )
+abline(0, 1, col = "red", lty = 2)
+```
+
+```{r big auc, cache = TRUE, echo = FALSE}
+## AUC
+auc.ash = auc.gdash = auc.qvalue = auc.pvalue = c()
+for (i in 1 : m) {
+  response = as.numeric(beta[[i]] != 0)
+  auc.ash[i] = pROC::roc(response, ashr::get_lfdr(fit.ash[[i]]))$auc
+  auc.gdash[i] = pROC::roc(response, ashr::get_lfdr(fit.gdash.ash[[i]]))$auc
+  auc.qvalue[i] = pROC::roc(response, fit.qvalue[[i]]$lfdr)$auc
+  auc.pvalue[i] = pROC::roc(response, p[[i]])$auc
+}
+```
+
+```{r big auc BH, cache = TRUE, echo = FALSE}
+auc.BH = c()
+for (i in 1 : m) {
+  response = as.numeric(beta[[i]] != 0)
+  auc.BH[i] = pROC::roc(response, BH[[i]])$auc
+}
+```
+
+```{r big auc plotting, cache = TRUE, echo = FALSE}
+par(mfrow = c(1, 2))
+## boxplot
+boxplot(auc.pvalue, auc.ash, auc.gdash, auc.qvalue, auc.BH, names = c("p-value", "ASH", "GD-ASH", "qvalue", "BH"), ylim = c(0, 1), ylab = "AUC", main = expression("Area Under the ROC Curve"), las = 2)
+abline(h = 0.5, lty = 2, col = "red")
+legend("bottom", lty = 2, col = "red", "AUC = 0.5 baseline")
+
+## scatterplot
+plot(auc.ash, auc.gdash, xlab = "AUC(ASH)", ylab = "AUC(GD-ASH)", main = expression("AUC: GD-ASH vs ASH"), xlim = range(auc.ash, auc.gdash), ylim = range(auc.ash, auc.gdash))
+abline(0, 1, col = "red", lty = 2)
+```
+
+```{r big q-cali, cache = TRUE, echo = FALSE}
+fdp = function (FDR, response, predictor) {
+  return(1 - mean(response[predictor <= FDR]))
+}
+fdp.ash = fdp.gdash = fdp.qvalue = fdp.BH = list()
+fdr.list = seq(0, 1, 0.001)
+for (i in 1 : m) {
+  response = (beta[[i]] != 0)
+  qvalue.ash = ashr::get_qvalue(fit.ash[[i]])
+  qvalue.gdash = ashr::get_qvalue(fit.gdash.ash[[i]])
+  qvalue.qvalue = fit.qvalue[[i]]$qvalues
+  fdp.ash[[i]] = sapply(fdr.list, fdp, response = response, predictor = qvalue.ash)
+  fdp.gdash[[i]] = sapply(fdr.list, fdp, response = response, predictor = qvalue.gdash)
+  fdp.qvalue[[i]] = sapply(fdr.list, fdp, response = response, qvalue.qvalue)
+  fdp.BH[[i]] = sapply(fdr.list, fdp, response = response, BH[[i]])
+}
+```
+
+```{r big q-cali plotting, cache = TRUE, echo = FALSE}
+plot(fdr.list, fdr.list, type = "n",
+     xlim = c(0, 1), ylim = c(0, 1), xlab = "Nominal False Discovery Rate", ylab = "Empirical False Discovery Proportion", main = "Calibration of q values")
+lines(fdr.list, fdp.ash[[77]], col = "green")
+lines(fdr.list, fdp.gdash[[77]], col = "blue")
+lines(fdr.list, fdp.qvalue[[77]], col = "yellow")
+lines(fdr.list, fdp.BH[[77]])
+abline(0, 1, lty = 2, col = "red")
+legend("topleft", lty = 1, col = c("green", "blue", "yellow"), c("ASH", "GD-ASH", "qvalue"))
+```
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```
