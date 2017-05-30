@@ -231,8 +231,8 @@ gauss.deriv = function(x, ord) {
 }
 
 Hermite = function (gd.ord) {
-  x <- polynom()
-  H <- polylist(x, - 1 + x^2)
+  x <- PolynomF::polynom()
+  H <- PolynomF::polylist(x, - 1 + x^2)
   if (gd.ord >= 3) {
     for(n in 2 : (gd.ord - 1))
       H[[n+1]] <- x * H[[n]] - n * H[[n-1]]
