@@ -321,12 +321,52 @@ for (i in 1 : m) {
 ```{r zero q-cali plotting, cache = TRUE, echo = FALSE}
 plot(fdr.list, fdr.list, type = "n",
      xlim = c(0, 1), ylim = c(0, 1), xlab = "Nominal False Discovery Rate", ylab = "Empirical False Discovery Proportion", main = "Calibration of q values")
-lines(fdr.list, fdp.ash[[77]], col = "green")
-lines(fdr.list, fdp.gdash[[77]], col = "blue")
-lines(fdr.list, fdp.qvalue[[77]], col = "yellow")
-lines(fdr.list, fdp.BH[[77]])
+lines(fdr.list, fdp.ash[[17]], col = "green")
+lines(fdr.list, fdp.gdash[[17]], col = "blue")
+lines(fdr.list, fdp.qvalue[[17]], col = "yellow")
+lines(fdr.list, fdp.BH[[17]])
 abline(0, 1, lty = 2, col = "red")
-legend("topleft", lty = 1, col = c("green", "blue", "yellow"), c("ASH", "GD-ASH", "qvalue"))
+legend("topleft", lty = 1, col = c("green", "blue", "yellow", "black"), c("ASH", "GD-ASH", "qvalue", "BH"))
+```
+
+```{r zero fsp, cache = TRUE, echo = FALSE}
+fsp = function (FSR, true, observation, predictor) {
+  discovery = predictor <= FSR
+  return(mean(sign(observation[discovery]) != true[discovery]))
+}
+fsp.ash = fsp.gdash = list()
+fsr.list = seq(0, 1, 0.001)
+for (i in 1 : m) {
+  true = sign(beta[[i]])
+  svalue.ash = ashr::get_svalue(fit.ash[[i]])
+  svalue.gdash = ashr::get_svalue(fit.gdash.ash[[i]])
+  fsp.ash[[i]] = sapply(fsr.list, fsp, true = true, observation = betahat[[i]], predictor = svalue.ash)
+  fsp.gdash[[i]] = sapply(fsr.list, fsp, true = true, observation = betahat[[i]], predictor = svalue.gdash)
+}
+```
+
+```{r zero fsp gdash-ash, cache = TRUE, echo = FALSE, eval = FALSE}
+K = (fsr.list <= 0.5)
+fsp.ash.diff = fsp.gdash.diff = c()
+for (i in 1 : m) {
+  fsp.ash.diff[i] = mean(abs(fsp.ash[[i]][1 : K] - fsr.list[1 : K]))
+  fsp.gdash.diff[i] = mean(abs(fsp.gdash[[i]][1 : K] - fsr.list[1 : K]))
+}
+boxplot(fsp.ash.diff, fsp.gdash.diff, 
+        names = c("ASH", "GD-ASH"),
+        ylab = expression("FSP - FSR")
+)
+plot(fsp.ash.diff, fsp.gdash.diff, xlim = range(fsp.ash.diff, fsp.gdash.diff), ylim = range(fsp.ash.diff, fsp.gdash.diff), xlab = "ASH", ylab = "GD-ASH")
+abline(0, 1, lty = 2, col = "red")
+```
+
+```{r zero fsp plotting, cache = TRUE, echo = FALSE}
+plot(fsr.list, fsr.list, type = "n",
+     xlim = c(0, 1), ylim = c(0, 1), xlab = "Nominal False Sign Rate", ylab = "Empirical False Sign Proportion", main = "Calibration of S values")
+lines(fsr.list, fsp.ash[[17]], col = "green")
+lines(fsr.list, fsp.gdash[[17]], col = "blue")
+abline(0, 1, lty = 2, col = "red")
+legend("topleft", lty = 1, col = c("green", "blue"), c("ASH", "GD-ASH"))
 ```
 
 ## SNR = 2
@@ -477,14 +517,38 @@ for (i in 1 : m) {
 ```{r small q-cali plotting, cache = TRUE, echo = FALSE}
 plot(fdr.list, fdr.list, type = "n",
      xlim = c(0, 1), ylim = c(0, 1), xlab = "Nominal False Discovery Rate", ylab = "Empirical False Discovery Proportion", main = "Calibration of q values")
-lines(fdr.list, fdp.ash[[77]], col = "green")
-lines(fdr.list, fdp.gdash[[77]], col = "blue")
-lines(fdr.list, fdp.qvalue[[77]], col = "yellow")
-lines(fdr.list, fdp.BH[[77]])
+lines(fdr.list, fdp.ash[[17]], col = "green")
+lines(fdr.list, fdp.gdash[[17]], col = "blue")
+lines(fdr.list, fdp.qvalue[[17]], col = "yellow")
+lines(fdr.list, fdp.BH[[17]])
 abline(0, 1, lty = 2, col = "red")
 legend("topleft", lty = 1, col = c("green", "blue", "yellow"), c("ASH", "GD-ASH", "qvalue"))
 ```
 
+```{r small fsp, cache = TRUE, echo = FALSE}
+fsp = function (FSR, true, observation, predictor) {
+  discovery = predictor <= FSR
+  return(mean(sign(observation[discovery]) != true[discovery]))
+}
+fsp.ash = fsp.gdash = list()
+fsr.list = seq(0, 1, 0.001)
+for (i in 1 : m) {
+  true = sign(beta[[i]])
+  svalue.ash = ashr::get_svalue(fit.ash[[i]])
+  svalue.gdash = ashr::get_svalue(fit.gdash.ash[[i]])
+  fsp.ash[[i]] = sapply(fsr.list, fsp, true = true, observation = betahat[[i]], predictor = svalue.ash)
+  fsp.gdash[[i]] = sapply(fsr.list, fsp, true = true, observation = betahat[[i]], predictor = svalue.gdash)
+}
+```
+
+```{r small fsp plotting, cache = TRUE, echo = FALSE}
+plot(fsr.list, fsr.list, type = "n",
+     xlim = c(0, 1), ylim = c(0, 1), xlab = "Nominal False Sign Rate", ylab = "Empirical False Sign Proportion", main = "Calibration of S values")
+lines(fsr.list, fsp.ash[[17]], col = "green")
+lines(fsr.list, fsp.gdash[[17]], col = "blue")
+abline(0, 1, lty = 2, col = "red")
+legend("topleft", lty = 1, col = c("green", "blue"), c("ASH", "GD-ASH"))
+```
 
 ## SNR = 5
 
@@ -628,12 +692,37 @@ for (i in 1 : m) {
 ```{r medium q-cali plotting, cache = TRUE, echo = FALSE}
 plot(fdr.list, fdr.list, type = "n",
      xlim = c(0, 1), ylim = c(0, 1), xlab = "Nominal False Discovery Rate", ylab = "Empirical False Discovery Proportion", main = "Calibration of q values")
-lines(fdr.list, fdp.ash[[77]], col = "green")
-lines(fdr.list, fdp.gdash[[77]], col = "blue")
-lines(fdr.list, fdp.qvalue[[77]], col = "yellow")
-lines(fdr.list, fdp.BH[[77]])
+lines(fdr.list, fdp.ash[[17]], col = "green")
+lines(fdr.list, fdp.gdash[[17]], col = "blue")
+lines(fdr.list, fdp.qvalue[[17]], col = "yellow")
+lines(fdr.list, fdp.BH[[17]])
 abline(0, 1, lty = 2, col = "red")
 legend("topleft", lty = 1, col = c("green", "blue", "yellow"), c("ASH", "GD-ASH", "qvalue"))
+```
+
+```{r medium fsp, cache = TRUE, echo = FALSE}
+fsp = function (FSR, true, observation, predictor) {
+  discovery = predictor <= FSR
+  return(mean(sign(observation[discovery]) != true[discovery]))
+}
+fsp.ash = fsp.gdash = list()
+fsr.list = seq(0, 1, 0.001)
+for (i in 1 : m) {
+  true = sign(beta[[i]])
+  svalue.ash = ashr::get_svalue(fit.ash[[i]])
+  svalue.gdash = ashr::get_svalue(fit.gdash.ash[[i]])
+  fsp.ash[[i]] = sapply(fsr.list, fsp, true = true, observation = betahat[[i]], predictor = svalue.ash)
+  fsp.gdash[[i]] = sapply(fsr.list, fsp, true = true, observation = betahat[[i]], predictor = svalue.gdash)
+}
+```
+
+```{r medium fsp plotting, cache = TRUE, echo = FALSE}
+plot(fsr.list, fsr.list, type = "n",
+     xlim = c(0, 1), ylim = c(0, 1), xlab = "Nominal False Sign Rate", ylab = "Empirical False Sign Proportion", main = "Calibration of S values")
+lines(fsr.list, fsp.ash[[17]], col = "green")
+lines(fsr.list, fsp.gdash[[17]], col = "blue")
+abline(0, 1, lty = 2, col = "red")
+legend("topleft", lty = 1, col = c("green", "blue"), c("ASH", "GD-ASH"))
 ```
 
 ## SNR = 10
@@ -784,12 +873,37 @@ for (i in 1 : m) {
 ```{r big q-cali plotting, cache = TRUE, echo = FALSE}
 plot(fdr.list, fdr.list, type = "n",
      xlim = c(0, 1), ylim = c(0, 1), xlab = "Nominal False Discovery Rate", ylab = "Empirical False Discovery Proportion", main = "Calibration of q values")
-lines(fdr.list, fdp.ash[[77]], col = "green")
-lines(fdr.list, fdp.gdash[[77]], col = "blue")
-lines(fdr.list, fdp.qvalue[[77]], col = "yellow")
-lines(fdr.list, fdp.BH[[77]])
+lines(fdr.list, fdp.ash[[17]], col = "green")
+lines(fdr.list, fdp.gdash[[17]], col = "blue")
+lines(fdr.list, fdp.qvalue[[17]], col = "yellow")
+lines(fdr.list, fdp.BH[[17]])
 abline(0, 1, lty = 2, col = "red")
 legend("topleft", lty = 1, col = c("green", "blue", "yellow"), c("ASH", "GD-ASH", "qvalue"))
+```
+
+```{r big fsp, cache = TRUE, echo = FALSE}
+fsp = function (FSR, true, observation, predictor) {
+  discovery = predictor <= FSR
+  return(mean(sign(observation[discovery]) != true[discovery]))
+}
+fsp.ash = fsp.gdash = list()
+fsr.list = seq(0, 1, 0.001)
+for (i in 1 : m) {
+  true = sign(beta[[i]])
+  svalue.ash = ashr::get_svalue(fit.ash[[i]])
+  svalue.gdash = ashr::get_svalue(fit.gdash.ash[[i]])
+  fsp.ash[[i]] = sapply(fsr.list, fsp, true = true, observation = betahat[[i]], predictor = svalue.ash)
+  fsp.gdash[[i]] = sapply(fsr.list, fsp, true = true, observation = betahat[[i]], predictor = svalue.gdash)
+}
+```
+
+```{r big fsp plotting, cache = TRUE, echo = FALSE}
+plot(fsr.list, fsr.list, type = "n",
+     xlim = c(0, 1), ylim = c(0, 1), xlab = "Nominal False Sign Rate", ylab = "Empirical False Sign Proportion", main = "Calibration of S values")
+lines(fsr.list, fsp.ash[[17]], col = "green")
+lines(fsr.list, fsp.gdash[[17]], col = "blue")
+abline(0, 1, lty = 2, col = "red")
+legend("topleft", lty = 1, col = c("green", "blue"), c("ASH", "GD-ASH"))
 ```
 
 ## Session information
