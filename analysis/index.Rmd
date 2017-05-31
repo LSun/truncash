@@ -132,8 +132,19 @@ Fitting the corrrelated null with Gaussian derivatives has two constraints: non-
 * [Simulated Signals Added to Real Data: Part 1](real_data_simulation.html)
 * [Simulated Signals Added to Real Data: Part 2](real_data_simulation_2.html)
 * [Simulated Signals Added to Real Data: Part 3](real_data_simulation_3.html)
+* [Simulated Signals Added to Real Data: Part 4](real_data_simulation_4.html)
+
 
 Using the `seqgendiff` pipeline developed by [David](http://dcgerard.github.io/), [Mengyin](https://github.com/mengyin), and Matthew, we are adding simulated $\pi_0\delta_0 + \left(1 - \pi0\right)N\left(0, \sigma^2\right)$ signals to GTEx/Liver RNA-seq expression matrix, and compare our method with `ASH` and [`SVA`](http://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.0030161).
+
+* [Completely Synthetic Correlated Null](simulated_correlated_null.html)
+
+Following [Gao](http://home.uchicago.edu/gaow/)'s suggestion, we are taking a look at whether Gaussian derivatives can satisfactorily fit synthetic correlated $N\left(0, 1\right)$ $z$ scores.  Suggested by Matthew, **it might have something to do with the distribution of eigenvalues in a random matrix**, and the [Wigner semicircle distribution](https://en.wikipedia.org/wiki/Wigner_semicircle_distribution).
+
+* [Simulated True Effects with Realistic Correlated Noises: Part I](simulation_real_se.html)
+* [Simulated True Effects with Realistic Correlated Noises: Part II](simulation_real_se_2.html)
+
+The large-scale simulation testing for GD-ASH with simulated effects under different sparsity, strength, and shape, and realistic correlated noises.
 
 [`ashr`]: https://github.com/stephens999/ashr
 

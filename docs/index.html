@@ -328,8 +328,18 @@ $(document).ready(function () {
 <li><a href="real_data_simulation.html">Simulated Signals Added to Real Data: Part 1</a></li>
 <li><a href="real_data_simulation_2.html">Simulated Signals Added to Real Data: Part 2</a></li>
 <li><a href="real_data_simulation_3.html">Simulated Signals Added to Real Data: Part 3</a></li>
+<li><a href="real_data_simulation_4.html">Simulated Signals Added to Real Data: Part 4</a></li>
 </ul>
 <p>Using the <code>seqgendiff</code> pipeline developed by <a href="http://dcgerard.github.io/">David</a>, <a href="https://github.com/mengyin">Mengyin</a>, and Matthew, we are adding simulated <span class="math inline">\(\pi_0\delta_0 + \left(1 - \pi0\right)N\left(0, \sigma^2\right)\)</span> signals to GTEx/Liver RNA-seq expression matrix, and compare our method with <code>ASH</code> and <a href="http://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.0030161"><code>SVA</code></a>.</p>
+<ul>
+<li><a href="simulated_correlated_null.html">Completely Synthetic Correlated Null</a></li>
+</ul>
+<p>Following <a href="http://home.uchicago.edu/gaow/">Gao</a>’s suggestion, we are taking a look at whether Gaussian derivatives can satisfactorily fit synthetic correlated <span class="math inline">\(N\left(0, 1\right)\)</span> <span class="math inline">\(z\)</span> scores. Suggested by Matthew, <strong>it might have something to do with the distribution of eigenvalues in a random matrix</strong>, and the <a href="https://en.wikipedia.org/wiki/Wigner_semicircle_distribution">Wigner semicircle distribution</a>.</p>
+<ul>
+<li><a href="simulation_real_se.html">Simulated True Effects with Realistic Correlated Noises: Part I</a></li>
+<li><a href="simulation_real_se_2.html">Simulated True Effects with Realistic Correlated Noises: Part II</a></li>
+</ul>
+<p>The large-scale simulation testing for GD-ASH with simulated effects under different sparsity, strength, and shape, and realistic correlated noises.</p>
 <!-- The goal of this new template is to simplify the setup and maintenance of a research website. -->
 <!-- Specifically, -->
 <!-- *  Easier to build and extend the website using the new tools in the [rmarkdown][] package and [latest RStudio release][rstudio] -->
