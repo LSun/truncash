@@ -289,8 +289,8 @@ $(document).ready(function () {
 </ul>
 <p>Under the exchangeability assumption, the goodness of fit of empirical Bayes can be measured by the behavior of <span class="math inline">\(\left\{\hat F_j = \hat F_{\hat\beta_j | \hat s_j}\left(\hat\beta_j\mid\hat s_j\right)\right\}\)</span>. Meanwhile, if <code>ASH</code> is applied to correlated null <span class="math inline">\(z\)</span> scores, estimated <span class="math inline">\(\hat g\)</span> will not only be different from <span class="math inline">\(\delta_0\)</span>; moreover, with this estimated <span class="math inline">\(\hat g\)</span>, <span class="math inline">\(\left\{\hat F_j\right\}\)</span> might not behave like <span class="math inline">\(\text{Unif}\left[0, 1\right]\)</span>.</p>
 <ul>
-<li><a href="diagnostic_plot_2.html">Diagnostic Plots for Uniformity</a></li>
-<li><a href="diagnostic_ash.html">Diagnostic Plots for <code>ASH</code></a></li>
+<li><a href="diagnostic_plot_2.html">Diagnostic plots for uniform distribution</a></li>
+<li><a href="diagnostic_ash.html">Diagnostic plots for <code>ASH</code></a></li>
 <li><a href="plot_diagnostic.html"><code>ashr::plot_diagnostic()</code> in <code>ashr</code></a></li>
 </ul>
 <p>Essentially we hope to tell whether <span class="math inline">\(n\)</span> random samples are uniformly distributed, and the task seems more complicated than what it sounds. There are multiple ways to do it, and some of them have been absorbed into the <code>ashr</code> package.</p>
@@ -319,25 +319,26 @@ $(document).ready(function () {
 </ul>
 <p>Several ways are explored to make fitting Gaussian derivatives more efficient and accurate.</p>
 <ul>
-<li><a href="mosek_reg_4.html">Regularized Gaussian Derivatives: Correlated Null</a></li>
-<li><a href="mosek_reg_5.html">Regularized Gaussian Derivatives &amp; <code>ASH</code>: Simulated True Effects with Homoscedastic Correlated Noises</a></li>
-<li><a href="mosek_reg_6.html">Regularized Gaussian Derivatives &amp; <code>ASH</code>: Simulated True Effects with Heteroskedastic Correlated Noises</a></li>
+<li><a href="mosek_reg_4.html">Regularized Gaussian Derivatives: Correlated null</a></li>
+<li><a href="mosek_reg_5.html">Regularized Gaussian Derivatives &amp; <code>ASH</code>: Simulated true effects with homoscedastic correlated noises</a></li>
+<li><a href="mosek_reg_6.html">Regularized Gaussian Derivatives &amp; <code>ASH</code>: Simulated true effects with heteroskedastic correlated noises</a></li>
 </ul>
 <p>Fitting the corrrelated null with Gaussian derivatives has two constraints: non-negativity and orderly decay, and both are intractable. We are using <span class="math inline">\(L_1\)</span> regularization to try to solve both.</p>
 <ul>
-<li><a href="real_data_simulation.html">Simulated Signals Added to Real Data: Part 1</a></li>
-<li><a href="real_data_simulation_2.html">Simulated Signals Added to Real Data: Part 2</a></li>
-<li><a href="real_data_simulation_3.html">Simulated Signals Added to Real Data: Part 3</a></li>
-<li><a href="real_data_simulation_4.html">Simulated Signals Added to Real Data: Part 4</a></li>
+<li><a href="real_data_simulation.html">Simulated signals added to real data: Part 1</a></li>
+<li><a href="real_data_simulation_2.html">Simulated signals added to real data: Part 2</a></li>
+<li><a href="real_data_simulation_3.html">Simulated signals added to real data: Part 3</a></li>
+<li><a href="real_data_simulation_4.html">Simulated signals added to real data: Part 4</a></li>
 </ul>
 <p>Using the <code>seqgendiff</code> pipeline developed by <a href="http://dcgerard.github.io/">David</a>, <a href="https://github.com/mengyin">Mengyin</a>, and Matthew, we are adding simulated <span class="math inline">\(\pi_0\delta_0 + \left(1 - \pi0\right)N\left(0, \sigma^2\right)\)</span> signals to GTEx/Liver RNA-seq expression matrix, and compare our method with <code>ASH</code> and <a href="http://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.0030161"><code>SVA</code></a>.</p>
 <ul>
-<li><a href="simulated_correlated_null.html">Completely Synthetic Correlated Null</a></li>
+<li><a href="simulated_correlated_null.html">Completely synthetic correlated null</a></li>
+<li><a href="simulated_correlated_null_2.html">Completely synthetic correlated null: More complicated cases</a></li>
 </ul>
-<p>Following <a href="http://home.uchicago.edu/gaow/">Gao</a>’s suggestion, we are taking a look at whether Gaussian derivatives can satisfactorily fit synthetic correlated <span class="math inline">\(N\left(0, 1\right)\)</span> <span class="math inline">\(z\)</span> scores. Suggested by Matthew, <strong>it might have something to do with the distribution of eigenvalues in a random matrix</strong>, and the <a href="https://en.wikipedia.org/wiki/Wigner_semicircle_distribution">Wigner semicircle distribution</a>.</p>
+<p>Following <a href="http://home.uchicago.edu/gaow/">Gao</a>’s suggestion, we are taking a look at whether Gaussian derivatives can satisfactorily fit synthetic correlated <span class="math inline">\(N\left(0, 1\right)\)</span> <span class="math inline">\(z\)</span> scores. Suggested by Matthew, <strong>it might have something to do with the distribution of eigenvalues in a random matrix</strong>, and the <a href="https://en.wikipedia.org/wiki/Wigner_semicircle_distribution">Wigner semicircle distribution</a>. It’s also an interesting comparison with Gaussian mixtures.</p>
 <ul>
-<li><a href="simulation_real_se.html">Simulated True Effects with Realistic Correlated Noises: Part I</a></li>
-<li><a href="simulation_real_se_2.html">Simulated True Effects with Realistic Correlated Noises: Part II</a></li>
+<li><a href="simulation_real_se.html">Simulated true effects with realistic correlated noises: Large and moderate SNR</a></li>
+<li><a href="simulation_real_se_2.html">Simulated true effects with realistic correlated noises: Small SNR</a></li>
 </ul>
 <p>The large-scale simulation testing for GD-ASH with simulated effects under different sparsity, strength, and shape, and realistic correlated noises.</p>
 <!-- The goal of this new template is to simplify the setup and maintenance of a research website. -->

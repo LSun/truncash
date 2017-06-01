@@ -93,8 +93,8 @@ Continuing from the empirical studies above, we are looking at why $N\left(0, \s
 
 Under the exchangeability assumption, the goodness of fit of empirical Bayes can be measured by the behavior of $\left\{\hat F_j = \hat F_{\hat\beta_j | \hat s_j}\left(\hat\beta_j\mid\hat s_j\right)\right\}$.  Meanwhile, if `ASH` is applied to correlated null $z$ scores, estimated $\hat g$ will not only be different from $\delta_0$; moreover, with this estimated $\hat g$, $\left\{\hat F_j\right\}$ might not behave like $\text{Unif}\left[0, 1\right]$.
 
-* [Diagnostic Plots for Uniformity](diagnostic_plot_2.html)
-* [Diagnostic Plots for `ASH`](diagnostic_ash.html)
+* [Diagnostic plots for uniform distribution](diagnostic_plot_2.html)
+* [Diagnostic plots for `ASH`](diagnostic_ash.html)
 * [`ashr::plot_diagnostic()` in `ashr`](plot_diagnostic.html)
 
 Essentially we hope to tell whether $n$ random samples are uniformly distributed, and the task seems more complicated than what it sounds.  There are multiple ways to do it, and some of them have been absorbed into the `ashr` package.
@@ -123,26 +123,27 @@ The previous investigation is boiled down to a prototypical problem: the classic
 
 Several ways are explored to make fitting Gaussian derivatives more efficient and accurate.
 
-* [Regularized Gaussian Derivatives: Correlated Null](mosek_reg_4.html)
-* [Regularized Gaussian Derivatives & `ASH`: Simulated True Effects with Homoscedastic Correlated Noises](mosek_reg_5.html)
-* [Regularized Gaussian Derivatives & `ASH`: Simulated True Effects with Heteroskedastic Correlated Noises](mosek_reg_6.html)
+* [Regularized Gaussian Derivatives: Correlated null](mosek_reg_4.html)
+* [Regularized Gaussian Derivatives & `ASH`: Simulated true effects with homoscedastic correlated noises](mosek_reg_5.html)
+* [Regularized Gaussian Derivatives & `ASH`: Simulated true effects with heteroskedastic correlated noises](mosek_reg_6.html)
 
 Fitting the corrrelated null with Gaussian derivatives has two constraints: non-negativity and orderly decay, and both are intractable.  We are using $L_1$ regularization to try to solve both.
 
-* [Simulated Signals Added to Real Data: Part 1](real_data_simulation.html)
-* [Simulated Signals Added to Real Data: Part 2](real_data_simulation_2.html)
-* [Simulated Signals Added to Real Data: Part 3](real_data_simulation_3.html)
-* [Simulated Signals Added to Real Data: Part 4](real_data_simulation_4.html)
+* [Simulated signals added to real data: Part 1](real_data_simulation.html)
+* [Simulated signals added to real data: Part 2](real_data_simulation_2.html)
+* [Simulated signals added to real data: Part 3](real_data_simulation_3.html)
+* [Simulated signals added to real data: Part 4](real_data_simulation_4.html)
 
 
 Using the `seqgendiff` pipeline developed by [David](http://dcgerard.github.io/), [Mengyin](https://github.com/mengyin), and Matthew, we are adding simulated $\pi_0\delta_0 + \left(1 - \pi0\right)N\left(0, \sigma^2\right)$ signals to GTEx/Liver RNA-seq expression matrix, and compare our method with `ASH` and [`SVA`](http://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.0030161).
 
-* [Completely Synthetic Correlated Null](simulated_correlated_null.html)
+* [Completely synthetic correlated null](simulated_correlated_null.html)
+* [Completely synthetic correlated null: More complicated cases](simulated_correlated_null_2.html)
 
-Following [Gao](http://home.uchicago.edu/gaow/)'s suggestion, we are taking a look at whether Gaussian derivatives can satisfactorily fit synthetic correlated $N\left(0, 1\right)$ $z$ scores.  Suggested by Matthew, **it might have something to do with the distribution of eigenvalues in a random matrix**, and the [Wigner semicircle distribution](https://en.wikipedia.org/wiki/Wigner_semicircle_distribution).
+Following [Gao](http://home.uchicago.edu/gaow/)'s suggestion, we are taking a look at whether Gaussian derivatives can satisfactorily fit synthetic correlated $N\left(0, 1\right)$ $z$ scores.  Suggested by Matthew, **it might have something to do with the distribution of eigenvalues in a random matrix**, and the [Wigner semicircle distribution](https://en.wikipedia.org/wiki/Wigner_semicircle_distribution).  It's also an interesting comparison with Gaussian mixtures.
 
-* [Simulated True Effects with Realistic Correlated Noises: Part I](simulation_real_se.html)
-* [Simulated True Effects with Realistic Correlated Noises: Part II](simulation_real_se_2.html)
+* [Simulated true effects with realistic correlated noises: Large and moderate SNR](simulation_real_se.html)
+* [Simulated true effects with realistic correlated noises: Small SNR](simulation_real_se_2.html)
 
 The large-scale simulation testing for GD-ASH with simulated effects under different sparsity, strength, and shape, and realistic correlated noises.
 
