@@ -1,0 +1,150 @@
+---
+title: "Simulating Correlated $N(0, 1)$ $Z$ Scores: More Complicated"
+author: "Lei Sun"
+date: 2017-05-31
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+## Introduction
+
+Despite his [theory on the connection between Gaussian derivatives and empirical distributions of correlated null $z$ scores](http://amstat.tandfonline.com/doi/abs/10.1198/jasa.2010.tm10237), Dr. Schwartzman in his own research [used Gaussian mixtures](http://amstat.tandfonline.com/doi/abs/10.1080/01621459.2014.958156) instead of Gaussian derivatives to fit the empirical distribution.  A motivating example of his is a large number of marginally $N\left(0, 1\right)$ $z$ scores that are closely correlated with each other within one group, but independent between groups.  We now show that data simulated in this way can also [be fitted by Gaussian derivatives by the method of moments](simulated_correlated_null.html#fitting).  To be specific, let $n$ standard normal random samples be in $K$ groups, in each group $k$, given $x_k$, $y_{ki}$ iid $N\left(0, 1\right)$,
+
+$$
+z_{ki} = \sqrt{\rho} x_k + \sqrt{1 - \rho} y_{ki} \ .
+$$
+In all the simulations, we choose $n = 10^4$, $\rho = 0.9$, and for theoretical exploration, $L = 100$ Gaussian derivatives.
+
+```{r, message = FALSE, echo = FALSE, cache = TRUE}
+source("../code/gdash.R")
+
+gd.std.mat = function(x, order) {
+  hermite = Hermite(order)
+  gd.mat = matrix(0, nrow = length(x), ncol = order)
+  for (j in 1 : order) {
+    gd.mat[, j] = hermite[[j]](x) * dnorm(x) * (-1)^j / sqrt(factorial(j))
+  }
+  gd.mat = cbind(dnorm(x), gd.mat)
+}
+
+WL = 100
+hermite.list = orthopolynom::hermite.he.polynomials(WL)
+hermite.coef = orthopolynom::polynomial.coefficients(hermite.list)
+
+fit.gd = function (order, z) {
+  moments = c()
+  for (i in 0 : order) {
+    moments[i + 1] = mean(z^i)
+  }
+  w.std = c()
+  for (i in 0 : order) {
+    w.std[i + 1] = sum(moments[1 : (i + 1)] / sqrt(factorial(i)) * hermite.coef[[i + 1]]) * (-1)^i
+  }
+  x.seq = seq(-(max(abs(z)) + 1), (max(abs(z)) + 1), 0.01)
+  y.gd = gd.std.mat(x.seq, order) %*% w.std[1 : (order + 1)]
+  z.hist = hist(z, breaks = 100, plot = FALSE)
+  hist(z, breaks = 100, prob = TRUE, main = "Histogram of Simulated Correlated N(0, 1) z Scores", 
+       ylim = c(
+         min(0, y.gd),
+         max(z.hist$density, y.gd, dnorm(x.seq))
+       ), xlim = range(x.seq))
+  lines(x.seq, dnorm(x.seq), col = "red")
+  lines(x.seq, y.gd, col = "blue")
+  legend("topleft", lty = 1, col = c("red", "blue"), legend = c("N (0, 1)", paste(order, "Gaussian\nDerivatives")), bty = "n")
+}
+
+z.sim = function (n, K, rho) {
+  x = rnorm(K)
+  m = round(n / K)
+  x = rep(x, c(rep(m, K - 1), n - m * (K - 1)))
+  z = sqrt(rho) * x + sqrt(1 - rho) * rnorm(n)
+  return(z)
+}
+```
+
+```{r}
+n = 1e4
+rho = 0.9
+L = 100
+```
+
+## Scenario I: One Group
+
+```{r 1G, cache = TRUE}
+set.seed(777)
+K = 1
+for (j in 1 : 5) {
+  z = z.sim(n, K, rho)
+  fit.gd(L, z)
+}
+```
+
+## Scenario II: Two Groups
+
+```{r 2G, cache = TRUE}
+set.seed(777)
+K = 2
+for (j in 1 : 5) {
+  z = z.sim(n, K, rho)
+  fit.gd(L, z)
+}
+```
+
+## Scenario III: Three Groups
+
+```{r 3G, cache = TRUE}
+set.seed(777)
+K = 3
+for (j in 1 : 5) {
+  z = z.sim(n, K, rho)
+  fit.gd(L, z)
+}
+```
+
+## Scenario IV: Four Groups
+
+```{r 4G, cache = TRUE}
+set.seed(777)
+K = 4
+for (j in 1 : 5) {
+  z = z.sim(n, K, rho)
+  fit.gd(L, z)
+}
+```
+
+## Scenario V: Five Groups
+
+```{r 5G, cache = TRUE}
+set.seed(777)
+K = 5
+for (j in 1 : 5) {
+  z = z.sim(n, K, rho)
+  fit.gd(L, z)
+}
+```
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```
