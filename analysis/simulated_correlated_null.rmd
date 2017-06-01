@@ -74,20 +74,12 @@ gd.std.mat = function(x, order) {
   gd.mat = cbind(dnorm(x), gd.mat)
 }
 
-w_prior = function(lambda, rho, order) {
-  w_prior = rep(lambda, order)
-  w_prior[seq(2, order, by = 2)] = lambda / rho^{1 : (order / 2)}
-  return(w_prior)
-}
-
 WL = 100
 hermite.list = orthopolynom::hermite.he.polynomials(WL)
 hermite.coef = orthopolynom::polynomial.coefficients(hermite.list)
 ```
 
 ```{r, echo = FALSE, cache = TRUE}
-lambda = 10
-rho = 0.5
 order = 50
 set.seed(777)
 for (j in 1 : 10) {
@@ -103,15 +95,14 @@ w.std = c()
 for (i in 0 : WL) {
   w.std[i + 1] = sum(moments[1 : (i + 1)] / sqrt(factorial(i)) * hermite.coef[[i + 1]]) * (-1)^i
 }
-# w.std = w.mosek(matrix_lik_w = gd.std.mat(z, order), w_prior = w_prior(lambda, rho, order))
 x.seq = seq(-max(abs(z), 3.5), max(abs(z), 3.5), 0.01)
 y.gd = gd.std.mat(x.seq, order) %*% w.std[1 : (order + 1)]
 z.hist = hist(z, breaks = 100, plot = FALSE)
 hist(z, breaks = 100, prob = TRUE, main = "Histogram of Simulated Correlated N(0, 1) z Scores", ylim = c(0, max(c(z.hist$density, dnorm(0)))), xlim = range(x.seq))
 lines(x.seq, dnorm(x.seq), col = "red")
 lines(x.seq, y.gd, col = "blue")
-legend("topleft", inset = c(0, 0.075), lty = 1, col = "red", "N (0, 1)", bty = "n")
-legend("topright", lty = 1, col = "blue", "50 Gaussian\nDerivatives", bty = "n")
+legend("topleft", lty = 1, col = "red", "N (0, 1)", bty = "n")
+legend("topright", lty = 1, col = "blue", "50 Gaussian\nDerivatives", yjust = 1, bty = "n")
 }
 ```
 
