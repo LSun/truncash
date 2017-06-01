@@ -180,6 +180,202 @@ plot(mse.ash, mse.gdash, xlab = "MSE(ASH)", ylab = "MSE(GD-ASH)", main = express
 abline(0, 1, col = "red", lty = 2)
 ```
 
+```{r null fdp, cache = TRUE, echo = FALSE}
+fdp = function (FDR, predictor) {
+  return(any(predictor <= FDR))
+}
+fdp.ash = fdp.gdash = fdp.qvalue = fdp.BH = list()
+fdr.list = seq(0, 1, 0.001)
+for (i in 1 : m) {
+  qvalue.ash = ashr::get_qvalue(fit.ash[[i]])
+  qvalue.gdash = ashr::get_qvalue(fit.gdash.ash[[i]])
+  qvalue.qvalue = fit.qvalue[[i]]$qvalues
+  fdp.ash[[i]] = sapply(fdr.list, fdp, predictor = qvalue.ash)
+  fdp.gdash[[i]] = sapply(fdr.list, fdp, predictor = qvalue.gdash)
+  fdp.qvalue[[i]] = sapply(fdr.list, fdp, predictor = qvalue.qvalue)
+  fdp.BH[[i]] = sapply(fdr.list, fdp, predictor = BH[[i]])
+}
+```
+
+```{r null average fdp summary, cache = TRUE, echo = FALSE}
+mean.fdp.ash = colMeans(matrix(unlist(fdp.ash), nrow = m, byrow = TRUE))
+sd.fdp.ash = apply(matrix(unlist(fdp.ash), nrow = m, byrow = TRUE), 2, sd)
+
+mean.fdp.gdash = colMeans(matrix(unlist(fdp.gdash), nrow = m, byrow = TRUE))
+sd.fdp.gdash = apply(matrix(unlist(fdp.gdash), nrow = m, byrow = TRUE), 2, sd)
+
+mean.fdp.qvalue = colMeans(matrix(unlist(fdp.qvalue), nrow = m, byrow = TRUE))
+sd.fdp.qvalue = apply(matrix(unlist(fdp.qvalue), nrow = m, byrow = TRUE), 2, sd)
+
+mean.fdp.BH = colMeans(matrix(unlist(fdp.BH), nrow = m, byrow = TRUE))
+sd.fdp.BH = apply(matrix(unlist(fdp.BH), nrow = m, byrow = TRUE), 2, sd)
+```
+
+```{r null average fdp plotting, echo = FALSE}
+par(mfrow = c(1, 2))
+
+plot(fdr.list, fdr.list, type = "n",
+     xlim = c(0, 1), ylim = c(0, 1), xlab = "Nominal False Discovery Rate", ylab = "Average False Discovery Proportion", main = "Calibration of FDR")
+
+polygon(x = c(fdr.list, rev(fdr.list)),
+        y = c(mean.fdp.BH - 2 * sd.fdp.BH / sqrt(m), rev(mean.fdp.BH + 2 * sd.fdp.BH / sqrt(m))),
+        col = "#E0E0E080", border = FALSE
+        )
+
+polygon(x = c(fdr.list, rev(fdr.list)),
+        y = c(mean.fdp.qvalue - 2 * sd.fdp.qvalue / sqrt(m), rev(mean.fdp.qvalue + 2 * sd.fdp.qvalue / sqrt(m))),
+        col = "#FFE5CC80", border = FALSE
+        )
+
+polygon(x = c(fdr.list, rev(fdr.list)),
+        y = c(mean.fdp.ash - 2 * sd.fdp.ash / sqrt(m), rev(mean.fdp.ash + 2 * sd.fdp.ash / sqrt(m))),
+        col = "#E5FFCC80", border = FALSE
+        )
+
+polygon(x = c(fdr.list, rev(fdr.list)),
+        y = c(mean.fdp.gdash - 2 * sd.fdp.gdash / sqrt(m), rev(mean.fdp.gdash + 2 * sd.fdp.gdash / sqrt(m))),
+        col = "#CCE5FF80", border = FALSE
+        )
+
+lines(fdr.list, mean.fdp.BH - 2 * sd.fdp.BH / sqrt(m), lty = 2, col = "#606060")
+lines(fdr.list, mean.fdp.BH + 2 * sd.fdp.BH / sqrt(m), lty = 2, col = "#606060")
+
+lines(fdr.list, mean.fdp.qvalue - 2 * sd.fdp.qvalue / sqrt(m), lty = 2, col = "#CC6600")
+lines(fdr.list, mean.fdp.qvalue + 2 * sd.fdp.qvalue / sqrt(m), lty = 2, col = "#CC6600")
+
+lines(fdr.list, mean.fdp.ash - 2 * sd.fdp.ash / sqrt(m), lty = 2, col = "#66CC00")
+lines(fdr.list, mean.fdp.ash + 2 * sd.fdp.ash / sqrt(m), lty = 2, col = "#66CC00")
+
+lines(fdr.list, mean.fdp.gdash - 2 * sd.fdp.gdash / sqrt(m), lty = 2, col = "#0066CC")
+lines(fdr.list, mean.fdp.gdash + 2 * sd.fdp.gdash / sqrt(m), lty = 2, col = "#0066CC")
+
+lines(fdr.list, mean.fdp.ash, col = "green")
+lines(fdr.list, mean.fdp.gdash, col = "blue")
+lines(fdr.list, mean.fdp.qvalue, col = "orange")
+lines(fdr.list, mean.fdp.BH)
+abline(0, 1, col = "red")
+legend("topleft", lty = 1, col = c("green", "blue", "orange", "black"), c("ASH", "GD-ASH", "qvalue", "BH"))
+
+plot(fdr.list, fdr.list, type = "n",
+     xlim = c(0, 0.2), ylim = c(0, 0.2), xlab = "Nominal False Discovery Rate", ylab = "Average False Discovery Proportion", main = "Calibration of FDR: Zoom-in")
+
+polygon(x = c(fdr.list, rev(fdr.list)),
+        y = c(mean.fdp.BH - 2 * sd.fdp.BH / sqrt(m), rev(mean.fdp.BH + 2 * sd.fdp.BH / sqrt(m))),
+        col = "#E0E0E080", border = FALSE
+        )
+
+polygon(x = c(fdr.list, rev(fdr.list)),
+        y = c(mean.fdp.qvalue - 2 * sd.fdp.qvalue / sqrt(m), rev(mean.fdp.qvalue + 2 * sd.fdp.qvalue / sqrt(m))),
+        col = "#FFE5CC80", border = FALSE
+        )
+
+polygon(x = c(fdr.list, rev(fdr.list)),
+        y = c(mean.fdp.ash - 2 * sd.fdp.ash / sqrt(m), rev(mean.fdp.ash + 2 * sd.fdp.ash / sqrt(m))),
+        col = "#E5FFCC80", border = FALSE
+        )
+
+polygon(x = c(fdr.list, rev(fdr.list)),
+        y = c(mean.fdp.gdash - 2 * sd.fdp.gdash / sqrt(m), rev(mean.fdp.gdash + 2 * sd.fdp.gdash / sqrt(m))),
+        col = "#CCE5FF80", border = FALSE
+        )
+
+lines(fdr.list, mean.fdp.BH - 2 * sd.fdp.BH / sqrt(m), lty = 2, col = "#606060")
+lines(fdr.list, mean.fdp.BH + 2 * sd.fdp.BH / sqrt(m), lty = 2, col = "#606060")
+
+lines(fdr.list, mean.fdp.qvalue - 2 * sd.fdp.qvalue / sqrt(m), lty = 2, col = "#CC6600")
+lines(fdr.list, mean.fdp.qvalue + 2 * sd.fdp.qvalue / sqrt(m), lty = 2, col = "#CC6600")
+
+lines(fdr.list, mean.fdp.ash - 2 * sd.fdp.ash / sqrt(m), lty = 2, col = "#66CC00")
+lines(fdr.list, mean.fdp.ash + 2 * sd.fdp.ash / sqrt(m), lty = 2, col = "#66CC00")
+
+lines(fdr.list, mean.fdp.gdash - 2 * sd.fdp.gdash / sqrt(m), lty = 2, col = "#0066CC")
+lines(fdr.list, mean.fdp.gdash + 2 * sd.fdp.gdash / sqrt(m), lty = 2, col = "#0066CC")
+
+lines(fdr.list, mean.fdp.ash, col = "green")
+lines(fdr.list, mean.fdp.gdash, col = "blue")
+lines(fdr.list, mean.fdp.qvalue, col = "orange")
+lines(fdr.list, mean.fdp.BH)
+abline(0, 1, col = "red")
+legend("topleft", lty = 1, col = c("green", "blue", "orange", "black"), c("ASH", "GD-ASH", "qvalue", "BH"))
+```
+
+```{r null fsp, cache = TRUE, echo = FALSE}
+fsp = function (FSR, observation, predictor) {
+  fsp = 0
+  if (any(predictor <= FSR)) {
+    fsp = mean(observation[predictor <= FSR] != 0)
+  }
+  return(fsp)
+}
+fsp.ash = fsp.gdash = list()
+fsr.list = seq(0, 1, 0.001)
+for (i in 1 : m) {
+  svalue.ash = ashr::get_svalue(fit.ash[[i]])
+  svalue.gdash = ashr::get_svalue(fit.gdash.ash[[i]])
+  fsp.ash[[i]] = sapply(fsr.list, fsp, observation = betahat[[i]], predictor = svalue.ash)
+  fsp.gdash[[i]] = sapply(fsr.list, fsp, observation = betahat[[i]], predictor = svalue.gdash)
+}
+```
+
+```{r null average fsp summary, cache = TRUE, echo = FALSE}
+mean.fsp.ash = colMeans(matrix(unlist(fsp.ash), nrow = m, byrow = TRUE))
+sd.fsp.ash = apply(matrix(unlist(fsp.ash), nrow = m, byrow = TRUE), 2, sd)
+mean.fsp.gdash = colMeans(matrix(unlist(fsp.gdash), nrow = m, byrow = TRUE))
+sd.fsp.gdash = apply(matrix(unlist(fsp.gdash), nrow = m, byrow = TRUE), 2, sd)
+```
+
+```{r null average fsp plotting, echo = FALSE}
+par(mfrow = c(1, 2))
+
+plot(fsr.list, fsr.list, type = "n",
+     xlim = c(0, 1), ylim = c(0, 1), xlab = "Nominal False Discovery Rate", ylab = "Average False Sign Proportion", main = "Calibration of S values")
+
+polygon(x = c(fsr.list, rev(fsr.list)),
+        y = c(mean.fsp.ash - 2 * sd.fsp.ash / sqrt(m), rev(mean.fsp.ash + 2 * sd.fsp.ash / sqrt(m))),
+        col = "#E5FFCC80", border = FALSE
+        )
+
+polygon(x = c(fsr.list, rev(fsr.list)),
+        y = c(mean.fsp.gdash - 2 * sd.fsp.gdash / sqrt(m), rev(mean.fsp.gdash + 2 * sd.fsp.gdash / sqrt(m))),
+        col = "#CCE5FF80", border = FALSE
+        )
+
+lines(fsr.list, mean.fsp.ash - 2 * sd.fsp.ash / sqrt(m), lty = 2, col = "#66CC00")
+lines(fsr.list, mean.fsp.ash + 2 * sd.fsp.ash / sqrt(m), lty = 2, col = "#66CC00")
+
+lines(fsr.list, mean.fsp.gdash - 2 * sd.fsp.gdash / sqrt(m), lty = 2, col = "#0066CC")
+lines(fsr.list, mean.fsp.gdash + 2 * sd.fsp.gdash / sqrt(m), lty = 2, col = "#0066CC")
+
+lines(fsr.list, mean.fsp.ash, col = "green")
+lines(fsr.list, mean.fsp.gdash, col = "blue")
+abline(0, 1, col = "red")
+legend("topleft", lty = 1, col = c("green", "blue"), c("ASH", "GD-ASH"))
+
+plot(fsr.list, fsr.list, type = "n",
+     xlim = c(0, 0.2), ylim = c(0, 0.2), xlab = "Nominal False Discovery Rate", ylab = "Average False Sign Proportion", main = "Calibration of S values: Zoom-in")
+
+polygon(x = c(fsr.list, rev(fsr.list)),
+        y = c(mean.fsp.ash - 2 * sd.fsp.ash / sqrt(m), rev(mean.fsp.ash + 2 * sd.fsp.ash / sqrt(m))),
+        col = "#E5FFCC80", border = FALSE
+        )
+
+polygon(x = c(fsr.list, rev(fsr.list)),
+        y = c(mean.fsp.gdash - 2 * sd.fsp.gdash / sqrt(m), rev(mean.fsp.gdash + 2 * sd.fsp.gdash / sqrt(m))),
+        col = "#CCE5FF80", border = FALSE
+        )
+
+lines(fsr.list, mean.fsp.ash - 2 * sd.fsp.ash / sqrt(m), lty = 2, col = "#66CC00")
+lines(fsr.list, mean.fsp.ash + 2 * sd.fsp.ash / sqrt(m), lty = 2, col = "#66CC00")
+
+lines(fsr.list, mean.fsp.gdash - 2 * sd.fsp.gdash / sqrt(m), lty = 2, col = "#0066CC")
+lines(fsr.list, mean.fsp.gdash + 2 * sd.fsp.gdash / sqrt(m), lty = 2, col = "#0066CC")
+
+lines(fsr.list, mean.fsp.ash, col = "green")
+lines(fsr.list, mean.fsp.gdash, col = "blue")
+abline(0, 1, col = "red")
+legend("topleft", lty = 1, col = c("green", "blue"), c("ASH", "GD-ASH"))
+```
+
 ## SNR = 0
 
 $$
@@ -318,17 +514,6 @@ for (i in 1 : m) {
 }
 ```
 
-```{r zero average fdp, cache = TRUE, echo = FALSE}
-plot(fdr.list, fdr.list, type = "n",
-     xlim = c(0, 1), ylim = c(0, 1), xlab = "Nominal False Discovery Rate", ylab = "Average False Discovery Proportion", main = "Calibration of pFDR")
-lines(fdr.list, colMeans(matrix(unlist(fdp.ash), nrow = m, byrow = TRUE)), col = "green")
-lines(fdr.list, colMeans(matrix(unlist(fdp.gdash), nrow = m, byrow = TRUE)), col = "blue")
-lines(fdr.list, colMeans(matrix(unlist(fdp.qvalue), nrow = m, byrow = TRUE)), col = "yellow")
-lines(fdr.list, colMeans(matrix(unlist(fdp.BH), nrow = m, byrow = TRUE)))
-abline(0, 1, lty = 2, col = "red")
-legend("topleft", lty = 1, col = c("green", "blue", "yellow", "black"), c("ASH", "GD-ASH", "qvalue", "BH"))
-```
-
 ```{r zero fsp, cache = TRUE, echo = FALSE}
 fsp = function (FSR, true, observation, predictor) {
   discovery = predictor <= FSR
@@ -345,12 +530,159 @@ for (i in 1 : m) {
 }
 ```
 
-```{r zero average fsp, cache = TRUE, echo = FALSE}
+```{r zero average fdp summary, cache = TRUE, echo = FALSE}
+mean.fdp.ash = colMeans(matrix(unlist(fdp.ash), nrow = m, byrow = TRUE))
+sd.fdp.ash = apply(matrix(unlist(fdp.ash), nrow = m, byrow = TRUE), 2, sd)
+mean.fdp.gdash = colMeans(matrix(unlist(fdp.gdash), nrow = m, byrow = TRUE))
+sd.fdp.gdash = apply(matrix(unlist(fdp.gdash), nrow = m, byrow = TRUE), 2, sd)
+mean.fdp.qvalue = colMeans(matrix(unlist(fdp.qvalue), nrow = m, byrow = TRUE))
+sd.fdp.qvalue = apply(matrix(unlist(fdp.qvalue), nrow = m, byrow = TRUE), 2, sd)
+mean.fdp.BH = colMeans(matrix(unlist(fdp.BH), nrow = m, byrow = TRUE))
+sd.fdp.BH = apply(matrix(unlist(fdp.BH), nrow = m, byrow = TRUE), 2, sd)
+```
+
+```{r zero average fdp plotting, echo = FALSE}
+par(mfrow = c(1, 2))
+plot(fdr.list, fdr.list, type = "n",
+     xlim = c(0, 1), ylim = c(0, 1), xlab = "Nominal False Discovery Rate", ylab = "Average False Discovery Proportion", main = "Calibration of pFDR")
+
+polygon(x = c(fdr.list, rev(fdr.list)),
+        y = c(mean.fdp.BH - 2 * sd.fdp.BH / sqrt(m), rev(mean.fdp.BH + 2 * sd.fdp.BH / sqrt(m))),
+        col = "#E0E0E080", border = FALSE
+        )
+
+polygon(x = c(fdr.list, rev(fdr.list)),
+        y = c(mean.fdp.qvalue - 2 * sd.fdp.qvalue / sqrt(m), rev(mean.fdp.qvalue + 2 * sd.fdp.qvalue / sqrt(m))),
+        col = "#FFE5CC80", border = FALSE
+        )
+
+polygon(x = c(fdr.list, rev(fdr.list)),
+        y = c(mean.fdp.ash - 2 * sd.fdp.ash / sqrt(m), rev(mean.fdp.ash + 2 * sd.fdp.ash / sqrt(m))),
+        col = "#E5FFCC80", border = FALSE
+        )
+
+polygon(x = c(fdr.list, rev(fdr.list)),
+        y = c(mean.fdp.gdash - 2 * sd.fdp.gdash / sqrt(m), rev(mean.fdp.gdash + 2 * sd.fdp.gdash / sqrt(m))),
+        col = "#CCE5FF80", border = FALSE
+        )
+
+lines(fdr.list, mean.fdp.BH - 2 * sd.fdp.BH / sqrt(m), lty = 2, col = "#606060")
+lines(fdr.list, mean.fdp.BH + 2 * sd.fdp.BH / sqrt(m), lty = 2, col = "#606060")
+
+lines(fdr.list, mean.fdp.qvalue - 2 * sd.fdp.qvalue / sqrt(m), lty = 2, col = "#CC6600")
+lines(fdr.list, mean.fdp.qvalue + 2 * sd.fdp.qvalue / sqrt(m), lty = 2, col = "#CC6600")
+
+lines(fdr.list, mean.fdp.ash - 2 * sd.fdp.ash / sqrt(m), lty = 2, col = "#66CC00")
+lines(fdr.list, mean.fdp.ash + 2 * sd.fdp.ash / sqrt(m), lty = 2, col = "#66CC00")
+
+lines(fdr.list, mean.fdp.gdash - 2 * sd.fdp.gdash / sqrt(m), lty = 2, col = "#0066CC")
+lines(fdr.list, mean.fdp.gdash + 2 * sd.fdp.gdash / sqrt(m), lty = 2, col = "#0066CC")
+
+lines(fdr.list, mean.fdp.ash, col = "green")
+lines(fdr.list, mean.fdp.gdash, col = "blue")
+lines(fdr.list, mean.fdp.qvalue, col = "orange")
+lines(fdr.list, mean.fdp.BH)
+abline(0, 1, col = "red")
+legend("topleft", lty = 1, col = c("green", "blue", "orange", "black"), c("ASH", "GD-ASH", "qvalue", "BH"))
+
+plot(fdr.list, fdr.list, type = "n",
+     xlim = c(0, 0.2), ylim = c(0, 0.2), xlab = "Nominal False Discovery Rate", ylab = "Average False Discovery Proportion", main = "Calibration of pFDR: Zoom-in")
+
+polygon(x = c(fdr.list, rev(fdr.list)),
+        y = c(mean.fdp.BH - 2 * sd.fdp.BH / sqrt(m), rev(mean.fdp.BH + 2 * sd.fdp.BH / sqrt(m))),
+        col = "#E0E0E080", border = FALSE
+        )
+
+polygon(x = c(fdr.list, rev(fdr.list)),
+        y = c(mean.fdp.qvalue - 2 * sd.fdp.qvalue / sqrt(m), rev(mean.fdp.qvalue + 2 * sd.fdp.qvalue / sqrt(m))),
+        col = "#FFE5CC80", border = FALSE
+        )
+
+polygon(x = c(fdr.list, rev(fdr.list)),
+        y = c(mean.fdp.ash - 2 * sd.fdp.ash / sqrt(m), rev(mean.fdp.ash + 2 * sd.fdp.ash / sqrt(m))),
+        col = "#E5FFCC80", border = FALSE
+        )
+
+polygon(x = c(fdr.list, rev(fdr.list)),
+        y = c(mean.fdp.gdash - 2 * sd.fdp.gdash / sqrt(m), rev(mean.fdp.gdash + 2 * sd.fdp.gdash / sqrt(m))),
+        col = "#CCE5FF80", border = FALSE
+        )
+
+lines(fdr.list, mean.fdp.BH - 2 * sd.fdp.BH / sqrt(m), lty = 2, col = "#606060")
+lines(fdr.list, mean.fdp.BH + 2 * sd.fdp.BH / sqrt(m), lty = 2, col = "#606060")
+
+lines(fdr.list, mean.fdp.qvalue - 2 * sd.fdp.qvalue / sqrt(m), lty = 2, col = "#CC6600")
+lines(fdr.list, mean.fdp.qvalue + 2 * sd.fdp.qvalue / sqrt(m), lty = 2, col = "#CC6600")
+
+lines(fdr.list, mean.fdp.ash - 2 * sd.fdp.ash / sqrt(m), lty = 2, col = "#66CC00")
+lines(fdr.list, mean.fdp.ash + 2 * sd.fdp.ash / sqrt(m), lty = 2, col = "#66CC00")
+
+lines(fdr.list, mean.fdp.gdash - 2 * sd.fdp.gdash / sqrt(m), lty = 2, col = "#0066CC")
+lines(fdr.list, mean.fdp.gdash + 2 * sd.fdp.gdash / sqrt(m), lty = 2, col = "#0066CC")
+
+lines(fdr.list, mean.fdp.ash, col = "green")
+lines(fdr.list, mean.fdp.gdash, col = "blue")
+lines(fdr.list, mean.fdp.qvalue, col = "orange")
+lines(fdr.list, mean.fdp.BH)
+abline(0, 1, col = "red")
+legend("topleft", lty = 1, col = c("green", "blue", "orange", "black"), c("ASH", "GD-ASH", "qvalue", "BH"))
+```
+
+```{r zero average fsp summary, cache = TRUE, echo = FALSE}
+mean.fsp.ash = colMeans(matrix(unlist(fsp.ash), nrow = m, byrow = TRUE))
+sd.fsp.ash = apply(matrix(unlist(fsp.ash), nrow = m, byrow = TRUE), 2, sd)
+mean.fsp.gdash = colMeans(matrix(unlist(fsp.gdash), nrow = m, byrow = TRUE))
+sd.fsp.gdash = apply(matrix(unlist(fsp.gdash), nrow = m, byrow = TRUE), 2, sd)
+```
+
+```{r zero average fsp plotting, echo = FALSE}
+par(mfrow = c(1, 2))
 plot(fsr.list, fsr.list, type = "n",
      xlim = c(0, 1), ylim = c(0, 1), xlab = "Nominal False Discovery Rate", ylab = "Average False Sign Proportion", main = "Calibration of S values")
-lines(fsr.list, colMeans(matrix(unlist(fsp.ash), nrow = m, byrow = TRUE)), col = "green")
-lines(fsr.list, colMeans(matrix(unlist(fsp.gdash), nrow = m, byrow = TRUE)), col = "blue")
-abline(0, 1, lty = 2, col = "red")
+
+polygon(x = c(fsr.list, rev(fsr.list)),
+        y = c(mean.fsp.ash - 2 * sd.fsp.ash / sqrt(m), rev(mean.fsp.ash + 2 * sd.fsp.ash / sqrt(m))),
+        col = "#E5FFCC80", border = FALSE
+        )
+
+polygon(x = c(fsr.list, rev(fsr.list)),
+        y = c(mean.fsp.gdash - 2 * sd.fsp.gdash / sqrt(m), rev(mean.fsp.gdash + 2 * sd.fsp.gdash / sqrt(m))),
+        col = "#CCE5FF80", border = FALSE
+        )
+
+lines(fsr.list, mean.fsp.ash - 2 * sd.fsp.ash / sqrt(m), lty = 2, col = "#66CC00")
+lines(fsr.list, mean.fsp.ash + 2 * sd.fsp.ash / sqrt(m), lty = 2, col = "#66CC00")
+
+lines(fsr.list, mean.fsp.gdash - 2 * sd.fsp.gdash / sqrt(m), lty = 2, col = "#0066CC")
+lines(fsr.list, mean.fsp.gdash + 2 * sd.fsp.gdash / sqrt(m), lty = 2, col = "#0066CC")
+
+lines(fsr.list, mean.fsp.ash, col = "green")
+lines(fsr.list, mean.fsp.gdash, col = "blue")
+abline(0, 1, col = "red")
+legend("topleft", lty = 1, col = c("green", "blue"), c("ASH", "GD-ASH"))
+
+plot(fsr.list, fsr.list, type = "n",
+     xlim = c(0, 0.2), ylim = c(0, 0.2), xlab = "Nominal False Discovery Rate", ylab = "Average False Sign Proportion", main = "Calibration of S values: Zoom-in")
+
+polygon(x = c(fsr.list, rev(fsr.list)),
+        y = c(mean.fsp.ash - 2 * sd.fsp.ash / sqrt(m), rev(mean.fsp.ash + 2 * sd.fsp.ash / sqrt(m))),
+        col = "#E5FFCC80", border = FALSE
+        )
+
+polygon(x = c(fsr.list, rev(fsr.list)),
+        y = c(mean.fsp.gdash - 2 * sd.fsp.gdash / sqrt(m), rev(mean.fsp.gdash + 2 * sd.fsp.gdash / sqrt(m))),
+        col = "#CCE5FF80", border = FALSE
+        )
+
+lines(fsr.list, mean.fsp.ash - 2 * sd.fsp.ash / sqrt(m), lty = 2, col = "#66CC00")
+lines(fsr.list, mean.fsp.ash + 2 * sd.fsp.ash / sqrt(m), lty = 2, col = "#66CC00")
+
+lines(fsr.list, mean.fsp.gdash - 2 * sd.fsp.gdash / sqrt(m), lty = 2, col = "#0066CC")
+lines(fsr.list, mean.fsp.gdash + 2 * sd.fsp.gdash / sqrt(m), lty = 2, col = "#0066CC")
+
+lines(fsr.list, mean.fsp.ash, col = "green")
+lines(fsr.list, mean.fsp.gdash, col = "blue")
+abline(0, 1, col = "red")
 legend("topleft", lty = 1, col = c("green", "blue"), c("ASH", "GD-ASH"))
 ```
 
@@ -515,23 +847,159 @@ for (i in 1 : m) {
 }
 ```
 
-```{r small average fdp, cache = TRUE, echo = FALSE}
-plot(fdr.list, fdr.list, type = "n",
-     xlim = c(0, 1), ylim = c(0, 1), xlab = "Nominal False Discovery Rate", ylab = "Average False Discovery Proportion", main = "Calibration of pFDR")
-lines(fdr.list, colMeans(matrix(unlist(fdp.ash), nrow = m, byrow = TRUE)), col = "green")
-lines(fdr.list, colMeans(matrix(unlist(fdp.gdash), nrow = m, byrow = TRUE)), col = "blue")
-lines(fdr.list, colMeans(matrix(unlist(fdp.qvalue), nrow = m, byrow = TRUE)), col = "yellow")
-lines(fdr.list, colMeans(matrix(unlist(fdp.BH), nrow = m, byrow = TRUE)))
-abline(0, 1, lty = 2, col = "red")
-legend("topleft", lty = 1, col = c("green", "blue", "yellow", "black"), c("ASH", "GD-ASH", "qvalue", "BH"))
+```{r small average fdp summary, cache = TRUE, echo = FALSE}
+mean.fdp.ash = colMeans(matrix(unlist(fdp.ash), nrow = m, byrow = TRUE))
+sd.fdp.ash = apply(matrix(unlist(fdp.ash), nrow = m, byrow = TRUE), 2, sd)
+mean.fdp.gdash = colMeans(matrix(unlist(fdp.gdash), nrow = m, byrow = TRUE))
+sd.fdp.gdash = apply(matrix(unlist(fdp.gdash), nrow = m, byrow = TRUE), 2, sd)
+mean.fdp.qvalue = colMeans(matrix(unlist(fdp.qvalue), nrow = m, byrow = TRUE))
+sd.fdp.qvalue = apply(matrix(unlist(fdp.qvalue), nrow = m, byrow = TRUE), 2, sd)
+mean.fdp.BH = colMeans(matrix(unlist(fdp.BH), nrow = m, byrow = TRUE))
+sd.fdp.BH = apply(matrix(unlist(fdp.BH), nrow = m, byrow = TRUE), 2, sd)
 ```
 
-```{r small average fsp, cache = TRUE, echo = FALSE}
+```{r small average fdp plotting, echo = FALSE}
+par(mfrow = c(1, 2))
+plot(fdr.list, fdr.list, type = "n",
+     xlim = c(0, 1), ylim = c(0, 1), xlab = "Nominal False Discovery Rate", ylab = "Average False Discovery Proportion", main = "Calibration of pFDR")
+
+polygon(x = c(fdr.list, rev(fdr.list)),
+        y = c(mean.fdp.BH - 2 * sd.fdp.BH / sqrt(m), rev(mean.fdp.BH + 2 * sd.fdp.BH / sqrt(m))),
+        col = "#E0E0E080", border = FALSE
+        )
+
+polygon(x = c(fdr.list, rev(fdr.list)),
+        y = c(mean.fdp.qvalue - 2 * sd.fdp.qvalue / sqrt(m), rev(mean.fdp.qvalue + 2 * sd.fdp.qvalue / sqrt(m))),
+        col = "#FFE5CC80", border = FALSE
+        )
+
+polygon(x = c(fdr.list, rev(fdr.list)),
+        y = c(mean.fdp.ash - 2 * sd.fdp.ash / sqrt(m), rev(mean.fdp.ash + 2 * sd.fdp.ash / sqrt(m))),
+        col = "#E5FFCC80", border = FALSE
+        )
+
+polygon(x = c(fdr.list, rev(fdr.list)),
+        y = c(mean.fdp.gdash - 2 * sd.fdp.gdash / sqrt(m), rev(mean.fdp.gdash + 2 * sd.fdp.gdash / sqrt(m))),
+        col = "#CCE5FF80", border = FALSE
+        )
+
+lines(fdr.list, mean.fdp.BH - 2 * sd.fdp.BH / sqrt(m), lty = 2, col = "#606060")
+lines(fdr.list, mean.fdp.BH + 2 * sd.fdp.BH / sqrt(m), lty = 2, col = "#606060")
+
+lines(fdr.list, mean.fdp.qvalue - 2 * sd.fdp.qvalue / sqrt(m), lty = 2, col = "#CC6600")
+lines(fdr.list, mean.fdp.qvalue + 2 * sd.fdp.qvalue / sqrt(m), lty = 2, col = "#CC6600")
+
+lines(fdr.list, mean.fdp.ash - 2 * sd.fdp.ash / sqrt(m), lty = 2, col = "#66CC00")
+lines(fdr.list, mean.fdp.ash + 2 * sd.fdp.ash / sqrt(m), lty = 2, col = "#66CC00")
+
+lines(fdr.list, mean.fdp.gdash - 2 * sd.fdp.gdash / sqrt(m), lty = 2, col = "#0066CC")
+lines(fdr.list, mean.fdp.gdash + 2 * sd.fdp.gdash / sqrt(m), lty = 2, col = "#0066CC")
+
+lines(fdr.list, mean.fdp.ash, col = "green")
+lines(fdr.list, mean.fdp.gdash, col = "blue")
+lines(fdr.list, mean.fdp.qvalue, col = "orange")
+lines(fdr.list, mean.fdp.BH)
+abline(0, 1, col = "red")
+legend("topleft", lty = 1, col = c("green", "blue", "orange", "black"), c("ASH", "GD-ASH", "qvalue", "BH"))
+
+plot(fdr.list, fdr.list, type = "n",
+     xlim = c(0, 0.2), ylim = c(0, 0.2), xlab = "Nominal False Discovery Rate", ylab = "Average False Discovery Proportion", main = "Calibration of pFDR: Zoom-in")
+
+polygon(x = c(fdr.list, rev(fdr.list)),
+        y = c(mean.fdp.BH - 2 * sd.fdp.BH / sqrt(m), rev(mean.fdp.BH + 2 * sd.fdp.BH / sqrt(m))),
+        col = "#E0E0E080", border = FALSE
+        )
+
+polygon(x = c(fdr.list, rev(fdr.list)),
+        y = c(mean.fdp.qvalue - 2 * sd.fdp.qvalue / sqrt(m), rev(mean.fdp.qvalue + 2 * sd.fdp.qvalue / sqrt(m))),
+        col = "#FFE5CC80", border = FALSE
+        )
+
+polygon(x = c(fdr.list, rev(fdr.list)),
+        y = c(mean.fdp.ash - 2 * sd.fdp.ash / sqrt(m), rev(mean.fdp.ash + 2 * sd.fdp.ash / sqrt(m))),
+        col = "#E5FFCC80", border = FALSE
+        )
+
+polygon(x = c(fdr.list, rev(fdr.list)),
+        y = c(mean.fdp.gdash - 2 * sd.fdp.gdash / sqrt(m), rev(mean.fdp.gdash + 2 * sd.fdp.gdash / sqrt(m))),
+        col = "#CCE5FF80", border = FALSE
+        )
+
+lines(fdr.list, mean.fdp.BH - 2 * sd.fdp.BH / sqrt(m), lty = 2, col = "#606060")
+lines(fdr.list, mean.fdp.BH + 2 * sd.fdp.BH / sqrt(m), lty = 2, col = "#606060")
+
+lines(fdr.list, mean.fdp.qvalue - 2 * sd.fdp.qvalue / sqrt(m), lty = 2, col = "#CC6600")
+lines(fdr.list, mean.fdp.qvalue + 2 * sd.fdp.qvalue / sqrt(m), lty = 2, col = "#CC6600")
+
+lines(fdr.list, mean.fdp.ash - 2 * sd.fdp.ash / sqrt(m), lty = 2, col = "#66CC00")
+lines(fdr.list, mean.fdp.ash + 2 * sd.fdp.ash / sqrt(m), lty = 2, col = "#66CC00")
+
+lines(fdr.list, mean.fdp.gdash - 2 * sd.fdp.gdash / sqrt(m), lty = 2, col = "#0066CC")
+lines(fdr.list, mean.fdp.gdash + 2 * sd.fdp.gdash / sqrt(m), lty = 2, col = "#0066CC")
+
+lines(fdr.list, mean.fdp.ash, col = "green")
+lines(fdr.list, mean.fdp.gdash, col = "blue")
+lines(fdr.list, mean.fdp.qvalue, col = "orange")
+lines(fdr.list, mean.fdp.BH)
+abline(0, 1, col = "red")
+legend("topleft", lty = 1, col = c("green", "blue", "orange", "black"), c("ASH", "GD-ASH", "qvalue", "BH"))
+```
+
+```{r small average fsp summary, cache = TRUE, echo = FALSE}
+mean.fsp.ash = colMeans(matrix(unlist(fsp.ash), nrow = m, byrow = TRUE))
+sd.fsp.ash = apply(matrix(unlist(fsp.ash), nrow = m, byrow = TRUE), 2, sd)
+mean.fsp.gdash = colMeans(matrix(unlist(fsp.gdash), nrow = m, byrow = TRUE))
+sd.fsp.gdash = apply(matrix(unlist(fsp.gdash), nrow = m, byrow = TRUE), 2, sd)
+```
+
+```{r small average fsp plotting, echo = FALSE}
+par(mfrow = c(1, 2))
 plot(fsr.list, fsr.list, type = "n",
      xlim = c(0, 1), ylim = c(0, 1), xlab = "Nominal False Discovery Rate", ylab = "Average False Sign Proportion", main = "Calibration of S values")
-lines(fsr.list, colMeans(matrix(unlist(fsp.ash), nrow = m, byrow = TRUE)), col = "green")
-lines(fsr.list, colMeans(matrix(unlist(fsp.gdash), nrow = m, byrow = TRUE)), col = "blue")
-abline(0, 1, lty = 2, col = "red")
+
+polygon(x = c(fsr.list, rev(fsr.list)),
+        y = c(mean.fsp.ash - 2 * sd.fsp.ash / sqrt(m), rev(mean.fsp.ash + 2 * sd.fsp.ash / sqrt(m))),
+        col = "#E5FFCC80", border = FALSE
+        )
+
+polygon(x = c(fsr.list, rev(fsr.list)),
+        y = c(mean.fsp.gdash - 2 * sd.fsp.gdash / sqrt(m), rev(mean.fsp.gdash + 2 * sd.fsp.gdash / sqrt(m))),
+        col = "#CCE5FF80", border = FALSE
+        )
+
+lines(fsr.list, mean.fsp.ash - 2 * sd.fsp.ash / sqrt(m), lty = 2, col = "#66CC00")
+lines(fsr.list, mean.fsp.ash + 2 * sd.fsp.ash / sqrt(m), lty = 2, col = "#66CC00")
+
+lines(fsr.list, mean.fsp.gdash - 2 * sd.fsp.gdash / sqrt(m), lty = 2, col = "#0066CC")
+lines(fsr.list, mean.fsp.gdash + 2 * sd.fsp.gdash / sqrt(m), lty = 2, col = "#0066CC")
+
+lines(fsr.list, mean.fsp.ash, col = "green")
+lines(fsr.list, mean.fsp.gdash, col = "blue")
+abline(0, 1, col = "red")
+legend("topleft", lty = 1, col = c("green", "blue"), c("ASH", "GD-ASH"))
+
+plot(fsr.list, fsr.list, type = "n",
+     xlim = c(0, 0.2), ylim = c(0, 0.2), xlab = "Nominal False Discovery Rate", ylab = "Average False Sign Proportion", main = "Calibration of S values: Zoom-in")
+
+polygon(x = c(fsr.list, rev(fsr.list)),
+        y = c(mean.fsp.ash - 2 * sd.fsp.ash / sqrt(m), rev(mean.fsp.ash + 2 * sd.fsp.ash / sqrt(m))),
+        col = "#E5FFCC80", border = FALSE
+        )
+
+polygon(x = c(fsr.list, rev(fsr.list)),
+        y = c(mean.fsp.gdash - 2 * sd.fsp.gdash / sqrt(m), rev(mean.fsp.gdash + 2 * sd.fsp.gdash / sqrt(m))),
+        col = "#CCE5FF80", border = FALSE
+        )
+
+lines(fsr.list, mean.fsp.ash - 2 * sd.fsp.ash / sqrt(m), lty = 2, col = "#66CC00")
+lines(fsr.list, mean.fsp.ash + 2 * sd.fsp.ash / sqrt(m), lty = 2, col = "#66CC00")
+
+lines(fsr.list, mean.fsp.gdash - 2 * sd.fsp.gdash / sqrt(m), lty = 2, col = "#0066CC")
+lines(fsr.list, mean.fsp.gdash + 2 * sd.fsp.gdash / sqrt(m), lty = 2, col = "#0066CC")
+
+lines(fsr.list, mean.fsp.ash, col = "green")
+lines(fsr.list, mean.fsp.gdash, col = "blue")
+abline(0, 1, col = "red")
 legend("topleft", lty = 1, col = c("green", "blue"), c("ASH", "GD-ASH"))
 ```
 
@@ -690,23 +1158,159 @@ for (i in 1 : m) {
 }
 ```
 
-```{r medium average fdp, cache = TRUE, echo = FALSE}
-plot(fdr.list, fdr.list, type = "n",
-     xlim = c(0, 1), ylim = c(0, 1), xlab = "Nominal False Discovery Rate", ylab = "Average False Discovery Proportion", main = "Calibration of pFDR")
-lines(fdr.list, colMeans(matrix(unlist(fdp.ash), nrow = m, byrow = TRUE)), col = "green")
-lines(fdr.list, colMeans(matrix(unlist(fdp.gdash), nrow = m, byrow = TRUE)), col = "blue")
-lines(fdr.list, colMeans(matrix(unlist(fdp.qvalue), nrow = m, byrow = TRUE)), col = "yellow")
-lines(fdr.list, colMeans(matrix(unlist(fdp.BH), nrow = m, byrow = TRUE)))
-abline(0, 1, lty = 2, col = "red")
-legend("topleft", lty = 1, col = c("green", "blue", "yellow", "black"), c("ASH", "GD-ASH", "qvalue", "BH"))
+```{r medium average fdp summary, cache = TRUE, echo = FALSE}
+mean.fdp.ash = colMeans(matrix(unlist(fdp.ash), nrow = m, byrow = TRUE))
+sd.fdp.ash = apply(matrix(unlist(fdp.ash), nrow = m, byrow = TRUE), 2, sd)
+mean.fdp.gdash = colMeans(matrix(unlist(fdp.gdash), nrow = m, byrow = TRUE))
+sd.fdp.gdash = apply(matrix(unlist(fdp.gdash), nrow = m, byrow = TRUE), 2, sd)
+mean.fdp.qvalue = colMeans(matrix(unlist(fdp.qvalue), nrow = m, byrow = TRUE))
+sd.fdp.qvalue = apply(matrix(unlist(fdp.qvalue), nrow = m, byrow = TRUE), 2, sd)
+mean.fdp.BH = colMeans(matrix(unlist(fdp.BH), nrow = m, byrow = TRUE))
+sd.fdp.BH = apply(matrix(unlist(fdp.BH), nrow = m, byrow = TRUE), 2, sd)
 ```
 
-```{r medium average fsp, cache = TRUE, echo = FALSE}
+```{r medium average fdp plotting, echo = FALSE}
+par(mfrow = c(1, 2))
+plot(fdr.list, fdr.list, type = "n",
+     xlim = c(0, 1), ylim = c(0, 1), xlab = "Nominal False Discovery Rate", ylab = "Average False Discovery Proportion", main = "Calibration of pFDR")
+
+polygon(x = c(fdr.list, rev(fdr.list)),
+        y = c(mean.fdp.BH - 2 * sd.fdp.BH / sqrt(m), rev(mean.fdp.BH + 2 * sd.fdp.BH / sqrt(m))),
+        col = "#E0E0E080", border = FALSE
+        )
+
+polygon(x = c(fdr.list, rev(fdr.list)),
+        y = c(mean.fdp.qvalue - 2 * sd.fdp.qvalue / sqrt(m), rev(mean.fdp.qvalue + 2 * sd.fdp.qvalue / sqrt(m))),
+        col = "#FFE5CC80", border = FALSE
+        )
+
+polygon(x = c(fdr.list, rev(fdr.list)),
+        y = c(mean.fdp.ash - 2 * sd.fdp.ash / sqrt(m), rev(mean.fdp.ash + 2 * sd.fdp.ash / sqrt(m))),
+        col = "#E5FFCC80", border = FALSE
+        )
+
+polygon(x = c(fdr.list, rev(fdr.list)),
+        y = c(mean.fdp.gdash - 2 * sd.fdp.gdash / sqrt(m), rev(mean.fdp.gdash + 2 * sd.fdp.gdash / sqrt(m))),
+        col = "#CCE5FF80", border = FALSE
+        )
+
+lines(fdr.list, mean.fdp.BH - 2 * sd.fdp.BH / sqrt(m), lty = 2, col = "#606060")
+lines(fdr.list, mean.fdp.BH + 2 * sd.fdp.BH / sqrt(m), lty = 2, col = "#606060")
+
+lines(fdr.list, mean.fdp.qvalue - 2 * sd.fdp.qvalue / sqrt(m), lty = 2, col = "#CC6600")
+lines(fdr.list, mean.fdp.qvalue + 2 * sd.fdp.qvalue / sqrt(m), lty = 2, col = "#CC6600")
+
+lines(fdr.list, mean.fdp.ash - 2 * sd.fdp.ash / sqrt(m), lty = 2, col = "#66CC00")
+lines(fdr.list, mean.fdp.ash + 2 * sd.fdp.ash / sqrt(m), lty = 2, col = "#66CC00")
+
+lines(fdr.list, mean.fdp.gdash - 2 * sd.fdp.gdash / sqrt(m), lty = 2, col = "#0066CC")
+lines(fdr.list, mean.fdp.gdash + 2 * sd.fdp.gdash / sqrt(m), lty = 2, col = "#0066CC")
+
+lines(fdr.list, mean.fdp.ash, col = "green")
+lines(fdr.list, mean.fdp.gdash, col = "blue")
+lines(fdr.list, mean.fdp.qvalue, col = "orange")
+lines(fdr.list, mean.fdp.BH)
+abline(0, 1, col = "red")
+legend("topleft", lty = 1, col = c("green", "blue", "orange", "black"), c("ASH", "GD-ASH", "qvalue", "BH"))
+
+plot(fdr.list, fdr.list, type = "n",
+     xlim = c(0, 0.2), ylim = c(0, 0.2), xlab = "Nominal False Discovery Rate", ylab = "Average False Discovery Proportion", main = "Calibration of pFDR: Zoom-in")
+
+polygon(x = c(fdr.list, rev(fdr.list)),
+        y = c(mean.fdp.BH - 2 * sd.fdp.BH / sqrt(m), rev(mean.fdp.BH + 2 * sd.fdp.BH / sqrt(m))),
+        col = "#E0E0E080", border = FALSE
+        )
+
+polygon(x = c(fdr.list, rev(fdr.list)),
+        y = c(mean.fdp.qvalue - 2 * sd.fdp.qvalue / sqrt(m), rev(mean.fdp.qvalue + 2 * sd.fdp.qvalue / sqrt(m))),
+        col = "#FFE5CC80", border = FALSE
+        )
+
+polygon(x = c(fdr.list, rev(fdr.list)),
+        y = c(mean.fdp.ash - 2 * sd.fdp.ash / sqrt(m), rev(mean.fdp.ash + 2 * sd.fdp.ash / sqrt(m))),
+        col = "#E5FFCC80", border = FALSE
+        )
+
+polygon(x = c(fdr.list, rev(fdr.list)),
+        y = c(mean.fdp.gdash - 2 * sd.fdp.gdash / sqrt(m), rev(mean.fdp.gdash + 2 * sd.fdp.gdash / sqrt(m))),
+        col = "#CCE5FF80", border = FALSE
+        )
+
+lines(fdr.list, mean.fdp.BH - 2 * sd.fdp.BH / sqrt(m), lty = 2, col = "#606060")
+lines(fdr.list, mean.fdp.BH + 2 * sd.fdp.BH / sqrt(m), lty = 2, col = "#606060")
+
+lines(fdr.list, mean.fdp.qvalue - 2 * sd.fdp.qvalue / sqrt(m), lty = 2, col = "#CC6600")
+lines(fdr.list, mean.fdp.qvalue + 2 * sd.fdp.qvalue / sqrt(m), lty = 2, col = "#CC6600")
+
+lines(fdr.list, mean.fdp.ash - 2 * sd.fdp.ash / sqrt(m), lty = 2, col = "#66CC00")
+lines(fdr.list, mean.fdp.ash + 2 * sd.fdp.ash / sqrt(m), lty = 2, col = "#66CC00")
+
+lines(fdr.list, mean.fdp.gdash - 2 * sd.fdp.gdash / sqrt(m), lty = 2, col = "#0066CC")
+lines(fdr.list, mean.fdp.gdash + 2 * sd.fdp.gdash / sqrt(m), lty = 2, col = "#0066CC")
+
+lines(fdr.list, mean.fdp.ash, col = "green")
+lines(fdr.list, mean.fdp.gdash, col = "blue")
+lines(fdr.list, mean.fdp.qvalue, col = "orange")
+lines(fdr.list, mean.fdp.BH)
+abline(0, 1, col = "red")
+legend("topleft", lty = 1, col = c("green", "blue", "orange", "black"), c("ASH", "GD-ASH", "qvalue", "BH"))
+```
+
+```{r medium average fsp summary, cache = TRUE, echo = FALSE}
+mean.fsp.ash = colMeans(matrix(unlist(fsp.ash), nrow = m, byrow = TRUE))
+sd.fsp.ash = apply(matrix(unlist(fsp.ash), nrow = m, byrow = TRUE), 2, sd)
+mean.fsp.gdash = colMeans(matrix(unlist(fsp.gdash), nrow = m, byrow = TRUE))
+sd.fsp.gdash = apply(matrix(unlist(fsp.gdash), nrow = m, byrow = TRUE), 2, sd)
+```
+
+```{r medium average fsp plotting, echo = FALSE}
+par(mfrow = c(1, 2))
 plot(fsr.list, fsr.list, type = "n",
      xlim = c(0, 1), ylim = c(0, 1), xlab = "Nominal False Discovery Rate", ylab = "Average False Sign Proportion", main = "Calibration of S values")
-lines(fsr.list, colMeans(matrix(unlist(fsp.ash), nrow = m, byrow = TRUE)), col = "green")
-lines(fsr.list, colMeans(matrix(unlist(fsp.gdash), nrow = m, byrow = TRUE)), col = "blue")
-abline(0, 1, lty = 2, col = "red")
+
+polygon(x = c(fsr.list, rev(fsr.list)),
+        y = c(mean.fsp.ash - 2 * sd.fsp.ash / sqrt(m), rev(mean.fsp.ash + 2 * sd.fsp.ash / sqrt(m))),
+        col = "#E5FFCC80", border = FALSE
+        )
+
+polygon(x = c(fsr.list, rev(fsr.list)),
+        y = c(mean.fsp.gdash - 2 * sd.fsp.gdash / sqrt(m), rev(mean.fsp.gdash + 2 * sd.fsp.gdash / sqrt(m))),
+        col = "#CCE5FF80", border = FALSE
+        )
+
+lines(fsr.list, mean.fsp.ash - 2 * sd.fsp.ash / sqrt(m), lty = 2, col = "#66CC00")
+lines(fsr.list, mean.fsp.ash + 2 * sd.fsp.ash / sqrt(m), lty = 2, col = "#66CC00")
+
+lines(fsr.list, mean.fsp.gdash - 2 * sd.fsp.gdash / sqrt(m), lty = 2, col = "#0066CC")
+lines(fsr.list, mean.fsp.gdash + 2 * sd.fsp.gdash / sqrt(m), lty = 2, col = "#0066CC")
+
+lines(fsr.list, mean.fsp.ash, col = "green")
+lines(fsr.list, mean.fsp.gdash, col = "blue")
+abline(0, 1, col = "red")
+legend("topleft", lty = 1, col = c("green", "blue"), c("ASH", "GD-ASH"))
+
+plot(fsr.list, fsr.list, type = "n",
+     xlim = c(0, 0.2), ylim = c(0, 0.2), xlab = "Nominal False Discovery Rate", ylab = "Average False Sign Proportion", main = "Calibration of S values: Zoom-in")
+
+polygon(x = c(fsr.list, rev(fsr.list)),
+        y = c(mean.fsp.ash - 2 * sd.fsp.ash / sqrt(m), rev(mean.fsp.ash + 2 * sd.fsp.ash / sqrt(m))),
+        col = "#E5FFCC80", border = FALSE
+        )
+
+polygon(x = c(fsr.list, rev(fsr.list)),
+        y = c(mean.fsp.gdash - 2 * sd.fsp.gdash / sqrt(m), rev(mean.fsp.gdash + 2 * sd.fsp.gdash / sqrt(m))),
+        col = "#CCE5FF80", border = FALSE
+        )
+
+lines(fsr.list, mean.fsp.ash - 2 * sd.fsp.ash / sqrt(m), lty = 2, col = "#66CC00")
+lines(fsr.list, mean.fsp.ash + 2 * sd.fsp.ash / sqrt(m), lty = 2, col = "#66CC00")
+
+lines(fsr.list, mean.fsp.gdash - 2 * sd.fsp.gdash / sqrt(m), lty = 2, col = "#0066CC")
+lines(fsr.list, mean.fsp.gdash + 2 * sd.fsp.gdash / sqrt(m), lty = 2, col = "#0066CC")
+
+lines(fsr.list, mean.fsp.ash, col = "green")
+lines(fsr.list, mean.fsp.gdash, col = "blue")
+abline(0, 1, col = "red")
 legend("topleft", lty = 1, col = c("green", "blue"), c("ASH", "GD-ASH"))
 ```
 
@@ -871,23 +1475,159 @@ for (i in 1 : m) {
 }
 ```
 
-```{r big average fdp, cache = TRUE, echo = FALSE}
-plot(fdr.list, fdr.list, type = "n",
-     xlim = c(0, 1), ylim = c(0, 1), xlab = "Nominal False Discovery Rate", ylab = "Average False Discovery Proportion", main = "Calibration of pFDR")
-lines(fdr.list, colMeans(matrix(unlist(fdp.ash), nrow = m, byrow = TRUE)), col = "green")
-lines(fdr.list, colMeans(matrix(unlist(fdp.gdash), nrow = m, byrow = TRUE)), col = "blue")
-lines(fdr.list, colMeans(matrix(unlist(fdp.qvalue), nrow = m, byrow = TRUE)), col = "yellow")
-lines(fdr.list, colMeans(matrix(unlist(fdp.BH), nrow = m, byrow = TRUE)))
-abline(0, 1, lty = 2, col = "red")
-legend("topleft", lty = 1, col = c("green", "blue", "yellow", "black"), c("ASH", "GD-ASH", "qvalue", "BH"))
+```{r big average fdp summary, cache = TRUE, echo = FALSE}
+mean.fdp.ash = colMeans(matrix(unlist(fdp.ash), nrow = m, byrow = TRUE))
+sd.fdp.ash = apply(matrix(unlist(fdp.ash), nrow = m, byrow = TRUE), 2, sd)
+mean.fdp.gdash = colMeans(matrix(unlist(fdp.gdash), nrow = m, byrow = TRUE))
+sd.fdp.gdash = apply(matrix(unlist(fdp.gdash), nrow = m, byrow = TRUE), 2, sd)
+mean.fdp.qvalue = colMeans(matrix(unlist(fdp.qvalue), nrow = m, byrow = TRUE))
+sd.fdp.qvalue = apply(matrix(unlist(fdp.qvalue), nrow = m, byrow = TRUE), 2, sd)
+mean.fdp.BH = colMeans(matrix(unlist(fdp.BH), nrow = m, byrow = TRUE))
+sd.fdp.BH = apply(matrix(unlist(fdp.BH), nrow = m, byrow = TRUE), 2, sd)
 ```
 
-```{r big average fsp, cache = TRUE, echo = FALSE}
+```{r big average fdp plotting, echo = FALSE}
+par(mfrow = c(1, 2))
+plot(fdr.list, fdr.list, type = "n",
+     xlim = c(0, 1), ylim = c(0, 1), xlab = "Nominal False Discovery Rate", ylab = "Average False Discovery Proportion", main = "Calibration of pFDR")
+
+polygon(x = c(fdr.list, rev(fdr.list)),
+        y = c(mean.fdp.BH - 2 * sd.fdp.BH / sqrt(m), rev(mean.fdp.BH + 2 * sd.fdp.BH / sqrt(m))),
+        col = "#E0E0E080", border = FALSE
+        )
+
+polygon(x = c(fdr.list, rev(fdr.list)),
+        y = c(mean.fdp.qvalue - 2 * sd.fdp.qvalue / sqrt(m), rev(mean.fdp.qvalue + 2 * sd.fdp.qvalue / sqrt(m))),
+        col = "#FFE5CC80", border = FALSE
+        )
+
+polygon(x = c(fdr.list, rev(fdr.list)),
+        y = c(mean.fdp.ash - 2 * sd.fdp.ash / sqrt(m), rev(mean.fdp.ash + 2 * sd.fdp.ash / sqrt(m))),
+        col = "#E5FFCC80", border = FALSE
+        )
+
+polygon(x = c(fdr.list, rev(fdr.list)),
+        y = c(mean.fdp.gdash - 2 * sd.fdp.gdash / sqrt(m), rev(mean.fdp.gdash + 2 * sd.fdp.gdash / sqrt(m))),
+        col = "#CCE5FF80", border = FALSE
+        )
+
+lines(fdr.list, mean.fdp.BH - 2 * sd.fdp.BH / sqrt(m), lty = 2, col = "#606060")
+lines(fdr.list, mean.fdp.BH + 2 * sd.fdp.BH / sqrt(m), lty = 2, col = "#606060")
+
+lines(fdr.list, mean.fdp.qvalue - 2 * sd.fdp.qvalue / sqrt(m), lty = 2, col = "#CC6600")
+lines(fdr.list, mean.fdp.qvalue + 2 * sd.fdp.qvalue / sqrt(m), lty = 2, col = "#CC6600")
+
+lines(fdr.list, mean.fdp.ash - 2 * sd.fdp.ash / sqrt(m), lty = 2, col = "#66CC00")
+lines(fdr.list, mean.fdp.ash + 2 * sd.fdp.ash / sqrt(m), lty = 2, col = "#66CC00")
+
+lines(fdr.list, mean.fdp.gdash - 2 * sd.fdp.gdash / sqrt(m), lty = 2, col = "#0066CC")
+lines(fdr.list, mean.fdp.gdash + 2 * sd.fdp.gdash / sqrt(m), lty = 2, col = "#0066CC")
+
+lines(fdr.list, mean.fdp.ash, col = "green")
+lines(fdr.list, mean.fdp.gdash, col = "blue")
+lines(fdr.list, mean.fdp.qvalue, col = "orange")
+lines(fdr.list, mean.fdp.BH)
+abline(0, 1, col = "red")
+legend("topleft", lty = 1, col = c("green", "blue", "orange", "black"), c("ASH", "GD-ASH", "qvalue", "BH"))
+
+plot(fdr.list, fdr.list, type = "n",
+     xlim = c(0, 0.2), ylim = c(0, 0.2), xlab = "Nominal False Discovery Rate", ylab = "Average False Discovery Proportion", main = "Calibration of pFDR: Zoom-in")
+
+polygon(x = c(fdr.list, rev(fdr.list)),
+        y = c(mean.fdp.BH - 2 * sd.fdp.BH / sqrt(m), rev(mean.fdp.BH + 2 * sd.fdp.BH / sqrt(m))),
+        col = "#E0E0E080", border = FALSE
+        )
+
+polygon(x = c(fdr.list, rev(fdr.list)),
+        y = c(mean.fdp.qvalue - 2 * sd.fdp.qvalue / sqrt(m), rev(mean.fdp.qvalue + 2 * sd.fdp.qvalue / sqrt(m))),
+        col = "#FFE5CC80", border = FALSE
+        )
+
+polygon(x = c(fdr.list, rev(fdr.list)),
+        y = c(mean.fdp.ash - 2 * sd.fdp.ash / sqrt(m), rev(mean.fdp.ash + 2 * sd.fdp.ash / sqrt(m))),
+        col = "#E5FFCC80", border = FALSE
+        )
+
+polygon(x = c(fdr.list, rev(fdr.list)),
+        y = c(mean.fdp.gdash - 2 * sd.fdp.gdash / sqrt(m), rev(mean.fdp.gdash + 2 * sd.fdp.gdash / sqrt(m))),
+        col = "#CCE5FF80", border = FALSE
+        )
+
+lines(fdr.list, mean.fdp.BH - 2 * sd.fdp.BH / sqrt(m), lty = 2, col = "#606060")
+lines(fdr.list, mean.fdp.BH + 2 * sd.fdp.BH / sqrt(m), lty = 2, col = "#606060")
+
+lines(fdr.list, mean.fdp.qvalue - 2 * sd.fdp.qvalue / sqrt(m), lty = 2, col = "#CC6600")
+lines(fdr.list, mean.fdp.qvalue + 2 * sd.fdp.qvalue / sqrt(m), lty = 2, col = "#CC6600")
+
+lines(fdr.list, mean.fdp.ash - 2 * sd.fdp.ash / sqrt(m), lty = 2, col = "#66CC00")
+lines(fdr.list, mean.fdp.ash + 2 * sd.fdp.ash / sqrt(m), lty = 2, col = "#66CC00")
+
+lines(fdr.list, mean.fdp.gdash - 2 * sd.fdp.gdash / sqrt(m), lty = 2, col = "#0066CC")
+lines(fdr.list, mean.fdp.gdash + 2 * sd.fdp.gdash / sqrt(m), lty = 2, col = "#0066CC")
+
+lines(fdr.list, mean.fdp.ash, col = "green")
+lines(fdr.list, mean.fdp.gdash, col = "blue")
+lines(fdr.list, mean.fdp.qvalue, col = "orange")
+lines(fdr.list, mean.fdp.BH)
+abline(0, 1, col = "red")
+legend("topleft", lty = 1, col = c("green", "blue", "orange", "black"), c("ASH", "GD-ASH", "qvalue", "BH"))
+```
+
+```{r big average fsp summary, cache = TRUE, echo = FALSE}
+mean.fsp.ash = colMeans(matrix(unlist(fsp.ash), nrow = m, byrow = TRUE))
+sd.fsp.ash = apply(matrix(unlist(fsp.ash), nrow = m, byrow = TRUE), 2, sd)
+mean.fsp.gdash = colMeans(matrix(unlist(fsp.gdash), nrow = m, byrow = TRUE))
+sd.fsp.gdash = apply(matrix(unlist(fsp.gdash), nrow = m, byrow = TRUE), 2, sd)
+```
+
+```{r big average fsp plotting, echo = FALSE}
+par(mfrow = c(1, 2))
 plot(fsr.list, fsr.list, type = "n",
      xlim = c(0, 1), ylim = c(0, 1), xlab = "Nominal False Discovery Rate", ylab = "Average False Sign Proportion", main = "Calibration of S values")
-lines(fsr.list, colMeans(matrix(unlist(fsp.ash), nrow = m, byrow = TRUE)), col = "green")
-lines(fsr.list, colMeans(matrix(unlist(fsp.gdash), nrow = m, byrow = TRUE)), col = "blue")
-abline(0, 1, lty = 2, col = "red")
+
+polygon(x = c(fsr.list, rev(fsr.list)),
+        y = c(mean.fsp.ash - 2 * sd.fsp.ash / sqrt(m), rev(mean.fsp.ash + 2 * sd.fsp.ash / sqrt(m))),
+        col = "#E5FFCC80", border = FALSE
+        )
+
+polygon(x = c(fsr.list, rev(fsr.list)),
+        y = c(mean.fsp.gdash - 2 * sd.fsp.gdash / sqrt(m), rev(mean.fsp.gdash + 2 * sd.fsp.gdash / sqrt(m))),
+        col = "#CCE5FF80", border = FALSE
+        )
+
+lines(fsr.list, mean.fsp.ash - 2 * sd.fsp.ash / sqrt(m), lty = 2, col = "#66CC00")
+lines(fsr.list, mean.fsp.ash + 2 * sd.fsp.ash / sqrt(m), lty = 2, col = "#66CC00")
+
+lines(fsr.list, mean.fsp.gdash - 2 * sd.fsp.gdash / sqrt(m), lty = 2, col = "#0066CC")
+lines(fsr.list, mean.fsp.gdash + 2 * sd.fsp.gdash / sqrt(m), lty = 2, col = "#0066CC")
+
+lines(fsr.list, mean.fsp.ash, col = "green")
+lines(fsr.list, mean.fsp.gdash, col = "blue")
+abline(0, 1, col = "red")
+legend("topleft", lty = 1, col = c("green", "blue"), c("ASH", "GD-ASH"))
+
+plot(fsr.list, fsr.list, type = "n",
+     xlim = c(0, 0.2), ylim = c(0, 0.2), xlab = "Nominal False Discovery Rate", ylab = "Average False Sign Proportion", main = "Calibration of S values: Zoom-in")
+
+polygon(x = c(fsr.list, rev(fsr.list)),
+        y = c(mean.fsp.ash - 2 * sd.fsp.ash / sqrt(m), rev(mean.fsp.ash + 2 * sd.fsp.ash / sqrt(m))),
+        col = "#E5FFCC80", border = FALSE
+        )
+
+polygon(x = c(fsr.list, rev(fsr.list)),
+        y = c(mean.fsp.gdash - 2 * sd.fsp.gdash / sqrt(m), rev(mean.fsp.gdash + 2 * sd.fsp.gdash / sqrt(m))),
+        col = "#CCE5FF80", border = FALSE
+        )
+
+lines(fsr.list, mean.fsp.ash - 2 * sd.fsp.ash / sqrt(m), lty = 2, col = "#66CC00")
+lines(fsr.list, mean.fsp.ash + 2 * sd.fsp.ash / sqrt(m), lty = 2, col = "#66CC00")
+
+lines(fsr.list, mean.fsp.gdash - 2 * sd.fsp.gdash / sqrt(m), lty = 2, col = "#0066CC")
+lines(fsr.list, mean.fsp.gdash + 2 * sd.fsp.gdash / sqrt(m), lty = 2, col = "#0066CC")
+
+lines(fsr.list, mean.fsp.ash, col = "green")
+lines(fsr.list, mean.fsp.gdash, col = "blue")
+abline(0, 1, col = "red")
 legend("topleft", lty = 1, col = c("green", "blue"), c("ASH", "GD-ASH"))
 ```
 
