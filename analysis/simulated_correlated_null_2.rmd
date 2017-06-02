@@ -1,5 +1,5 @@
 ---
-title: "Simulating Correlated $N(0, 1)$ $Z$ Scores: More Complicated"
+title: "Simulating Correlated $N(0, 1)$ $Z$ Scores: More Exotic"
 author: "Lei Sun"
 date: 2017-05-31
 output: html_document
