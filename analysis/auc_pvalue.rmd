@@ -58,8 +58,6 @@ legend("bottomright", lty = 1, col = c("black", "blue"), legend = c("p value", "
 
 This simple illustration shows why we would have different AUC with $p$ values and `BH`.
 
-
-
 ## Session information
 
 <!-- Insert the session information into the document -->
