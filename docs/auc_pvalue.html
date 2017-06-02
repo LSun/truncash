@@ -316,7 +316,7 @@ shared across the workflowr files. -->
 <p><strong>Last updated:</strong> 2017-06-02</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> aff3b46</p>
+<p><strong>Code version:</strong> bf20fcd</p>
 <!-- Add your analysis here -->
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
@@ -329,8 +329,8 @@ shared across the workflowr files. -->
 <p>The three dotted lines in the plot show the three scenarios with <code>BH</code> applied to this data set. The critical decision boundary is when we have the nominal FDR <span class="math inline">\(\alpha = 0.01\)</span> in red. When <span class="math inline">\(\alpha &lt; 0.01\)</span>, like the green line, no <span class="math inline">\(p\)</span> value falls below the line and thus no discovery is declared. On the other hand, when <span class="math inline">\(\alpha &gt; 0.01\)</span>, like the blue line, the largest <span class="math inline">\(p\)</span> value falls below the line and thus all hypotheses would be declared as discoveries. Therefore, under <code>BH</code>, at different nominal FDR levels, we either fail to reject any null hypothesis, or reject all of <span class="math inline">\(6\)</span> together. In another word, we either have false positive rate (FPR) <span class="math inline">\(=\)</span> true positive rate (TPR) <span class="math inline">\(=\)</span> 0, or FRP <span class="math inline">\(=\)</span> TPR <span class="math inline">\(=\)</span> 1. Below we plot the two ROC curves by <code>BH</code> and by simply thresholding <span class="math inline">\(p\)</span> values. In this case using <span class="math inline">\(p\)</span> values (AUC <span class="math inline">\(=\)</span> 0.78) is actually better than using <code>BH</code> (AUC = 0.5).</p>
 <p><img src="figure/auc_pvalue.rmd/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
 <ol style="list-style-type: decimal">
-<li>Note that <code>BH</code> indeed doesn’t change the order of hypotheses set by <span class="math inline">\(p\)</span> values. As in this exmaple, if a hypothesis with a larger <span class="math inline">\(p\)</span> value is rejected, all hypotheses with smaller <span class="math inline">\(p\)</span> values will also be rejected; meanwhile, when a hypothesis with a smaller <span class="math inline">\(p\)</span> value is not rejected, all hypotheses with larger <span class="math inline">\(p\)</span> values won’t be rejected either.</li>
-<li>However, <code>BH</code> is capable of generating ties in hypotheses. As in this exmaple, all <span class="math inline">\(6\)</span> hypothese have distinctive <span class="math inline">\(p\)</span> values, yet they are essentially equivalent under <code>BH</code>.</li>
+<li>Note that <code>BH</code> <strong>indeed doesn’t change the order</strong> of hypotheses set by <span class="math inline">\(p\)</span> values. As in this exmaple, if a hypothesis with a larger <span class="math inline">\(p\)</span> value is rejected, all hypotheses with smaller <span class="math inline">\(p\)</span> values will also be rejected; meanwhile, when a hypothesis with a smaller <span class="math inline">\(p\)</span> value is not rejected, all hypotheses with larger <span class="math inline">\(p\)</span> values won’t be rejected either.</li>
+<li>However, <code>BH</code> is capable of <strong>generating ties in hypotheses</strong>. As in this exmaple, all <span class="math inline">\(6\)</span> hypothese have distinctive <span class="math inline">\(p\)</span> values, yet they are essentially equivalent under <code>BH</code>.</li>
 </ol>
 <p>This simple illustration shows why we would have different AUC with <span class="math inline">\(p\)</span> values and <code>BH</code>.</p>
 </div>
