@@ -1,0 +1,67 @@
+---
+title: "Why AUC of `BH` and $p$ values are different?"
+author: "Lei Sun"
+date: 2017-06-02
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+## Introduction
+
+We usually use [AUC (area under the receiver operating characteristic curve)](https://en.wikipedia.org/wiki/Receiver_operating_characteristic#Area_under_the_curve) to measure the performance of a statistical testing procedure.  In essence, AUC is solely determined by how the hypotheses are ranked by the procedure.  Thus, Matthew's intuition is that the three methods based on $p$ values, $p$ values, Benjamini-Hochberg, and `qvalue` should give the equivalent AUC.  However, [it doesn't appear so in our simulation](simulation_real_se.html).  It turns out there is a simple explanation for the difference bwteen `BH` and $p$ values.
+
+## A simple illustration
+
+Given a nominal FDR level $\alpha$, and $m$ $p$ values, `BH` starts with the least significant or largest $p$ value and compares each ordered $p$ value $p_{(k)}$ with $\frac{\alpha}mk$.  Now suppose we have 6 $p$ values in the increasing order, $\left\{0.005, 0.006, 0.007, 0.008, 0.009, 0.010\right\}$, plotted as follows.  These $p$ values correpond with hypotheses of true positives ("T") or false positives ("F").  In this example, the hypotheses associated with the ordered $p$ values are set to be $\left\{T, T, F, F, T, F\right\}$.
+
+```{r, echo = FALSE}
+p = 5:10 / 1000
+plot(p, ylim = c(0, 0.012), xlim = c(0, 7), pch = 4, xlab = "Order", ylab = "Ordered p value", main = "Benjamini-Hochberg Decision Boundary")
+abline(0, 0.01 / 6, lty = 2, col = "red")
+abline(0, 0.02 / 6, lty = 2, col = "blue")
+abline(0, 0.005 / 6, lty = 2, col = "green")
+legend("topleft", legend = paste("FDR =", c(0.005, 0.01, 0.02)), lty = 2, col = c("green", "red", "blue"))
+text(1 : 6, p, c("T", "T", "F", "F", "T", "F"), pos = 3)
+```
+
+The three dotted lines in the plot show the three scenarios with `BH` applied to this data set.  The critical decision boundary is when we have the nominal FDR $\alpha = 0.01$ in red.  When $\alpha < 0.01$, like the green line, no $p$ value falls below the line and thus no discovery is declared.  On the other hand, when $\alpha > 0.01$, like the blue line, the largest $p$ value falls below the line and thus all hypotheses would be declared as discoveries.  Therefore, under `BH`, at different nominal FDR levels, we either fail to reject any null hypothesis, or reject all of $6$ together.  In another word, we either have false positive rate (FPR) $=$ true positive rate (TPR) $=$ 0, or FRP $=$ TPR $=$ 1.  Below we plot the two ROC curves by `BH` and by simply thresholding $p$ values.  In this case using $p$ values (AUC $=$ 0.78) is actually better than using `BH` (AUC = 0.5).
+
+```{r, echo = FALSE, message = FALSE}
+library(pROC)
+roc = roc(response = c(1, 1, 0, 0, 1, 0), predictor = p, plot = TRUE, main = "Receiver Operating Characteristic Curve")
+segments(1, 0, 0, 1, col = "blue")
+legend("bottomright", lty = 1, col = c("black", "blue"), legend = c("p value", "BH"))
+```
+
+1. Note that `BH` indeed doesn't change the order of hypotheses set by $p$ values.  As in this exmaple, if a hypothesis with a larger $p$ value is rejected, all hypotheses with smaller $p$ values will also be rejected; meanwhile, when a hypothesis with a smaller $p$ value is not rejected, all hypotheses with larger $p$ values won't be rejected either.
+2. However, `BH` is capable of generating ties in hypotheses.  As in this exmaple, all $6$ hypothese have distinctive $p$ values, yet they are essentially equivalent under `BH`.
+
+This simple illustration shows why we would have different AUC with $p$ values and `BH`.
+
+
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```
