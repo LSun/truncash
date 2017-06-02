@@ -53,8 +53,8 @@ segments(1, 0, 0, 1, col = "blue")
 legend("bottomright", lty = 1, col = c("black", "blue"), legend = c("p value", "BH"))
 ```
 
-1. Note that `BH` indeed doesn't change the order of hypotheses set by $p$ values.  As in this exmaple, if a hypothesis with a larger $p$ value is rejected, all hypotheses with smaller $p$ values will also be rejected; meanwhile, when a hypothesis with a smaller $p$ value is not rejected, all hypotheses with larger $p$ values won't be rejected either.
-2. However, `BH` is capable of generating ties in hypotheses.  As in this exmaple, all $6$ hypothese have distinctive $p$ values, yet they are essentially equivalent under `BH`.
+1. Note that `BH` **indeed doesn't change the order** of hypotheses set by $p$ values.  As in this exmaple, if a hypothesis with a larger $p$ value is rejected, all hypotheses with smaller $p$ values will also be rejected; meanwhile, when a hypothesis with a smaller $p$ value is not rejected, all hypotheses with larger $p$ values won't be rejected either.
+2. However, `BH` is capable of **generating ties in hypotheses**.  As in this exmaple, all $6$ hypothese have distinctive $p$ values, yet they are essentially equivalent under `BH`.
 
 This simple illustration shows why we would have different AUC with $p$ values and `BH`.
 
