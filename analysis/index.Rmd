@@ -147,6 +147,8 @@ Following [Gao](http://home.uchicago.edu/gaow/)'s suggestion, we are taking a lo
 
 The large-scale simulation testing for GD-ASH with simulated effects under different sparsity, strength, and shape, and realistic correlated noises.
 
+* [Why AUC of p value and `BH` might be different?](auc_pvalue.html)
+
 [`ashr`]: https://github.com/stephens999/ashr
 
 <!-- The goal of this new template is to simplify the setup and maintenance of a research website. -->
