@@ -1,3 +1,15 @@
+## selection top expressed genes
+top_genes_index = function (ngene, data) {return(order(rowSums(data), decreasing = TRUE)[1 : ngene])}
+
+lcpm = function(data) {R = colSums(data); t(log2(((t(data) + 0.5) / (R + 1)) * 10^6))}
+
+top_gene_selection = function (ngene, data) {
+  Y = lcpm(data)
+  subset = top_genes_index(ngene, data)
+  data = data[subset, ]
+  return(list(data = data, ngene = ngene))
+}
+
 # this script generates a 1k * 10k matrix with p-values
 # of correlatednull data simulated from GTEx/Liver rna-seq
 # each row is a random simulation run of n genes

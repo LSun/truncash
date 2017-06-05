@@ -1,0 +1,198 @@
+---
+title: "Simulating Correlated $N(0, 1)$ $Z$ Scores: Still More"
+author: "Lei Sun"
+date: 2017-06-04
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+## Introduction
+
+This time the correlated $z$ scores are simulated similar to [the previous low rank example](simulated_correlated_null.html) but with different numbers of $k$.
+
+```{r functions, message = FALSE, echo = FALSE, cache = TRUE}
+source("../code/gdash.R")
+
+gd.std.mat = function(x, order) {
+  hermite = Hermite(order)
+  gd.mat = matrix(0, nrow = length(x), ncol = order)
+  for (j in 1 : order) {
+    gd.mat[, j] = hermite[[j]](x) * dnorm(x) * (-1)^j / sqrt(factorial(j))
+  }
+  gd.mat = cbind(dnorm(x), gd.mat)
+}
+
+WL = 100
+hermite.list = orthopolynom::hermite.he.polynomials(WL)
+hermite.coef = orthopolynom::polynomial.coefficients(hermite.list)
+
+fit.gd = function (order, z) {
+  moments = c()
+  for (i in 0 : order) {
+    moments[i + 1] = mean(z^i)
+  }
+  w.std = c()
+  for (i in 0 : order) {
+    w.std[i + 1] = sum(moments[1 : (i + 1)] / sqrt(factorial(i)) * hermite.coef[[i + 1]]) * (-1)^i
+  }
+  x.seq = seq(-(max(abs(z)) + 1), (max(abs(z)) + 1), 0.01)
+  y.gd = gd.std.mat(x.seq, order) %*% w.std[1 : (order + 1)]
+  z.hist = hist(z, breaks = 100, plot = FALSE)
+  hist(z, breaks = 100, prob = TRUE, main = "Histogram of Simulated Correlated N(0, 1) z Scores", 
+       ylim = c(
+         min(0, y.gd),
+         max(z.hist$density, y.gd, dnorm(x.seq))
+       ), xlim = range(x.seq))
+  lines(x.seq, dnorm(x.seq), col = "red")
+  lines(x.seq, y.gd, col = "blue")
+  legend("topleft", lty = 1, col = c("red", "blue"), legend = c("N (0, 1)", paste(order, "Gaussian\nDerivatives")), bty = "n")
+}
+
+z.sim = function (n, k) {
+  L = matrix(rnorm(n * k), ncol = k)
+  sd = sqrt(rowSums(L^2))
+  z = L %*% rnorm(k) / sd
+  return(z)
+}
+```
+
+```{r parameters}
+n = 1e4
+L = 100
+```
+
+## $k = 1$
+
+```{r 1, cache = TRUE}
+set.seed(777)
+k = 1
+for (j in 1 : 2) {
+  z = z.sim(n, k)
+  fit.gd(L, z)
+}
+```
+
+## $k = 2$
+
+```{r 2, cache = TRUE}
+set.seed(777)
+k = 2
+for (j in 1 : 2) {
+  z = z.sim(n, k)
+  fit.gd(L, z)
+}
+```
+
+## $k = 3$
+
+```{r 3, cache = TRUE}
+set.seed(777)
+k = 3
+for (j in 1 : 2) {
+  z = z.sim(n, k)
+  fit.gd(L, z)
+}
+```
+
+## $k = 4$
+
+```{r 4, cache = TRUE}
+set.seed(777)
+k = 4
+for (j in 1 : 2) {
+  z = z.sim(n, k)
+  fit.gd(L, z)
+}
+```
+
+## $k = 5$
+
+```{r 5, cache = TRUE}
+set.seed(777)
+k = 5
+for (j in 1 : 2) {
+  z = z.sim(n, k)
+  fit.gd(L, z)
+}
+```
+
+## $k = 6$
+
+```{r 6, cache = TRUE}
+set.seed(777)
+k = 6
+for (j in 1 : 2) {
+  z = z.sim(n, k)
+  fit.gd(L, z)
+}
+```
+
+## $k = 7$
+
+```{r 7, cache = TRUE}
+set.seed(777)
+k = 7
+for (j in 1 : 2) {
+  z = z.sim(n, k)
+  fit.gd(L, z)
+}
+```
+
+## $k = 8$
+
+```{r 8, cache = TRUE}
+set.seed(777)
+k = 8
+for (j in 1 : 2) {
+  z = z.sim(n, k)
+  fit.gd(L, z)
+}
+```
+
+## $k = 9$
+
+```{r 9, cache = TRUE}
+set.seed(777)
+k = 9
+for (j in 1 : 2) {
+  z = z.sim(n, k)
+  fit.gd(L, z)
+}
+```
+
+## $k = 10$
+
+```{r 10, cache = TRUE}
+set.seed(777)
+k = 10
+for (j in 1 : 2) {
+  z = z.sim(n, k)
+  fit.gd(L, z)
+}
+```
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```
