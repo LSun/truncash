@@ -92,7 +92,7 @@ w.mosek = function (matrix_lik_w, w_prior, w.init = NULL) {
   z <- Rmosek::mosek(P, opts = list(verbose = 0, usesol = TRUE))
   status <- z$sol$itr$solsta
   w <- z$sol$itr$suc - z$sol$itr$slc
-  list(w = w, status = status)
+  return(list(w = w, status = status))
 }
 
 
@@ -132,7 +132,7 @@ w.mosek.primal = function (matrix_lik_w, w_prior, w.init = NULL) {
   z <- Rmosek::mosek(P, opts = list(verbose = 0, usesol = TRUE))
   status <- z$sol$itr$solsta
   w <- z$sol$itr$xx[-(1 : n)]
-  list(w = w, status = status)
+  return(list(w = w, status = status))
 }
 
 
