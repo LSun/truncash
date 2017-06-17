@@ -1,5 +1,5 @@
 ---
-title: "Posterior Inference with Gaussian Derivative Likelihood: More Simulation"
+title: "Posterior Inference with Gaussian Derivative Likelihood: Model and Result"
 author: "Lei Sun"
 date: 2017-06-14
 output: html_document

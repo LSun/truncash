@@ -13,7 +13,7 @@
 
 <meta name="date" content="2017-06-14" />
 
-<title>Posterior Inference with Gaussian Derivative Likelihood: More Simulation</title>
+<title>Posterior Inference with Gaussian Derivative Likelihood: Model and Result</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -302,7 +302,7 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Posterior Inference with Gaussian Derivative Likelihood: More Simulation</h1>
+<h1 class="title toc-ignore">Posterior Inference with Gaussian Derivative Likelihood: Model and Result</h1>
 <h4 class="author"><em>Lei Sun</em></h4>
 <h4 class="date"><em>2017-06-14</em></h4>
 
@@ -316,10 +316,10 @@ shared across the workflowr files. -->
 <p><strong>Last updated:</strong> 2017-06-17</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 5748711</p>
+<p><strong>Code version:</strong> 73b4bb7</p>
 <!-- Add your analysis here -->
-<div id="model" class="section level2">
-<h2>Model</h2>
+<div id="gd-ash-model" class="section level2">
+<h2><code>GD-ASH</code> Model</h2>
 <p>Recall the typical <code>GD-ASH</code> model is</p>
 <p><span class="math display">\[
 \begin{array}{l}
@@ -334,7 +334,10 @@ f(z) = \sum w_l\frac{1}{\sqrt{l!}}\varphi^{(l)}(z) \ .
 <p><span class="math display">\[
 \frac{1}{\hat s_j}\sum w_l \frac{1}{\sqrt{l!}} \varphi^{(l)}\left(\frac{\hat\beta_j - \beta_j}{\hat s_j}\right) \ .
 \]</span> Note that when <span class="math inline">\(f = \varphi\)</span> it becomes the independent <span class="math inline">\(N\left(\beta_j, \hat s_j^2\right)\)</span> case.</p>
-<p>Therefore, the posterior distribution of <span class="math inline">\(\beta_j | \hat s_j, \hat\beta_j\)</span> should be</p>
+</div>
+<div id="gd-lik-model" class="section level2">
+<h2><code>GD-Lik</code> Model</h2>
+<p>Therefore, if we use Gaussian derivatives instead of Gaussian as the likelihood, the posterior distribution of <span class="math inline">\(\beta_j | \hat s_j, \hat\beta_j\)</span> should be</p>
 <p><span class="math display">\[
 \begin{array}{rcl}
 f\left(\beta_j \mid \hat s_j, \hat\beta_j\right)
@@ -375,7 +378,10 @@ d\beta_j
 :=
 \sum \pi_k \sum w_l f_{jkl}
 \ .
-\]</span> ## Posterior mean</p>
+\]</span></p>
+</div>
+<div id="posterior-mean" class="section level2">
+<h2>Posterior mean</h2>
 <p>After algebra, the posterior mean is given by</p>
 <p><span class="math display">\[
 E\left[\beta_j \mid \hat s_j, \hat \beta_j \right]
@@ -417,16 +423,19 @@ p\left(\beta_j = 0\mid \hat s_j, \hat \beta_j\right)
 \sum w_l
 f_{jkl}
 } \ .
-\]</span> ## Local FSR</p>
+\]</span></p>
+</div>
+<div id="local-fsr" class="section level2">
+<h2>Local FSR</h2>
 <p>Right now the analytic form of <code>lfsr</code> using Gaussian derivatives is unavailable.</p>
 </div>
 <div id="simulation" class="section level2">
 <h2>Simulation</h2>
-<p>The correlated <span class="math inline">\(N\left(0, 1\right)\)</span> <span class="math inline">\(z\)</span> scores are simulated from the GTEx/Liver data by <a href="nullpipeline.html">the null pipeline</a>. In order to get a better sense of the effectiveness of <code>GD-ASH</code> and <code>GD-Lik</code>, we are using data sets more distorted by correlation in the simulation. In particular, we are using an “inflation” batch, defined as the standard error of the correlated <span class="math inline">\(z\)</span> no less than <span class="math inline">\(1.2\)</span>, and a “deflation” batch, defined as that no greater than <span class="math inline">\(0.8\)</span>. Out of <span class="math inline">\(1000\)</span> simulated data sets, there are <span class="math inline">\(109\)</span> inflation ones and 97 deflation ones.</p>
-<p>In order to create realistic heterskedastic estimated standard error, <span class="math inline">\(\hat s_j\)</span>’s are also simulated from <a href="nullpipeline.html">the same null pipeline</a>. Let <span class="math inline">\(\sigma^2 = \frac1n \sum\limits_{j = 1}^n \hat s_j^2\)</span> be the average strength of the heteroskedastic noise, and the true effects <span class="math inline">\(\beta_j\)</span>’s are simulated from <span class="math display">\[
+<p>The correlated <span class="math inline">\(N\left(0, 1\right)\)</span> <span class="math inline">\(z\)</span> scores are simulated from the GTEx/Liver data by the <a href="nullpipeline.html">null pipeline</a>. In order to get a better sense of the effectiveness of <code>GD-ASH</code> and <code>GD-Lik</code>, we are using data sets more distorted by correlation in the simulation. In particular, we are using an “inflation” batch, defined as the standard error of the correlated <span class="math inline">\(z\)</span> no less than <span class="math inline">\(1.2\)</span>, and a “deflation” batch, defined as that no greater than <span class="math inline">\(0.8\)</span>. Out of <span class="math inline">\(1000\)</span> simulated data sets, there are <span class="math inline">\(109\)</span> inflation ones and <span class="math inline">\(99\)</span> deflation ones.</p>
+<p>In order to create realistic heterskedastic estimated standard error, <span class="math inline">\(\hat s_j\)</span>’s are also simulated from the same <a href="nullpipeline.html">null pipeline</a>. Let <span class="math inline">\(\sigma^2 = \frac1n \sum\limits_{j = 1}^n \hat s_j^2\)</span> be the average strength of the heteroskedastic noise, and the true effects <span class="math inline">\(\beta_j\)</span>’s are simulated from <span class="math display">\[
 0.6\delta_0 + 0.3N\left(0, \sigma^2\right) + 0.1N\left(0, \left(2\sigma\right)^2\right) \ .
 \]</span></p>
-<p>Then let <span class="math inline">\(\hat\beta_j = \beta_j + \hat s_j z_j\)</span>, <span class="math inline">\(\hat s_j\)</span>, along with <span class="math inline">\(\hat z_j = \hat\beta_j / \hat s_j\)</span>, <span class="math inline">\(\hat p_j= 2\left(1 - \Phi\left(\left|\hat z_j\right|\right)\right)\)</span>, be the summary statistics fed into <code>GD-ASH</code>, as well as into <code>BH</code>, <code>qvalue</code>, <code>locfdr</code>, <code>ASH</code> for a comparison.</p>
+<p>Then let <span class="math inline">\(\hat\beta_j = \beta_j + \hat s_j z_j\)</span>. We are using <span class="math inline">\(\hat\beta_j\)</span>, <span class="math inline">\(\hat s_j\)</span>, along with <span class="math inline">\(\hat z_j = \hat\beta_j / \hat s_j\)</span>, <span class="math inline">\(\hat p_j= 2\left(1 - \Phi\left(\left|\hat z_j\right|\right)\right)\)</span>, as the summary statistics fed to <code>GD-ASH</code> and <code>GD-Lik</code>, as well as into <code>BH</code>, <code>qvalue</code>, <code>locfdr</code>, <code>ASH</code> for a comparison.</p>
 <pre class="r"><code>source(&quot;../code/gdash_lik.R&quot;)</code></pre>
 <pre class="r"><code>z.mat = readRDS(&quot;../output/z_null_liver_777.rds&quot;)
 se.mat = readRDS(&quot;../output/sebetahat_null_liver_777.rds&quot;)</code></pre>
@@ -446,8 +455,8 @@ nrow(z.deflation)</code></pre>
 </div>
 <div id="inflation-data-sets" class="section level2">
 <h2>Inflation data sets</h2>
-<div id="some-examples-of-inflated-correlated-null" class="section level3">
-<h3>Some examples of inflated correlated null</h3>
+<div id="some-examples-of-inflated-correlated-null-z-scores" class="section level3">
+<h3>Some examples of inflated correlated null <span class="math inline">\(z\)</span> scores</h3>
 <p><img src="figure/gd_lik_2.rmd/inflation%20examples-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="hat-pi_0" class="section level3">
@@ -478,12 +487,12 @@ nrow(z.deflation)</code></pre>
 </div>
 <div id="deflation-data-sets" class="section level2">
 <h2>Deflation data sets</h2>
-<div id="some-examples-of-deflated-correlated-null" class="section level3">
-<h3>Some examples of deflated correlated null</h3>
+<div id="some-examples-of-deflated-correlated-null-z-scores" class="section level3">
+<h3>Some examples of deflated correlated null <span class="math inline">\(z\)</span> scores</h3>
 <p><img src="figure/gd_lik_2.rmd/deflation%20examples-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="hat-pi_0-1" class="section level3">
-<h3><span class="math inline">\(\hat pi_0\)</span></h3>
+<h3><span class="math inline">\(\hat \pi_0\)</span></h3>
 <p>Almost all methods except <code>GD-ASH</code> overestimate as expected. <code>GD-ASH</code> occasionally severely underestimates as <a href="simulation_real_se.html#global_null">seen before</a>.</p>
 <p><img src="figure/gd_lik_2.rmd/deflation%20pihat0-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
@@ -512,7 +521,7 @@ nrow(z.deflation)</code></pre>
 <h2>Remarks</h2>
 <ol style="list-style-type: decimal">
 <li>Would be nice to come up with a way to calculate <code>lfsr</code> in <code>GD-Lik</code>.</li>
-<li>Many methods are too liberal for inflation cases and too conservative for deflation cases, showing a lack of robustness against correlation. However, probably on average they seem about right.</li>
+<li>Many methods are too liberal for inflation cases and too conservative for deflation cases, showing a lack of robustness against correlation. Although, on average they probably seem about right.</li>
 </ol>
 </div>
 <div id="session-information" class="section level2">

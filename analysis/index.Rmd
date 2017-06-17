@@ -162,7 +162,7 @@ Talked about using Gaussian derivatives to handle correlation at Matthew's group
 An RNA-seq data set of mouse hearts contains $23K$+ genes and only 4 samples, two for each condition.  `GD-ASH` applying to this data set raises several interesting questions.
 
 * [`GD-ASH` with Gaussian derivative likelihood: Initial simulation](gd_lik.html)
-* [`GD-ASH` with Gaussian derivative likelihood: Models, formulae, and simulation](gd_lik_2.html)
+* [`GD-ASH` with Gaussian derivative likelihood: Model, formulae, and simulation](gd_lik_2.html)
 
 When the noise is correlated, the likelihood should be correlated.  However, in the [`GD-ASH`](ash_gd.html) model, noise is essentially treated to be independently sampled from an empirical null fitted by Gaussian derivatives, so it would make more sense to use Gaussian derivatives, rather than simple Gaussian, as likelihood.
 
