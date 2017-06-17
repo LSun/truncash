@@ -1,0 +1,161 @@
+---
+title: "Correlated $z$ scores"
+author: "Lei Sun"
+date: 2017-06-08
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+## Because Efron said so!
+
+Efron 2004 JASA, Efron 2007 JASA, Efron 2008 StatSci, Efron 2009 AoAS,  Efron 2010 JASA (with discussion), Efron 2010 Book.
+
+## Intuition
+
+Suppose all $z$ scores are perfectly correlated.
+
+## Simulation
+
+$z = Lx$
+
+```{r, echo = FALSE}
+par(mfrow = c(2, 2))
+set.seed(1)
+n = 1e6
+k = 4
+L = matrix(rnorm(n * k), nrow = n)
+s = sqrt(rowSums(L^2))
+L = L / s
+x = rnorm(k)
+z = L %*% x
+z.hist = hist(z, breaks = 100, plot = FALSE)
+ylim = c(0, max(z.hist$density, dnorm(0)))
+xlim = max(4, abs(z) + 1)
+hist(z, breaks = 100, prob = TRUE, xlim = c(-xlim, xlim), ylim = ylim)
+R = sqrt(sum(x^2))
+x.plot = seq(-max(abs(z)) - 1, max(abs(z)) + 1, length = 1000)
+y.plot = 2 * sqrt(pmax(R^2 - x.plot^2, 0)) / (pi * R^2)
+lines(x.plot, y.plot, col = "blue")
+lines(seq(-6, 6, length = 1000), dnorm(seq(-6, 6, length = 1000)), col = "red")
+set.seed(1)
+n = 1e6
+k = 5
+L = matrix(rnorm(n * k), nrow = n)
+s = sqrt(rowSums(L^2))
+L = L / s
+x = rnorm(k)
+z = L %*% x
+z.hist = hist(z, breaks = 100, plot = FALSE)
+ylim = c(0, max(z.hist$density, dnorm(0)))
+xlim = max(4, abs(z) + 1)
+hist(z, breaks = 100, prob = TRUE, xlim = c(-xlim, xlim), ylim = ylim)
+lines(seq(-6, 6, length = 1000), dnorm(seq(-6, 6, length = 1000)), col = "red")
+set.seed(1)
+n = 1e6
+k = 6
+L = matrix(rnorm(n * k), nrow = n)
+s = sqrt(rowSums(L^2))
+L = L / s
+x = rnorm(k)
+z = L %*% x
+z.hist = hist(z, breaks = 100, plot = FALSE)
+ylim = c(0, max(z.hist$density, dnorm(0)))
+xlim = max(4, abs(z) + 1)
+hist(z, breaks = 100, prob = TRUE, xlim = c(-xlim, xlim), ylim = ylim)
+lines(seq(-6, 6, length = 1000), dnorm(seq(-6, 6, length = 1000)), col = "red")
+set.seed(1)
+n = 1e6
+k = 7
+L = matrix(rnorm(n * k), nrow = n)
+s = sqrt(rowSums(L^2))
+L = L / s
+x = rnorm(k)
+z = L %*% x
+z.hist = hist(z, breaks = 100, plot = FALSE)
+ylim = c(0, max(z.hist$density, dnorm(0)))
+xlim = max(4, abs(z) + 1)
+hist(z, breaks = 100, prob = TRUE, xlim = c(-xlim, xlim), ylim = ylim)
+lines(seq(-6, 6, length = 1000), dnorm(seq(-6, 6, length = 1000)), col = "red")
+```
+
+$z_i = \sqrt{\rho}x + \sqrt{1-\rho}e_i$
+
+```{r echo = FALSE}
+z.sim = function (n, K, rho) {
+  x = rnorm(K)
+  m = round(n / K)
+  x = rep(x, c(rep(m, K - 1), n - m * (K - 1)))
+  z = sqrt(rho) * x + sqrt(1 - rho) * rnorm(n)
+  return(z)
+}
+
+set.seed(1)
+par(mfrow = c(2, 2))
+for (i in 1:4) {
+  z = z.sim(1e4, i, 0.9)
+  z.hist = hist(z, breaks = 100, plot = FALSE)
+  ylim = c(0, max(z.hist$density, dnorm(0)))
+  xlim = max(4, abs(z) + 1)
+  hist(z, breaks = 100, prob = TRUE, xlim = c(-xlim, xlim), ylim = ylim)
+  lines(seq(-6, 6, length = 1000), dnorm(seq(-6, 6, length = 1000)), col = "red")
+}
+```
+
+## Real data
+
+```{r echo = FALSE}
+z.mat = readRDS("../output/z_null_liver_777.rds")
+sel = c(32, 327, 355, 483)
+par(mfrow = c(2, 2))
+for (i in 1 : 4) {
+  z = z.mat[sel[i], ]
+  z.hist = hist(z, breaks = 100, plot = FALSE)
+  ylim = c(0, max(z.hist$density, dnorm(0)))
+  xlim = max(4, abs(z) + 1)
+  hist(z, breaks = 100, prob = TRUE, xlim = c(-xlim, xlim), ylim = ylim)
+  lines(seq(-6, 6, length = 1000), dnorm(seq(-6, 6, length = 1000)), col = "red")
+}
+```
+
+## Efron's method: `locfdr`
+
+
+```{r echo = FALSE}
+par(mfrow = c(1, 2))
+for (i in 1 : 4) {
+  z = z.mat[sel[i], ]
+  z.hist = hist(z, breaks = 100, plot = FALSE)
+  ylim = c(0, max(z.hist$density, dnorm(0)))
+  xlim = max(4, abs(z) + 1)
+  hist(z, breaks = 100, prob = TRUE, xlim = c(-xlim, xlim), ylim = ylim)
+  lines(seq(-6, 6, length = 1000), dnorm(seq(-6, 6, length = 1000)), col = "red")
+  locfdr::locfdr(z)
+}
+```
+
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```
