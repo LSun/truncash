@@ -1,0 +1,256 @@
+---
+title: "Real Data with Simulated Signals: Part V"
+author: "Lei Sun"
+date: 2017-06-03
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+```{r, message = FALSE}
+library(edgeR)
+library(limma)
+library(sva)
+library(cate)
+library(vicar)
+library(ashr)
+library(pROC)
+source("../code/gdash.R")
+```
+
+```{r}
+mat = readRDS("../data/liver.sim.rds")
+```
+
+```{r}
+counts_to_summary = function (counts, design) {
+  dgecounts = edgeR::calcNormFactors(edgeR::DGEList(counts = counts, group = design[, 2]))
+  v = limma::voom(dgecounts, design, plot = FALSE)
+  lim = limma::lmFit(v)
+  r.ebayes = limma::eBayes(lim)
+  p = r.ebayes$p.value[, 2]
+  t = r.ebayes$t[, 2]
+  z = sign(t) * qnorm(1 - p/2)
+  betahat = lim$coefficients[,2]
+  sebetahat = betahat / z
+  return (list(betahat = betahat, sebetahat = sebetahat, z = z))
+}
+```
+
+```{r}
+one_sim <- function (mat, ngene, nsamp, pi0, sd) {
+## add simulated signals
+mat.sim = seqgendiff::poisthin(t(mat), nsamp = nsamp, ngene = ngene, gselect = "random", signal_params = list(mean = 0, sd = sd), prop_null = pi0)
+counts = t(mat.sim$Y) ## ngene * nsamples matrix 
+design = mat.sim$X
+beta = mat.sim$beta
+which_signal = (beta != 0)
+
+## methods using summary statistics only
+summary = counts_to_summary(counts, design)
+
+fit.pvalue = (1 - pnorm(abs(summary$z))) * 2
+fit.BH = p.adjust(fit.pvalue, method = "BH")
+fit.qvalue = qvalue::qvalue(fit.pvalue)
+fit.locfdr = locfdr::locfdr(summary$z, bre = round(ngene / 20), plot = 0)
+fit.ash = ashr::ash(summary$betahat, summary$sebetahat, mixcompdist = "normal", method = "fdr")
+fit.gdash = gdash(summary$betahat, summary$sebetahat)
+fit.gdash.ash = ashr::ash(summary$betahat, summary$sebetahat, fixg = TRUE, g = fit.gdash$fitted_g)
+
+## methods using data matrix
+Y = t(log(counts + 0.5))
+X = design
+
+num_sv <- sva::num.sv(dat = t(Y), mod = X, method = "be")
+
+mout <- vicar::mouthwash(Y = Y, X = X, k = num_sv, cov_of_interest = 2, include_intercept = FALSE)
+
+cate_cate <- cate::cate.fit(X.primary = X[, 2, drop = FALSE], X.nuis = X[, -2, drop = FALSE], Y = Y, r = num_sv, adj.method = "rr")
+
+sva_sva <- sva::sva(dat = t(Y), mod = X, mod0 = X[, -2, drop = FALSE], n.sv = num_sv)
+X.sva <- cbind(X, sva_sva$sv)
+lmout <- limma::lmFit(object = t(Y), design = X.sva)
+eout  <- limma::ebayes(lmout)
+svaout           <- list()
+svaout$betahat   <- lmout$coefficients[, 2]
+svaout$sebetahat <- lmout$stdev.unscaled[, 2] * sqrt(eout$s2.post)
+svaout$pvalues   <- eout$p.value[, 2]
+
+## result: roc auc
+roc_res = c(
+  pvalue = pROC::roc(response = which_signal, predictor = fit.pvalue)$auc,
+  BH = pROC::roc(response = which_signal, predictor = fit.BH)$auc,
+  qvalue = pROC::roc(response = which_signal, predictor = fit.qvalue$lfdr)$auc,
+  locfdr = pROC::roc(response = which_signal, predictor = fit.locfdr$fdr)$auc,
+  ash = pROC::roc(response = which_signal, predictor = ashr::get_lfdr(fit.ash))$auc,
+  cash = pROC::roc(response = which_signal, predictor = ashr::get_lfdr(fit.gdash.ash))$auc,
+  mouthwash = pROC::roc(response = which_signal, predictor = c(mout$result$lfdr))$auc,
+  cate = pROC::roc(response = which_signal, predictor = c(cate_cate$beta.p.value))$auc,
+  sva = pROC::roc(response = which_signal, predictor = c(svaout$pvalues))$auc
+)
+
+## ash with summary statistics
+method_list <- list()
+
+method_list$cate           <- list()
+method_list$cate$betahat   <- c(cate_cate$beta)
+method_list$cate$sebetahat <- c(sqrt(cate_cate$beta.cov.row * cate_cate$beta.cov.col) / sqrt(nrow(X)))
+
+method_list$sva             <- list()
+method_list$sva$betahat     <- c(svaout$betahat)
+method_list$sva$sebetahat   <- c(svaout$sebetahat)
+
+ashfit <- lapply(method_list, FUN = function(x) {ashr::ash(x$betahat, x$sebetahat, mixcompdist = "normal", method = "fdr")})
+ashfit$ash <- fit.ash
+ashfit$cash <- fit.gdash.ash
+ashfit$mouthwash <- mout
+ashfit = ashfit[c("ash", "cash", "mouthwash", "cate", "sva")]
+
+## pi0
+pi0_res <- sapply(ashfit, FUN = ashr::get_pi0)
+pi0_res <- c(
+  qvalue = fit.qvalue$pi0,
+  locfdr = min(1, fit.locfdr$fp0["mlest", "p0"]),
+  pi0_res
+  )
+
+## mse
+mse_res <- sapply(ashfit, FUN = function(x) {mean((ashr::get_pm(x) - beta)^2)})
+mse_res <- c(ols = mean((summary$betahat - beta)^2), mse_res)
+
+## pFDP calibration
+pFDP_alpha = function (alpha, tail_stat, true, obs) {
+  return(1 - mean(true[tail_stat <= alpha]))
+}
+pFSP_alpha = function (alpha, tail_stat, true, obs) {
+  return(mean(sign(obs[tail_stat <= alpha]) != sign(true[tail_stat <= alpha])))
+}
+
+tail_cali_list = function (alpha_list, tail_cali_alpha, tail_stat, true, obs) {
+  sapply(alpha_list, tail_cali_alpha, tail_stat, true, obs)
+}
+alpha_list = seq(0, 0.2, by = 0.001)
+pFDP <- sapply(
+  ashfit, FUN = function (x) {
+    tail_cali_list(alpha_list, pFDP_alpha, ashr::get_qvalue(x), which_signal, x$data$x)
+  }
+)
+pFDP_BH = tail_cali_list(alpha_list, pFDP_alpha, fit.BH, which_signal, summary$betahat)
+pFDP_qvalue = tail_cali_list(alpha_list, pFDP_alpha, fit.qvalue$qvalues, which_signal, summary$betahat)
+pFDP_res = cbind(BH = pFDP_BH, qvalue = pFDP_qvalue, pFDP)
+
+## pFSR calibration
+pFSP_res <- sapply(
+  ashfit, FUN = function (x) {
+  tail_cali_list(alpha_list, pFSP_alpha, ashr::get_svalue(x), beta, x$data$x)
+  }
+)
+
+return(list(pi = pi0_res, mse = mse_res, auc = roc_res, alpha = alpha_list, pFDP = pFDP_res, pFSP = pFSP_res))
+}
+```
+
+```{r}
+n_sim = function (n, mat, ngene, nsamp, pi0, sd) {
+  pi0_list = mse_list = auc_list = pFDP_list = pFSP_list = list()
+  for (i in 1 : n) {
+    one_res = one_sim(mat, ngene, nsamp, pi0, sd)
+    pi0_list[[i]] = one_res$pi
+    mse_list[[i]] = one_res$mse
+    auc_list[[i]] = one_res$auc
+    pFDP_list[[i]] = one_res$pFDP
+    pFSP_list[[i]] = one_res$pFSP
+  }
+  alpha_vec = one_res$alpha
+  pi0_mat = matrix(unlist(pi0_list), nrow = n, byrow = TRUE)
+  colnames(pi0_mat) = names(pi0_list[[1]])
+  mse_mat = matrix(unlist(mse_list), nrow = n, byrow = TRUE)
+  colnames(mse_mat) = names(mse_list[[1]])
+  auc_mat = matrix(unlist(auc_list), nrow = n, byrow = TRUE)
+  colnames(auc_mat) = names(auc_list[[1]])
+  pFDP_mat = list()
+  for (j in 1 : ncol(pFDP_list[[1]])) {
+    pFDP_mat[[j]] = t(sapply(pFDP_list, FUN = function(x) {rbind(x[, j])}))
+  }
+  names(pFDP_mat) = colnames(pFDP_list[[1]])
+  pFSP_mat = list()
+  for (j in 1 : ncol(pFSP_list[[1]])) {
+    pFSP_mat[[j]] = t(sapply(pFSP_list, FUN = function(x) {rbind(x[, j])}))
+  }
+  names(pFSP_mat) = colnames(pFSP_list[[1]])
+  return(list(pi0 = pi0_mat, mse = mse_mat, auc = auc_mat, alpha = alpha_vec, pFDP = pFDP_mat, pFSP = pFSP_mat))
+}
+```
+
+```{r, message = FALSE, cache = TRUE, result = "hide"}
+sd = 0.6
+pi0 = 0.9
+ngene = 1e3
+nsamp = 10
+nsim = 100
+
+set.seed(777)
+system.time(res <- n_sim(nsim, mat, ngene, nsamp, pi0, sd))
+```
+
+```{r echo = FALSE}
+boxplot(res$pi0, ylim = c(0, 1), names = colnames(res$pi0), ylab = expression(hat(pi)[0]), main = expression(hat(pi)[0]), las = 2, cex.axis = 0.9)
+abline(h = pi0, lty = 2, col = "red")
+
+boxplot.range = boxplot(res$mse[, -1], plot = FALSE)
+boxplot(res$mse, ylim = par("yaxp")[1 : 2], ylab = "MSE",
+        main = expression("MSE of Posterior Mean"),
+        las = 2, cex.axis = 0.9)
+
+boxplot(res$auc, ylim = c(0, 1), ylab = "AUC", main = expression("Area Under the ROC Curve"), las = 2, cex.axis = 0.9)
+abline(h = 0.5, lty = 2, col = "red")
+legend("bottom", lty = 2, col = "red", "Baseline")
+```
+
+
+```{r echo = FALSE}
+plot.tail.cali = function (tail.cali.list, alpha) {
+  nsim = nrow(tail.cali.list[[1]])
+  avg.mat = sapply(tail.cali.list, colMeans, na.rm = TRUE)
+  sd.mat = sapply(tail.cali.list, FUN = function (x) {apply(x, 2, sd, na.rm = TRUE)})
+  col.vec = grDevices::rainbow(ncol(avg.mat))
+  col.mat = grDevices::col2rgb(col.vec)
+  plot(1:10, 1:10, type = "n", bty = "n", xaxt = "n", yaxt = "n", xlab = NULL, ylab = NULL)
+  legend("center", lty = 1, col = col.vec, legend = names(tail.cali.list))
+  plot(alpha, alpha, ylim = c(0, 2 * max(alpha)), type = "n",
+       xlab = "Nominal Positive False Rate", ylab = "Average Positive False Proportion", main = "Calibration")
+  for (kk in 1 : ncol(avg.mat)) {
+    lines(alpha, avg.mat[, kk], col = col.vec[kk], cex = 2)
+    polygon(x = c(alpha, rev(alpha)), y = c(avg.mat[, kk] - 2 * sd.mat[, kk] / sqrt(nsim), rev(avg.mat[, kk] + 2 * sd.mat[, kk] / sqrt(nsim))), col = grDevices::rgb(col.mat[1, kk], col.mat[2, kk], col.mat[3, kk], alpha = 100, max = 255), border = col.vec[kk], lty = 2)
+  }
+  lines(alpha, alpha, cex = 1.2)
+}
+
+plot.tail.cali(res$pFDP, res$alpha)
+plot.tail.cali(res$pFSP, res$alpha)
+```
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```
