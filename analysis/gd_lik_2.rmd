@@ -1,0 +1,673 @@
+---
+title: "Posterior Inference with Gaussian Derivative Likelihood: More Simulation"
+author: "Lei Sun"
+date: 2017-06-14
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+## `GD-ASH` Model
+
+Recall the typical `GD-ASH` model is
+
+$$
+\begin{array}{l}
+\beta_j \sim \sum\pi_k N\left(0, \sigma_k^2\right) \ ;\\
+\hat\beta_j = \beta_j + \hat s_j z_j  \ ;\\
+z_j \sim N\left(0, 1\right), \text{ correlated} \ .
+\end{array}
+$$
+Then we are fitting the empirical distribution of $z$ with Gaussian derivatives
+
+$$
+f(z) = \sum w_l\frac{1}{\sqrt{l!}}\varphi^{(l)}(z) \ .
+$$
+Therefore, in essence, we are changing the likelihood of $\hat\beta_j | \hat s_j, \beta_j$ from correlated $N\left(\beta_j, \hat s_j^2\right)$ to independent $\frac{1}{\hat s_j}f\left(\frac{\hat\beta_j - \beta_j}{\hat s_j}\right)$, which using Gaussian derivatives is
+
+$$
+\frac{1}{\hat s_j}\sum w_l \frac{1}{\sqrt{l!}} \varphi^{(l)}\left(\frac{\hat\beta_j - \beta_j}{\hat s_j}\right) \ .
+$$
+Note that when $f = \varphi$ it becomes the independent $N\left(\beta_j, \hat s_j^2\right)$ case.
+
+## `GD-Lik` Model
+
+Therefore, if we use Gaussian derivatives instead of Gaussian as the likelihood, the posterior distribution of $\beta_j | \hat s_j, \hat\beta_j$ should be
+
+$$
+\begin{array}{rcl}
+f\left(\beta_j \mid \hat s_j, \hat\beta_j\right)
+&=&
+\frac{
+\displaystyle g\left(\beta_j\right)
+f\left(\hat\beta_j \mid \hat s_j, \beta_j \right)
+}{
+\displaystyle\int g\left(\beta_j\right) f\left(\hat\beta_j \mid \hat s_j, \beta_j \right) d\beta_j
+}\\
+&=&
+\frac{
+\displaystyle
+\sum\pi_k\sum w_l 
+\frac{1}{\sigma_k}
+\varphi\left(\frac{\beta_j - \mu_k}{\sigma_k}\right)
+\frac{1}{\hat s_j}
+\frac{1}{\sqrt{l!}}
+\varphi^{(l)}\left(\frac{\hat\beta_j - \beta_j}{\hat s_j}\right)
+}{
+\displaystyle
+\sum\pi_k\sum w_l \int
+\frac{1}{\sigma_k}
+\varphi\left(\frac{\beta_j - \mu_k}{\sigma_k}\right)
+\frac{1}{\hat s_j}
+\frac{1}{\sqrt{l!}}
+\varphi^{(l)}\left(\frac{\hat\beta_j - \beta_j}{\hat s_j}\right)
+d\beta_j
+} \ .
+\end{array}
+$$
+The denominator [readily has an analytic form](ash_gd.html#normal_mixture_prior) which is
+
+$$
+\displaystyle
+\sum\pi_k \sum w_l
+\frac{\hat s_j^l}{\left(\sqrt{\sigma_k^2 + \hat s_j^2}\right)^{l+1}}
+\frac{1}{\sqrt{l!}}
+\varphi^{(l)}\left(\frac{\hat\beta_j - \mu_k}{\sqrt{\sigma_k^2 + \hat s_j^2}}\right)
+:=
+\sum \pi_k \sum w_l f_{jkl}
+\ .
+$$
+
+## Posterior mean
+
+After algebra, the posterior mean is given by
+
+$$
+E\left[\beta_j \mid \hat s_j, \hat \beta_j \right]
+=
+\int \beta_j
+f\left(\beta_j \mid \hat s_j, \hat\beta_j\right) d\beta_j
+=
+\displaystyle
+\frac{
+\sum \pi_k \sum w_l m_{jkl}
+}{
+\sum \pi_k \sum w_l f_{jkl}
+} \ ,
+$$
+where $f_{jkl}$ is defined as above and
+$$
+m_{jkl} =
+-
+\frac{\hat s_j^l \sigma_k^2}{\left(\sqrt{\sigma_k^2 + \hat s_j^2}\right)^{l+2}}
+\frac{1}{\sqrt{l!}}
+\varphi^{(l+1)}\left(\frac{\hat\beta_j - \mu_k}{\sqrt{\sigma_k^2 + \hat s_j^2}}\right)
++
+\frac{\hat s_j^l\mu_k}{\left(\sqrt{\sigma_k^2 + \hat s_j^2}\right)^{l+1}}
+\frac{1}{\sqrt{l!}}
+\varphi^{(l)}\left(\frac{\hat\beta_j - \mu_k}{\sqrt{\sigma_k^2 + \hat s_j^2}}\right) \ .
+$$
+
+## Local FDR
+
+Assuming $\mu_k \equiv 0$, the `lfdr` is given by
+$$
+p\left(\beta_j = 0\mid \hat s_j, \hat \beta_j\right)
+=
+\frac{
+\pi_0
+\sum w_l 
+\frac{1}{\hat s_j}
+\frac{1}{\sqrt{l!}}
+\varphi^{(l)}\left(\frac{\hat\beta_j}{\hat s_j}\right)
+}{
+\sum \pi_k
+\sum w_l
+f_{jkl}
+} \ .
+$$
+
+## Local FSR
+
+Right now the analytic form of `lfsr` using Gaussian derivatives is unavailable.
+
+## Simulation
+
+The correlated $N\left(0, 1\right)$ $z$ scores are simulated from the GTEx/Liver data by the [null pipeline](nullpipeline.html).  In order to get a better sense of the effectiveness of `GD-ASH` and `GD-Lik`, we are using data sets more distorted by correlation in the simulation.  In particular, we are using an "inflation" batch, defined as the standard error of the correlated $z$ no less than $1.2$, and a "deflation" batch, defined as that no greater than $0.8$.  Out of $1000$ simulated data sets, there are $109$ inflation ones and $99$ deflation ones.
+
+In order to create realistic heterskedastic estimated standard error, $\hat s_j$'s are also simulated from the same [null pipeline](nullpipeline.html).  Let $\sigma^2 = \frac1n \sum\limits_{j = 1}^n \hat s_j^2$ be the average strength of the heteroskedastic noise, and the true effects $\beta_j$'s are simulated from
+$$
+0.6\delta_0 + 0.3N\left(0, \sigma^2\right) + 0.1N\left(0, \left(2\sigma\right)^2\right) \ .
+$$
+
+Then let $\hat\beta_j = \beta_j + \hat s_j z_j$.  We are using $\hat\beta_j$, $\hat s_j$, along with $\hat z_j = \hat\beta_j / \hat s_j$, $\hat p_j= 2\left(1 - \Phi\left(\left|\hat z_j\right|\right)\right)$, as the summary statistics fed to `GD-ASH` and `GD-Lik`, as well as into `BH`, `qvalue`, `locfdr`, `ASH` for a comparison.
+
+```{r code, message = FALSE}
+source("../code/gdash_lik.R")
+```
+
+```{r effect sampling function, echo = FALSE}
+## produce simulated true signals beta
+sample.g = function (g, n) {
+  UseMethod("sample.g")
+}
+
+sample.g.normalmix = function (g, n) {
+  K = length(g$pi)
+  beta = list()
+  for (i in 1 : K) {
+    beta[[i]] = rnorm(ceiling(n * g$pi[i]), g$mean[i], g$sd[i])
+  }
+  return(list(beta = sample(unlist(beta)), mixcompdist = "normal"))
+}
+```
+
+```{r pFDR calibration function, echo = FALSE}
+pFDP = function (FDR, response, predictor) {
+  return(1 - mean(response[predictor <= FDR]))
+}
+pFDR.calib = function (beta, qvalue, pFDR.nominal) {
+  pFDP.list = list()
+  for (i in 1 : length(beta))
+  pFDP.list[[i]] = sapply(pFDR.nominal, pFDP,
+                         response = (beta[[i]] != 0),
+                         predictor = qvalue[[i]])
+  pFDP.mat = matrix(unlist(pFDP.list), nrow = length(pFDP.list), byrow = TRUE)
+  pFDP.samplesize = colSums(!is.na(pFDP.mat))
+  pFDP.mean = colMeans(pFDP.mat, na.rm = TRUE)
+  pFDP.mean.sd = apply(pFDP.mat, 2, sd, na.rm = TRUE) / sqrt(pFDP.samplesize)
+  return(list(pFDR.nominal = pFDR.nominal, pFDP.mean = pFDP.mean, pFDP.mean.sd = pFDP.mean.sd))
+}
+```
+
+```{r pFSR calibration function, echo = FALSE}
+pFSP = function (FSR, true_sign, obs_sign, svalue) {
+  ind = (svalue <= FSR)
+  return(mean(obs_sign[ind] != true_sign[ind]))
+}
+pFSR.calib = function (beta, betahat, svalue, pFSR.nominal) {
+  pFSP.list = list()
+  for (i in 1 : length(beta))
+  pFSP.list[[i]] = sapply(pFSR.nominal, pFSP,
+                          true_sign = sign(beta[[i]]),
+                          obs_sign = sign(betahat[[i]]),
+                          svalue = svalue[[i]])
+  pFSP.mat = matrix(unlist(pFSP.list), nrow = length(pFSP.list), byrow = TRUE)
+  pFSP.samplesize = colSums(!is.na(pFSP.mat))
+  pFSP.mean = colMeans(pFSP.mat, na.rm = TRUE)
+  pFSP.mean.sd = apply(pFSP.mat, 2, sd, na.rm = TRUE) / sqrt(pFSP.samplesize)
+  return(list(pFSR.nominal = pFSR.nominal, pFSP.mean = pFSP.mean, pFSP.mean.sd = pFSP.mean.sd))
+}
+```
+
+```{r read data}
+z.mat = readRDS("../output/z_null_liver_777.rds")
+se.mat = readRDS("../output/sebetahat_null_liver_777.rds")
+```
+
+```{r select data sets}
+z.sd = apply(z.mat, 1, sd)
+inflation.index = (z.sd >= 1.2)
+deflation.index = (z.sd <= 0.8)
+z.inflation = z.mat[inflation.index, ]
+se.inflation = se.mat[inflation.index, ]
+## Number of inflation data sets
+nrow(z.inflation)
+z.deflation = z.mat[deflation.index, ]
+se.deflation = se.mat[deflation.index, ]
+## Number of deflation data sets
+nrow(z.deflation)
+```
+
+## Inflation data sets
+
+### Some examples of inflated correlated null $z$ scores
+
+```{r inflation examples, echo = FALSE}
+exp = sample(nrow(z.inflation), 4)
+z.exp = z.inflation[exp, ]
+par(mfrow = c(2, 2))
+for (kk in 1 : length(exp)) {
+  exp.hist = hist(z.exp[kk, ], breaks = 100, plot = FALSE)
+  hist(z.exp[kk, ], breaks = 100, prob = TRUE, ylim = c(0, max(exp.hist$density, dnorm(0))), main = "", xlab = "")
+  x.plot = seq(- max(abs(z.exp[kk, ])) - 2, max(abs(z.exp[kk, ])) + 2, 0.01)
+  lines(x.plot, dnorm(x.plot), col = "red")
+}
+```
+
+```{r inflation fitting, echo = FALSE, cache = TRUE, message = FALSE, warning = FALSE}
+pihat0.ash = pihat0.gdash = pihat0.qvalue = c()
+mse.mle = mse.ash = mse.gdash.ash = mse.gdash = c()
+auc.pvalue = auc.BH = auc.qvalue.qvalue = auc.qvalue.lfdr = auc.ash.qvalue = auc.ash.lfdr = auc.gdash.ash.qvalue = auc.gdash.ash.lfdr = auc.gdash.lfdr = auc.gdash.qvalue = c()
+betahat.list = beta.list = list()
+qvalue.BH = qvalue.qvalue = qvalue.ash = qvalue.gdash.ash = qvalue.gdash = svalue.ash = svalue.gdash.ash = list()
+for (i in 1 : nrow(z.inflation)) {
+  n = length(z.inflation[i, ])
+  sigma_n = sqrt(mean(se.inflation[i, ]^2))
+  sigma_s.1 = sigma_n
+  sigma_s.2 = 2 * sigma_n
+  g = ashr::normalmix(pi = c(0.6, 0.3, 0.1), mean = 0, sd = c(0, sigma_s.1, sigma_s.2))
+  beta = sample.g(g, n)$beta
+  response = (beta != 0)
+  betahat = beta + se.inflation[i, ] * z.inflation[i, ]
+  pvalue = (1 - pnorm(abs(betahat / se.inflation[i, ]))) * 2
+  fit.ash = ashr::ash(betahat, se.inflation[i, ], mixcompdist = "normal", method = "fdr")
+  fit.gdash = gdash(betahat, se.inflation[i, ])
+  fit.gdash.ash = ashr::ash(betahat, se.inflation[i, ], fixg = TRUE, g = fit.gdash$fitted_g)
+  fit.qvalue = qvalue::qvalue(pvalue)
+  fit.BH = p.adjust(pvalue, method = "BH")
+
+  pihat0.ash[i] = ashr::get_pi0(fit.ash)
+  pihat0.gdash[i] = ashr::get_pi0(fit.gdash)
+  pihat0.qvalue[i] = fit.qvalue$pi0
+  
+  mse.mle[i] = mean((betahat - beta)^2)
+  mse.ash[i] = mean((ashr::get_pm(fit.ash) - beta)^2)
+  mse.gdash.ash[i] = mean((ashr::get_pm(fit.gdash.ash) - beta)^2)
+  mse.gdash[i] = mean((fit.gdash$pm - beta)^2)
+
+  auc.pvalue[i] = pROC::roc(response, pvalue)$auc
+  auc.BH[i] = pROC::roc(response, fit.BH)$auc
+  auc.qvalue.qvalue[i] = pROC::roc(response, fit.qvalue$qvalues)$auc
+  auc.qvalue.lfdr[i] = pROC::roc(response, fit.qvalue$lfdr)$auc
+  auc.ash.qvalue[i] = pROC::roc(response, ashr::get_qvalue(fit.ash))$auc
+  auc.ash.lfdr[i] = pROC::roc(response, ashr::get_lfdr(fit.ash))$auc
+  auc.gdash.ash.qvalue[i] = pROC::roc(response, ashr::get_qvalue(fit.gdash.ash))$auc
+  auc.gdash.ash.lfdr[i] = pROC::roc(response, ashr::get_lfdr(fit.gdash.ash))$auc
+  auc.gdash.qvalue[i] = pROC::roc(response, fit.gdash$qvalue)$auc
+  auc.gdash.lfdr[i] = pROC::roc(response, fit.gdash$lfdr)$auc
+  
+  beta.list[[i]] = beta
+  betahat.list[[i]] = betahat
+  qvalue.BH[[i]] = fit.BH
+  qvalue.qvalue[[i]] = fit.qvalue$qvalues
+  qvalue.ash[[i]] = ashr::get_qvalue(fit.ash)
+  qvalue.gdash.ash[[i]] = ashr::get_qvalue(fit.gdash.ash)
+  qvalue.gdash[[i]] = fit.gdash$qvalue
+  svalue.ash[[i]] = ashr::get_svalue(fit.ash)
+  svalue.gdash.ash[[i]] = ashr::get_svalue(fit.gdash.ash)
+}
+```
+
+```{r inflation locfdr fitting, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
+pihat0.locfdr = c()
+auc.locfdr.qvalue = auc.locfdr.lfdr = c()
+qvalue.locfdr = list()
+for (i in 1 : nrow(z.inflation)) {
+  sebetahat = se.inflation[i, ]
+  betahat = betahat.list[[i]]
+  response = (beta.list[[i]] != 0)
+  tryCatch({
+    fit.locfdr = locfdr::locfdr(betahat / sebetahat, plot = 0)
+    pihat0.locfdr[i] = fit.locfdr$fp0[3, 3]
+    auc.locfdr.qvalue[i] = pROC::roc(response, ashr::qval.from.lfdr(fit.locfdr$fdr))$auc
+    auc.locfdr.lfdr[i] = pROC::roc(response, fit.locfdr$fdr)$auc
+    qvalue.locfdr[[i]] = ashr::qval.from.lfdr(fit.locfdr$fdr)
+  }, error = function (err) {
+    invisible(NA)
+  }
+  )
+}
+```
+
+### $\hat \pi_0$
+`locfdr` overestimates, `ASH` underestimates, `GD-ASH` on target, `qvalue` surprisingly good.
+
+```{r inflation pihat0, echo = FALSE}
+boxplot(pihat0.qvalue, 
+        pihat0.locfdr, 
+        pihat0.ash,
+        pihat0.gdash,
+        ylim = c(0, 1), 
+        names = c("qvalue",
+                  "locfdr",
+                  "ASH",
+                  "GD-ASH"),
+        ylab = expression(hat(pi)[0]),
+        main = expression(hat(pi)[0]),
+        las = 2
+        )
+abline(h = 0.6, lty = 2, col = "red")
+```
+
+### MSE
+
+`GD-Lik` clearly improves the posterior estimates of `GD-ASH`.
+
+```{r inflation mse, echo = FALSE}
+boxplot(mse.ash, mse.gdash.ash, mse.gdash,
+        names = c("ASH", "GD-ASH", "GD-Lik"),
+        ylab = "MSE",
+        main = expression("MSE of Posterior Mean"),
+        las = 2
+        )
+```
+
+### AUC
+
+For almost all methods, `.q` means using q values, and `.l` using local FDRs. `GD-Lik` is the best, yet even the vanilla $p$ values are not much worse.  It indicates that all the methods based on summary statistics indeed make few changes to the order of original $p$ values.  Worth noting is that `locfdr` doesn't perform well, and `lfdr`'s give a drastically different result than q values do, probably due to some artifacts like [ties](auc_pvalue.html).
+
+```{r inflation auc, echo = FALSE}
+boxplot(auc.pvalue, auc.BH, auc.qvalue.qvalue, auc.qvalue.lfdr, 
+        auc.locfdr.qvalue, auc.locfdr.lfdr,
+        auc.ash.qvalue, auc.ash.lfdr, auc.gdash.ash.qvalue, auc.gdash.ash.lfdr, auc.gdash.qvalue, auc.gdash.lfdr,
+        names = c("p-value", "BH", "qvalue.q", "qvalue.l",
+                  "locfdr.q", "locfdr.l",
+                  "ASH.q", "ASH.l", "GD-ASH.q", "GD-ASH.l", "GD-Lik.q", "GD-Lik.l"),
+        ylim = c(0, 1), ylab = "AUC", main = expression("Area Under the ROC Curve"), las = 2)
+abline(h = 0.5, lty = 2, col = "red")
+abline(h = median(auc.gdash.lfdr), lty = 2, col = "blue")
+```
+
+### q values and positive FDR (pFDR) calibration
+
+Dashed lines are $y = x$ and $y = 2x$.  `ASH` and `qvalue` are too liberal, and `locfdr` is too conservative.  `GD-ASH` and `BH` give very similar results and not far off.  `BH`'s calibrates pFDR relatively well, even though it's only guaranteed to control FDR under independence.  `GD-Lik` calibrates pFDR almost precisely.
+
+```{r inflation qvalue calibration plotting, echo = FALSE}
+pFDR.nominal = seq(0, 0.2, 0.001)[-1]
+
+pFDP.polygon.plot = function (beta, qvalue, pFDR.nominal, col) {
+  summary = pFDR.calib(beta, qvalue, pFDR.nominal)
+  mean = summary$pFDP.mean
+  sd = summary$pFDP.mean.sd
+  lines(pFDR.nominal, mean, col = col, cex = 2)
+  polygon.color.rgb = as.vector(grDevices::col2rgb(col))
+  polygon(x = c(0, pFDR.nominal, rev(pFDR.nominal), 0),
+          y = c(0, mean - 2 * sd, rev(mean + 2 * sd), 0),
+          col = grDevices::rgb(polygon.color.rgb[1], polygon.color.rgb[2], polygon.color.rgb[3], alpha = 100, max = 255),
+          border = col,
+          lty = 2)
+}
+
+pFDR.methods = c("BH", "qvalue", "locfdr", "ASH", "GD-ASH", "GD-Lik")
+col.vec = grDevices::rainbow(6)
+plot(1:10, 1:10, type = "n", bty = "n", xaxt = "n", yaxt = "n", xlab = "", ylab = "")
+legend("center", lty = 1, col = col.vec, legend = pFDR.methods)
+plot(pFDR.nominal, pFDR.nominal, ylim = c(0, 2 * max(pFDR.nominal)), type = "n", xlab = "Nominal Positive False Discovery Rate", ylab = "Average Positive False Discovery Proportion", main = "Calibration of q Value")
+
+pFDP.polygon.plot(beta.list, qvalue.BH, pFDR.nominal, col.vec[1])
+pFDP.polygon.plot(beta.list, qvalue.qvalue, pFDR.nominal, col.vec[2])
+pFDP.polygon.plot(beta.list, qvalue.locfdr, pFDR.nominal, col.vec[3])
+pFDP.polygon.plot(beta.list, qvalue.ash, pFDR.nominal, col.vec[4])
+pFDP.polygon.plot(beta.list, qvalue.gdash.ash, pFDR.nominal, col.vec[5])
+pFDP.polygon.plot(beta.list, qvalue.gdash, pFDR.nominal, col.vec[6])
+
+lines(c(0, pFDR.nominal), c(0, pFDR.nominal), cex = 3, lty = 6)
+lines(c(0, pFDR.nominal), 2 * c(0, pFDR.nominal), cex = 3, lty = 4)
+```
+
+### s values and positive FSR (pFSR) calibration
+
+Both `ASH` and `GD-ASH` are too liberal, although `GD-ASH` is not too far off.
+
+```{r inflation svalue calibration plotting, echo = FALSE}
+pFSR.nominal = seq(0, 0.2, 0.001)[-1]
+
+pFSP.polygon.plot = function (beta, betahat, svalue, pFSR.nominal, col) {
+  summary = pFSR.calib(beta, betahat, svalue, pFSR.nominal)
+  mean = summary$pFSP.mean
+  sd = summary$pFSP.mean.sd
+  lines(pFSR.nominal, mean, col = col, cex = 2)
+  polygon.color.rgb = as.vector(grDevices::col2rgb(col))
+  polygon(x = c(0, pFSR.nominal, rev(pFSR.nominal), 0),
+          y = c(0, mean - 2 * sd, rev(mean + 2 * sd), 0),
+          col = grDevices::rgb(polygon.color.rgb[1], polygon.color.rgb[2], polygon.color.rgb[3], alpha = 100, max = 255),
+          border = col,
+          lty = 2)
+}
+
+pFSR.methods = c("ASH", "GD-ASH")
+col.vec = grDevices::rainbow(6)[4 : 5]
+plot(1:10, 1:10, type = "n", bty = "n", xaxt = "n", yaxt = "n", xlab = "", ylab = "")
+legend("center", lty = 1, col = col.vec, legend = pFSR.methods)
+plot(pFSR.nominal, pFSR.nominal, ylim = c(0, 2 * max(pFSR.nominal)), type = "n", xlab = "Nominal Positive False Sign Rate", ylab = "Average Positive False Sign Proportion", main = "Calibration of s Value")
+
+pFSP.polygon.plot(beta.list, betahat.list, svalue.ash, pFSR.nominal, col.vec[1])
+pFSP.polygon.plot(beta.list, betahat.list, svalue.gdash.ash, pFSR.nominal, col.vec[2])
+
+lines(c(0, pFSR.nominal), c(0, pFSR.nominal), cex = 3, lty = 6)
+lines(c(0, pFSR.nominal), 2 * c(0, pFSR.nominal), cex = 3, lty = 4)
+```
+
+## Deflation data sets
+
+### Some examples of deflated correlated null $z$ scores
+
+```{r deflation examples, echo = FALSE}
+exp = sample(nrow(z.deflation), 4)
+z.exp = z.deflation[exp, ]
+par(mfrow = c(2, 2))
+for (kk in 1 : length(exp)) {
+  exp.hist = hist(z.exp[kk, ], breaks = 100, plot = FALSE)
+  hist(z.exp[kk, ], breaks = 100, prob = TRUE, ylim = c(0, max(exp.hist$density, dnorm(0))), main = "", xlab = "")
+  x.plot = seq(- max(abs(z.exp[kk, ])) - 2, max(abs(z.exp[kk, ])) + 2, 0.01)
+  lines(x.plot, dnorm(x.plot), col = "red")
+}
+```
+
+```{r deflation fitting, echo = FALSE, cache = TRUE, message = FALSE, warning = FALSE}
+pihat0.ash = pihat0.gdash = pihat0.qvalue = c()
+mse.mle = mse.ash = mse.gdash.ash = mse.gdash = c()
+auc.pvalue = auc.BH = auc.qvalue.qvalue = auc.qvalue.lfdr = auc.ash.qvalue = auc.ash.lfdr = auc.gdash.ash.qvalue = auc.gdash.ash.lfdr = auc.gdash.lfdr = auc.gdash.qvalue = c()
+betahat.list = beta.list = list()
+qvalue.BH = qvalue.qvalue = qvalue.ash = qvalue.gdash.ash = qvalue.gdash = svalue.ash = svalue.gdash.ash = list()
+for (i in 1 : nrow(z.deflation)) {
+  sebetahat = se.deflation[i, ]
+  z = z.deflation[i, ]
+  n = length(z)
+  sigma_n = sqrt(mean(sebetahat^2))
+  sigma_s.1 = sigma_n
+  sigma_s.2 = 2 * sigma_n
+  g = ashr::normalmix(pi = c(0.6, 0.3, 0.1), mean = 0, sd = c(0, sigma_s.1, sigma_s.2))
+  beta = sample.g(g, n)$beta
+  response = (beta != 0)
+  betahat = beta + sebetahat * z
+  pvalue = (1 - pnorm(abs(betahat / sebetahat))) * 2
+  fit.ash = ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+  fit.gdash = gdash(betahat, sebetahat)
+  fit.gdash.ash = ashr::ash(betahat, sebetahat, fixg = TRUE, g = fit.gdash$fitted_g)
+  fit.qvalue = qvalue::qvalue(pvalue)
+  fit.BH = p.adjust(pvalue, method = "BH")
+
+  pihat0.ash[i] = ashr::get_pi0(fit.ash)
+  pihat0.gdash[i] = ashr::get_pi0(fit.gdash)
+  pihat0.qvalue[i] = fit.qvalue$pi0
+
+  mse.mle[i] = mean((betahat - beta)^2)
+  mse.ash[i] = mean((ashr::get_pm(fit.ash) - beta)^2)
+  mse.gdash.ash[i] = mean((ashr::get_pm(fit.gdash.ash) - beta)^2)
+  mse.gdash[i] = mean((fit.gdash$pm - beta)^2)
+
+  auc.pvalue[i] = pROC::roc(response, pvalue)$auc
+  auc.BH[i] = pROC::roc(response, fit.BH)$auc
+  auc.qvalue.qvalue[i] = pROC::roc(response, fit.qvalue$qvalues)$auc
+  auc.qvalue.lfdr[i] = pROC::roc(response, fit.qvalue$lfdr)$auc
+  auc.ash.qvalue[i] = pROC::roc(response, ashr::get_qvalue(fit.ash))$auc
+  auc.ash.lfdr[i] = pROC::roc(response, ashr::get_lfdr(fit.ash))$auc
+  auc.gdash.ash.qvalue[i] = pROC::roc(response, ashr::get_qvalue(fit.gdash.ash))$auc
+  auc.gdash.ash.lfdr[i] = pROC::roc(response, ashr::get_lfdr(fit.gdash.ash))$auc
+  auc.gdash.qvalue[i] = pROC::roc(response, fit.gdash$qvalue)$auc
+  auc.gdash.lfdr[i] = pROC::roc(response, fit.gdash$lfdr)$auc
+  
+  beta.list[[i]] = beta
+  betahat.list[[i]] = betahat
+  qvalue.BH[[i]] = fit.BH
+  qvalue.qvalue[[i]] = fit.qvalue$qvalues
+  qvalue.ash[[i]] = ashr::get_qvalue(fit.ash)
+  qvalue.gdash.ash[[i]] = ashr::get_qvalue(fit.gdash.ash)
+  qvalue.gdash[[i]] = fit.gdash$qvalue
+  svalue.ash[[i]] = ashr::get_svalue(fit.ash)
+  svalue.gdash.ash[[i]] = ashr::get_svalue(fit.gdash.ash)
+}
+```
+
+```{r deflation locfdr fitting, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
+pihat0.locfdr = c()
+auc.locfdr.qvalue = auc.locfdr.lfdr = c()
+qvalue.locfdr = list()
+for (i in 1 : nrow(z.deflation)) {
+  sebetahat = se.deflation[i, ]
+  betahat = betahat.list[[i]]
+  response = (beta.list[[i]] != 0)
+  tryCatch({
+    fit.locfdr = locfdr::locfdr(betahat / sebetahat, plot = 0)
+    pihat0.locfdr[i] = fit.locfdr$fp0[3, 3]
+    auc.locfdr.qvalue[i] = pROC::roc(response, ashr::qval.from.lfdr(fit.locfdr$fdr))$auc
+    auc.locfdr.lfdr[i] = pROC::roc(response, fit.locfdr$fdr)$auc
+    qvalue.locfdr[[i]] = ashr::qval.from.lfdr(fit.locfdr$fdr)
+  }, error = function (err) {
+    invisible(NA)
+  }
+  )
+}
+```
+
+### $\hat \pi_0$
+
+Almost all methods except `GD-ASH` overestimate as expected.  `GD-ASH` occasionally severely underestimates as [seen before](simulation_real_se.html#global_null).
+
+```{r deflation pihat0, echo = FALSE}
+boxplot(pihat0.qvalue, 
+        pihat0.locfdr, 
+        pihat0.ash,
+        pihat0.gdash,
+        ylim = c(0, 1), 
+        names = c("qvalue",
+                  "locfdr",
+                  "ASH",
+                  "GD-ASH"),
+        ylab = expression(hat(pi)[0]),
+        main = expression(hat(pi)[0]),
+        las = 2
+        )
+abline(h = 0.6, lty = 2, col = "red")
+```
+
+### MSE
+
+`GD-Lik` does better than `ASH` and `GD-ASH` but not as significantly as in the inflation case.
+
+```{r deflation mse, echo = FALSE}
+boxplot(mse.ash, mse.gdash.ash, mse.gdash,
+        names = c("ASH", "GD-ASH", "GD-Lik"),
+        ylab = "MSE",
+        main = expression("MSE of Posterior Mean"),
+        las = 2
+        )
+```
+
+### AUC
+
+Similar story as in the inflation case, although this time `qvalue`'s `lfdr` behaves weirdly.
+
+```{r deflation auc, echo = FALSE}
+boxplot(auc.pvalue, auc.BH, auc.qvalue.qvalue, auc.qvalue.lfdr, 
+        auc.locfdr.qvalue, auc.locfdr.lfdr,
+        auc.ash.qvalue, auc.ash.lfdr, auc.gdash.ash.qvalue, auc.gdash.ash.lfdr, auc.gdash.qvalue, auc.gdash.lfdr,
+        names = c("p-value", "BH", "qvalue.q", "qvalue.l",
+                  "locfdr.q", "locfdr.l",
+                  "ASH.q", "ASH.l", "GD-ASH.q", "GD-ASH.l", "GD_Lik.q", "GD_Lik.l"),
+        ylim = c(0, 1), ylab = "AUC", main = expression("Area Under the ROC Curve"), las = 2)
+abline(h = 0.5, lty = 2, col = "red")
+abline(h = median(auc.gdash.lfdr), lty = 2, col = "blue")
+```
+
+### q values and positive FDR (pFDR) calibration
+
+Essentially all methods successfully control pFDR.  `GD-Lik` looks good although off a little.  `qvalue` is the most conservative, followed by `ASH`, `GD-ASH`, and `locfdr`.
+
+```{r deflation qvalue calibration plotting, echo = FALSE}
+pFDR.nominal = seq(0, 0.2, 0.001)[-1]
+
+pFDP.polygon.plot = function (beta, qvalue, pFDR.nominal, col) {
+  summary = pFDR.calib(beta, qvalue, pFDR.nominal)
+  mean = summary$pFDP.mean
+  sd = summary$pFDP.mean.sd
+  lines(pFDR.nominal, mean, col = col, cex = 2)
+  polygon.color.rgb = as.vector(grDevices::col2rgb(col))
+  polygon(x = c(0, pFDR.nominal, rev(pFDR.nominal), 0),
+          y = c(0, mean - 2 * sd, rev(mean + 2 * sd), 0),
+          col = grDevices::rgb(polygon.color.rgb[1], polygon.color.rgb[2], polygon.color.rgb[3], alpha = 100, max = 255),
+          border = col,
+          lty = 2)
+}
+
+pFDR.methods = c("BH", "qvalue", "locfdr", "ASH", "GD-ASH", "GD-Lik")
+col.vec = grDevices::rainbow(6)
+plot(1:10, 1:10, type = "n", bty = "n", xaxt = "n", yaxt = "n", xlab = "", ylab = "")
+legend("center", lty = 1, col = col.vec, legend = pFDR.methods)
+plot(pFDR.nominal, pFDR.nominal, ylim = c(0, 2 * max(pFDR.nominal)), type = "n", xlab = "Nominal Positive False Discovery Rate", ylab = "Average Positive False Discovery Proportion", main = "Calibration of q Value")
+
+pFDP.polygon.plot(beta.list, qvalue.BH, pFDR.nominal, col.vec[1])
+pFDP.polygon.plot(beta.list, qvalue.qvalue, pFDR.nominal, col.vec[2])
+pFDP.polygon.plot(beta.list, qvalue.locfdr, pFDR.nominal, col.vec[3])
+pFDP.polygon.plot(beta.list, qvalue.ash, pFDR.nominal, col.vec[4])
+pFDP.polygon.plot(beta.list, qvalue.gdash.ash, pFDR.nominal, col.vec[5])
+pFDP.polygon.plot(beta.list, qvalue.gdash, pFDR.nominal, col.vec[6])
+
+lines(c(0, pFDR.nominal), c(0, pFDR.nominal), cex = 3, lty = 6)
+lines(c(0, pFDR.nominal), 2 * c(0, pFDR.nominal), cex = 3, lty = 4)
+```
+
+### s values and positive FSR (pFSR) calibration
+
+Both `ASH` and `GD-ASH` seem too conservative, although `GD-ASH` is more powerful.
+
+```{r deflation svalue calibration plotting, echo = FALSE}
+pFSR.nominal = seq(0, 0.2, 0.001)[-1]
+
+pFSP.polygon.plot = function (beta, betahat, svalue, pFSR.nominal, col) {
+  summary = pFSR.calib(beta, betahat, svalue, pFSR.nominal)
+  mean = summary$pFSP.mean
+  sd = summary$pFSP.mean.sd
+  lines(pFSR.nominal, mean, col = col, cex = 2)
+  polygon.color.rgb = as.vector(grDevices::col2rgb(col))
+  polygon(x = c(0, pFSR.nominal, rev(pFSR.nominal), 0),
+          y = c(0, mean - 2 * sd, rev(mean + 2 * sd), 0),
+          col = grDevices::rgb(polygon.color.rgb[1], polygon.color.rgb[2], polygon.color.rgb[3], alpha = 100, max = 255),
+          border = col,
+          lty = 2)
+}
+
+pFSR.methods = c("ASH", "GD-ASH")
+col.vec = grDevices::rainbow(6)[4 : 5]
+plot(1:10, 1:10, type = "n", bty = "n", xaxt = "n", yaxt = "n", xlab = "", ylab = "")
+legend("center", lty = 1, col = col.vec, legend = pFSR.methods)
+plot(pFSR.nominal, pFSR.nominal, ylim = c(0, 2 * max(pFSR.nominal)), type = "n", xlab = "Nominal Positive False Sign Rate", ylab = "Average Positive False Sign Proportion", main = "Calibration of s Value")
+
+pFSP.polygon.plot(beta.list, betahat.list, svalue.ash, pFSR.nominal, col.vec[1])
+pFSP.polygon.plot(beta.list, betahat.list, svalue.gdash.ash, pFSR.nominal, col.vec[2])
+
+lines(c(0, pFSR.nominal), c(0, pFSR.nominal), cex = 3, lty = 6)
+lines(c(0, pFSR.nominal), 2 * c(0, pFSR.nominal), cex = 3, lty = 4)
+```
+
+## Remarks
+
+1. Would be nice to come up with a way to calculate `lfsr` in `GD-Lik`.
+2. Many methods are too liberal for inflation cases and too conservative for deflation cases, showing a lack of robustness against correlation.  Although, on average they probably seem about right.
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```

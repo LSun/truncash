@@ -1,0 +1,214 @@
+---
+title: "Posterior Inference with Gaussian Derivative Likelihood: Initial Simulations"
+author: "Lei Sun"
+date: 2017-06-12
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+```{r gdash, message = FALSE}
+source("../code/gdash_lik.R")
+```
+
+```{r functions, echo = FALSE}
+## produce simulated true signals beta
+sample.g = function (g, n) {
+  UseMethod("sample.g")
+}
+
+sample.g.normalmix = function (g, n) {
+  K = length(g$pi)
+  beta = list()
+  for (i in 1 : K) {
+    beta[[i]] = rnorm(ceiling(n * g$pi[i]), g$mean[i], g$sd[i])
+  }
+  return(list(beta = sample(unlist(beta)), mixcompdist = "normal"))
+}
+```
+
+```{r data}
+sebetahat = readRDS("../output/sebetahat_null_liver_777.rds")
+z = readRDS("../output/z_null_liver_777.rds")
+m = nrow(z)
+n = ncol(z)
+```
+
+```{r param}
+pi0 = 0.99
+effect_strength = 3
+```
+
+```{r sim, echo = FALSE, cache = TRUE}
+pihat0.ash = pihat0.gdash = pihat0.qvalue = c()
+mse.mle = mse.ash = mse.gdash.ash = mse.gdash = c()
+auc.pvalue = auc.BH = auc.qvalue.qvalue = auc.qvalue.lfdr = auc.ash.qvalue = auc.ash.lfdr = auc.gdash.ash.qvalue = auc.gdash.ash.lfdr = auc.gdash.lfdr = auc.gdash.qvalue = c()
+dataset.sel = sample(m, 200)
+for (i in dataset.sel) {
+  sigma_n = sqrt(mean(sebetahat[i, ]^2))
+  beta = rnorm(round(n * (1 - pi0)), 0, effect_strength * sigma_n)
+  beta = sample(c(beta, rep(0, n - length(beta))))
+  response = (beta != 0)
+  betahat = beta + sebetahat[i, ] * z[i, ]
+  pvalue = (1 - pnorm(abs(betahat / sebetahat[i, ]))) * 2
+  fit.ash = ashr::ash(betahat, sebetahat[i, ], mixcompdist = "normal", method = "fdr")
+  fit.gdash = gdash(betahat, sebetahat[i, ])
+  fit.gdash.ash = ashr::ash(betahat, sebetahat[i, ], fixg = TRUE, g = fit.gdash$fitted_g)
+  fit.qvalue = qvalue::qvalue(pvalue)
+  # fit.locfdr = locfdr::locfdr(betahat / sebetahat[i, ])
+  fit.BH = p.adjust(pvalue, method = "BH")
+
+  pihat0.ash[i] = ashr::get_pi0(fit.ash)
+  pihat0.gdash[i] = ashr::get_pi0(fit.gdash)
+  pihat0.qvalue[i] = fit.qvalue$pi0
+  # pihat0.locfdr[i] = min(1, fit.locfdr$fp0[3, 3])
+  
+  mse.mle[i] = mean((betahat - beta)^2)
+  mse.ash[i] = mean((ashr::get_pm(fit.ash) - beta)^2)
+  mse.gdash.ash[i] = mean((ashr::get_pm(fit.gdash.ash) - beta)^2)
+  mse.gdash[i] = mean((fit.gdash$pm - beta)^2)
+
+  auc.pvalue[i] = pROC::roc(response, pvalue)$auc
+  auc.BH[i] = pROC::roc(response, fit.BH)$auc
+  auc.qvalue.qvalue[i] = pROC::roc(response, fit.qvalue$qvalues)$auc
+  auc.qvalue.lfdr[i] = pROC::roc(response, fit.qvalue$lfdr)$auc
+  # auc.locfdr.lfdr[i] = pROC::roc(response, fit.locfdr$fdr)$auc
+  auc.ash.qvalue[i] = pROC::roc(response, ashr::get_qvalue(fit.ash))$auc
+  auc.ash.lfdr[i] = pROC::roc(response, ashr::get_lfdr(fit.ash))$auc
+  auc.gdash.ash.qvalue[i] = pROC::roc(response, ashr::get_qvalue(fit.gdash.ash))$auc
+  auc.gdash.ash.lfdr[i] = pROC::roc(response, ashr::get_lfdr(fit.gdash.ash))$auc
+  auc.gdash.lfdr[i] = pROC::roc(response, fit.gdash$lfdr)$auc
+  auc.gdash.qvalue[i] = pROC::roc(response, fit.gdash$qvalue)$auc
+}
+```
+
+```{r plotting, echo = FALSE}
+boxplot(pihat0.qvalue, 
+        # pihat0.locfdr, 
+        pihat0.ash, pihat0.gdash,
+        ylim = c(0, 1), names = c("qvalue", 
+                                  # "locfdr", 
+                                  "ash", "cash"), ylab = expression(hat(pi)[0]), main = expression(hat(pi)[0]), las = 2
+        )
+abline(h = pi0, lty = 2, col = "red")
+
+boxplot.param = boxplot(mse.ash, mse.gdash.ash, mse.gdash, plot = FALSE)
+boxplot = boxplot(mse.ash, mse.gdash.ash, mse.gdash,
+        names = c("ash", "cash", "cash_lik"),
+        ylab = "MSE",
+        main = expression("MSE of Posterior Mean"),
+        las = 2
+        )
+
+boxplot(auc.pvalue, auc.BH, auc.qvalue.qvalue, auc.qvalue.lfdr, 
+        #auc.locfdr.lfdr, 
+        auc.ash.qvalue, auc.ash.lfdr, auc.gdash.ash.qvalue, auc.gdash.ash.lfdr, auc.gdash.qvalue, auc.gdash.lfdr,
+        names = c("p-value", "BH", "qvalue.q", "qvalue.l",
+                  # "locfdr.l",
+                  "ash.q", "ash.l", "cash.q", "cash.l", "cash_lik.q", "cash_lik.l"),
+        ylim = c(0, 1), ylab = "AUC", main = expression("Area Under the ROC Curve"), las = 2)
+abline(h = 0.5, lty = 2, col = "red")
+legend("bottom", lty = 2, col = "red", "AUC = 0.5 baseline")
+```
+
+
+
+```{r sim 2, echo = FALSE, cache = TRUE}
+pihat0.ash = pihat0.gdash = pihat0.qvalue = c()
+mse.mle = mse.ash = mse.gdash.ash = mse.gdash = c()
+auc.pvalue = auc.BH = auc.qvalue.qvalue = auc.qvalue.lfdr = auc.ash.qvalue = auc.ash.lfdr = auc.gdash.ash.qvalue = auc.gdash.ash.lfdr = auc.gdash.lfdr = auc.gdash.qvalue = c()
+dataset.sel = sample(m, 200)
+for (i in dataset.sel) {
+  sigma_n = sqrt(mean(sebetahat[i, ]^2))
+  sigma_s.1 = sigma_n
+  sigma_s.2 = 2 * sigma_n
+  g = ashr::normalmix(pi = c(0.6, 0.3, 0.1), mean = 0, sd = c(0, sigma_s.1, sigma_s.2))
+  beta = sample.g(g, n)$beta
+  response = (beta != 0)
+  betahat = beta + sebetahat[i, ] * z[i, ]
+  pvalue = (1 - pnorm(abs(betahat / sebetahat[i, ]))) * 2
+  fit.ash = ashr::ash(betahat, sebetahat[i, ], mixcompdist = "normal", method = "fdr")
+  fit.gdash = gdash(betahat, sebetahat[i, ])
+  fit.gdash.ash = ashr::ash(betahat, sebetahat[i, ], fixg = TRUE, g = fit.gdash$fitted_g)
+  fit.qvalue = qvalue::qvalue(pvalue)
+  # fit.locfdr = locfdr::locfdr(betahat / sebetahat[i, ])
+  fit.BH = p.adjust(pvalue, method = "BH")
+
+  pihat0.ash[i] = ashr::get_pi0(fit.ash)
+  pihat0.gdash[i] = ashr::get_pi0(fit.gdash)
+  pihat0.qvalue[i] = fit.qvalue$pi0
+  # pihat0.locfdr[i] = min(1, fit.locfdr$fp0[3, 3])
+  
+  mse.mle[i] = mean((betahat - beta)^2)
+  mse.ash[i] = mean((ashr::get_pm(fit.ash) - beta)^2)
+  mse.gdash.ash[i] = mean((ashr::get_pm(fit.gdash.ash) - beta)^2)
+  mse.gdash[i] = mean((fit.gdash$pm - beta)^2)
+
+  auc.pvalue[i] = pROC::roc(response, pvalue)$auc
+  auc.BH[i] = pROC::roc(response, fit.BH)$auc
+  auc.qvalue.qvalue[i] = pROC::roc(response, fit.qvalue$qvalues)$auc
+  auc.qvalue.lfdr[i] = pROC::roc(response, fit.qvalue$lfdr)$auc
+  # auc.locfdr.lfdr[i] = pROC::roc(response, fit.locfdr$fdr)$auc
+  auc.ash.qvalue[i] = pROC::roc(response, ashr::get_qvalue(fit.ash))$auc
+  auc.ash.lfdr[i] = pROC::roc(response, ashr::get_lfdr(fit.ash))$auc
+  auc.gdash.ash.qvalue[i] = pROC::roc(response, ashr::get_qvalue(fit.gdash.ash))$auc
+  auc.gdash.ash.lfdr[i] = pROC::roc(response, ashr::get_lfdr(fit.gdash.ash))$auc
+  auc.gdash.lfdr[i] = pROC::roc(response, fit.gdash$lfdr)$auc
+  auc.gdash.qvalue[i] = pROC::roc(response, fit.gdash$qvalue)$auc
+}
+```
+
+```{r plotting 2, echo = FALSE}
+boxplot(pihat0.qvalue, 
+        # pihat0.locfdr, 
+        pihat0.ash, pihat0.gdash,
+        ylim = c(0, 1), names = c("qvalue", 
+                                  # "locfdr", 
+                                  "ash", "cash"), ylab = expression(hat(pi)[0]), main = expression(hat(pi)[0]), las = 2
+        )
+abline(h = 0.6, lty = 2, col = "red")
+
+boxplot.param = boxplot(mse.ash, mse.gdash.ash, mse.gdash, plot = FALSE)
+boxplot = boxplot(mse.ash, mse.gdash.ash, mse.gdash,
+        names = c("ash", "cash", "cash_lik"),
+        ylab = "MSE",
+        main = expression("MSE of Posterior Mean"),
+        las = 2
+        )
+
+boxplot(auc.pvalue, auc.BH, auc.qvalue.qvalue, auc.qvalue.lfdr, 
+        #auc.locfdr.lfdr, 
+        auc.ash.qvalue, auc.ash.lfdr, auc.gdash.ash.qvalue, auc.gdash.ash.lfdr, auc.gdash.qvalue, auc.gdash.lfdr,
+        names = c("p-value", "BH", "qvalue.q", "qvalue.l",
+                  # "locfdr.l",
+                  "ash.q", "ash.l", "cash.q", "cash.l", "cash_lik.q", "cash_lik.l"),
+        ylim = c(0, 1), ylab = "AUC", main = expression("Area Under the ROC Curve"), las = 2)
+abline(h = 0.5, lty = 2, col = "red")
+legend("bottom", lty = 2, col = "red", "AUC = 0.5 baseline")
+```
+
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```

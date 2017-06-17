@@ -133,12 +133,14 @@ Fitting the corrrelated null with Gaussian derivatives has two constraints: non-
 * [Simulated signals added to real data: Part 2](real_data_simulation_2.html)
 * [Simulated signals added to real data: Part 3](real_data_simulation_3.html)
 * [Simulated signals added to real data: Part 4](real_data_simulation_4.html)
+* [Simulated signals added to real data: Part 5](real_data_simulation_5.html)
 
+Using the `seqgendiff` pipeline developed by [David](http://dcgerard.github.io/), [Mengyin](https://github.com/mengyin), and Matthew, we are adding simulated $\pi_0\delta_0 + \left(1 - \pi0\right)N\left(0, \sigma^2\right)$ signals to GTEx/Liver RNA-seq expression matrix, and compare our method with [`BH`](http://www.jstor.org/stable/2346101), [`qvalue`](http://bioconductor.org/packages/release/bioc/html/qvalue.html), [`locfdr`](https://cran.r-project.org/web/packages/locfdr/index.html), [`ash`](https://github.com/stephens999/ashr), [`sva`](https://www.bioconductor.org/packages/release/bioc/html/sva.html), [`cate`](https://cran.r-project.org/web/packages/cate/index.html), [`mouthwash`](https://github.com/dcgerard/vicar).  The pipeline and result here are mostly exploratory and in development stage.  More mature version will follow.
 
-Using the `seqgendiff` pipeline developed by [David](http://dcgerard.github.io/), [Mengyin](https://github.com/mengyin), and Matthew, we are adding simulated $\pi_0\delta_0 + \left(1 - \pi0\right)N\left(0, \sigma^2\right)$ signals to GTEx/Liver RNA-seq expression matrix, and compare our method with `ASH` and [`SVA`](http://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.0030161).
-
-* [Completely synthetic correlated null](simulated_correlated_null.html)
-* [Completely synthetic correlated null: More complicated cases](simulated_correlated_null_2.html)
+* [Completely synthetic correlated null: Low rank simulation](simulated_correlated_null.html)
+* [Completely synthetic correlated null: Multiple groups of closely correlated null](simulated_correlated_null_2.html)
+* [Completely synthetic correlated null: More low rank simulation ](simulated_correlated_null_3.html)
+* [Completely synthetic correlated null: Limit case of low rank simulation](simulated_correlated_null_4.html)
 
 Following [Gao](http://home.uchicago.edu/gaow/)'s suggestion, we are taking a look at whether Gaussian derivatives can satisfactorily fit synthetic correlated $N\left(0, 1\right)$ $z$ scores.  Suggested by Matthew, **it might have something to do with the distribution of eigenvalues in a random matrix**, and the [Wigner semicircle distribution](https://en.wikipedia.org/wiki/Wigner_semicircle_distribution).  It's also an interesting comparison with Gaussian mixtures.
 
@@ -147,7 +149,22 @@ Following [Gao](http://home.uchicago.edu/gaow/)'s suggestion, we are taking a lo
 
 The large-scale simulation testing for GD-ASH with simulated effects under different sparsity, strength, and shape, and realistic correlated noises.
 
-* [Why AUC of p value and `BH` might be different?](auc_pvalue.html)
+* [Why AUC of $p$ values and `BH` might be different?](auc_pvalue.html)
+
+AUC-wise, $p$ values and $BH$ should perform almost the same, since `BH` doesn't change the order of $p$ values, but in practice their performance might differ.  It turns out ties should be one important reason.
+
+* [Group meeting presentation on `GD-ASH`](group_meeting_0608.html)
+
+Talked about using Gaussian derivatives to handle correlation at Matthew's group meeting.
+
+* [`GD-ASH` applied to Smemo et al 2014 data](smemo.html)
+
+An RNA-seq data set of mouse hearts contains $23K$+ genes and only 4 samples, two for each condition.  `GD-ASH` applying to this data set raises several interesting questions.
+
+* [`GD-ASH` with Gaussian derivative likelihood: Initial simulation](gd_lik.html)
+* [`GD-ASH` with Gaussian derivative likelihood: Models, formulae, and simulation](gd_lik_2.html)
+
+When the noise is correlated, the likelihood should be correlated.  However, in the [`GD-ASH`](ash_gd.html) model, noise is essentially treated to be independently sampled from an empirical null fitted by Gaussian derivatives, so it would make more sense to use Gaussian derivatives, rather than simple Gaussian, as likelihood.
 
 [`ashr`]: https://github.com/stephens999/ashr
 

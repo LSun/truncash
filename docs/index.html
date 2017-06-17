@@ -329,11 +329,14 @@ $(document).ready(function () {
 <li><a href="real_data_simulation_2.html">Simulated signals added to real data: Part 2</a></li>
 <li><a href="real_data_simulation_3.html">Simulated signals added to real data: Part 3</a></li>
 <li><a href="real_data_simulation_4.html">Simulated signals added to real data: Part 4</a></li>
+<li><a href="real_data_simulation_5.html">Simulated signals added to real data: Part 5</a></li>
 </ul>
-<p>Using the <code>seqgendiff</code> pipeline developed by <a href="http://dcgerard.github.io/">David</a>, <a href="https://github.com/mengyin">Mengyin</a>, and Matthew, we are adding simulated <span class="math inline">\(\pi_0\delta_0 + \left(1 - \pi0\right)N\left(0, \sigma^2\right)\)</span> signals to GTEx/Liver RNA-seq expression matrix, and compare our method with <code>ASH</code> and <a href="http://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.0030161"><code>SVA</code></a>.</p>
+<p>Using the <code>seqgendiff</code> pipeline developed by <a href="http://dcgerard.github.io/">David</a>, <a href="https://github.com/mengyin">Mengyin</a>, and Matthew, we are adding simulated <span class="math inline">\(\pi_0\delta_0 + \left(1 - \pi0\right)N\left(0, \sigma^2\right)\)</span> signals to GTEx/Liver RNA-seq expression matrix, and compare our method with <a href="http://www.jstor.org/stable/2346101"><code>BH</code></a>, <a href="http://bioconductor.org/packages/release/bioc/html/qvalue.html"><code>qvalue</code></a>, <a href="https://cran.r-project.org/web/packages/locfdr/index.html"><code>locfdr</code></a>, <a href="https://github.com/stephens999/ashr"><code>ash</code></a>, <a href="https://www.bioconductor.org/packages/release/bioc/html/sva.html"><code>sva</code></a>, <a href="https://cran.r-project.org/web/packages/cate/index.html"><code>cate</code></a>, <a href="https://github.com/dcgerard/vicar"><code>mouthwash</code></a>. The pipeline and result here are mostly exploratory and in development stage. More mature version will follow.</p>
 <ul>
-<li><a href="simulated_correlated_null.html">Completely synthetic correlated null</a></li>
-<li><a href="simulated_correlated_null_2.html">Completely synthetic correlated null: More complicated cases</a></li>
+<li><a href="simulated_correlated_null.html">Completely synthetic correlated null: Low rank simulation</a></li>
+<li><a href="simulated_correlated_null_2.html">Completely synthetic correlated null: Multiple groups of closely correlated null</a></li>
+<li><a href="simulated_correlated_null_3.html">Completely synthetic correlated null: More low rank simulation</a></li>
+<li><a href="simulated_correlated_null_4.html">Completely synthetic correlated null: Limit case of low rank simulation</a></li>
 </ul>
 <p>Following <a href="http://home.uchicago.edu/gaow/">Gao</a>’s suggestion, we are taking a look at whether Gaussian derivatives can satisfactorily fit synthetic correlated <span class="math inline">\(N\left(0, 1\right)\)</span> <span class="math inline">\(z\)</span> scores. Suggested by Matthew, <strong>it might have something to do with the distribution of eigenvalues in a random matrix</strong>, and the <a href="https://en.wikipedia.org/wiki/Wigner_semicircle_distribution">Wigner semicircle distribution</a>. It’s also an interesting comparison with Gaussian mixtures.</p>
 <ul>
@@ -342,8 +345,22 @@ $(document).ready(function () {
 </ul>
 <p>The large-scale simulation testing for GD-ASH with simulated effects under different sparsity, strength, and shape, and realistic correlated noises.</p>
 <ul>
-<li><a href="auc_pvalue.html">Why AUC of p value and <code>BH</code> might be different?</a></li>
+<li><a href="auc_pvalue.html">Why AUC of <span class="math inline">\(p\)</span> values and <code>BH</code> might be different?</a></li>
 </ul>
+<p>AUC-wise, <span class="math inline">\(p\)</span> values and <span class="math inline">\(BH\)</span> should perform almost the same, since <code>BH</code> doesn’t change the order of <span class="math inline">\(p\)</span> values, but in practice their performance might differ. It turns out ties should be one important reason.</p>
+<ul>
+<li><a href="group_meeting_0608.html">Group meeting presentation on <code>GD-ASH</code></a></li>
+</ul>
+<p>Talked about using Gaussian derivatives to handle correlation at Matthew’s group meeting.</p>
+<ul>
+<li><a href="smemo.html"><code>GD-ASH</code> applied to Smemo et al 2014 data</a></li>
+</ul>
+<p>An RNA-seq data set of mouse hearts contains <span class="math inline">\(23K\)</span>+ genes and only 4 samples, two for each condition. <code>GD-ASH</code> applying to this data set raises several interesting questions.</p>
+<ul>
+<li><a href="gd_lik.html"><code>GD-ASH</code> with Gaussian derivative likelihood: Initial simulation</a></li>
+<li><a href="gd_lik_2.html"><code>GD-ASH</code> with Gaussian derivative likelihood: Models, formulae, and simulation</a></li>
+</ul>
+<p>When the noise is correlated, the likelihood should be correlated. However, in the <a href="ash_gd.html"><code>GD-ASH</code></a> model, noise is essentially treated to be independently sampled from an empirical null fitted by Gaussian derivatives, so it would make more sense to use Gaussian derivatives, rather than simple Gaussian, as likelihood.</p>
 <!-- The goal of this new template is to simplify the setup and maintenance of a research website. -->
 <!-- Specifically, -->
 <!-- *  Easier to build and extend the website using the new tools in the [rmarkdown][] package and [latest RStudio release][rstudio] -->
