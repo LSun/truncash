@@ -1,0 +1,106 @@
+---
+title: "Semicircular correlated $z$ scores"
+author: "Lei Sun"
+date: 2017-06-07
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+## Data generation
+
+Let $L_{n \times k} = \left[L_{ij}\right]_{n \times k}$ be a matrix, each entry of which is generated as follows.
+
+1. Let $L_{ij} \sim N(0, 1)$ independently.
+2. Let $L_{ij} = \displaystyle\frac {L_{ij}}{\sqrt{L_{i1}^2 + \cdots + L_{ik}^2}}$.  That is, normalizing each row so that each row has a unit $l_2$ norm.
+
+Then taking $L$ as known, let $x \sim N\left(0, I_k\right)$ be a $k$-dimensional vector comprised of $k$ independent $N\left(0, 1\right)$ random variables.  Then
+$$
+z = Lx \sim N\left(0, LL^T\right)
+$$
+should be $n$ marginally $N\left(0, 1\right)$ but correlated $z$ scores.  Indeed,
+$$
+\begin{array}{c}
+\text{var}\left(z_i\right) = l_i^Tl_i = 1 \ ;
+\\
+\text{cov}\left(z_i, z_j\right) = l_i^Tl_j \neq 0 \text{, in general} \ ;
+\end{array}
+$$
+where $l_i^T$ and $l_j^T$ are $i^\text{th}$ and $j^\text{th}$ rows of $L$ respectively.
+
+Then we plot the histogram of $n$ $z$ scores.  One interesting thing is we can prove what these histograms would look like when $n$ is sufficiently large.
+
+## $k = 4$
+
+For example, when $k = 4$, $n$ is sufficiently large, say, $10^6$, the histogram of $z$ looks like a **semicircle** almost perfectly, as illustrated in the following simulation.  The semicircle is centered at the origin, and has a radius of $\left\|x\right\|_2$.
+
+```{r}
+set.seed(1)
+n = 1e6
+k = 4
+L = matrix(rnorm(n * k), nrow = n)
+s = sqrt(rowSums(L^2))
+L = L / s
+x = rnorm(k)
+z = L %*% x
+hist(z, breaks = 100, prob = TRUE)
+R = sqrt(sum(x^2))
+x.plot = seq(-max(abs(z)) - 1, max(abs(z)) + 1, length = 1000)
+y.plot = 2 * sqrt(pmax(R^2 - x.plot^2, 0)) / (pi * R^2)
+lines(x.plot, y.plot, col = "red")
+```
+
+Actually, when $k \neq 4$, for example, $k = 3$ or $k = 5$, the histograms of these correlated $z$ scores, simulated the same way, look different, and their shapes when $n \to \infty$ can be mathematically determined.
+
+## $k = 3$
+
+```{r}
+set.seed(1)
+n = 1e6
+k = 3
+L = matrix(rnorm(n * k), nrow = n)
+s = sqrt(rowSums(L^2))
+L = L / s
+x = rnorm(k)
+z = L %*% x
+hist(z, breaks = 100, prob = TRUE)
+```
+
+## $k = 5$
+
+```{r}
+set.seed(1)
+n = 1e6
+k = 5
+L = matrix(rnorm(n * k), nrow = n)
+s = sqrt(rowSums(L^2))
+L = L / s
+x = rnorm(k)
+z = L %*% x
+hist(z, breaks = 100, prob = TRUE)
+```
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```
