@@ -1,0 +1,175 @@
+---
+title: "Gaussian derivatives applied to Smemo's data"
+author: "Lei Sun"
+date: 2017-06-14
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+## Introduction
+
+[Smemo et al 2014](http://www.nature.com/nature/journal/v507/n7492/abs/nature13138.html) provides a mouse heart RNA-seq data set.  The data set contains 2 conditions, and each condition has only 2 samples.  We'll see if Gaussian derivatives can handle this difficult situation.
+
+```{r read data}
+counts = read.table("../data/smemo.txt", header = T, row.name = 1)
+counts = counts[, -5]
+```
+
+```{r data size}
+## Number of genes
+nrow(counts)
+## Number of samples
+ncol(counts)
+## Sneak peek
+head(counts, 10)
+```
+
+## Preprocessing
+
+In the first exploratory investigation, we only choose genes whose expression levels are not all zero for all 4 samples.  This is to prevent the complications brought by "non-expressed" genes.
+
+```{r remove zero genes}
+counts.nonzero = counts[rowSums(counts) >= 1, ]
+## Equivalently
+## counts.nonzero = counts[apply(counts, 1, max) >= 1, ]
+design = model.matrix(~c(0, 0, 1, 1))
+## Number of genes expressed
+nrow(counts.nonzero)
+```
+
+Then we feed the count matrix to [the pipeline to get the summary statistics](nullpipeline.html): $\hat\beta$, $\hat s$, $z$.
+
+```{r, counts to summary function}
+counts_to_summary = function (counts, design) {
+  dgecounts = edgeR::calcNormFactors(edgeR::DGEList(counts = counts, group = design[, 2]))
+  v = limma::voom(dgecounts, design, plot = FALSE)
+  lim = limma::lmFit(v)
+  r.ebayes = limma::eBayes(lim)
+  p = r.ebayes$p.value[, 2]
+  t = r.ebayes$t[, 2]
+  z = sign(t) * qnorm(1 - p/2)
+  betahat = lim$coefficients[,2]
+  sebetahat = betahat / z
+  return (list(betahat = betahat, sebetahat = sebetahat, z = z))
+}
+```
+
+```{r nonzero summary, echo = FALSE}
+summary <- counts_to_summary(counts.nonzero, design)
+betahat <- summary$betahat
+sebetahat <- summary$sebetahat
+z <- summary$z
+```
+
+## Fitting $z$ with Gaussian derivatives
+
+Suppose $z$ are correlated null, will they be well fitted by 10 Gaussian derivatives?
+
+```{r nonzero fitting and plotting, message = FALSE}
+source("../code/gdash.R")
+source("../code/gdfit.R")
+w.fit = gdfit(z, gd.ord = 10)
+plot.gdfit(z, w.fit$w, w.fit$gd.ord, breaks = 100)
+plot.gdfit(z, w.fit$w, w.fit$gd.ord, std.norm = FALSE, breaks = 100)
+plot(ecdf(z))
+plot.gdfit(z, w.fit$w, w.fit$gd.ord, breaks = "Sturges")
+plot.gdfit(z, w.fit$w, w.fit$gd.ord, std.norm = FALSE, breaks = "Sturges")
+```
+
+## Remove two peaks
+
+```{r non-singleton}
+## Remove all singletons
+counts.nonsingleton = counts[rowSums(counts) > 1, ]
+## Number of non-singleton genes
+nrow(counts.nonsingleton)
+```
+
+```{r non-singleton summary, echo = FALSE}
+summary <- counts_to_summary(counts.nonsingleton, design)
+betahat <- summary$betahat
+sebetahat <- summary$sebetahat
+z <- summary$z
+```
+
+```{r non-singleton fitting and plotting}
+w.fit = gdfit(z, gd.ord = 10)
+plot.gdfit(z, w.fit$w, w.fit$gd.ord, breaks = 100)
+plot.gdfit(z, w.fit$w, w.fit$gd.ord, std.norm = FALSE, breaks = 100)
+plot(ecdf(z))
+```
+
+## Higher expression
+
+```{r positive}
+## Remove all zeros
+counts.pos = counts[apply(counts, 1, min) > 0, ]
+## Number of positive genes
+nrow(counts.pos)
+```
+
+```{r positive summary, echo = FALSE}
+summary <- counts_to_summary(counts.pos, design)
+betahat <- summary$betahat
+sebetahat <- summary$sebetahat
+z <- summary$z
+```
+
+```{r positive fitting and plotting}
+w.fit = gdfit(z, gd.ord = 10)
+cat(rbind(paste(0 : w.fit$gd.ord, ":"), paste(w.fit$w, ";")))
+plot.gdfit(z, w.fit$w, w.fit$gd.ord, breaks = 100)
+plot.gdfit(z, w.fit$w, w.fit$gd.ord, std.norm = FALSE, breaks = 100)
+plot(ecdf(z))
+```
+
+```{r betahat vs sebetahat}
+plot(betahat, sebetahat, cex = 0.7, pch = 19)
+```
+
+```{r betahat vs z}
+plot(betahat, z, cex = 0.7, pch = 19)
+```
+
+```{r gd-ash}
+fit.gdash = gdash(betahat, sebetahat)
+fit.gdash
+```
+
+```{r BH}
+fit.ash = ashr::ash(betahat, sebetahat)
+lfsr.ash = ashr::get_lfsr(fit.ash)
+sum(lfsr.ash <= 0.05)
+fit.gdash.ash = ashr::ash(betahat, sebetahat, fixg = TRUE, g = fit.gdash$fitted_g)
+lfsr.gdash.ash = ashr::get_lfsr(fit.gdash.ash)
+sum(lfsr.gdash.ash <= 0.05)
+pval = (1 - pnorm(abs(z))) * 2
+pval.BH = p.adjust(pval, method = "BH")
+sum(pval.BH <= 0.05)
+```
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```
