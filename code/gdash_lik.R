@@ -6,7 +6,12 @@ require(PolynomF)
 require(Rmosek)
 require(ashr)
 
-gdash = function (betahat, sebetahat, gd.ord = 10, primal = FALSE, gd.normalized = TRUE, w.lambda = 10, w.rho = 0.5, mixcompdist = "normal", method = "fdr", control = list(maxiter = 50)) {
+gdash = function (betahat, sebetahat,
+                  mixcompdist = "normal", method = "fdr",
+                  gd.normalized = TRUE, primal = FALSE,
+                  gd.ord = 10, w.lambda = 10, w.rho = 0.5,
+                  gd.priority = TRUE,
+                  control = list(maxiter = 50)) {
   if (method == "fdr") {
     sd = c(0, autoselect.mixsd(betahat, sebetahat, mult = sqrt(2)))
     pi_prior = c(10, rep(1, length(sd) - 1))
@@ -22,32 +27,45 @@ gdash = function (betahat, sebetahat, gd.ord = 10, primal = FALSE, gd.normalized
     w_prior = w.lambda / sqrt(w.rho^(1:gd.ord))
     w_prior[seq(1, gd.ord, by = 2)] = 0
   }
-  res = biopt(array_F, pi_prior, w_prior, control, primal)
+  res = biopt(array_F, pi_prior, w_prior, control, primal, gd.priority)
   pihat = res$pihat
   what = res$what
   fitted_g = normalmix(pi = pihat, mean = 0, sd = sd)
+  loglik = -res$B
   array_PM = array_pm(betahat, sebetahat, sd, gd.ord, gd.normalized)
   array_PM = aperm(array_PM, c(2, 3, 1))
   beta_pm = colSums(t(apply(pihat * array_PM, 2, colSums)) * what) / colSums(t(apply(pihat * array_F, 2, colSums)) * what)
   lfdr = lfdr_top(pihat[1], what, betahat, sebetahat, gd.ord) / colSums(t(apply(pihat * array_F, 2, colSums)) * what)
   qvalue = ashr::qval.from.lfdr(lfdr)
-  return(list(fitted_g = fitted_g, w = what, niter = res$niter, converged = res$converged, array_F = array_F, array_PM = array_PM, pm = beta_pm, lfdr = as.vector(lfdr), qvalue = qvalue))
+  return(list(fitted_g = fitted_g, w = what, loglik = loglik, niter = res$niter, converged = res$converged, array_F = array_F, array_PM = array_PM, pm = beta_pm, lfdr = as.vector(lfdr), qvalue = qvalue))
 }
 
-bifixpoint = function(pinw, array_F, pi_prior, w_prior, primal){
+bifixpoint = function(pinw, array_F, pi_prior, w_prior, primal, gd.priority){
   Kpi = dim(array_F)[1]
   Lw = dim(array_F)[2]
   pi = pinw[1 : Kpi]
   w = pinw[-(1 : Kpi)]
-  matrix_lik_w = apply(array_F * pi, 2, colSums)
-  if (primal) {
-    g_current = matrix_lik_w %*% w
-    w_new = c(1, w.mosek.primal(matrix_lik_w, w_prior, w.init = c(g_current, w[-1]))$w)
+  if (gd.priority) {
+    matrix_lik_w = apply(array_F * pi, 2, colSums)
+    if (primal) {
+      g_current = matrix_lik_w %*% w
+      w_new = c(1, w.mosek.primal(matrix_lik_w, w_prior, w.init = c(g_current, w[-1]))$w)
+    } else {
+      w_new = c(1, w.mosek(matrix_lik_w, w_prior, w.init = w)$w)
+    }
+    matrix_lik_pi = apply(aperm(array_F, c(2, 1, 3)) * w_new, 2, colSums)
+    pi_new = mixIP(matrix_lik_pi, pi_prior, pi)$pihat
   } else {
-    w_new = c(1, w.mosek(matrix_lik_w, w_prior, w.init = w)$w)
+    matrix_lik_pi = apply(aperm(array_F, c(2, 1, 3)) * w, 2, colSums)
+    pi_new = mixIP(matrix_lik_pi, pi_prior, pi)$pihat
+    matrix_lik_w = apply(array_F * pi_new, 2, colSums)
+    if (primal) {
+      g_current = matrix_lik_w %*% w
+      w_new = c(1, w.mosek.primal(matrix_lik_w, w_prior, w.init = c(g_current, w[-1]))$w)
+    } else {
+      w_new = c(1, w.mosek(matrix_lik_w, w_prior, w.init = w)$w)
+    }
   }
-  matrix_lik_pi = apply(aperm(array_F, c(2,1,3)) * w_new, 2, colSums)
-  pi_new = mixIP(matrix_lik_pi, pi_prior, pi)$pihat
   # w_new = c(1, w.cvxr.uncns(matrix_lik_w, w.init = w)$primal_values[[1]])
   return(c(pi_new, w_new))
 }
@@ -177,7 +195,7 @@ set_control_mixIP=function(control){
   return(control)
 }
 
-biopt = function (array_F, pi_prior, w_prior, control, primal) {
+biopt = function (array_F, pi_prior, w_prior, control, primal, gd.priority) {
   control.default = list(K = 1, method = 3, square = TRUE,
                          step.min0 = 1, step.max0 = 1, mstep = 4, kr = 1, objfn.inc = 1,
                          tol = 1e-07, maxiter = 5000, trace = FALSE)
@@ -189,7 +207,7 @@ biopt = function (array_F, pi_prior, w_prior, control, primal) {
   Lw = dim(array_F)[2]
   pinw_init = c(1, rep(0, Kpi - 1), 1, rep(0, Lw - 1))
   res = squarem(par = pinw_init, fixptfn = bifixpoint, objfn = binegpenloglik,
-                array_F = array_F, pi_prior = pi_prior, w_prior = w_prior, primal = primal, control = controlinput)
+                array_F = array_F, pi_prior = pi_prior, w_prior = w_prior, primal = primal, gd.priority = gd.priority, control = controlinput)
   return(list(pihat = normalize(pmax(0, res$par[1 : Kpi])),
               what = res$par[-(1 : Kpi)],
               B = res$value.objfn,
@@ -201,7 +219,7 @@ normalmix = function (pi, mean, sd) {
   structure(data.frame(pi, mean, sd), class = "normalmix")
 }
 
-binegpenloglik = function (pinw, array_F, pi_prior, w_prior, primal)
+binegpenloglik = function (pinw, array_F, pi_prior, w_prior, primal, gd.priority)
 {
   return(-bipenloglik(pinw, array_F, pi_prior, w_prior))
 }
