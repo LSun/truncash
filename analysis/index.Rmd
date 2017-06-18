@@ -158,6 +158,7 @@ AUC-wise, $p$ values and $BH$ should perform almost the same, since `BH` doesn't
 Talked about using Gaussian derivatives to handle correlation at Matthew's group meeting.
 
 * [`GD-ASH` applied to Smemo et al 2014 data](smemo.html)
+* [`GD-ASH` applied to Smemo et al 2014 data: Fitting `ASH` first](smemo_2.html)
 
 An RNA-seq data set of mouse hearts contains $23K$+ genes and only 4 samples, two for each condition.  `GD-ASH` applying to this data set raises several interesting questions.
 
