@@ -32,7 +32,7 @@ Re-analyze [Smemo et al 2014](http://www.nature.com/nature/journal/v507/n7492/ab
 
 ```{r read data}
 counts.mat = read.table("../data/smemo.txt", header = T, row.name = 1)
-counts.mat = counts[, -5]
+counts.mat = counts.mat[, -5]
 ```
 
 ## Gene selection
@@ -40,7 +40,7 @@ counts.mat = counts[, -5]
 Only use genes with total counts of $4$ samples $\geq 5$.
 
 ```{r remove zero genes}
-counts = counts.mat[rowSums(counts) >= 5, ]
+counts = counts.mat[rowSums(counts.mat) >= 5, ]
 design = model.matrix(~c(0, 0, 1, 1))
 ```
 
