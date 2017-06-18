@@ -1,0 +1,145 @@
+---
+title: "Gaussian derivatives applied to Smemo's data"
+author: "Lei Sun"
+date: 2017-06-17
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+## Introduction
+
+Re-analyze [Smemo et al 2014](http://www.nature.com/nature/journal/v507/n7492/abs/nature13138.html)'s mouse heart RNA-seq data after discussion with Matthew.
+
+```{r read data}
+counts = read.table("../data/smemo.txt", header = T, row.name = 1)
+counts = counts[, -5]
+```
+
+## Gene selection
+
+Only use genes with total counts of $4$ samples $\geq 5$.
+
+```{r remove zero genes}
+counts.5 = counts[rowSums(counts) >= 5, ]
+design = model.matrix(~c(0, 0, 1, 1))
+```
+
+```{r number of selected genes, echo = FALSE}
+cat("Number of selected genes:", nrow(counts.5))
+```
+
+## Summary statistics
+
+```{r counts to summary statistics}
+source("../code/count_to_summary.R")
+summary <- count_to_summary(counts.5, design)
+betahat <- summary$betahat
+sebetahat <- summary$sebetahat
+z <- summary$z
+```
+
+## Fitting $z$ with Gaussian derivatives
+
+With stretch GD can fit $z$ scores, but it seems there should be signals.
+
+```{r fitting gaussian derivatives, message = FALSE, warning = FALSE, echo = FALSE}
+source("../code/gdash_lik.R")
+source("../code/gdfit.R")
+w.fit = gdfit(z, gd.ord = 10)
+cat("GD Coefficients:\n")
+cat(rbind(paste(1 : length(w.fit$w) - 1, ":"),
+          paste(w.fit$w, ";")
+          ))
+plot.gdfit(z, w.fit$w, w.fit$gd.ord, breaks = 100)
+plot.gdfit(z, w.fit$w, w.fit$gd.ord, std.norm = FALSE, breaks = 100)
+```
+
+## Discovered by `BH` and `ASH`
+
+Feeding summary statistics to `BH` and `ASH`, both give thousands of discoveries.
+
+```{r BH + ASH}
+fit.BH = p.adjust((1 - pnorm(abs(z))) * 2, method = "BH")
+## Number of discoveries by BH
+sum(fit.BH <= 0.05)
+fit.ash = ashr::ash(betahat, sebetahat, method = "fdr")
+## Number of discoveries by ASH
+sum(get_svalue(fit.ash) <= 0.05)
+```
+
+## Fitting `ASH` first or Gaussian derivatives first
+
+Using default setting $L = 10$, $\lambda = 10$, $\rho = 0.5$, compare the `GD-ASH` results by fitting `ASH` first vs fitting `GD` first.  They indeed arrive at different local minima.
+
+```{r GD-ASH fitting, message = FALSE, cache = TRUE}
+fit.gdash.ASH <- gdash(betahat, sebetahat,
+                       gd.priority = FALSE)
+## Regularized log-likelihood by fitting ASH first
+fit.gdash.ASH$loglik
+
+fit.gdash.GD <- gdash(betahat, sebetahat)
+## Regularized log-likelihood by fitting GD first
+fit.gdash.GD$loglik
+```
+
+## `GD-ASH` with larger penalties on $w$
+
+Using $\lambda = 50$, $\rho = 0.1$, fitting `ASH` first and `GD` first give the same result, and produce 1400+ discoveries with $q$ values $\leq 0.05$, all of which are discovered by `BH`.
+
+```{r GD-ASH-Lik fitting, message = FALSE, cache = TRUE}
+L = 10
+lambda = 50
+rho = 0.1
+fit.gdash.ASH <- gdash(betahat, sebetahat,
+                       gd.ord = L, w.lambda = lambda, w.rho = rho,
+                       gd.priority = FALSE)
+## Regularized log-likelihood by fitting ASH first
+fit.gdash.ASH$loglik
+## Number of discoveries
+sum(fit.gdash.ASH$qvalue <= 0.05)
+fit.gdash.GD <- gdash(betahat, sebetahat,
+                      gd.ord = L, w.lambda = lambda, w.rho = rho,
+                      gd.priority = TRUE)
+## Regularized log-likelihood by fitting GD first
+fit.gdash.GD$loglik
+## Number of discoveries
+sum(fit.gdash.GD$qvalue <= 0.05)
+```
+
+```{r GD-ASH discoveries histogram, echo = FALSE}
+cat("GD Coefficients:\n")
+cat(rbind(paste(1 : length(fit.gdash.ASH$w) - 1, ":"),
+          paste(fit.gdash.ASH$w, ";")
+          ))
+hist(z[fit.gdash.ASH$qvalue <= 0.05], breaks = 100, prob = TRUE,
+     xlab = "z scores discovered by GD-ASH",
+     main = "Historgram of discovered z scores"
+     )
+```
+
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```
