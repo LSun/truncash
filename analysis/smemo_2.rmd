@@ -31,8 +31,8 @@ knitr::read_chunk("chunks.R")
 Re-analyze [Smemo et al 2014](http://www.nature.com/nature/journal/v507/n7492/abs/nature13138.html)'s mouse heart RNA-seq data after discussion with Matthew.
 
 ```{r read data}
-counts = read.table("../data/smemo.txt", header = T, row.name = 1)
-counts = counts[, -5]
+counts.mat = read.table("../data/smemo.txt", header = T, row.name = 1)
+counts.mat = counts[, -5]
 ```
 
 ## Gene selection
@@ -40,19 +40,19 @@ counts = counts[, -5]
 Only use genes with total counts of $4$ samples $\geq 5$.
 
 ```{r remove zero genes}
-counts.5 = counts[rowSums(counts) >= 5, ]
+counts = counts.mat[rowSums(counts) >= 5, ]
 design = model.matrix(~c(0, 0, 1, 1))
 ```
 
 ```{r number of selected genes, echo = FALSE}
-cat("Number of selected genes:", nrow(counts.5))
+cat("Number of selected genes:", nrow(counts))
 ```
 
 ## Summary statistics
 
 ```{r counts to summary statistics}
 source("../code/count_to_summary.R")
-summary <- count_to_summary(counts.5, design)
+summary <- count_to_summary(counts, design)
 betahat <- summary$betahat
 sebetahat <- summary$sebetahat
 z <- summary$z
