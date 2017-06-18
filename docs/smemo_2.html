@@ -316,25 +316,25 @@ shared across the workflowr files. -->
 <p><strong>Last updated:</strong> 2017-06-18</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> e6d5a64</p>
+<p><strong>Code version:</strong> 8ecbed7</p>
 <!-- Add your analysis here -->
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
 <p>Re-analyze <a href="http://www.nature.com/nature/journal/v507/n7492/abs/nature13138.html">Smemo et al 2014</a>’s mouse heart RNA-seq data after discussion with Matthew.</p>
-<pre class="r"><code>counts = read.table(&quot;../data/smemo.txt&quot;, header = T, row.name = 1)
-counts = counts[, -5]</code></pre>
+<pre class="r"><code>counts.mat = read.table(&quot;../data/smemo.txt&quot;, header = T, row.name = 1)
+counts.mat = counts.mat[, -5]</code></pre>
 </div>
 <div id="gene-selection" class="section level2">
 <h2>Gene selection</h2>
 <p>Only use genes with total counts of <span class="math inline">\(4\)</span> samples <span class="math inline">\(\geq 5\)</span>.</p>
-<pre class="r"><code>counts.5 = counts[rowSums(counts) &gt;= 5, ]
+<pre class="r"><code>counts = counts.mat[rowSums(counts.mat) &gt;= 5, ]
 design = model.matrix(~c(0, 0, 1, 1))</code></pre>
 <pre><code>Number of selected genes: 17191</code></pre>
 </div>
 <div id="summary-statistics" class="section level2">
 <h2>Summary statistics</h2>
 <pre class="r"><code>source(&quot;../code/count_to_summary.R&quot;)
-summary &lt;- count_to_summary(counts.5, design)
+summary &lt;- count_to_summary(counts, design)
 betahat &lt;- summary$betahat
 sebetahat &lt;- summary$sebetahat
 z &lt;- summary$z</code></pre>
