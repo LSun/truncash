@@ -167,6 +167,10 @@ An RNA-seq data set of mouse hearts contains $23K$+ genes and only 4 samples, tw
 
 When the noise is correlated, the likelihood should be correlated.  However, in the [`GD-ASH`](ash_gd.html) model, noise is essentially treated to be independently sampled from an empirical null fitted by Gaussian derivatives, so it would make more sense to use Gaussian derivatives, rather than simple Gaussian, as likelihood.
 
+* [Primal vs Dual in `Rmosek`](rmosek_primal_dual.html)
+
+A more in-depth look into the [primal vs dual](mosek_reg.html) problem in `Rmosek` implementation.
+
 [`ashr`]: https://github.com/stephens999/ashr
 
 <!-- The goal of this new template is to simplify the setup and maintenance of a research website. -->
