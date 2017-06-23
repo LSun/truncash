@@ -10,7 +10,7 @@ gdash = function (betahat, sebetahat,
                   mixcompdist = "normal", method = "fdr",
                   gd.normalized = TRUE, primal = FALSE,
                   gd.ord = 10, w.lambda = 10, w.rho = 0.5,
-                  gd.priority = TRUE,
+                  gd.priority = FALSE,
                   control = list(maxiter = 50)) {
   if (method == "fdr") {
     sd = c(0, autoselect.mixsd(betahat, sebetahat, mult = sqrt(2)))
