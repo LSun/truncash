@@ -1,0 +1,189 @@
+---
+title: "`Rmosek`: Primal vs Dual"
+author: "Lei Sun"
+date: 2017-06-21
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+## Introduction
+
+It has been [noted](https://lsun.github.io/truncash/mosek_reg.html) that in the specific maximum likelihood estimation problem, optimization runs faster in the dual form than in the primal one.  We are testing that with a simple numeric example.
+
+## Problem
+
+Let $A_{n \times m}$ be a matrix with $n \geq m$ and $a$ an $n$-vector.  The [prototypical](mosek_reg.html#basic_form:_primal) convex optimization problem in my applications is
+
+$$
+\begin{array}{rl}
+\min\limits_{f \in \mathbb{R}^m, \ \ g \in \mathbb{R}^n} & -\sum\limits_{i = 1}^n\log\left(g_i\right) \\
+\text{s.t.} & Af + a = g\\
+& g \geq 0 \ .
+\end{array}
+$$
+**Note here the only reason we are adding the latent variable $g$ is that in this way we can code the problem using `Rmosek::mosek` as a "separable convex optimization" (SCOPT) problem.**
+
+Its dual form is
+
+$$
+\begin{array}{rl}
+\min\limits_{\nu \in \mathbb{R}^n} & a^T\nu-\sum\limits_{i = 1}^n\log\left(\nu_i\right) \\
+\text{s.t.} & A^T\nu = 0\\
+& \nu\geq0 \ .
+\end{array}
+$$
+
+The idea is that when $n \gg m$, the dual optimization should be much faster than the primal one using `Rmosek::mosek`.
+
+## Comparison
+
+Let $n = 10^4$, $m = 10$, so that indeed $n \gg m$.  We run $1000$ simulation trials.  In each trial we feed the primal and the dual with the same $A$ and $a$.  $A$ and $a$ are generated so that both the primal and dual problems are feasible at least in theory.  Now we are comparing accuracy, time cost, and numbers of iterations of the two forms.
+
+```{r, echo = FALSE, message = FALSE}
+Hermite = function (gd.ord) {
+  x <- PolynomF::polynom()
+  H <- PolynomF::polylist(x, - 1 + x^2)
+  if (gd.ord >= 3) {
+    for(n in 2 : (gd.ord - 1))
+      H[[n+1]] <- x * H[[n]] - n * H[[n-1]]
+  }
+  return(H)
+}
+```
+
+```{r, echo = FALSE, message = FALSE, cache = TRUE}
+n <- 1e4
+m <- 10
+N <- 1e3
+set.seed(777)
+
+time.primal = time.sys.primal = niter.primal = status.primal = log.lik.primal = time.dual = time.sys.dual = niter.dual = status.dual = log.lik.dual = c()
+
+for (i in seq_len(N)) {
+  ## Generate test data sets
+  z <- rnorm(n, 0, sqrt(1.5))
+  hermite <- Hermite(m)
+  gd0.std <- dnorm(z)
+  A <- cbind(gd0.std)
+  for (j in 1 : m) {
+    gd.std <- (-1)^j * hermite[[j]](z) * gd0.std / sqrt(factorial(j))
+    A <- cbind(A, gd.std)
+  }
+  a <- A[, 1]
+  A <- A[, -1]
+  
+  ## Primal optim
+  P <- list()
+  P$sense <- "min"
+  P$c <- rep(0, n + m)
+  P$A <- Matrix::Matrix(cbind(diag(n), -A), sparse = TRUE)
+  P$bc <- rbind(a, a)
+  P$bx <- rbind(c(rep(0, n), rep(-Inf, m)),
+                c(rep(Inf, n), rep(Inf, m)))
+  opro <- matrix(list(), nrow = 5, ncol = n)
+  rownames(opro) <- c("type", "j", "f", "g", "h")
+  opro[1, ] <- as.list(rep("log", n))
+  opro[2, ] <- as.list(1 : n)
+  opro[3, ] <- as.list(rep(-1, n))
+  opro[4, ] <- as.list(rep(1, n))
+  opro[5, ] <- as.list(rep(0, n))
+  P$scopt <- list(opro = opro)
+  time.primal[i] <- system.time(res <- Rmosek::mosek(P, opts = list(verbose = 0, getinfo = TRUE)))[3]
+  time.sys.primal[i] <- res$dinfo$INTPNT_TIME
+  niter.primal[i] <- res$iinfo$INTPNT_ITER
+  status.primal[i] <- res$sol$itr$solsta
+  g <- res$sol$itr$xx[1 : n]
+  f <- res$sol$itr$xx[-(1 : n)]
+  log.lik.primal[i] <- sum(log(g))
+  
+  ## Dual optim
+  P <- list()
+  P$sense <- "min"
+  P <- list(sense = "min")
+  P$c <- a
+  P$A <- Matrix::Matrix(t(A), sparse = TRUE)
+  P$bc <- rbind(rep(0, m), rep(0, m))
+  P$bx <- rbind(rep(0, n), rep(Inf, n))
+  opro <- matrix(list(), nrow = 5, ncol = n)
+  rownames(opro) <- c("type", "j", "f", "g", "h")
+  opro[1, ] <- as.list(rep("log", n))
+  opro[2, ] <- as.list(1:n)
+  opro[3, ] <- as.list(rep(-1, n))
+  opro[4, ] <- as.list(rep(1, n))
+  opro[5, ] <- as.list(rep(0, n))
+  P$scopt <- list(opro = opro)
+  time.dual[i] <- system.time(res <- Rmosek::mosek(P, opts = list(verbose = 0, getinfo = TRUE)))[3]
+  time.sys.dual[i] <- res$dinfo$INTPNT_TIME
+  niter.dual[i] <- res$iinfo$INTPNT_ITER
+  status.dual[i] <- res$sol$itr$solsta
+  f <- res$sol$itr$suc - res$sol$itr$slc
+  g <- 1 / res$sol$itr$xx
+  log.lik.dual[i] <- sum(log(g))
+}
+```
+
+In the following comparisons, we only compare the results when both primal and dual reach the optimal.  Worthnoting is that out of $1000$ runs, the dual reaches optimal in all of them, whereas the primal doesn't in 61 of them, or $6.1\%$.
+
+### Total time cost
+
+```{r echo = FALSE}
+ind = (status.primal == "OPTIMAL")
+boxplot(log(time.primal[ind]), log(time.dual[ind]), names = c("Primal", "Dual"), main = "Total Run Time in Logarithm")
+plot(log(time.primal[ind]), log(time.dual[ind]), xlab = "Primal in Logarithm", ylab = "Dual in Logarithm", main = "Comparison on Total Run Time in Logarithm")
+abline(0, 1, lty = 1, col = "red")
+legend("topleft", lty = 1, col = "red", "y = x")
+```
+
+### Number of iterations
+
+```{r echo = FALSE}
+boxplot(log(niter.primal[ind]), log(niter.dual[ind]), names = c("Primal", "Dual"), main = "Number of Iterations in Logarithm")
+plot(log(niter.primal[ind]), log(niter.dual[ind]), xlab = "Primal in Logarithm", ylab = "Dual in Logarithm", main = "Comparison on Number of Iteration in Logarithm")
+abline(0, 1, lty = 1, col = "red")
+legend("topleft", lty = 1, col = "red", "y = x", bty = "n")
+```
+
+### Time per iteration
+
+```{r echo = FALSE}
+boxplot(log(time.primal[ind]) - log(niter.primal[ind]), log(time.dual[ind]) - log(niter.dual[ind]), names = c("Primal", "Dual"), main = "Run Time per Iteration in Logarithm")
+plot(log(time.primal[ind]) - log(niter.primal[ind]), log(time.dual[ind]) - log(niter.dual[ind]), xlab = "Primal in Logarithm", ylab = "Dual in Logarithm", main = "Comparison on Run Time per Iteration in Logarithm")
+abline(0, 1, lty = 1, col = "red")
+legend("topleft", lty = 1, col = "red", "y = x", bty = "n")
+```
+
+### Log likelihood
+
+It appears the dual form also gives better results in the sense that the log-likelihood given by dual is larger than the log-likelihood given by primal, when both reach the optimal.  For both forms, the log-likelihood is given by $\sum\log\left(Af + a\right) = \sum\log\left(g\right)$.
+
+```{r echo = FALSE}
+plot(log.lik.primal[ind], log.lik.dual[ind], main = "Comparison on Log Likelihood", xlab = "Primal", ylab = "Dual")
+abline(0, 1, lty = 1, col = "red")
+legend("topleft", lty = 1, col = "red", "y = x", bty = "n")
+```
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```
