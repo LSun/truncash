@@ -32,7 +32,7 @@ It has been [noted](https://lsun.github.io/truncash/mosek_reg.html) that in the 
 
 ## Problem
 
-Let $A_{n \times m}$ be a matrix with $n \geq m$ and $a$ an $n$-vector.  The [prototypical](mosek_reg.html#basic_form:_primal) convex optimization problem in my applications is
+Let $A_{n \times m}$ be a matrix with $n \gg m$ and $a$ an $n$-vector.  The [prototypical](mosek_reg.html#basic_form:_primal) convex optimization problem in my applications is
 
 $$
 \begin{array}{rl}
@@ -151,7 +151,7 @@ ind = (status.primal == "OPTIMAL")
 boxplot(log(time.primal[ind]), log(time.dual[ind]), names = c("Primal", "Dual"), main = "Total Run Time in Logarithm")
 plot(log(time.primal[ind]), log(time.dual[ind]), xlab = "Primal in Logarithm", ylab = "Dual in Logarithm", main = "Comparison on Total Run Time in Logarithm")
 abline(0, 1, lty = 1, col = "red")
-legend("topleft", lty = 1, col = "red", "y = x")
+legend("topleft", lty = 1, col = "red", "y = x", bty = "n")
 ```
 
 ### Number of iterations
@@ -160,7 +160,7 @@ legend("topleft", lty = 1, col = "red", "y = x")
 boxplot(log(niter.primal[ind]), log(niter.dual[ind]), names = c("Primal", "Dual"), main = "Number of Iterations in Logarithm")
 plot(log(niter.primal[ind]), log(niter.dual[ind]), xlab = "Primal in Logarithm", ylab = "Dual in Logarithm", main = "Comparison on Number of Iteration in Logarithm")
 abline(0, 1, lty = 1, col = "red")
-legend("topleft", lty = 1, col = "red", "y = x", bty = "n")
+legend("bottomright", lty = 1, col = "red", "y = x", bty = "n")
 ```
 
 ### Time per iteration
