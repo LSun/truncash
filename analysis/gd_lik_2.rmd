@@ -401,7 +401,7 @@ pFDP.polygon.plot = function (beta, qvalue, pFDR.nominal, col) {
 pFDR.methods = c("BH", "qvalue", "locfdr", "ASH", "GD-ASH", "GD-Lik")
 col.vec = grDevices::rainbow(6)
 plot(1:10, 1:10, type = "n", bty = "n", xaxt = "n", yaxt = "n", xlab = "", ylab = "")
-legend("center", lty = 1, col = col.vec, legend = pFDR.methods)
+legend("bottom", ncol = 2, lty = 1, col = col.vec, legend = pFDR.methods)
 plot(pFDR.nominal, pFDR.nominal, ylim = c(0, 2 * max(pFDR.nominal)), type = "n", xlab = "Nominal Positive False Discovery Rate", ylab = "Average Positive False Discovery Proportion", main = "Calibration of q Value")
 
 pFDP.polygon.plot(beta.list, qvalue.BH, pFDR.nominal, col.vec[1])
@@ -438,7 +438,7 @@ pFSP.polygon.plot = function (beta, betahat, svalue, pFSR.nominal, col) {
 pFSR.methods = c("ASH", "GD-ASH")
 col.vec = grDevices::rainbow(6)[4 : 5]
 plot(1:10, 1:10, type = "n", bty = "n", xaxt = "n", yaxt = "n", xlab = "", ylab = "")
-legend("center", lty = 1, col = col.vec, legend = pFSR.methods)
+legend("bottom", ncol = 2, lty = 1, col = col.vec, legend = pFSR.methods)
 plot(pFSR.nominal, pFSR.nominal, ylim = c(0, 2 * max(pFSR.nominal)), type = "n", xlab = "Nominal Positive False Sign Rate", ylab = "Average Positive False Sign Proportion", main = "Calibration of s Value")
 
 pFSP.polygon.plot(beta.list, betahat.list, svalue.ash, pFSR.nominal, col.vec[1])
@@ -614,7 +614,7 @@ pFDP.polygon.plot = function (beta, qvalue, pFDR.nominal, col) {
 pFDR.methods = c("BH", "qvalue", "locfdr", "ASH", "GD-ASH", "GD-Lik")
 col.vec = grDevices::rainbow(6)
 plot(1:10, 1:10, type = "n", bty = "n", xaxt = "n", yaxt = "n", xlab = "", ylab = "")
-legend("center", lty = 1, col = col.vec, legend = pFDR.methods)
+legend("bottom", ncol =2, lty = 1, col = col.vec, legend = pFDR.methods)
 plot(pFDR.nominal, pFDR.nominal, ylim = c(0, 2 * max(pFDR.nominal)), type = "n", xlab = "Nominal Positive False Discovery Rate", ylab = "Average Positive False Discovery Proportion", main = "Calibration of q Value")
 
 pFDP.polygon.plot(beta.list, qvalue.BH, pFDR.nominal, col.vec[1])
@@ -651,7 +651,7 @@ pFSP.polygon.plot = function (beta, betahat, svalue, pFSR.nominal, col) {
 pFSR.methods = c("ASH", "GD-ASH")
 col.vec = grDevices::rainbow(6)[4 : 5]
 plot(1:10, 1:10, type = "n", bty = "n", xaxt = "n", yaxt = "n", xlab = "", ylab = "")
-legend("center", lty = 1, col = col.vec, legend = pFSR.methods)
+legend("bottom", ncol = 2, lty = 1, col = col.vec, legend = pFSR.methods)
 plot(pFSR.nominal, pFSR.nominal, ylim = c(0, 2 * max(pFSR.nominal)), type = "n", xlab = "Nominal Positive False Sign Rate", ylab = "Average Positive False Sign Proportion", main = "Calibration of s Value")
 
 pFSP.polygon.plot(beta.list, betahat.list, svalue.ash, pFSR.nominal, col.vec[1])
