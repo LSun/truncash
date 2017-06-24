@@ -1,0 +1,180 @@
+---
+title: "`Rmosek`: Primal vs Dual with $l_1$ regularization"
+author: "Lei Sun"
+date: 2017-06-23
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+## Introduction
+
+Following [previous simulation](rmosek_primal_dual.html), we are adding $l_1$ regularization to the primal form such that
+
+$$
+\begin{array}{rl}
+\min\limits_{f \in \mathbb{R}^m, \ \ g \in \mathbb{R}^n} & -\sum\limits_{i = 1}^n\log\left(g_i\right) + \sum\limits_{j = 1}^m\lambda_j\left|f_j\right| \\
+\text{s.t.} & Af + a = g\\
+& g \geq 0 \ .
+\end{array}
+$$
+
+Its dual form is
+
+$$
+\begin{array}{rl}
+\min\limits_{\nu \in \mathbb{R}^n} & a^T\nu-\sum\limits_{i = 1}^n\log\left(\nu_i\right) \\
+\text{s.t.} & \left|A^T\nu\right| \leq \lambda\\
+& \nu\geq0 \ .
+\end{array}
+$$
+
+**Right now we haven't figured out how to program the $l_1$ regularized primal form in `Rmosek`, so here we are only comparing the dual form with or without regularization.**
+
+## Simulation
+
+Let $\lambda$ be
+
+$$
+\lambda_i = \begin{cases}
+0 & i \text{ odd ;}\\
+a / \rho^{i/2} & i \text{ even .}\\
+\end{cases}
+$$
+with $a = 10$, $\rho = 0.5$.  $n = 10^4$, $m = 10$, $A$ and $a$ are generated in the [same](rmosek_primal_dual.html) way.
+
+```{r, echo = FALSE, message = FALSE}
+Hermite = function (gd.ord) {
+  x <- PolynomF::polynom()
+  H <- PolynomF::polylist(x, - 1 + x^2)
+  if (gd.ord >= 3) {
+    for(n in 2 : (gd.ord - 1))
+      H[[n+1]] <- x * H[[n]] - n * H[[n-1]]
+  }
+  return(H)
+}
+```
+
+```{r, echo = FALSE, message = FALSE, cache = TRUE}
+set.seed(777)
+N <- 1e3
+
+n <- 1e4
+m <- 10
+rho <- 0.5
+a <- 10
+lambda <- a / sqrt(rho^(1 : m))
+lambda[seq(1, m, by = 2)] = 0
+
+time.dual = time.dual.reg = time.sys.dual = time.sys.dual.reg = niter.dual = niter.dual.reg = status.dual = status.dual.reg = c()
+
+for (i in seq_len(N)) {
+  ## Generate test data sets
+  z <- rnorm(n, 0, sqrt(1.5))
+  hermite <- Hermite(m)
+  gd0.std <- dnorm(z)
+  A <- cbind(gd0.std)
+  for (j in 1 : m) {
+    gd.std <- (-1)^j * hermite[[j]](z) * gd0.std / sqrt(factorial(j))
+    A <- cbind(A, gd.std)
+  }
+  a <- A[, 1]
+  A <- A[, -1]
+  
+  ## Dual optim w/o l_0 reg
+  P <- list()
+  P$sense <- "min"
+  P <- list(sense = "min")
+  P$c <- a
+  P$A <- Matrix::Matrix(t(A), sparse = TRUE)
+  P$bc <- rbind(rep(0, m), rep(0, m))
+  P$bx <- rbind(rep(0, n), rep(Inf, n))
+  opro <- matrix(list(), nrow = 5, ncol = n)
+  rownames(opro) <- c("type", "j", "f", "g", "h")
+  opro[1, ] <- as.list(rep("log", n))
+  opro[2, ] <- as.list(1:n)
+  opro[3, ] <- as.list(rep(-1, n))
+  opro[4, ] <- as.list(rep(1, n))
+  opro[5, ] <- as.list(rep(0, n))
+  P$scopt <- list(opro = opro)
+  time.dual[i] <- system.time(res <- Rmosek::mosek(P, opts = list(verbose = 0, getinfo = TRUE)))[3]
+  time.sys.dual[i] <- res$dinfo$INTPNT_TIME
+  niter.dual[i] <- res$iinfo$INTPNT_ITER
+  status.dual[i] <- res$sol$itr$solsta
+  
+  ## Dual optim w l_0 reg
+  P <- list()
+  P$sense <- "min"
+  P <- list(sense = "min")
+  P$c <- a
+  P$A <- Matrix::Matrix(t(A), sparse = TRUE)
+  P$bc <- rbind(-lambda, lambda)
+  P$bx <- rbind(rep(0, n), rep(Inf, n))
+  opro <- matrix(list(), nrow = 5, ncol = n)
+  rownames(opro) <- c("type", "j", "f", "g", "h")
+  opro[1, ] <- as.list(rep("log", n))
+  opro[2, ] <- as.list(1:n)
+  opro[3, ] <- as.list(rep(-1, n))
+  opro[4, ] <- as.list(rep(1, n))
+  opro[5, ] <- as.list(rep(0, n))
+  P$scopt <- list(opro = opro)
+  time.dual.reg[i] <- system.time(res <- Rmosek::mosek(P, opts = list(verbose = 0, getinfo = TRUE)))[3]
+  time.sys.dual.reg[i] <- res$dinfo$INTPNT_TIME
+  niter.dual.reg[i] <- res$iinfo$INTPNT_ITER
+  status.dual.reg[i] <- res$sol$itr$solsta
+}
+```
+
+The dual optimization in all $1000$ simulation trials reaches the optimal solution both with and without regularization.
+
+## Total time cost
+
+```{r echo = FALSE}
+boxplot(log(time.dual), log(time.dual.reg), names = c("Dual", "Dual + Reg"), main = "Total Run Time in Logarithm")
+plot(log(time.dual), log(time.dual.reg), xlab = "Dual in Logarithm", ylab = "Dual + Reg in Logarithm", main = "Comparison on Total Run Time in Logarithm")
+abline(0, 1, lty = 1, col = "red")
+legend("bottomright", lty = 1, col = "red", "y = x", bty = "n")
+```
+
+## Number of iterations
+
+```{r echo = FALSE}
+boxplot(log(niter.dual), log(niter.dual.reg), names = c("Dual", "Dual + Reg"), main = "Number of Iterations in Logarithm")
+plot(log(niter.dual), log(niter.dual.reg), xlab = "Dual in Logarithm", ylab = "Dual + Reg in Logarithm", main = "Comparison on Number of Iterations in Logarithm")
+abline(0, 1, lty = 1, col = "red")
+legend("bottomright", lty = 1, col = "red", "y = x", bty = "n")
+```
+
+## Time per iteration
+
+```{r echo = FALSE}
+boxplot(log(time.dual) - log(niter.dual), log(time.dual.reg) - log(niter.dual.reg), names = c("Dual", "Dual + Reg"), main = "Run Time per Iteration in Logarithm")
+plot(log(time.dual) - log(niter.dual), log(time.dual.reg) - log(niter.dual.reg), xlab = "Dual in Logarithm", ylab = "Dual + Reg in Logarithm", main = "Comparison on Run Time per Iteration in Logarithm")
+abline(0, 1, lty = 1, col = "red")
+legend("bottomright", lty = 1, col = "red", "y = x", bty = "n")
+```
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```
