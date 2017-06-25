@@ -382,6 +382,18 @@ abline(h = median(auc.gdash.lfdr), lty = 2, col = "blue")
 
 Dashed lines are $y = x$ and $y = 2x$.  `ASH` and `qvalue` are too liberal, and `locfdr` is too conservative.  `GD-ASH` and `BH` give very similar results and not far off.  `BH`'s calibrates pFDR relatively well, even though it's only guaranteed to control FDR under independence.  `GD-Lik` calibrates pFDR almost precisely.
 
+#### Model and data generation
+
+$$
+\begin{array}{l}
+\hat\beta_j = \beta_j + \sigma_j z_j \\
+z_j \sim N(0, 1), \text{ correlated, simulated from real data}\\
+\sigma_j : \text{ heteroskedastic, simulated from real data}\\
+\beta_j \sim 0.6\delta_0 + 0.3N(0, \sigma^2) + 0.1N\left(0, \left(2\sigma\right)^2\right)
+\end{array}
+$$
+
+
 ```{r inflation qvalue calibration plotting, echo = FALSE}
 pFDR.nominal = seq(0, 0.2, 0.001)[-1]
 
