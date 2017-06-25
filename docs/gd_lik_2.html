@@ -313,10 +313,10 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2017-06-24</p>
+<p><strong>Last updated:</strong> 2017-06-25</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 1217d1e</p>
+<p><strong>Code version:</strong> c9aadb6</p>
 <!-- Add your analysis here -->
 <div id="gd-ash-model" class="section level2">
 <h2><code>GD-ASH</code> Model</h2>
@@ -477,7 +477,18 @@ nrow(z.deflation)</code></pre>
 <div id="q-values-and-positive-fdr-pfdr-calibration" class="section level3">
 <h3>q values and positive FDR (pFDR) calibration</h3>
 <p>Dashed lines are <span class="math inline">\(y = x\)</span> and <span class="math inline">\(y = 2x\)</span>. <code>ASH</code> and <code>qvalue</code> are too liberal, and <code>locfdr</code> is too conservative. <code>GD-ASH</code> and <code>BH</code> give very similar results and not far off. <code>BH</code>’s calibrates pFDR relatively well, even though it’s only guaranteed to control FDR under independence. <code>GD-Lik</code> calibrates pFDR almost precisely.</p>
+<div id="model-and-data-generation" class="section level4">
+<h4>Model and data generation</h4>
+<p><span class="math display">\[
+\begin{array}{l}
+\hat\beta_j = \beta_j + \sigma_j z_j \\
+z_j \sim N(0, 1), \text{ correlated, simulated from real data}\\
+\sigma_j : \text{ heteroskedastic, simulated from real data}\\
+\beta_j \sim 0.6\delta_0 + 0.3N(0, \sigma^2) + 0.1N\left(0, \left(2\sigma\right)^2\right)
+\end{array}
+\]</span></p>
 <p><img src="figure/gd_lik_2.rmd/inflation%20qvalue%20calibration%20plotting-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/gd_lik_2.rmd/inflation%20qvalue%20calibration%20plotting-2.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
 </div>
 <div id="s-values-and-positive-fsr-pfsr-calibration" class="section level3">
 <h3>s values and positive FSR (pFSR) calibration</h3>
