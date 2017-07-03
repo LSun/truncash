@@ -313,10 +313,10 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2017-06-25</p>
+<p><strong>Last updated:</strong> 2017-06-30</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> c9aadb6</p>
+<p><strong>Code version:</strong> 921703f</p>
 <!-- Add your analysis here -->
 <div id="gd-ash-model" class="section level2">
 <h2><code>GD-ASH</code> Model</h2>
@@ -490,6 +490,10 @@ z_j \sim N(0, 1), \text{ correlated, simulated from real data}\\
 <p><img src="figure/gd_lik_2.rmd/inflation%20qvalue%20calibration%20plotting-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/gd_lik_2.rmd/inflation%20qvalue%20calibration%20plotting-2.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 </div>
+<div id="fdr-calibration" class="section level3">
+<h3>FDR calibration</h3>
+<p><img src="figure/gd_lik_2.rmd/inflation%20FDR%20calibration%20plotting-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/gd_lik_2.rmd/inflation%20FDR%20calibration%20plotting-2.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
 <div id="s-values-and-positive-fsr-pfsr-calibration" class="section level3">
 <h3>s values and positive FSR (pFSR) calibration</h3>
 <p>Both <code>ASH</code> and <code>GD-ASH</code> are too liberal, although <code>GD-ASH</code> is not too far off.</p>
@@ -521,6 +525,10 @@ z_j \sim N(0, 1), \text{ correlated, simulated from real data}\\
 <h3>q values and positive FDR (pFDR) calibration</h3>
 <p>Essentially all methods successfully control pFDR. <code>GD-Lik</code> looks good although off a little. <code>qvalue</code> is the most conservative, followed by <code>ASH</code>, <code>GD-ASH</code>, and <code>locfdr</code>.</p>
 <p><img src="figure/gd_lik_2.rmd/deflation%20qvalue%20calibration%20plotting-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/gd_lik_2.rmd/deflation%20qvalue%20calibration%20plotting-2.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="fdr-calibration-1" class="section level3">
+<h3>FDR calibration</h3>
+<p><img src="figure/gd_lik_2.rmd/deflation%20FDR%20calibration%20plotting-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/gd_lik_2.rmd/deflation%20FDR%20calibration%20plotting-2.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="s-values-and-positive-fsr-pfsr-calibration-1" class="section level3">
 <h3>s values and positive FSR (pFSR) calibration</h3>
