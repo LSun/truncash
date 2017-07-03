@@ -197,6 +197,20 @@ pFDR.calib = function (beta, qvalue, pFDR.nominal) {
   pFDP.mean.sd = apply(pFDP.mat, 2, sd, na.rm = TRUE) / sqrt(pFDP.samplesize)
   return(list(pFDR.nominal = pFDR.nominal, pFDP.mean = pFDP.mean, pFDP.mean.sd = pFDP.mean.sd))
 }
+
+FDR.calib = function (beta, qvalue, pFDR.nominal) {
+  pFDP.list = list()
+  for (i in 1 : length(beta))
+  pFDP.list[[i]] = sapply(pFDR.nominal, pFDP,
+                         response = (beta[[i]] != 0),
+                         predictor = qvalue[[i]])
+  pFDP.mat = matrix(unlist(pFDP.list), nrow = length(pFDP.list), byrow = TRUE)
+  pFDP.mat[is.na(pFDP.mat)] <- 0
+  pFDP.samplesize = colSums(!is.na(pFDP.mat))
+  pFDP.mean = colMeans(pFDP.mat, na.rm = TRUE)
+  pFDP.mean.sd = apply(pFDP.mat, 2, sd, na.rm = TRUE) / sqrt(pFDP.samplesize)
+  return(list(pFDR.nominal = pFDR.nominal, pFDP.mean = pFDP.mean, pFDP.mean.sd = pFDP.mean.sd))
+}
 ```
 
 ```{r pFSR calibration function, echo = FALSE}
@@ -414,7 +428,7 @@ pFDR.methods = c("BH", "qvalue", "locfdr", "ASH", "GD-ASH", "GD-Lik")
 col.vec = grDevices::rainbow(6)
 plot(1:10, 1:10, type = "n", bty = "n", xaxt = "n", yaxt = "n", xlab = "", ylab = "")
 legend("bottom", ncol = 2, lty = 1, col = col.vec, legend = pFDR.methods)
-plot(pFDR.nominal, pFDR.nominal, ylim = c(0, 2 * max(pFDR.nominal)), type = "n", xlab = "Nominal Positive False Discovery Rate", ylab = "Average Positive False Discovery Proportion", main = "Calibration of q Value")
+plot(pFDR.nominal, pFDR.nominal, ylim = c(0, 2 * max(pFDR.nominal)), type = "n", xlab = "Nominal Positive False Discovery Rate", ylab = "Average Positive False Discovery Proportion", main = "Calibration of Positive FDR")
 
 pFDP.polygon.plot(beta.list, qvalue.BH, pFDR.nominal, col.vec[1])
 pFDP.polygon.plot(beta.list, qvalue.qvalue, pFDR.nominal, col.vec[2])
@@ -422,6 +436,37 @@ pFDP.polygon.plot(beta.list, qvalue.locfdr, pFDR.nominal, col.vec[3])
 pFDP.polygon.plot(beta.list, qvalue.ash, pFDR.nominal, col.vec[4])
 pFDP.polygon.plot(beta.list, qvalue.gdash.ash, pFDR.nominal, col.vec[5])
 pFDP.polygon.plot(beta.list, qvalue.gdash, pFDR.nominal, col.vec[6])
+
+lines(c(0, pFDR.nominal), c(0, pFDR.nominal), cex = 3, lty = 6)
+lines(c(0, pFDR.nominal), 2 * c(0, pFDR.nominal), cex = 3, lty = 4)
+```
+
+### FDR calibration
+
+```{r inflation FDR calibration plotting, echo = FALSE}
+pFDR.nominal = seq(0, 0.2, 0.001)[-1]
+
+pFDP.polygon.plot = function (beta, qvalue, pFDR.nominal, col) {
+  summary = FDR.calib(beta, qvalue, pFDR.nominal)
+  mean = summary$pFDP.mean
+  sd = summary$pFDP.mean.sd
+  lines(pFDR.nominal, mean, col = col, cex = 2)
+  polygon.color.rgb = as.vector(grDevices::col2rgb(col))
+  polygon(x = c(0, pFDR.nominal, rev(pFDR.nominal), 0),
+          y = c(0, mean - 2 * sd, rev(mean + 2 * sd), 0),
+          col = grDevices::rgb(polygon.color.rgb[1], polygon.color.rgb[2], polygon.color.rgb[3], alpha = 100, max = 255),
+          border = col,
+          lty = 2)
+}
+
+pFDR.methods = c("BH", "GD-Lik")
+col.vec = grDevices::rainbow(6)[c(1, 6)]
+plot(1:10, 1:10, type = "n", bty = "n", xaxt = "n", yaxt = "n", xlab = "", ylab = "")
+legend("bottom", ncol = 2, lty = 1, col = col.vec, legend = pFDR.methods)
+plot(pFDR.nominal, pFDR.nominal, ylim = c(0, 2 * max(pFDR.nominal)), type = "n", xlab = "Nominal False Discovery Rate", ylab = "Average False Discovery Proportion", main = "Calibration of FDR")
+
+pFDP.polygon.plot(beta.list, qvalue.BH, pFDR.nominal, col.vec[1])
+pFDP.polygon.plot(beta.list, qvalue.gdash, pFDR.nominal, col.vec[2])
 
 lines(c(0, pFDR.nominal), c(0, pFDR.nominal), cex = 3, lty = 6)
 lines(c(0, pFDR.nominal), 2 * c(0, pFDR.nominal), cex = 3, lty = 4)
@@ -627,7 +672,7 @@ pFDR.methods = c("BH", "qvalue", "locfdr", "ASH", "GD-ASH", "GD-Lik")
 col.vec = grDevices::rainbow(6)
 plot(1:10, 1:10, type = "n", bty = "n", xaxt = "n", yaxt = "n", xlab = "", ylab = "")
 legend("bottom", ncol =2, lty = 1, col = col.vec, legend = pFDR.methods)
-plot(pFDR.nominal, pFDR.nominal, ylim = c(0, 2 * max(pFDR.nominal)), type = "n", xlab = "Nominal Positive False Discovery Rate", ylab = "Average Positive False Discovery Proportion", main = "Calibration of q Value")
+plot(pFDR.nominal, pFDR.nominal, ylim = c(0, 2 * max(pFDR.nominal)), type = "n", xlab = "Nominal Positive False Discovery Rate", ylab = "Average Positive False Discovery Proportion", main = "Calibration of Positive FDR")
 
 pFDP.polygon.plot(beta.list, qvalue.BH, pFDR.nominal, col.vec[1])
 pFDP.polygon.plot(beta.list, qvalue.qvalue, pFDR.nominal, col.vec[2])
@@ -639,6 +684,38 @@ pFDP.polygon.plot(beta.list, qvalue.gdash, pFDR.nominal, col.vec[6])
 lines(c(0, pFDR.nominal), c(0, pFDR.nominal), cex = 3, lty = 6)
 lines(c(0, pFDR.nominal), 2 * c(0, pFDR.nominal), cex = 3, lty = 4)
 ```
+
+### FDR calibration
+
+```{r deflation FDR calibration plotting, echo = FALSE}
+pFDR.nominal = seq(0, 0.2, 0.001)[-1]
+
+pFDP.polygon.plot = function (beta, qvalue, pFDR.nominal, col) {
+  summary = FDR.calib(beta, qvalue, pFDR.nominal)
+  mean = summary$pFDP.mean
+  sd = summary$pFDP.mean.sd
+  lines(pFDR.nominal, mean, col = col, cex = 2)
+  polygon.color.rgb = as.vector(grDevices::col2rgb(col))
+  polygon(x = c(0, pFDR.nominal, rev(pFDR.nominal), 0),
+          y = c(0, mean - 2 * sd, rev(mean + 2 * sd), 0),
+          col = grDevices::rgb(polygon.color.rgb[1], polygon.color.rgb[2], polygon.color.rgb[3], alpha = 100, max = 255),
+          border = col,
+          lty = 2)
+}
+
+pFDR.methods = c("BH", "GD-Lik")
+col.vec = grDevices::rainbow(6)[c(1, 6)]
+plot(1:10, 1:10, type = "n", bty = "n", xaxt = "n", yaxt = "n", xlab = "", ylab = "")
+legend("bottom", ncol = 2, lty = 1, col = col.vec, legend = pFDR.methods)
+plot(pFDR.nominal, pFDR.nominal, ylim = c(0, 2 * max(pFDR.nominal)), type = "n", xlab = "Nominal False Discovery Rate", ylab = "Average False Discovery Proportion", main = "Calibration of FDR")
+
+pFDP.polygon.plot(beta.list, qvalue.BH, pFDR.nominal, col.vec[1])
+pFDP.polygon.plot(beta.list, qvalue.gdash, pFDR.nominal, col.vec[2])
+
+lines(c(0, pFDR.nominal), c(0, pFDR.nominal), cex = 3, lty = 6)
+lines(c(0, pFDR.nominal), 2 * c(0, pFDR.nominal), cex = 3, lty = 4)
+```
+
 
 ### s values and positive FSR (pFSR) calibration
 
