@@ -19,6 +19,10 @@ knitr::read_chunk("chunks.R")
 ```{r last-updated, echo=FALSE, results='asis'}
 ```
 
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
 
 <!-- Add your analysis here -->
 
