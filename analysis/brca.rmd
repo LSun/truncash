@@ -1,0 +1,141 @@
+---
+title: "Analyzing Efron's BRCA data set"
+author: "Lei Sun"
+date: 2017-07-21
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+
+<!-- Add your analysis here -->
+
+## Introduction
+
+It's a classic microarray data set used many times by Efron to illustrate his "empirical null" idea.  The data set is [downloaded online](http://myweb.uiowa.edu/pbreheny/data/hedenfalk.html)
+
+## Sanity check
+
+Pipeline can generate null $z$ scores when it's null?
+
+```{r read data}
+brca.ratio <- read.table("../data/hedenfalk.txt", header = TRUE)
+brca.logratio <- as.matrix(log2(brca.ratio[, c(1 : 6, 17, 7 : 10, 18 : 21)]))
+```
+
+```{r cache = TRUE, echo = FALSE}
+brca.logratio <- limma::normalizeBetweenArrays(brca.logratio)
+z.mat <- matrix(0, ncol = nrow(brca.logratio), nrow = 1e3)
+for (i in 1 : nrow(z.mat)) {
+  label <- sample(c(rep("BRCA1", 7), rep("BRCA2", 8)))
+  design <- model.matrix(~label)
+  lim = limma::lmFit(brca.logratio, design)
+  r.ebayes = limma::eBayes(lim)
+  p = r.ebayes$p.value[, 2]
+  t = r.ebayes$t[, 2]
+  z.mat[i, ] = sign(t) * qnorm(1 - p/2)
+}
+n = ncol(z.mat)
+m = nrow(z.mat)
+```
+
+```{r, cache = TRUE, echo = FALSE}
+tail.num = function(x, alpha) {
+  num = ifelse(alpha <= 0.5,
+               sum(as.numeric(x) <= qnorm(alpha)),
+               sum(as.numeric(x) >= qnorm(alpha))
+        ) 
+}
+```
+
+```{r, cache = TRUE, echo = FALSE}
+alpha.vec.row = c(0.0005, 0.001, 0.005, 0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99, 0.995, 0.999, 0.9995)
+tail.row = c()
+for (alpha in alpha.vec.row) {
+  tail.row = cbind(
+    tail.row,
+    apply(z.mat, 1, tail.num, alpha = alpha)
+  )
+}
+colnames(tail.row) = alpha.vec.row
+```
+
+```{r, cache = TRUE, echo = FALSE}
+alpha.vec.row = colnames(tail.row)
+
+for (alpha in alpha.vec.row) {
+  alpha.adj = ifelse(as.numeric(alpha) <= 0.5, as.numeric(alpha), 1 - as.numeric(alpha))
+  plot(table(tail.row[, alpha]),
+       xlab = bquote(R[.(alpha)]^i),
+       ylab = "Frequencies")
+  if (as.numeric(alpha) <= 0.5) {
+    title(bquote(paste("Correlated case: ", bar(R)[.(alpha)] == .(mean(tail.row[, alpha])), ", ", n %*% alpha == .(n * as.numeric(alpha)))))
+  } else {
+    title(bquote(paste("Correlated case: ", bar(R)[.(alpha)] == .(mean(tail.row[, alpha])), ", ", n %*% (1 - alpha) == .(n * (1 - as.numeric(alpha))))))
+  }
+  abline(v = alpha.adj * n, col = "red")
+  range.alpha.row = range(tail.row[, alpha])
+  expt.alpha.row = dbinom(range.alpha.row[1] : range.alpha.row[2], n, prob = alpha.adj) * m
+  lines(range.alpha.row[1] : range.alpha.row[2], expt.alpha.row, col = "blue")
+}
+```
+
+## Data analysis
+
+```{r, cache = TRUE, echo = FALSE}
+design <- model.matrix(~c(rep("BRCA1", 7), rep("BRCA2", 8)))
+lim = limma::lmFit(brca.logratio, design)
+r.ebayes = limma::eBayes(lim)
+p = r.ebayes$p.value[, 2]
+t = r.ebayes$t[, 2]
+z = sign(t) * qnorm(1 - p/2)
+betahat = lim$coefficients[,2]
+sebetahat = betahat / z
+```
+
+```{r, cache = TRUE, echo = FALSE}
+hist(z, breaks = 50, prob = TRUE, ylim = c(0, dnorm(0)))
+x.plot = seq(-5, 5, length = 1e3)
+lines(x.plot, dnorm(x.plot), col = "red")
+legend("topright", bty = "n", lty = 1, col = "red", "N(0, 1)")
+```
+
+```{r, message = FALSE, cache = TRUE}
+source("../code/gdash_lik.R")
+fit <- gdash(betahat, sebetahat)
+cat(fit$w)
+sum(fit$qvalue <= 0.1)
+```
+
+```{r, cache = TRUE, echo = FALSE}
+h <- Hermite(10)
+h.mat <- matrix(0, nrow = length(x.plot), ncol = 11)
+h.mat[, 1] <- dnorm(x.plot)
+for (i in 1 : 10) {
+  h.mat[, i + 1] = h.mat[, 1] * h[[i]](x.plot) * (-1)^i / sqrt(factorial(i))
+}
+y.plot <- h.mat %*% fit$w
+hist(z, breaks = 50, prob = TRUE, ylim = c(0, dnorm(0)))
+lines(x.plot, y.plot, col = "blue")
+lines(x.plot, dnorm(x.plot), col = "red")
+legend("topright", lty = 1, col = c("red", "blue"), c("N(0, 1)", "GD"), bty = "n")
+```
+
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```

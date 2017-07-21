@@ -172,6 +172,10 @@ When the noise is correlated, the likelihood should be correlated.  However, in 
 
 A more in-depth look into the [primal vs dual](mosek_reg.html) problem in `Rmosek` implementation.
 
+* [Data analysis: Efron's BRCA data](brca.html)
+
+A close look at Efron's classic BRCA data, used in many of his papers to illustrate the empirical Bayes idea which inspires this project.
+
 [`ashr`]: https://github.com/stephens999/ashr
 
 <!-- The goal of this new template is to simplify the setup and maintenance of a research website. -->
