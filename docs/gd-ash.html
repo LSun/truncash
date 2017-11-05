@@ -4,7 +4,7 @@
 
 <head>
 
-<meta charset="utf-8">
+<meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
 
@@ -313,10 +313,10 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2017-05-08</p>
+<p><strong>Last updated:</strong> 2017-11-05</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 6bac69e</p>
+<p><strong>Code version:</strong> 043bf89</p>
 <!-- Add your analysis here -->
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
@@ -344,9 +344,13 @@ for (i in 1 : sel.num) {
 <h2>Session information</h2>
 <!-- Insert the session information into the document -->
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 3.3.3 (2017-03-06)
-Platform: x86_64-apple-darwin13.4.0 (64-bit)
-Running under: macOS Sierra 10.12.4
+<pre><code>R version 3.4.1 (2017-06-30)
+Platform: x86_64-apple-darwin15.6.0 (64-bit)
+Running under: macOS Sierra 10.12.6
+
+Matrix products: default
+BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
+LAPACK: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRlapack.dylib
 
 locale:
 [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
@@ -355,15 +359,16 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 loaded via a namespace (and not attached):
- [1] Rcpp_0.12.10      lattice_0.20-34   codetools_0.2-15 
- [4] digest_0.6.11     foreach_1.4.3     rprojroot_1.2    
- [7] truncnorm_1.0-7   MASS_7.3-45       grid_3.3.3       
-[10] backports_1.0.5   git2r_0.18.0      magrittr_1.5     
-[13] evaluate_0.10     stringi_1.1.2     pscl_1.4.9       
-[16] doParallel_1.0.10 rmarkdown_1.3     iterators_1.0.8  
-[19] tools_3.3.3       stringr_1.2.0     parallel_3.3.3   
-[22] yaml_2.1.14       ashr_2.1-10       SQUAREM_2016.10-1
-[25] htmltools_0.3.5   knitr_1.15.1     </code></pre>
+ [1] Rcpp_0.12.12      knitr_1.16        magrittr_1.5     
+ [4] MASS_7.3-47       doParallel_1.0.10 pscl_1.5.1       
+ [7] SQUAREM_2016.8-2  lattice_0.20-35   foreach_1.4.3    
+[10] ashr_2.1-27       stringr_1.2.0     tools_3.4.1      
+[13] parallel_3.4.1    grid_3.4.1        git2r_0.19.0     
+[16] htmltools_0.3.6   iterators_1.0.8   yaml_2.1.14      
+[19] rprojroot_1.2     digest_0.6.12     Matrix_1.2-10    
+[22] codetools_0.2-15  evaluate_0.10.1   rmarkdown_1.6    
+[25] stringi_1.1.5     compiler_3.4.1    backports_1.1.0  
+[28] truncnorm_1.0-7  </code></pre>
 </div>
 
 <hr>
@@ -415,7 +420,7 @@ $(document).ready(function () {
   (function () {
     var script = document.createElement("script");
     script.type = "text/javascript";
-    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
     document.getElementsByTagName("head")[0].appendChild(script);
   })();
 </script>
