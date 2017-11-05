@@ -313,19 +313,26 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2017-06-03</p>
+<p><strong>Last updated:</strong> 2017-11-05</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 82f2a7d</p>
+<p><strong>Code version:</strong> 6639968</p>
 <!-- Add your analysis here -->
-<pre class="r"><code>library(edgeR)
-library(limma)
-library(sva)
-library(cate)
+<pre class="r"><code>library(edgeR)</code></pre>
+<pre><code>Warning: package &#39;edgeR&#39; was built under R version 3.4.2</code></pre>
+<pre><code>Warning: package &#39;limma&#39; was built under R version 3.4.2</code></pre>
+<pre class="r"><code>library(limma)
+library(sva)</code></pre>
+<pre><code>Warning: package &#39;sva&#39; was built under R version 3.4.2</code></pre>
+<pre><code>Warning: package &#39;mgcv&#39; was built under R version 3.4.2</code></pre>
+<pre><code>Warning: package &#39;genefilter&#39; was built under R version 3.4.2</code></pre>
+<pre><code>Warning: package &#39;BiocParallel&#39; was built under R version 3.4.2</code></pre>
+<pre class="r"><code>library(cate)
 library(vicar)
 library(ashr)
 library(pROC)
 source(&quot;../code/gdash.R&quot;)</code></pre>
+<pre><code>Warning: package &#39;SQUAREM&#39; was built under R version 3.4.2</code></pre>
 <pre class="r"><code>mat = readRDS(&quot;../data/liver.sim.rds&quot;)</code></pre>
 <pre class="r"><code>counts_to_summary = function (counts, design) {
   dgecounts = edgeR::calcNormFactors(edgeR::DGEList(counts = counts, group = design[, 2]))
@@ -651,9 +658,13 @@ Iteration (out of 5 ):1  2  3  4  5  </code></pre>
 <h2>Session information</h2>
 <!-- Insert the session information into the document -->
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 3.3.3 (2017-03-06)
-Platform: x86_64-apple-darwin13.4.0 (64-bit)
-Running under: macOS Sierra 10.12.5
+<pre><code>R version 3.4.1 (2017-06-30)
+Platform: x86_64-apple-darwin15.6.0 (64-bit)
+Running under: macOS Sierra 10.12.6
+
+Matrix products: default
+BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
+LAPACK: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRlapack.dylib
 
 locale:
 [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
@@ -662,33 +673,35 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] Rmosek_7.1.3      PolynomF_0.94     cvxr_0.0.0.9009  
- [4] REBayes_0.62      Matrix_1.2-8      SQUAREM_2016.10-1
- [7] EQL_1.0-0         ttutils_1.0-1     pROC_1.9.1       
-[10] ashr_2.1-19       vicar_0.1.6       cate_1.0.4       
-[13] sva_3.20.0        genefilter_1.54.2 mgcv_1.8-17      
-[16] nlme_3.1-131      edgeR_3.14.0      limma_3.28.5     
+ [1] Rmosek_7.1.3        PolynomF_0.94       cvxr_0.0.0.9009    
+ [4] REBayes_0.85        Matrix_1.2-11       SQUAREM_2017.10-1  
+ [7] EQL_1.0-0           ttutils_1.0-1       pROC_1.10.0        
+[10] ashr_2.1-27         vicar_0.1.6         cate_1.0.4         
+[13] sva_3.26.0          BiocParallel_1.12.0 genefilter_1.60.0  
+[16] mgcv_1.8-22         nlme_3.1-131        edgeR_3.20.1       
+[19] limma_3.34.0       
 
 loaded via a namespace (and not attached):
- [1] Rcpp_0.12.11         lattice_0.20-34      corpcor_1.6.8       
- [4] esaBcv_1.2.1         assertthat_0.2.0     rprojroot_1.2       
- [7] digest_0.6.12        foreach_1.4.3        truncnorm_1.0-7     
-[10] plyr_1.8.4           backports_1.0.5      stats4_3.3.3        
-[13] RSQLite_1.0.0        evaluate_0.10        ggplot2_2.2.1       
-[16] rlang_0.1            lazyeval_0.2.0       pscl_1.4.9          
-[19] svd_0.4              annotate_1.50.0      S4Vectors_0.10.1    
-[22] qvalue_2.4.2         rmarkdown_1.5        splines_3.3.3       
-[25] stringr_1.2.0        munsell_0.4.3        BiocGenerics_0.18.0 
-[28] ruv_0.9.6            htmltools_0.3.6      tibble_1.3.1        
-[31] IRanges_2.6.0        codetools_0.2-15     leapp_1.2           
-[34] XML_3.98-1.4         MASS_7.3-45          grid_3.3.3          
-[37] xtable_1.8-2         gtable_0.2.0         DBI_0.6-1           
-[40] git2r_0.18.0         magrittr_1.5         scales_0.4.1        
-[43] stringi_1.1.2        reshape2_1.4.2       doParallel_1.0.10   
-[46] seqgendiff_0.1.0     locfdr_1.1-8         iterators_1.0.8     
-[49] tools_3.3.3          Biobase_2.32.0       parallel_3.3.3      
-[52] survival_2.40-1      yaml_2.1.14          AnnotationDbi_1.34.3
-[55] colorspace_1.2-6     knitr_1.16          </code></pre>
+ [1] Biobase_2.38.0       svd_0.4.1            bit64_0.9-7         
+ [4] splines_3.4.1        foreach_1.4.3        stats4_3.4.1        
+ [7] blob_1.1.0           yaml_2.1.14          RSQLite_2.0         
+[10] backports_1.1.1      lattice_0.20-35      digest_0.6.12       
+[13] colorspace_1.3-2     htmltools_0.3.6      plyr_1.8.4          
+[16] XML_3.98-1.9         esaBcv_1.2.1         xtable_1.8-2        
+[19] corpcor_1.6.9        scales_0.5.0         git2r_0.19.0        
+[22] tibble_1.3.4         annotate_1.56.0      IRanges_2.12.0      
+[25] ggplot2_2.2.1        BiocGenerics_0.24.0  lazyeval_0.2.1      
+[28] survival_2.41-3      magrittr_1.5         memoise_1.1.0       
+[31] evaluate_0.10.1      doParallel_1.0.11    MASS_7.3-47         
+[34] truncnorm_1.0-7      tools_3.4.1          matrixStats_0.52.2  
+[37] stringr_1.2.0        S4Vectors_0.16.0     munsell_0.4.3       
+[40] locfit_1.5-9.1       AnnotationDbi_1.40.0 compiler_3.4.1      
+[43] rlang_0.1.4          grid_3.4.1           leapp_1.2           
+[46] RCurl_1.95-4.8       iterators_1.0.8      bitops_1.0-6        
+[49] rmarkdown_1.6        gtable_0.2.0         codetools_0.2-15    
+[52] DBI_0.7              ruv_0.9.6            knitr_1.17          
+[55] bit_1.1-12           rprojroot_1.2        stringi_1.1.5       
+[58] pscl_1.5.2           parallel_3.4.1       Rcpp_0.12.13        </code></pre>
 </div>
 
 <hr>
