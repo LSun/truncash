@@ -313,10 +313,10 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2017-06-17</p>
+<p><strong>Last updated:</strong> 2017-11-07</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 0214a4b</p>
+<p><strong>Code version:</strong> 2c05d59</p>
 <!-- Add your analysis here -->
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
@@ -370,8 +370,12 @@ nrow(counts.nonzero)</code></pre>
 <div id="fitting-z-with-gaussian-derivatives" class="section level2">
 <h2>Fitting <span class="math inline">\(z\)</span> with Gaussian derivatives</h2>
 <p>Suppose <span class="math inline">\(z\)</span> are correlated null, will they be well fitted by 10 Gaussian derivatives?</p>
-<pre class="r"><code>source(&quot;../code/gdash.R&quot;)
-source(&quot;../code/gdfit.R&quot;)
+<pre class="r"><code>source(&quot;../code/gdash.R&quot;)</code></pre>
+<pre><code>Warning: replacing previous import &#39;Matrix::crossprod&#39; by &#39;gmp::crossprod&#39;
+when loading &#39;cvxr&#39;</code></pre>
+<pre><code>Warning: replacing previous import &#39;Matrix::tcrossprod&#39; by
+&#39;gmp::tcrossprod&#39; when loading &#39;cvxr&#39;</code></pre>
+<pre class="r"><code>source(&quot;../code/gdfit.R&quot;)
 w.fit = gdfit(z, gd.ord = 10)
 plot.gdfit(z, w.fit$w, w.fit$gd.ord, breaks = 100)</code></pre>
 <p><img src="figure/smemo.rmd/nonzero%20fitting%20and%20plotting-1.png" width="672" style="display: block; margin: auto;" /></p>
@@ -423,11 +427,11 @@ cat(rbind(paste(0 : w.fit$gd.ord, &quot;:&quot;), paste(w.fit$w, &quot;;&quot;))
 fit.gdash</code></pre>
 <pre><code>$fitted_g
 $pi
- [1] 1.000000e+00 2.528799e-09 2.400115e-09 2.176696e-09 1.830508e-09
- [6] 1.379622e-09 9.118201e-10 5.331519e-10 2.878234e-10 1.520974e-10
-[11] 8.278530e-11 4.833388e-11 3.156003e-11 2.470501e-11 2.695685e-11
-[16] 5.699024e-11 1.271587e-10 5.089534e-11 1.086287e-11 4.376785e-12
-[21] 2.589190e-12 1.842737e-12 1.463603e-12
+ [1] 1.000000e+00 2.528802e-09 2.400118e-09 2.176700e-09 1.830511e-09
+ [6] 1.379624e-09 9.118214e-10 5.331526e-10 2.878238e-10 1.520977e-10
+[11] 8.278542e-11 4.833395e-11 3.156007e-11 2.470504e-11 2.695689e-11
+[16] 5.699028e-11 1.271587e-10 5.089537e-11 1.086289e-11 4.376792e-12
+[21] 2.589195e-12 1.842740e-12 1.463606e-12
 
 $mean
  [1] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
@@ -471,9 +475,13 @@ sum(pval.BH &lt;= 0.05)</code></pre>
 <h2>Session information</h2>
 <!-- Insert the session information into the document -->
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 3.3.3 (2017-03-06)
-Platform: x86_64-apple-darwin13.4.0 (64-bit)
-Running under: macOS Sierra 10.12.5
+<pre><code>R version 3.4.2 (2017-09-28)
+Platform: x86_64-apple-darwin15.6.0 (64-bit)
+Running under: macOS Sierra 10.12.6
+
+Matrix products: default
+BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
+LAPACK: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRlapack.dylib
 
 locale:
 [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
@@ -482,20 +490,21 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] Rmosek_7.1.3      PolynomF_0.94     cvxr_0.0.0.9009   REBayes_0.62     
-[5] Matrix_1.2-8      SQUAREM_2016.10-1 EQL_1.0-0         ttutils_1.0-1    
+[1] Rmosek_7.1.3      PolynomF_0.94     cvxr_0.0.0.9400   REBayes_0.85     
+[5] Matrix_1.2-11     SQUAREM_2017.10-1 EQL_1.0-0         ttutils_1.0-1    
 
 loaded via a namespace (and not attached):
- [1] Rcpp_0.12.11      knitr_1.16        magrittr_1.5     
- [4] edgeR_3.14.0      MASS_7.3-45       pscl_1.4.9       
- [7] doParallel_1.0.10 lattice_0.20-34   foreach_1.4.3    
-[10] ashr_2.1-19       stringr_1.2.0     tools_3.3.3      
-[13] parallel_3.3.3    grid_3.3.3        git2r_0.18.0     
+ [1] Rcpp_0.12.13      knitr_1.17        magrittr_1.5     
+ [4] edgeR_3.20.1      MASS_7.3-47       pscl_1.5.2       
+ [7] doParallel_1.0.11 lattice_0.20-35   foreach_1.4.3    
+[10] ashr_2.1-27       stringr_1.2.0     tools_3.4.2      
+[13] parallel_3.4.2    grid_3.4.2        git2r_0.19.0     
 [16] iterators_1.0.8   htmltools_0.3.6   assertthat_0.2.0 
 [19] yaml_2.1.14       rprojroot_1.2     digest_0.6.12    
-[22] codetools_0.2-15  evaluate_0.10     rmarkdown_1.5    
-[25] limma_3.28.5      stringi_1.1.2     backports_1.0.5  
-[28] truncnorm_1.0-7  </code></pre>
+[22] gmp_0.5-13.1      codetools_0.2-15  evaluate_0.10.1  
+[25] rmarkdown_1.6     limma_3.34.0      stringi_1.1.5    
+[28] compiler_3.4.2    backports_1.1.1   locfit_1.5-9.1   
+[31] truncnorm_1.0-7  </code></pre>
 </div>
 
 <hr>

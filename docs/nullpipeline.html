@@ -4,7 +4,7 @@
 
 <head>
 
-<meta charset="utf-8">
+<meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
 
@@ -309,8 +309,8 @@ div.tocify {
 </div>
 
 
-<p><strong>Last updated:</strong> 2017-02-14</p>
-<p><strong>Code version:</strong> 7693edf</p>
+<p><strong>Last updated:</strong> 2017-11-07</p>
+<p><strong>Code version:</strong> 2c05d59</p>
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
 <p>Up until now, we are using simulated correlated null data for exploration, and it would be helpful to examine and document the pipeline for generating these summary statistics, including <span class="math inline">\(\hat\beta\)</span>, <span class="math inline">\(\hat s\)</span>, <span class="math inline">\(z\)</span> score, <span class="math inline">\(t\)</span> statistics, <span class="math inline">\(p\)</span> value.</p>
@@ -555,79 +555,83 @@ lim.ebayes</code></pre>
 [1] Inf
 
 $s2.prior
-[1] 1.304242
+[1] 0.7679051
 
 $s2.post
-[1] 1.304242 1.304242 1.304242 1.304242 1.304242 1.304242
+[1] 0.7679051 0.7679051 0.7679051 0.7679051 0.7679051 0.7679051
 
 $t
   (Intercept)  condition
-1    30.07195  0.5392632
-2    37.78820  0.9823942
-3    30.08321 -1.1400578
-4    39.04655 -0.4145250
-5    28.52080 -0.4764665
-6    28.17116  0.4736195
+1    39.19105  0.7027908
+2    49.24719  1.2802980
+3    39.20572 -1.4857719
+4    50.88712 -0.5402266
+5    37.16953 -0.6209514
+6    36.71385  0.6172411
 
 $df.total
 [1] 12 12 12 12 12 12
 
 $p.value
    (Intercept) condition
-1 1.144359e-12 0.5995682
-2 7.583604e-14 0.3452983
-3 1.139291e-12 0.2765067
-4 5.133780e-14 0.6858037
-5 2.142997e-12 0.6423004
-6 2.479864e-12 0.6442714
+1 4.912765e-14 0.4955946
+2 3.220173e-15 0.2246354
+3 4.890901e-14 0.1631317
+4 2.177295e-15 0.5989240
+5 9.230571e-14 0.5462455
+6 1.069038e-13 0.5486090
 
 $var.prior
-[1] 12.267665051  0.007667291
+[1] 20.83590882  0.01302244
 
 $lods
   (Intercept) condition
-1    436.3862 -4.600265
-2    698.1822 -4.595506
-3    436.2283 -4.593388
-4    745.8775 -4.603161
-5    391.4357 -4.599544
-6    381.4607 -4.600873</code></pre>
+1    751.8553 -4.601380
+2   1196.5418 -4.585889
+3    751.9251 -4.583232
+4   1277.9980 -4.606774
+5    675.1656 -4.601095
+6    658.2650 -4.602920</code></pre>
 <pre class="r"><code>sebetahat.ebayes = lim$stdev.unscaled[, 2] * sqrt(lim.ebayes$s2.post)
 sebetahat.ebayes</code></pre>
 <pre><code>        1         2         3         4         5         6 
-0.8283756 0.7464178 0.9156631 0.7148442 0.9327501 0.8189236 </code></pre>
+0.6356266 0.5727390 0.7026037 0.5485120 0.7157149 0.6283739 </code></pre>
 <pre class="r"><code>t.ebayes = betahat.lim / sebetahat.ebayes
 t.ebayes</code></pre>
 <pre><code>         1          2          3          4          5          6 
- 0.5392632  0.9823942 -1.1400578 -0.4145250 -0.4764665  0.4736195 </code></pre>
+ 0.7027908  1.2802980 -1.4857719 -0.5402266 -0.6209514  0.6172411 </code></pre>
 <pre class="r"><code>lim.ebayes$t[, 2]</code></pre>
 <pre><code>         1          2          3          4          5          6 
- 0.5392632  0.9823942 -1.1400578 -0.4145250 -0.4764665  0.4736195 </code></pre>
+ 0.7027908  1.2802980 -1.4857719 -0.5402266 -0.6209514  0.6172411 </code></pre>
 <pre class="r"><code>df.ebayes = lim.ebayes$df.total
 df.ebayes</code></pre>
 <pre><code>[1] 12 12 12 12 12 12</code></pre>
 <pre class="r"><code>p.ebayes = (1 - pt(abs(t.ebayes), df.ebayes)) * 2
 p.ebayes</code></pre>
 <pre><code>        1         2         3         4         5         6 
-0.5995682 0.3452983 0.2765067 0.6858037 0.6423004 0.6442714 </code></pre>
+0.4955946 0.2246354 0.1631317 0.5989240 0.5462455 0.5486090 </code></pre>
 <pre class="r"><code>lim.ebayes$p.value[, 2]</code></pre>
 <pre><code>        1         2         3         4         5         6 
-0.5995682 0.3452983 0.2765067 0.6858037 0.6423004 0.6442714 </code></pre>
+0.4955946 0.2246354 0.1631317 0.5989240 0.5462455 0.5486090 </code></pre>
 </div>
 <div id="obtain-z-scores-from-moderated-p-values-and-t-statistics" class="section level3">
 <h3>obtain <span class="math inline">\(z\)</span> scores from moderated <span class="math inline">\(p\)</span>-values and <span class="math inline">\(t\)</span>-statistics</h3>
 <pre class="r"><code>z = qnorm(1 - lim.ebayes$p[, 2] / 2) * sign(lim.ebayes$t[, 2])
 z</code></pre>
 <pre><code>         1          2          3          4          5          6 
- 0.5250216  0.9437483 -1.0882004 -0.4045563 -0.4644849  0.4617350 </code></pre>
+ 0.6814377  1.2142943 -1.3946160 -0.5259485 -0.6033956  0.5998458 </code></pre>
 </div>
 </div>
 <div id="session-information" class="section level2">
 <h2>Session Information</h2>
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 3.3.2 (2016-10-31)
-Platform: x86_64-apple-darwin13.4.0 (64-bit)
-Running under: macOS Sierra 10.12.3
+<pre><code>R version 3.4.2 (2017-09-28)
+Platform: x86_64-apple-darwin15.6.0 (64-bit)
+Running under: macOS Sierra 10.12.6
+
+Matrix products: default
+BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
+LAPACK: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRlapack.dylib
 
 locale:
 [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
@@ -636,13 +640,14 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] edgeR_3.14.0  limma_3.28.14
+[1] edgeR_3.20.1 limma_3.34.0
 
 loaded via a namespace (and not attached):
- [1] backports_1.0.5 magrittr_1.5    rprojroot_1.2   tools_3.3.2    
- [5] htmltools_0.3.5 yaml_2.1.14     Rcpp_0.12.9     stringi_1.1.2  
- [9] rmarkdown_1.3   knitr_1.15.1    git2r_0.18.0    stringr_1.1.0  
-[13] digest_0.6.9    workflowr_0.3.0 evaluate_0.10  </code></pre>
+ [1] locfit_1.5-9.1  workflowr_0.7.0 Rcpp_0.12.13    lattice_0.20-35
+ [5] digest_0.6.12   rprojroot_1.2   grid_3.4.2      backports_1.1.1
+ [9] git2r_0.19.0    magrittr_1.5    evaluate_0.10.1 stringi_1.1.5  
+[13] rmarkdown_1.6   tools_3.4.2     stringr_1.2.0   yaml_2.1.14    
+[17] compiler_3.4.2  htmltools_0.3.6 knitr_1.17     </code></pre>
 </div>
 
 <hr>
@@ -694,7 +699,7 @@ $(document).ready(function () {
   (function () {
     var script = document.createElement("script");
     script.type = "text/javascript";
-    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
     document.getElementsByTagName("head")[0].appendChild(script);
   })();
 </script>

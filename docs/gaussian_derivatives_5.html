@@ -313,10 +313,10 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2017-07-03</p>
+<p><strong>Last updated:</strong> 2017-11-07</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> ce86d60</p>
+<p><strong>Code version:</strong> 2c05d59</p>
 <!-- Add your analysis here -->
 <div id="numerical-issues" class="section level2">
 <h2>Numerical issues</h2>
@@ -327,6 +327,10 @@ shared across the workflowr files. -->
 <h2>Examples</h2>
 <p>This example shows that numerical instability is reflected in the number of Gaussian derivatives fitted <span class="math inline">\(K\)</span> being too large, as well as in the normalized fitted weights of Gaussian derivatives <span class="math inline">\(\hat w_k\sqrt{k!}\)</span> being completely out of order <span class="math inline">\(\sqrt{\rho^K}\)</span>.</p>
 <pre class="r"><code>source(&quot;../code/ecdfz.R&quot;)</code></pre>
+<pre><code>Warning: replacing previous import &#39;Matrix::crossprod&#39; by &#39;gmp::crossprod&#39;
+when loading &#39;cvxr&#39;</code></pre>
+<pre><code>Warning: replacing previous import &#39;Matrix::tcrossprod&#39; by
+&#39;gmp::tcrossprod&#39; when loading &#39;cvxr&#39;</code></pre>
 <pre class="r"><code>z = read.table(&quot;../output/z_null_liver_777.txt&quot;)
 p = read.table(&quot;../output/p_null_liver_777.txt&quot;)</code></pre>
 <pre class="r"><code>library(ashr)
@@ -441,6 +445,7 @@ for (ord in 6:7) {
   capture.output(result &lt;- solve(prob), file = &quot;/dev/null&quot;)
   w.3[[ord - 5]] = c(w1, w2, result$primal_values[[1]])
 }</code></pre>
+<pre><code>Loading required package: Matrix</code></pre>
 <p><img src="figure/gaussian_derivatives_5.rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="conclusion" class="section level2">
@@ -454,9 +459,13 @@ for (ord in 6:7) {
 <h2>Session information</h2>
 <!-- Insert the session information into the document -->
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 3.3.3 (2017-03-06)
-Platform: x86_64-apple-darwin13.4.0 (64-bit)
-Running under: macOS Sierra 10.12.5
+<pre><code>R version 3.4.2 (2017-09-28)
+Platform: x86_64-apple-darwin15.6.0 (64-bit)
+Running under: macOS Sierra 10.12.6
+
+Matrix products: default
+BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
+LAPACK: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRlapack.dylib
 
 locale:
 [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
@@ -465,14 +474,15 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] cvxr_0.0.0.9009 EQL_1.0-0       ttutils_1.0-1  
+[1] Matrix_1.2-11   cvxr_0.0.0.9400 EQL_1.0-0       ttutils_1.0-1  
 
 loaded via a namespace (and not attached):
- [1] Rcpp_0.12.10    lattice_0.20-35 digest_0.6.12   rprojroot_1.2  
- [5] MASS_7.3-47     R6_2.2.1        grid_3.3.3      backports_1.0.5
- [9] git2r_0.18.0    magrittr_1.5    evaluate_0.10.1 stringi_1.1.5  
-[13] Matrix_1.2-10   rmarkdown_1.6   tools_3.3.3     stringr_1.2.0  
-[17] yaml_2.1.14     htmltools_0.3.6 knitr_1.16     </code></pre>
+ [1] Rcpp_0.12.13    lattice_0.20-35 gmp_0.5-13.1    digest_0.6.12  
+ [5] rprojroot_1.2   MASS_7.3-47     R6_2.2.2        grid_3.4.2     
+ [9] backports_1.1.1 git2r_0.19.0    magrittr_1.5    evaluate_0.10.1
+[13] stringi_1.1.5   rmarkdown_1.6   tools_3.4.2     stringr_1.2.0  
+[17] yaml_2.1.14     compiler_3.4.2  htmltools_0.3.6 ECOSolveR_0.3-2
+[21] knitr_1.17     </code></pre>
 </div>
 
 <hr>
