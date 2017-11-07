@@ -37,7 +37,7 @@ library(pROC)
 source("../code/gdash.R")
 ```
 
-```{r functions, include = FALSE, cache = TRUE}
+```{r functions, include = FALSE}
 ## selection top expressed genes
 top_genes_index = function (ngene, data) {return(order(rowSums(data), decreasing = TRUE)[1 : ngene])}
 
