@@ -1,5 +1,5 @@
 ---
-title: "Large-scale simulation for the cash paper"
+title: "Large-scale simulation for the cash paper, Part 1: Overall"
 author: "Lei Sun"
 date: 2017-11-09
 output: html_document
@@ -26,9 +26,7 @@ knitr::read_chunk("chunks.R")
 
 <!-- Add your analysis here -->
 
-Here we are doing large-scale simulation for the cash paper.
-
-## All data sets, inflated, deflated, on average.
+## All data sets on average, including both inflated, deflated, and others.
 
 ```{r code, message = FALSE, warning = FALSE}
 source("../code/gdash_lik.R")
