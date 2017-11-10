@@ -176,6 +176,12 @@ A more in-depth look into the [primal vs dual](mosek_reg.html) problem in `Rmose
 
 A close look at Efron's classic BRCA data, used in many of his papers to illustrate the empirical Bayes idea which inspires this project.
 
+* [Large-scale simulation with `CASH`, Part 1: Overall data sets](cash_sim_1.html)
+* [Large-scale simulation with `CASH`, Part 2: Over-dispersed data sets](cash_sim_2.html)
+* [Large-scale simulation with `CASH`, Part 3: Under-dispersed data sets](cash_sim_3.html)
+
+Using the same framework of [Gaussian derivative likelihood](gd_lik_2.html), large-scale simulations are performed to illustrate the `CASH` model.
+
 [`ashr`]: https://github.com/stephens999/ashr
 
 <!-- The goal of this new template is to simplify the setup and maintenance of a research website. -->

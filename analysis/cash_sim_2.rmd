@@ -1,7 +1,7 @@
 ---
-title: "Large-scale simulation for the cash paper, Part 1: Overall"
+title: "Large-scale simulation for the cash paper, Part 2: Over-dispersion"
 author: "Lei Sun"
-date: 2017-11-09
+date: 2017-11-10
 output: html_document
 ---
 
@@ -26,7 +26,7 @@ knitr::read_chunk("chunks.R")
 
 <!-- Add your analysis here -->
 
-## All data sets on average, including both over-dispersion, under-dispersion, and else
+## Conditioned on over-dispersed data sets only
 
 ```{r code, message = FALSE, warning = FALSE}
 source("../code/gdash_lik.R")
@@ -99,6 +99,18 @@ z.mat = readRDS("../output/z_null_liver_777.rds")
 se.mat = readRDS("../output/sebetahat_null_liver_777.rds")
 ```
 
+```{r select data sets}
+z.sd <- apply(z.mat, 1, sd)
+inflation.index = (z.sd > qchisq(0.9995, ncol(z.mat) - 1) / (ncol(z.mat) - 1))
+deflation.index = (z.sd < qchisq(0.0005, ncol(z.mat) - 1) / (ncol(z.mat) - 1))
+## Number of inflation data sets
+sum(inflation.index)
+## Number of deflation data sets
+sum(deflation.index)
+z.mat = z.mat[inflation.index, ]
+se.mat = se.mat[inflation.index, ]
+```
+
 ```{r fitting, echo = FALSE, cache = TRUE, message = FALSE, warning = FALSE}
 betahat.list = beta.list = list()
 
@@ -110,18 +122,22 @@ auc.pvalue = auc.BH = auc.qvalue.qvalue = auc.qvalue.lfdr = auc.ash.qvalue = auc
 
 qvalue.BH = qvalue.qvalue = qvalue.ash = qvalue.gdash = qvalue.locfdr = list()
 
-for (i in 1 : nrow(z.mat)) {
-  n = length(z.mat[i, ])
-  sigma_n = sqrt(mean(se.mat[i, ]^2))
+n <- ncol(z.mat)
+m <- nrow(z.mat)
+
+for (i in 1 : m) {
+  sebetahat <- se.mat[i, ]
+  z <- z.mat[i, ]
+  sigma_n = sqrt(mean(sebetahat^2))
   sigma_s.1 = sigma_n
   sigma_s.2 = 2 * sigma_n
   g = ashr::normalmix(pi = c(0.6, 0.3, 0.1), mean = 0, sd = c(0, sigma_s.1, sigma_s.2))
   beta = sample.g(g, n)$beta
   response = (beta != 0)
-  betahat = beta + se.mat[i, ] * z.mat[i, ]
-  pvalue = (1 - pnorm(abs(betahat / se.mat[i, ]))) * 2
-  fit.ash = ashr::ash(betahat, se.mat[i, ], mixcompdist = "normal", method = "fdr")
-  fit.gdash = gdash(betahat, se.mat[i, ])
+  betahat = beta + sebetahat * z
+  pvalue = (1 - pnorm(abs(betahat / sebetahat))) * 2
+  fit.ash = ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+  fit.gdash = gdash(betahat, sebetahat)
   fit.qvalue = qvalue::qvalue(pvalue)
   fit.BH = p.adjust(pvalue, method = "BH")
 
@@ -208,7 +224,7 @@ pFDR.methods = c("BH", "qvalue", "locfdr", "ASH", "CASH")
 col.vec = grDevices::rainbow(5)
 plot(1:10, 1:10, type = "n", bty = "n", xaxt = "n", yaxt = "n", xlab = "", ylab = "")
 legend("bottom", ncol = 2, lty = 1, col = col.vec, legend = pFDR.methods)
-plot(pFDR.nominal, pFDR.nominal, ylim = c(0, 2 * max(pFDR.nominal)), type = "n", xlab = "Nominal Positive False Discovery Rate", ylab = "Average Positive False Discovery Proportion", main = "Calibration of Positive FDR (Overall)")
+plot(pFDR.nominal, pFDR.nominal, ylim = c(0, 2 * max(pFDR.nominal)), type = "n", xlab = "Nominal Positive False Discovery Rate", ylab = "Average Positive False Discovery Proportion", main = "Calibration of Positive FDR (Over-Dispersion)")
 
 pFDP.polygon.plot(beta.list, qvalue.BH, pFDR.nominal, col.vec[1])
 pFDP.polygon.plot(beta.list, qvalue.qvalue, pFDR.nominal, col.vec[2])
@@ -219,6 +235,7 @@ pFDP.polygon.plot(beta.list, qvalue.gdash, pFDR.nominal, col.vec[5])
 lines(c(0, pFDR.nominal), c(0, pFDR.nominal), cex = 3, lty = 6)
 lines(c(0, pFDR.nominal), 2 * c(0, pFDR.nominal), cex = 3, lty = 4)
 ```
+
 
 ## Session information
 
