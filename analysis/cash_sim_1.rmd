@@ -28,7 +28,9 @@ knitr::read_chunk("chunks.R")
 
 Here we are doing large-scale simulation for the cash paper.
 
-```{r code, message = FALSE}
+## All data sets, inflated, deflated, on average.
+
+```{r code, message = FALSE, warning = FALSE}
 source("../code/gdash_lik.R")
 ```
 
@@ -100,9 +102,6 @@ se.mat = readRDS("../output/sebetahat_null_liver_777.rds")
 ```
 
 ```{r fitting, echo = FALSE, cache = TRUE, message = FALSE, warning = FALSE}
-ttt <- proc.time()
-test.run <- sample(1e3, 10)
-
 betahat.list = beta.list = list()
 
 pihat0.ash = pihat0.gdash = pihat0.qvalue = pihat0.locfdr = c()
@@ -113,7 +112,7 @@ auc.pvalue = auc.BH = auc.qvalue.qvalue = auc.qvalue.lfdr = auc.ash.qvalue = auc
 
 qvalue.BH = qvalue.qvalue = qvalue.ash = qvalue.gdash = qvalue.locfdr = list()
 
-for (i in test.run) {
+for (i in 1 : nrow(z.mat)) {
   n = length(z.mat[i, ])
   sigma_n = sqrt(mean(se.mat[i, ]^2))
   sigma_s.1 = sigma_n
@@ -164,8 +163,6 @@ for (i in test.run) {
   )
 
 }
-
-ttt <- proc.time() - ttt
 ```
 
 ```{r plot_pihat0, echo = FALSE}
