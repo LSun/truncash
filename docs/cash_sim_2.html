@@ -11,9 +11,9 @@
 
 <meta name="author" content="Lei Sun" />
 
-<meta name="date" content="2017-11-09" />
+<meta name="date" content="2017-11-10" />
 
-<title>Large-scale simulation for the cash paper, Part 1: Overall</title>
+<title>Large-scale simulation for the cash paper, Part 2: Over-dispersion</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -302,9 +302,9 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Large-scale simulation for the cash paper, Part 1: Overall</h1>
+<h1 class="title toc-ignore">Large-scale simulation for the cash paper, Part 2: Over-dispersion</h1>
 <h4 class="author"><em>Lei Sun</em></h4>
-<h4 class="date"><em>2017-11-09</em></h4>
+<h4 class="date"><em>2017-11-10</em></h4>
 
 </div>
 
@@ -320,15 +320,26 @@ America/Chicago&#39;</code></pre>
  package git2r is installed -->
 <p><strong>Code version:</strong> d337287</p>
 <!-- Add your analysis here -->
-<div id="all-data-sets-on-average-including-both-over-dispersion-under-dispersion-and-else" class="section level2">
-<h2>All data sets on average, including both over-dispersion, under-dispersion, and else</h2>
+<div id="conditioned-on-over-dispersed-data-sets-only" class="section level2">
+<h2>Conditioned on over-dispersed data sets only</h2>
 <pre class="r"><code>source(&quot;../code/gdash_lik.R&quot;)</code></pre>
 <pre class="r"><code>z.mat = readRDS(&quot;../output/z_null_liver_777.rds&quot;)
 se.mat = readRDS(&quot;../output/sebetahat_null_liver_777.rds&quot;)</code></pre>
-<p><img src="figure/cash_sim_1.rmd/plot_pihat0-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p><img src="figure/cash_sim_1.rmd/plot_mse-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p><img src="figure/cash_sim_1.rmd/plot_auc-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p><img src="figure/cash_sim_1.rmd/qvalue%20calibration%20plotting-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_sim_1.rmd/qvalue%20calibration%20plotting-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>z.sd &lt;- apply(z.mat, 1, sd)
+inflation.index = (z.sd &gt; qchisq(0.9995, ncol(z.mat) - 1) / (ncol(z.mat) - 1))
+deflation.index = (z.sd &lt; qchisq(0.0005, ncol(z.mat) - 1) / (ncol(z.mat) - 1))
+## Number of inflation data sets
+sum(inflation.index)</code></pre>
+<pre><code>[1] 299</code></pre>
+<pre class="r"><code>## Number of deflation data sets
+sum(deflation.index)</code></pre>
+<pre><code>[1] 477</code></pre>
+<pre class="r"><code>z.mat = z.mat[inflation.index, ]
+se.mat = se.mat[inflation.index, ]</code></pre>
+<p><img src="figure/cash_sim_2.rmd/plot_pihat0-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/cash_sim_2.rmd/plot_mse-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/cash_sim_2.rmd/plot_auc-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/cash_sim_2.rmd/qvalue%20calibration%20plotting-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_sim_2.rmd/qvalue%20calibration%20plotting-2.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="session-information" class="section level2">
 <h2>Session information</h2>
