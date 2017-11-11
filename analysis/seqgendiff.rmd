@@ -1,0 +1,239 @@
+---
+title: "`CASH` on Poisson thinning data by `seqgendiff::poisthin`"
+author: "Lei Sun"
+date: 2017-06-18
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+## Introduction
+
+In order to perform a large-scale simulation, we explore the `seqgendiff::poisthin` function developed by [David](http://dcgerard.github.io/).
+
+```{r packages, message = FALSE, warning = FALSE}
+library(seqgendiff)
+source("../code/count_to_summary.R")
+source("../code/gdash_lik.R")
+```
+
+```{r data}
+counts <- readRDS("../data/liver.sim.rds")
+```
+
+```{r functions, echo = FALSE}
+signal_fun <- function(n, pi0, pi1, pi2, sigma1, sigma2) {
+  vicar::rmixnorm(n = n, pi_vals = c(pi0, pi1, pi2), 
+                  mean_seq = rep(0, 3), sd_seq = c(0, sigma1, sigma2))
+}
+
+pFDP = function (FDR, response, predictor) {
+  return(1 - mean(response[predictor <= FDR]))
+}
+
+pFDR.calib = function (beta, qvalue, pFDR.nominal) {
+  pFDP.list = list()
+  for (i in 1 : length(beta))
+  pFDP.list[[i]] = sapply(pFDR.nominal, pFDP,
+                         response = (beta[[i]] != 0),
+                         predictor = qvalue[[i]])
+  pFDP.mat = matrix(unlist(pFDP.list), nrow = length(pFDP.list), byrow = TRUE)
+  pFDP.samplesize = colSums(!is.na(pFDP.mat))
+  pFDP.mean = colMeans(pFDP.mat, na.rm = TRUE)
+  pFDP.mean.sd = apply(pFDP.mat, 2, sd, na.rm = TRUE) / sqrt(pFDP.samplesize)
+  return(list(pFDR.nominal = pFDR.nominal, pFDP.mean = pFDP.mean, pFDP.mean.sd = pFDP.mean.sd))
+}
+
+FDR.calib = function (beta, qvalue, pFDR.nominal) {
+  pFDP.list = list()
+  for (i in 1 : length(beta))
+  pFDP.list[[i]] = sapply(pFDR.nominal, pFDP,
+                         response = (beta[[i]] != 0),
+                         predictor = qvalue[[i]])
+  pFDP.mat = matrix(unlist(pFDP.list), nrow = length(pFDP.list), byrow = TRUE)
+  pFDP.mat[is.na(pFDP.mat)] <- 0
+  pFDP.samplesize = colSums(!is.na(pFDP.mat))
+  pFDP.mean = colMeans(pFDP.mat, na.rm = TRUE)
+  pFDP.mean.sd = apply(pFDP.mat, 2, sd, na.rm = TRUE) / sqrt(pFDP.samplesize)
+  return(list(pFDR.nominal = pFDR.nominal, pFDP.mean = pFDP.mean, pFDP.mean.sd = pFDP.mean.sd))
+}
+
+pFDP.polygon.plot = function (beta, qvalue, pFDR.nominal, col) {
+  summary = pFDR.calib(beta, qvalue, pFDR.nominal)
+  mean = summary$pFDP.mean
+  sd = summary$pFDP.mean.sd
+  lines(pFDR.nominal, mean, col = col, cex = 2)
+  polygon.color.rgb = as.vector(grDevices::col2rgb(col))
+  polygon(x = c(0, pFDR.nominal, rev(pFDR.nominal), 0),
+          y = c(0, mean - 2 * sd, rev(mean + 2 * sd), 0),
+          col = grDevices::rgb(polygon.color.rgb[1], polygon.color.rgb[2], polygon.color.rgb[3], alpha = 100, max = 255),
+          border = col,
+          lty = 2)
+}
+```
+
+## More flexible effects
+
+Instead of $g = \pi_0\delta_0 + (1 - \pi_0)N(0, \sigma^2)$, we would like to add effects following $g = \pi_0\delta_0 + \pi_1N(0, \sigma_1^2) + \pi_2N(0, \sigma_2^2)$.
+
+The data is simulated by Poisson thinning, not by normal mean models.
+
+```{r simulation, cache = TRUE, echo = FALSE}
+nsim <- 100
+nsamp <- 5
+ngene <- 1e3
+
+signal_params <- list(pi0 = 0.6,
+                      pi1 = 0.3,
+                      pi2 = 0.1,
+                      sigma1 = 1,
+                      sigma2 = 2)
+
+betahat.list = beta.list = list()
+
+pihat0.ash = pihat0.gdash = pihat0.qvalue = pihat0.locfdr = c()
+
+mse.mle = mse.ash = mse.gdash = c()
+
+auc.pvalue = auc.BH = auc.qvalue.qvalue = auc.qvalue.lfdr = auc.ash.qvalue = auc.ash.lfdr = auc.gdash.qvalue = auc.gdash.lfdr = auc.locfdr.qvalue = auc.locfdr.lfdr = c()
+
+qvalue.BH = qvalue.qvalue = qvalue.ash = qvalue.gdash = qvalue.locfdr = list()
+
+for (i in 1 : nsim) {
+  mat.sim <- seqgendiff::poisthin(mat = t(counts),
+                                  nsamp = 2 * nsamp,
+                                  ngene = ngene,
+                                  gselect = "max",
+                                  prop_null = 0,
+                                  signal_fun = signal_fun,
+                                  signal_params = signal_params)
+  beta <- mat.sim$beta
+  response = (beta != 0)
+  summary <- count_to_summary(t(mat.sim$Y), mat.sim$X)
+  betahat <- summary$betahat
+  sebetahat <- summary$sebetahat
+  pvalue = (1 - pnorm(abs(betahat / sebetahat))) * 2
+  fit.ash = ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+  fit.gdash = gdash(betahat, sebetahat)
+  fit.qvalue = qvalue::qvalue(pvalue)
+  fit.BH = p.adjust(pvalue, method = "BH")
+  
+  pihat0.ash[i] = ashr::get_pi0(fit.ash)
+  pihat0.gdash[i] = ashr::get_pi0(fit.gdash)
+  pihat0.qvalue[i] = fit.qvalue$pi0
+  
+  mse.mle[i] = mean((betahat - beta)^2)
+  mse.ash[i] = mean((ashr::get_pm(fit.ash) - beta)^2)
+  mse.gdash[i] = mean((fit.gdash$pm - beta)^2)
+
+  auc.pvalue[i] = pROC::roc(response, pvalue)$auc
+  auc.BH[i] = pROC::roc(response, fit.BH)$auc
+  auc.qvalue.qvalue[i] = pROC::roc(response, fit.qvalue$qvalues)$auc
+  auc.qvalue.lfdr[i] = pROC::roc(response, fit.qvalue$lfdr)$auc
+  auc.ash.qvalue[i] = pROC::roc(response, ashr::get_qvalue(fit.ash))$auc
+  auc.ash.lfdr[i] = pROC::roc(response, ashr::get_lfdr(fit.ash))$auc
+  auc.gdash.qvalue[i] = pROC::roc(response, fit.gdash$qvalue)$auc
+  auc.gdash.lfdr[i] = pROC::roc(response, fit.gdash$lfdr)$auc
+  
+  beta.list[[i]] = beta
+  betahat.list[[i]] = betahat
+  qvalue.BH[[i]] = fit.BH
+  qvalue.qvalue[[i]] = fit.qvalue$qvalues
+  qvalue.ash[[i]] = ashr::get_qvalue(fit.ash)
+  qvalue.gdash[[i]] = fit.gdash$qvalue
+  
+  tryCatch({
+    fit.locfdr = locfdr::locfdr(betahat / sebetahat, plot = 0)
+    pihat0.locfdr[i] = fit.locfdr$fp0[3, 3]
+    auc.locfdr.qvalue[i] = pROC::roc(response, ashr::qval.from.lfdr(fit.locfdr$fdr))$auc
+    auc.locfdr.lfdr[i] = pROC::roc(response, fit.locfdr$fdr)$auc
+    qvalue.locfdr[[i]] = ashr::qval.from.lfdr(fit.locfdr$fdr)
+  }, error = function (err) {
+    invisible(NA)
+  }
+  )
+
+
+}
+```
+
+```{r plot_pihat0, echo = FALSE}
+boxplot(pihat0.qvalue, 
+        pihat0.locfdr, 
+        pihat0.ash,
+        pihat0.gdash,
+        ylim = c(0, 1), 
+        names = c("qvalue",
+                  "locfdr",
+                  "ASH",
+                  "CASH"),
+        ylab = expression(hat(pi)[0]),
+        main = expression(hat(pi)[0]),
+        las = 2
+        )
+abline(h = 0.6, lty = 2, col = "red")
+```
+
+```{r plot_mse, echo = FALSE}
+boxplot(mse.ash, mse.gdash,
+        names = c("ASH", "CASH"),
+        ylab = "MSE",
+        main = expression("MSE of Posterior Mean"),
+        las = 2
+        )
+```
+
+```{r plot_auc, echo = FALSE}
+boxplot(auc.pvalue, auc.BH, auc.qvalue.qvalue, auc.qvalue.lfdr, 
+        auc.locfdr.qvalue, auc.locfdr.lfdr,
+        auc.ash.qvalue, auc.ash.lfdr, auc.gdash.qvalue, auc.gdash.lfdr,
+        names = c("p-value", "BH", "qvalue.q", "qvalue.l",
+                  "locfdr.q", "locfdr.l",
+                  "ASH.q", "ASH.l", "CASH.q", "CASH.l"),
+        ylim = c(0, 1), ylab = "AUC", main = expression("Area Under the ROC Curve"), las = 2)
+abline(h = 0.5, lty = 2, col = "red")
+abline(h = median(auc.gdash.lfdr), lty = 2, col = "blue")
+```
+
+```{r qvalue calibration plotting, echo = FALSE}
+pFDR.nominal = seq(0, 0.2, 0.001)[-1]
+
+pFDR.methods = c("BH", "qvalue", "locfdr", "ASH", "CASH")
+col.vec = grDevices::rainbow(5)
+plot(1:10, 1:10, type = "n", bty = "n", xaxt = "n", yaxt = "n", xlab = "", ylab = "")
+legend("bottom", ncol = 2, lty = 1, col = col.vec, legend = pFDR.methods)
+plot(pFDR.nominal, pFDR.nominal, type = "n", xlab = "Nominal Positive False Discovery Rate", ylab = "Average Positive False Discovery Proportion", main = "Calibration of Positive FDR")
+
+pFDP.polygon.plot(beta.list, qvalue.BH, pFDR.nominal, col.vec[1])
+pFDP.polygon.plot(beta.list, qvalue.qvalue, pFDR.nominal, col.vec[2])
+pFDP.polygon.plot(beta.list, qvalue.locfdr, pFDR.nominal, col.vec[3])
+pFDP.polygon.plot(beta.list, qvalue.ash, pFDR.nominal, col.vec[4])
+pFDP.polygon.plot(beta.list, qvalue.gdash, pFDR.nominal, col.vec[5])
+
+lines(c(0, pFDR.nominal), c(0, pFDR.nominal), cex = 3, lty = 6)
+```
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```
