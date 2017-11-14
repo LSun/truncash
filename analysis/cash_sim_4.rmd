@@ -1,0 +1,290 @@
+---
+title: "Large-scale simulation for the cash paper, Part 4: Smaller, faster exploratory simulations -- Average pFDP"
+author: "Lei Sun"
+date: 2017-11-11
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+## Using smaller, faster, exploratory simulations
+
+Instead of doing a simulation with $1K$ runs, each run with $10K$ samples, we are downsizing it so that simulations can be done faster while still show a pattern. Right now, $100$ runs, each run with $5K$ samples seem adequate.
+
+We don't want the sample size to be too small. Small sample sizes appear to work less well with Gaussian derivatives fitting.
+
+## Frequentist pFDR accuracy with all data sets
+
+```{r code, message = FALSE, warning = FALSE}
+source("../code/gdash_lik.R")
+```
+
+```{r effect sampling function, echo = FALSE}
+## produce simulated true signals beta
+sample.g = function (g, n) {
+  UseMethod("sample.g")
+}
+
+sample.g.normalmix = function (g, n) {
+  K = length(g$pi)
+  beta = list()
+  for (i in 1 : K) {
+    beta[[i]] = rnorm(ceiling(n * g$pi[i]), g$mean[i], g$sd[i])
+  }
+  return(list(beta = sample(unlist(beta)), mixcompdist = "normal"))
+}
+```
+
+```{r pFDR calibration function, echo = FALSE}
+pFDP = function (FDR, response, predictor) {
+  return(1 - mean(response[predictor <= FDR]))
+}
+
+pFDR.calib = function (beta, qvalue, pFDR.nominal) {
+  pFDP.list = list()
+  for (i in 1 : length(beta))
+  pFDP.list[[i]] = sapply(pFDR.nominal, pFDP,
+                         response = (beta[[i]] != 0),
+                         predictor = qvalue[[i]])
+  pFDP.mat = matrix(unlist(pFDP.list), nrow = length(pFDP.list), byrow = TRUE)
+  pFDP.samplesize = colSums(!is.na(pFDP.mat))
+  pFDP.mean = colMeans(pFDP.mat, na.rm = TRUE)
+  pFDP.mean.sd = apply(pFDP.mat, 2, sd, na.rm = TRUE) / sqrt(pFDP.samplesize)
+  return(list(pFDR.nominal = pFDR.nominal, pFDP.mean = pFDP.mean, pFDP.mean.sd = pFDP.mean.sd))
+}
+
+FDR.calib = function (beta, qvalue, pFDR.nominal) {
+  pFDP.list = list()
+  for (i in 1 : length(beta))
+  pFDP.list[[i]] = sapply(pFDR.nominal, pFDP,
+                         response = (beta[[i]] != 0),
+                         predictor = qvalue[[i]])
+  pFDP.mat = matrix(unlist(pFDP.list), nrow = length(pFDP.list), byrow = TRUE)
+  pFDP.mat[is.na(pFDP.mat)] <- 0
+  pFDP.samplesize = colSums(!is.na(pFDP.mat))
+  pFDP.mean = colMeans(pFDP.mat, na.rm = TRUE)
+  pFDP.mean.sd = apply(pFDP.mat, 2, sd, na.rm = TRUE) / sqrt(pFDP.samplesize)
+  return(list(pFDR.nominal = pFDR.nominal, pFDP.mean = pFDP.mean, pFDP.mean.sd = pFDP.mean.sd))
+}
+
+pFDP.polygon.plot = function (beta, qvalue, pFDR.nominal, col) {
+  summary = pFDR.calib(beta, qvalue, pFDR.nominal)
+  mean = summary$pFDP.mean
+  sd = summary$pFDP.mean.sd
+  lines(pFDR.nominal, mean, col = col, cex = 2)
+  polygon.color.rgb = as.vector(grDevices::col2rgb(col))
+  polygon(x = c(0, pFDR.nominal, rev(pFDR.nominal), 0),
+          y = c(0, mean - 2 * sd, rev(mean + 2 * sd), 0),
+          col = grDevices::rgb(polygon.color.rgb[1], polygon.color.rgb[2], polygon.color.rgb[3], alpha = 100, max = 255),
+          border = col,
+          lty = 2)
+}
+```
+
+```{r read data}
+z.mat = readRDS("../output/z_null_liver_777.rds")
+se.mat = readRDS("../output/sebetahat_null_liver_777.rds")
+```
+
+```{r fitting_plotting function, echo = FALSE}
+
+cashSim <- function(z.mat, se.mat, nsim, ngene,
+                    g.pi = c(0.9, 0.1), g.sd = c(0, 1),
+                    relative_to_noise = TRUE) {
+  ## generate intermediary variables to store results
+  betahat.list = beta.list = list()
+  pihat0.ash = pihat0.gdash = pihat0.qvalue = c()
+  qvalue.BH = qvalue.qvalue = qvalue.ash = qvalue.gdash = list()
+  
+  ## select correlated null and standard error for simulation
+  row.select <- sample(nrow(z.mat), nsim)
+  z.mat <- z.mat[row.select, ]
+  se.mat <- se.mat[row.select, ]
+  
+  ## simulation
+  for (i in 1 : nsim) {
+    gene.select <- sample(ncol(z.mat), ngene)
+    ## standard error
+    sebetahat <- se.mat[i, gene.select]
+    ## correlated null
+    z <- z.mat[i, gene.select]
+    sigma_n <- 1
+    if (relative_to_noise) {
+      sigma_n <- sqrt(mean(sebetahat^2))
+    }
+    g <- ashr::normalmix(pi = g.pi, mean = 0, sd = g.sd * sigma_n)
+    ## true signal
+    beta = sample.g(g, ngene)$beta
+    beta.list[[i]] = beta
+    response = (beta != 0)
+    ## betahat
+    betahat = beta + sebetahat * z
+    ## p value
+    pvalue = (1 - pnorm(abs(betahat / sebetahat))) * 2
+
+    ## different methods
+    fit.ash = ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+    fit.gdash = gdash(betahat, sebetahat)
+    fit.qvalue = qvalue::qvalue(pvalue)
+    fit.BH = p.adjust(pvalue, method = "BH")
+    
+    ## pihat0
+    pihat0.ash[i] = ashr::get_pi0(fit.ash)
+    pihat0.gdash[i] = ashr::get_pi0(fit.gdash)
+    pihat0.qvalue[i] = fit.qvalue$pi0
+    
+    ## q value
+    qvalue.BH[[i]] = fit.BH
+    qvalue.qvalue[[i]] = fit.qvalue$qvalues
+    qvalue.ash[[i]] = ashr::get_qvalue(fit.ash)
+    qvalue.gdash[[i]] = fit.gdash$qvalue
+  }
+  
+  ## plot & compare pihat0
+  boxplot(pihat0.qvalue,
+          pihat0.ash,
+          pihat0.gdash,
+          ylim = c(0, 1),
+          names = c("qvalue",
+                    "ASH",
+                    "CASH"),
+          ylab = expression(hat(pi)[0]),
+          main = expression(hat(pi)[0]),
+          las = 2
+          )
+  abline(h = g.pi[1], lty = 2, col = "red")
+  
+  ## plot & compare qvalue / positive FDR
+  pFDR.nominal = seq(0, 0.2, 0.005)
+  pFDR.methods = c("BH", "qvalue", "ASH", "CASH")
+  col.vec = grDevices::rainbow(length(pFDR.methods))
+  plot(pFDR.nominal, pFDR.nominal, type = "n", xlab = "Nominal Positive False Discovery Rate", ylab = "Average Positive False Discovery Proportion", main = "Calibration of Positive FDR")
+  pFDP.polygon.plot(beta.list, qvalue.BH, pFDR.nominal, col.vec[1])
+  pFDP.polygon.plot(beta.list, qvalue.qvalue, pFDR.nominal, col.vec[2])
+  pFDP.polygon.plot(beta.list, qvalue.ash, pFDR.nominal, col.vec[3])
+  pFDP.polygon.plot(beta.list, qvalue.gdash, pFDR.nominal, col.vec[4])
+  lines(c(0, pFDR.nominal), c(0, pFDR.nominal), cex = 3, lty = 6)
+  legend("topleft", ncol = 2, lty = 1, col = col.vec, legend = pFDR.methods, bty = "n")
+}
+```
+
+## Simulation
+
+```{r cache = TRUE}
+cashSim(z.mat, se.mat,
+        nsim = 100, ngene = 1000,
+        g.pi = c(0.8, 0.2), g.sd = c(0, 1), relative_to_noise = TRUE)
+```
+
+## Simulation
+
+```{r cache = TRUE}
+cashSim(z.mat, se.mat,
+        nsim = 100, ngene = 1000,
+        g.pi = c(0.8, 0.2), g.sd = c(0, 2), relative_to_noise = TRUE)
+```
+
+## Simulation
+
+```{r cache = TRUE}
+cashSim(z.mat, se.mat,
+        nsim = 100, ngene = 1000,
+        g.pi = c(0.8, 0.2), g.sd = c(0, 1), relative_to_noise = FALSE)
+```
+
+## Simulation
+
+```{r cache = TRUE}
+cashSim(z.mat, se.mat,
+        nsim = 100, ngene = 1000,
+        g.pi = c(0.8, 0.1, 0.1), g.sd = c(0, 1, 2), relative_to_noise = TRUE)
+```
+
+## Simulation
+
+```{r cache = TRUE}
+cashSim(z.mat, se.mat,
+        nsim = 100, ngene = 1000,
+        g.pi = c(0.8, 0.1, 0.1), g.sd = c(0, 1, 2), relative_to_noise = FALSE)
+```
+
+## Simulation
+
+```{r cache = TRUE}
+cashSim(z.mat, se.mat,
+        nsim = 100, ngene = 1000,
+        g.pi = c(0.9, 0.1), g.sd = c(0, 1), relative_to_noise = TRUE)
+```
+
+## Simulation
+
+```{r cache = TRUE}
+cashSim(z.mat, se.mat,
+        nsim = 100, ngene = 1000,
+        g.pi = c(0.9, 0.1), g.sd = c(0, 2), relative_to_noise = TRUE)
+```
+
+## Simulation
+
+```{r cache = TRUE}
+cashSim(z.mat, se.mat,
+        nsim = 100, ngene = 1000,
+        g.pi = c(0.9, 0.1), g.sd = c(0, 1), relative_to_noise = FALSE)
+```
+
+## Simulation
+
+```{r cache = TRUE}
+cashSim(z.mat, se.mat,
+        nsim = 100, ngene = 1000,
+        g.pi = c(0.9, 0.05, 0.05), g.sd = c(0, 1, 2), relative_to_noise = TRUE)
+```
+
+## Simulation
+
+```{r cache = TRUE}
+cashSim(z.mat, se.mat,
+        nsim = 100, ngene = 1000,
+        g.pi = c(0.9, 0.05, 0.05), g.sd = c(0, 1, 2), relative_to_noise = FALSE)
+```
+
+## Simulation
+
+```{r cache = TRUE}
+cashSim(z.mat, se.mat,
+        nsim = 100, ngene = 1000,
+        g.pi = c(0.85, 0.10, 0.05), g.sd = c(0, 1, 2), relative_to_noise = TRUE)
+```
+
+## Simulation
+
+```{r cache = TRUE}
+cashSim(z.mat, se.mat,
+        nsim = 100, ngene = 1000,
+        g.pi = c(0.85, 0.10, 0.05), g.sd = c(0, 1, 2), relative_to_noise = FALSE)
+```
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```
