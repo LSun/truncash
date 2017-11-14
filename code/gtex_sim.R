@@ -1,28 +1,39 @@
-require(limma)
-require(edgeR)
-require(qvalue)
-require(ashr)
+library(limma)
+library(edgeR)
+source("../code/count_to_summary.R")
+
+ngene = 1e3
+nsamp = 5
+nsim = 1e2
 
 # Load in the gtex liver data
-
-r = read.csv("../data/liver.csv")
-r = r[, -(1 : 2)] # remove gene name and description
+r = readRDS("../data/liver.rds")
 
 #extract top g genes from G by n matrix X of expression
-
 top_genes_index = function (g, X)
 {return(order(rowSums(X), decreasing = TRUE)[1 : g])
 }
-
 lcpm = function (r) {
   R = colSums(r)
   t(log2(((t(r) + 0.5) / (R + 1)) * 10^6))
 }
-
 Y = lcpm(r)
-subset = top_genes_index(10000, Y)
-Y = Y[subset,]
+subset = top_genes_index(ngene, Y)
 r = r[subset,]
+
+z.mat = se.mat = matrix(nrow = nsim, ncol = ngene)
+
+set.seed(777)
+for (i in 1 : nsim) {
+  counts <- r[, sample(ncol(r), 2 * nsamp)]
+  design <- model.matrix(~c(rep(0, nsamp), rep(1, nsamp)))
+  summary <- count_to_summary(counts, design)
+  se.mat[i, ] <- summary$sebetahat
+  z.mat[i, ] <- summary$z
+}
+
+saveRDS(z.mat, "../output/z_null_liver_777_100_1000.rds")
+saveRDS(se.mat, "../output/sebetahat_null_liver_777_100_1000.rds")
 
 # transform counts to z scores
 # these z scores are marginally N(0, 1) under null
