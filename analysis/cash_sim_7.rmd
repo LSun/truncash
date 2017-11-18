@@ -1,7 +1,7 @@
 ---
-title: "Large-scale simulation for the cash paper, Part 4: Smaller, faster exploratory simulations -- Average pFDP"
+title: "Large-scale simulation for the cash paper, Part 7: Simulated correlated data"
 author: "Lei Sun"
-date: 2017-11-11
+date: 2017-11-16
 output: html_document
 ---
 
@@ -26,13 +26,15 @@ knitr::read_chunk("chunks.R")
 
 <!-- Add your analysis here -->
 
-## Using smaller, faster, exploratory simulations
-
-Instead of doing a simulation with $1K$ runs, each run with $10K$ samples, we are downsizing it so that simulations can be done faster while still show a pattern. Right now, $100$ runs, each run with $5K$ samples seem adequate.
-
-We don't want the sample size to be too small. Small sample sizes appear to work less well with Gaussian derivatives fitting.
-
-## Frequentist pFDR accuracy with all data sets
+```{r data_generation, cache = TRUE}
+set.seed(777)
+z.mat <- matrix(ncol = 1e4, nrow = 1e3)
+for (j in 1 : nrow(z.mat)) {
+  L <- matrix(rnorm(ncol(z.mat) * 10), ncol = 10)
+  z.mat[j, ] <- L %*% rnorm(10) / sqrt(rowSums(L^2))
+}
+se.mat <- matrix(sqrt(rchisq(ncol(z.mat) * nrow(z.mat), 1)), ncol = ncol(z.mat))
+```
 
 ```{r code, message = FALSE, warning = FALSE}
 source("../code/gdash_lik.R")
@@ -98,11 +100,6 @@ pFDP.polygon.plot = function (beta, qvalue, pFDR.nominal, col) {
           border = col,
           lty = 2)
 }
-```
-
-```{r read data}
-z.mat = readRDS("../output/z_null_liver_777.rds")
-se.mat = readRDS("../output/sebetahat_null_liver_777.rds")
 ```
 
 ```{r fitting_plotting function, echo = FALSE}
@@ -190,63 +187,7 @@ cashSim <- function(z.mat, se.mat, nsim, ngene,
 
 ```{r cache = TRUE}
 cashSim(z.mat, se.mat,
-        nsim = 100, ngene = 1000,
-        g.pi = c(0.8, 0.2), g.sd = c(0, 1), relative_to_noise = TRUE)
-```
-
-## Simulation
-
-```{r cache = TRUE}
-cashSim(z.mat, se.mat,
-        nsim = 100, ngene = 1000,
-        g.pi = c(0.8, 0.2), g.sd = c(0, 2), relative_to_noise = TRUE)
-```
-
-## Simulation
-
-```{r cache = TRUE}
-cashSim(z.mat, se.mat,
-        nsim = 100, ngene = 1000,
-        g.pi = c(0.8, 0.2), g.sd = c(0, 1), relative_to_noise = FALSE)
-```
-
-## Simulation
-
-```{r cache = TRUE}
-cashSim(z.mat, se.mat,
-        nsim = 100, ngene = 1000,
-        g.pi = c(0.8, 0.1, 0.1), g.sd = c(0, 1, 2), relative_to_noise = TRUE)
-```
-
-## Simulation
-
-```{r cache = TRUE}
-cashSim(z.mat, se.mat,
-        nsim = 100, ngene = 1000,
-        g.pi = c(0.8, 0.1, 0.1), g.sd = c(0, 1, 2), relative_to_noise = FALSE)
-```
-
-## Simulation
-
-```{r cache = TRUE}
-cashSim(z.mat, se.mat,
-        nsim = 100, ngene = 1000,
-        g.pi = c(0.9, 0.1), g.sd = c(0, 1), relative_to_noise = TRUE)
-```
-
-## Simulation
-
-```{r cache = TRUE}
-cashSim(z.mat, se.mat,
-        nsim = 100, ngene = 1000,
-        g.pi = c(0.9, 0.1), g.sd = c(0, 2), relative_to_noise = TRUE)
-```
-
-## Simulation
-
-```{r cache = TRUE}
-cashSim(z.mat, se.mat,
-        nsim = 100, ngene = 1000,
+        nsim = 100, ngene = 5000,
         g.pi = c(0.9, 0.1), g.sd = c(0, 1), relative_to_noise = FALSE)
 ```
 
@@ -254,15 +195,7 @@ cashSim(z.mat, se.mat,
 
 ```{r cache = TRUE}
 cashSim(z.mat, se.mat,
-        nsim = 100, ngene = 1000,
-        g.pi = c(0.9, 0.05, 0.05), g.sd = c(0, 1, 2), relative_to_noise = TRUE)
-```
-
-## Simulation
-
-```{r cache = TRUE}
-cashSim(z.mat, se.mat,
-        nsim = 100, ngene = 1000,
+        nsim = 100, ngene = 5000,
         g.pi = c(0.9, 0.05, 0.05), g.sd = c(0, 1, 2), relative_to_noise = FALSE)
 ```
 
@@ -270,16 +203,134 @@ cashSim(z.mat, se.mat,
 
 ```{r cache = TRUE}
 cashSim(z.mat, se.mat,
-        nsim = 100, ngene = 1000,
-        g.pi = c(0.85, 0.10, 0.05), g.sd = c(0, 1, 2), relative_to_noise = TRUE)
+        nsim = 100, ngene = 5000,
+        g.pi = c(0.9, 0.1), g.sd = c(0, 2), relative_to_noise = FALSE)
 ```
 
 ## Simulation
 
 ```{r cache = TRUE}
 cashSim(z.mat, se.mat,
-        nsim = 100, ngene = 1000,
-        g.pi = c(0.85, 0.10, 0.05), g.sd = c(0, 1, 2), relative_to_noise = FALSE)
+        nsim = 100, ngene = 5000,
+        g.pi = c(0.8, 0.2), g.sd = c(0, 1), relative_to_noise = FALSE)
+```
+
+## Simulation
+
+```{r cache = TRUE}
+cashSim(z.mat, se.mat,
+        nsim = 100, ngene = 5000,
+        g.pi = c(0.8, 0.1, 0.1), g.sd = c(0, 1, 2), relative_to_noise = FALSE)
+```
+
+## Simulation
+
+```{r cache = TRUE}
+cashSim(z.mat, se.mat,
+        nsim = 100, ngene = 5000,
+        g.pi = c(0.8, 0.2), g.sd = c(0, 2), relative_to_noise = FALSE)
+```
+
+## Simulation
+
+```{r cache = TRUE}
+cashSim(z.mat, se.mat,
+        nsim = 100, ngene = 5000,
+        g.pi = c(0.5, 0.5), g.sd = c(0, 1), relative_to_noise = FALSE)
+```
+
+## Simulation
+
+```{r cache = TRUE}
+cashSim(z.mat, se.mat,
+        nsim = 100, ngene = 5000,
+        g.pi = c(0.5, 0.4, 0.1), g.sd = c(0, 1, 2), relative_to_noise = FALSE)
+```
+
+## Simulation
+
+```{r cache = TRUE}
+cashSim(z.mat, se.mat,
+        nsim = 100, ngene = 5000,
+        g.pi = c(0.5, 0.5), g.sd = c(0, 2), relative_to_noise = FALSE)
+```
+
+## Change to homoscedasticity
+
+```{r cache = TRUE}
+se.mat <- matrix(1, ncol = ncol(z.mat), nrow = nrow(z.mat))
+```
+
+## Simulation
+
+```{r cache = TRUE}
+cashSim(z.mat, se.mat,
+        nsim = 100, ngene = 5000,
+        g.pi = c(0.9, 0.1), g.sd = c(0, 1), relative_to_noise = FALSE)
+```
+
+## Simulation
+
+```{r cache = TRUE}
+cashSim(z.mat, se.mat,
+        nsim = 100, ngene = 5000,
+        g.pi = c(0.9, 0.05, 0.05), g.sd = c(0, 1, 2), relative_to_noise = FALSE)
+```
+
+## Simulation
+
+```{r cache = TRUE}
+cashSim(z.mat, se.mat,
+        nsim = 100, ngene = 5000,
+        g.pi = c(0.9, 0.1), g.sd = c(0, 2), relative_to_noise = FALSE)
+```
+
+## Simulation
+
+```{r cache = TRUE}
+cashSim(z.mat, se.mat,
+        nsim = 100, ngene = 5000,
+        g.pi = c(0.8, 0.2), g.sd = c(0, 1), relative_to_noise = FALSE)
+```
+
+## Simulation
+
+```{r cache = TRUE}
+cashSim(z.mat, se.mat,
+        nsim = 100, ngene = 5000,
+        g.pi = c(0.8, 0.1, 0.1), g.sd = c(0, 1, 2), relative_to_noise = FALSE)
+```
+
+## Simulation
+
+```{r cache = TRUE}
+cashSim(z.mat, se.mat,
+        nsim = 100, ngene = 5000,
+        g.pi = c(0.8, 0.2), g.sd = c(0, 2), relative_to_noise = FALSE)
+```
+
+## Simulation
+
+```{r cache = TRUE}
+cashSim(z.mat, se.mat,
+        nsim = 100, ngene = 5000,
+        g.pi = c(0.5, 0.5), g.sd = c(0, 1), relative_to_noise = FALSE)
+```
+
+## Simulation
+
+```{r cache = TRUE}
+cashSim(z.mat, se.mat,
+        nsim = 100, ngene = 5000,
+        g.pi = c(0.5, 0.4, 0.1), g.sd = c(0, 1, 2), relative_to_noise = FALSE)
+```
+
+## Simulation
+
+```{r cache = TRUE}
+cashSim(z.mat, se.mat,
+        nsim = 100, ngene = 5000,
+        g.pi = c(0.5, 0.5), g.sd = c(0, 2), relative_to_noise = FALSE)
 ```
 
 ## Session information
