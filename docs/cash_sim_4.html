@@ -13,7 +13,7 @@
 
 <meta name="date" content="2017-11-11" />
 
-<title>Large-scale simulation for the cash paper, Part 4: Smaller, faster exploratory simulations – Average pFDP</title>
+<title>CASH Simulation, Part 4: Smaller, faster exploratory simulations – Average pFDP</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -302,7 +302,7 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Large-scale simulation for the cash paper, Part 4: Smaller, faster exploratory simulations – Average pFDP</h1>
+<h1 class="title toc-ignore">CASH Simulation, Part 4: Smaller, faster exploratory simulations – Average pFDP</h1>
 <h4 class="author"><em>Lei Sun</em></h4>
 <h4 class="date"><em>2017-11-11</em></h4>
 
@@ -313,15 +313,16 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2017-11-17</p>
+<p><strong>Last updated:</strong> 2017-11-22</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> b452d8a</p>
+<p><strong>Code version:</strong> 1a77d56</p>
 <!-- Add your analysis here -->
 <div id="using-smaller-faster-exploratory-simulations" class="section level2">
 <h2>Using smaller, faster, exploratory simulations</h2>
 <p>Instead of doing a simulation with <span class="math inline">\(1K\)</span> runs, each run with <span class="math inline">\(10K\)</span> samples, we are downsizing it so that simulations can be done faster while still show a pattern. Right now, <span class="math inline">\(100\)</span> runs, each run with <span class="math inline">\(5K\)</span> samples seem adequate.</p>
 <p>We don’t want the sample size to be too small. Small sample sizes appear to work less well with Gaussian derivatives fitting.</p>
+<p>We are experimenting with different effect size distributions, and see how the average pFDP look with all data sets across all nominal <span class="math inline">\(q\)</span> value levels.</p>
 </div>
 <div id="frequentist-pfdr-accuracy-with-all-data-sets" class="section level2">
 <h2>Frequentist pFDR accuracy with all data sets</h2>
