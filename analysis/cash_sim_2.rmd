@@ -1,5 +1,5 @@
 ---
-title: "Large-scale simulation for the cash paper, Part 2: Over-dispersion"
+title: "CASH Simulation, Part 2: Over-dispersion"
 author: "Lei Sun"
 date: 2017-11-10
 output: html_document

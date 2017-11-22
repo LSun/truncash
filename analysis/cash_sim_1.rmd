@@ -1,5 +1,5 @@
 ---
-title: "Large-scale simulation for the cash paper, Part 1: Overall"
+title: "CASH Simulation, Part 1: Overall"
 author: "Lei Sun"
 date: 2017-11-09
 output: html_document
@@ -25,6 +25,10 @@ knitr::read_chunk("chunks.R")
 ```
 
 <!-- Add your analysis here -->
+
+## Introduction
+
+We are doing large-scale simulation using `CASH` and other methods, with emphasis on the accuracy of FDR calibration.
 
 ## All data sets on average, including both over-dispersion, under-dispersion, and else
 

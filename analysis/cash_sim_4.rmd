@@ -1,5 +1,5 @@
 ---
-title: "Large-scale simulation for the cash paper, Part 4: Smaller, faster exploratory simulations -- Average pFDP"
+title: "CASH Simulation, Part 4: Smaller, faster exploratory simulations -- Average pFDP"
 author: "Lei Sun"
 date: 2017-11-11
 output: html_document
@@ -31,6 +31,8 @@ knitr::read_chunk("chunks.R")
 Instead of doing a simulation with $1K$ runs, each run with $10K$ samples, we are downsizing it so that simulations can be done faster while still show a pattern. Right now, $100$ runs, each run with $5K$ samples seem adequate.
 
 We don't want the sample size to be too small. Small sample sizes appear to work less well with Gaussian derivatives fitting.
+
+We are experimenting with different effect size distributions, and see how the average pFDP look with all data sets across all nominal $q$ value levels.
 
 ## Frequentist pFDR accuracy with all data sets
 
