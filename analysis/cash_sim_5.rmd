@@ -1,0 +1,145 @@
+---
+title: "CASH Simulation, Part 5: pFDP Variability"
+author: "Lei Sun"
+date: 2017-11-15
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+## Introduction
+
+We are using the data obtained from the [large-scale simulation with real data](cash_sim_1.html) to show the variability of the positive false discovery proportions obtained by different methods at nominal $q$ value $ = 0.05$. The true effect distribution is $0.6\delta_0 + 0.3N(0, 1) + 0.1N(0, 2^2)$.
+
+```{r pFDR calibration function, echo = FALSE}
+pFDP = function (FDR, response, predictor) {
+  return(1 - mean(response[predictor <= FDR]))
+}
+
+pFDR.calib = function (beta, qvalue, pFDR.nominal) {
+  pFDP.list = list()
+  for (i in 1 : length(beta))
+  pFDP.list[[i]] = sapply(pFDR.nominal, pFDP,
+                         response = (beta[[i]] != 0),
+                         predictor = qvalue[[i]])
+  pFDP.mat = matrix(unlist(pFDP.list), nrow = length(pFDP.list), byrow = TRUE)
+  pFDP.samplesize = colSums(!is.na(pFDP.mat))
+  pFDP.mean = colMeans(pFDP.mat, na.rm = TRUE)
+  pFDP.mean.sd = apply(pFDP.mat, 2, sd, na.rm = TRUE) / sqrt(pFDP.samplesize)
+  return(list(pFDR.nominal = pFDR.nominal, pFDP.mean = pFDP.mean, pFDP.mean.sd = pFDP.mean.sd, pFDP.mat = pFDP.mat))
+}
+
+FDR.calib = function (beta, qvalue, pFDR.nominal) {
+  pFDP.list = list()
+  for (i in 1 : length(beta))
+  pFDP.list[[i]] = sapply(pFDR.nominal, pFDP,
+                         response = (beta[[i]] != 0),
+                         predictor = qvalue[[i]])
+  pFDP.mat = matrix(unlist(pFDP.list), nrow = length(pFDP.list), byrow = TRUE)
+  pFDP.mat[is.na(pFDP.mat)] <- 0
+  pFDP.samplesize = colSums(!is.na(pFDP.mat))
+  pFDP.mean = colMeans(pFDP.mat, na.rm = TRUE)
+  pFDP.mean.sd = apply(pFDP.mat, 2, sd, na.rm = TRUE) / sqrt(pFDP.samplesize)
+  return(list(pFDR.nominal = pFDR.nominal, pFDP.mean = pFDP.mean, pFDP.mean.sd = pFDP.mean.sd))
+}
+
+pFDP.polygon.plot = function (beta, qvalue, pFDR.nominal, col) {
+  summary = pFDR.calib(beta, qvalue, pFDR.nominal)
+  mean = summary$pFDP.mean
+  sd = summary$pFDP.mean.sd
+  lines(pFDR.nominal, mean, col = col, cex = 2)
+  polygon.color.rgb = as.vector(grDevices::col2rgb(col))
+  polygon(x = c(0, pFDR.nominal, rev(pFDR.nominal), 0),
+          y = c(0, mean - 2 * sd, rev(mean + 2 * sd), 0),
+          col = grDevices::rgb(polygon.color.rgb[1], polygon.color.rgb[2], polygon.color.rgb[3], alpha = 100, max = 255),
+          border = col,
+          lty = 2)
+}
+```
+
+```{r read data}
+z.mat <- readRDS("../output/z_null_liver_777.rds")
+se.mat <- readRDS("../output/sebetahat_null_liver_777.rds")
+beta.list <- readRDS("../output/beta.list.rds")
+qvalue.list <- readRDS("../output/qvalue.list.rds")
+qvalue.BH <- qvalue.list$qvalue.BH
+qvalue.qvalue <- qvalue.list$qvalue.qvalue
+qvalue.locfdr <- qvalue.list$qvalue.locfdr
+qvalue.ash <- qvalue.list$qvalue.ash
+qvalue.gdash <- qvalue.list$qvalue.gdash
+```
+
+```{r package, echo = FALSE, message = FALSE}
+library(vioplot)
+```
+
+```{r pFDP, echo = FALSE, cache = TRUE}
+pFDR.nominal = seq(0, 0.2, 0.002)
+pFDP.BH <- pFDR.calib(beta.list, qvalue.BH, pFDR.nominal)$pFDP.mat
+pFDP.qvalue <- pFDR.calib(beta.list, qvalue.qvalue, pFDR.nominal)$pFDP.mat
+pFDP.locfdr <- pFDR.calib(beta.list, qvalue.locfdr, pFDR.nominal)$pFDP.mat
+pFDP.ash <- pFDR.calib(beta.list, qvalue.ash, pFDR.nominal)$pFDP.mat
+pFDP.gdash <- pFDR.calib(beta.list, qvalue.gdash, pFDR.nominal)$pFDP.mat
+```
+
+```{r plotting, echo = FALSE}
+## plot & compare qvalue / positive FDR
+pFDR.methods = c("BH", "qvalue", "locfdr", "ASH", "CASH")
+  col.vec = grDevices::rainbow(length(pFDR.methods))
+  plot(pFDR.nominal, pFDR.nominal, type = "n", xlab = "Nominal Positive False Discovery Rate", ylab = "Average Positive False Discovery Proportion", main = "Calibration of Positive FDR")
+  pFDP.polygon.plot(beta.list, qvalue.BH, pFDR.nominal, col.vec[1])
+  pFDP.polygon.plot(beta.list, qvalue.qvalue, pFDR.nominal, col.vec[2])
+  pFDP.polygon.plot(beta.list, qvalue.locfdr, pFDR.nominal, col.vec[3])
+  pFDP.polygon.plot(beta.list, qvalue.ash, pFDR.nominal, col.vec[4])
+  pFDP.polygon.plot(beta.list, qvalue.gdash, pFDR.nominal, col.vec[5])
+  lines(c(0, pFDR.nominal), c(0, pFDR.nominal), cex = 3, lty = 6)
+  legend("topleft", ncol = 2, lty = 1, col = col.vec, legend = pFDR.methods, bty = "n")
+  
+  sd.vec <- apply(z.mat, 1, sd)
+  over <- (sd.vec >= 1.1)
+  under <- (sd.vec <= 0.90)
+
+  plot(1:5, 1:5, xlim = c(0.5, 5.5), ylim = c(0, 0.6), xaxt = "n", type = "n", xlab = "", ylab = "")
+  points(jitter(rep(1, 1000), 2), pFDP.BH[, 26])
+  points(jitter(rep(2, 1000), 2), pFDP.qvalue[, 26])
+  points(jitter(rep(3, 1000), 2), pFDP.locfdr[, 26])
+  points(jitter(rep(4, 1000), 2), pFDP.ash[, 26])
+  points(jitter(rep(5, 1000), 2), pFDP.gdash[, 26])
+  abline(h = 0.05, col = "red", lty = 3)
+  boxplot(pFDP.BH[, 26], pFDP.qvalue[, 26], pFDP.locfdr[, 26], pFDP.ash[, 26], pFDP.gdash[, 26], names = pFDR.methods)
+  abline(h = 0.05, col = "red", lty = 3)
+  vioplot::vioplot(pFDP.BH[, 26], pFDP.qvalue[, 26], na.omit(pFDP.locfdr[, 26]), pFDP.ash[, 26], pFDP.gdash[, 26], names = pFDR.methods, col = "blue")
+  title(main = "Average Positive False Discovery Proportion, All")
+  abline(h = 0.05, col = "red", lty = 2)
+  vioplot::vioplot(pFDP.BH[over, 26], pFDP.qvalue[over, 26], na.omit(pFDP.locfdr[over, 26]), pFDP.ash[over, 26], pFDP.gdash[over, 26], names = pFDR.methods, col = "blue")
+  title(main = "Average Positive False Discovery Proportion, Inflated")
+  abline(h = 0.05, col = "red", lty = 2)
+  vioplot::vioplot(pFDP.BH[under, 26], pFDP.qvalue[under, 26], na.omit(pFDP.locfdr[under, 26]), pFDP.ash[under, 26], pFDP.gdash[under, 26], names = pFDR.methods, col = "blue")
+  title(main = "Average Positive False Discovery Proportion, Deflated")
+  abline(h = 0.05, col = "red", lty = 2)
+```
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```
