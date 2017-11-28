@@ -251,7 +251,8 @@ ggplot(data = melt(FDP.cutoff.annot, id.vars = "Noise"),
   theme(legend.position = "none", plot.title = element_text(hjust = 0.5))
 ```
 
-```{r cor FDR tail, fig.asp = 1, echo = FALSE}
+```{r cor FDR tail, fig.asp = 0.5, fig.width = 10, echo = FALSE}
+par(mfrow = c(1, 2))
 cutoff <- 0.01
 loc <- FDR.nominal == cutoff
 FDP.cutoff <- cbind(
@@ -288,6 +289,7 @@ abline(v = cutoff, lty = "dashed", col = "green")
 abline(0, 1, lty = "dashed", col = "green")
 legend("top", col = c("red", "blue", "gray"), c("Strong Overdispersion", "Strong Underdispersion", "In-between"), pch = 19, bty = "n")
 
+par(mfrow = c(1, 2))
 cutoff <- 0.05
 loc <- FDR.nominal == cutoff
 FDP.cutoff <- cbind(
