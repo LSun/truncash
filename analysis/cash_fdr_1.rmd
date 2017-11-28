@@ -1,0 +1,475 @@
+---
+title: "`CASH` on FDR, 1"
+author: "Lei Sun"
+date: 2017-11-24
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+## Introduction
+
+The model is
+
+$$
+\beta_j \sim g(\cdot) \ ;\\
+\hat\beta_j = \beta_j + \hat s_j z_j \ ;\\
+z_j \sim N(0, 1) \ ,
+$$
+where
+$$
+g = 0.5\delta_0 + 0.5N(0, \sigma_n^2) \ .
+$$
+We consider three scenarios for the noise $z_j$:
+1. Correlated, simulated from real data;
+2. Independent;
+3. Correlated, simulated from synthetic data.
+
+```{r code, message = FALSE, warning = FALSE}
+source("../code/gdash_lik.R")
+```
+
+```{r pFDR calibration function, echo = FALSE}
+## Calculate positive FDP for one data set and one nominal FDR threshold
+## positive FDP: proportion of null among all selected
+## return NA if none selected
+pFDP = function (FDR, response, predictor) {
+  return(1 - mean(response[predictor <= FDR]))
+}
+
+## Calculate average positive FDP for a simulation of a list of many data sets
+## and a vector of nominal FDR thresholds
+## Return a matrix, rows are data sets, columns are FDR thresholds
+pFDP.matrix <- function (beta, qvalue, FDR.nominal) {
+  pFDP.list = list()
+  for (i in 1 : length(beta))
+    pFDP.list[[i]] = sapply(FDR.nominal,
+                            pFDP,
+                            response = (beta[[i]] != 0),
+                            predictor = qvalue[[i]])
+  pFDP.mat = matrix(unlist(pFDP.list), nrow = length(pFDP.list), byrow = TRUE)
+  return(pFDP.mat)
+}
+
+## Calculate summary statistics of positive false discovery proportions
+## including mean and sd of the mean
+## over a simulation of a list of many data sets
+## and a vector of nominal FDR thresholds
+FDP.summary <- function (pFDP.mat, pFDR = TRUE) {
+  if (!pFDR) {
+    pFDP.mat[is.na(pFDP.mat)] <- 0
+  }
+  FDP.samplesize = colSums(!is.na(pFDP.mat))
+  FDP.mean = colMeans(pFDP.mat, na.rm = TRUE)
+  FDP.mean.sd = apply(pFDP.mat, 2, sd, na.rm = TRUE) / sqrt(FDP.samplesize)
+  return(list(FDP.mean = FDP.mean, FDP.mean.sd = FDP.mean.sd))
+}
+
+## plot a polygon of average false discovery proportion
+## with the line indicating average false discovery proportion or estimated FDR
+## polygon indicating standard error of the average
+FDP.polygon.plot <- function (pFDP.mat, pFDR = TRUE, FDR.nominal, col) {
+  FDP.sum <- FDP.summary(pFDP.mat, pFDR)
+  mean <- FDP.sum$FDP.mean
+  sd <- FDP.sum$FDP.mean.sd
+  lines(FDR.nominal, mean, col = col, lwd = 2)
+  polygon.color.rgb = as.vector(grDevices::col2rgb(col))
+  polygon(x = c(FDR.nominal, rev(FDR.nominal)),
+          y = c(mean - 2 * sd, rev(mean + 2 * sd)),
+          col = grDevices::rgb(polygon.color.rgb[1], polygon.color.rgb[2], polygon.color.rgb[3], alpha = 100, max = 255),
+          border = col,
+          lty = 2)
+}
+```
+
+```{r ggplot2 settings, echo = FALSE}
+library(reshape2)
+library(ggplot2)
+mean_sdp <- function(x) {
+   m <- mean(x)
+   ymax <- m + sd(x)
+   return(c(y = m, ymax = ymax, ymin = m))
+}
+method.name <- c("BH", "qvalue", "locfdr", "ASH", "CASH")
+method.col <- rainbow(length(method.name) + 1)[-1]
+```
+
+## Simulation settings
+
+```{r simulation parameters}
+nsim <- 100
+ngene <- 1000
+pi0 <- 0.5
+snr <- 1
+FDR.nominal <- seq(0, 0.1, 0.001)[-1]
+```
+
+## Correlated, real data
+
+```{r read gtex data}
+r <- readRDS("../data/liver.rds")
+```
+
+```{r gtex counts to summary, echo = FALSE}
+library(limma)
+library(edgeR)
+source("../code/count_to_summary.R")
+#extract top g genes from G by n matrix X of expression
+top_genes_index = function (g, X)
+{return(order(rowSums(X), decreasing = TRUE)[1 : g])
+}
+lcpm = function (r) {
+  R = colSums(r)
+  t(log2(((t(r) + 0.5) / (R + 1)) * 10^6))
+}
+Y = lcpm(r)
+subset = top_genes_index(ngene, Y)
+r = r[subset,]
+nsamp = 5
+```
+
+```{r cor fitting, echo = FALSE, cache = TRUE}
+pihat0.ash = pihat0.gdash = pihat0.qvalue = c()
+beta = qvalue.BH = qvalue.qvalue = qvalue.ash = qvalue.gdash = list()
+sd.z = c()
+err = se = list()
+
+set.seed(777)
+for (i in 1 : nsim) {
+  ## generate data
+  counts <- r[, sample(ncol(r), 2 * nsamp)]
+  design <- model.matrix(~c(rep(0, nsamp), rep(1, nsamp)))
+  summary <- count_to_summary(counts, design)
+  z <- summary$z
+  sd.n <- sqrt(mean(z^2))
+  beta[[i]] <- sample(c(rep(0, pi0 * ngene), rnorm((1 - pi0) * ngene, 0, snr * sd.n)))
+  sebetahat <- summary$sebetahat
+  betahat <- beta[[i]] + z * sebetahat
+  p = (1 - pnorm(abs(betahat / sebetahat))) * 2
+  
+  ## different methods
+  fit.ash = ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+  fit.gdash = gdash(betahat, sebetahat)
+  fit.qvalue = qvalue::qvalue(p)
+  fit.BH = p.adjust(p, method = "BH")
+
+  ## pihat0
+  pihat0.ash[i] = ashr::get_pi0(fit.ash)
+  pihat0.gdash[i] = ashr::get_pi0(fit.gdash)
+  pihat0.qvalue[i] = fit.qvalue$pi0
+  
+  ## FDR
+  qvalue.BH[[i]] = fit.BH
+  qvalue.qvalue[[i]] = fit.qvalue$qvalues
+  qvalue.ash[[i]] = ashr::get_qvalue(fit.ash)
+  qvalue.gdash[[i]] = fit.gdash$qvalue
+  
+  ## store the data
+  sd.z[i] <- sd(z)
+  err[[i]] <- z
+  se[[i]] <- sebetahat
+}
+```
+
+```{r cor pihat0, echo = FALSE}
+pihat0 <- cbind(
+  qvalue = pihat0.qvalue,
+  ASH = pihat0.ash,
+  CASH = pihat0.gdash
+)
+ggplot(data = melt(pihat0),
+        aes(x = Var2, y = value, col = Var2, fill = Var2)) +
+  geom_violin(trim = TRUE) +
+  stat_summary(fun.data = "mean_sdl", geom = "pointrange", col = "black") +
+  scale_color_manual(values = method.col[c(2, 4, 5)]) +
+  scale_fill_manual(values = method.col[c(2, 4, 5)]) +
+  geom_hline(yintercept = pi0, col = "red", linetype = "dashed") +
+  labs(title = expression(paste("Estimation of ", pi[0])), x = "", y = expression(hat(pi)[0])) +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5))
+```
+
+```{r cor FDR plotting, fig.asp = 1, echo = FALSE}
+plot(0, 0, xlim = range(FDR.nominal), ylim = range(FDR.nominal), type = "n", xlab = "nominal", ylab = "Average", main = "FDR")
+pFDP.mat.BH <- pFDP.matrix(beta, qvalue.BH, FDR.nominal)
+FDP.polygon.plot(pFDP.mat.BH, pFDR = FALSE, FDR.nominal, col = method.col[1])
+pFDP.mat.qvalue <- pFDP.matrix(beta, qvalue.qvalue, FDR.nominal)
+FDP.polygon.plot(pFDP.mat.qvalue, pFDR = FALSE, FDR.nominal, col = method.col[2])
+pFDP.mat.ash <- pFDP.matrix(beta, qvalue.ash, FDR.nominal)
+FDP.polygon.plot(pFDP.mat.ash, pFDR = FALSE, FDR.nominal, col = method.col[4])
+pFDP.mat.gdash <- pFDP.matrix(beta, qvalue.gdash, FDR.nominal)
+FDP.polygon.plot(pFDP.mat.gdash, pFDR = FALSE, FDR.nominal, col = method.col[5])
+lines(0 : 1, 0 : 1, lty = 2, lwd = 2)
+legend("topleft", lty = 1, col = method.col[c(1, 2, 4, 5)], c("BH", "qvalue", "ASH", "CASH"), bty = "n")
+```
+
+```{r cor FDR violin, echo = FALSE}
+cutoff <- 0.05
+loc <- FDR.nominal == cutoff
+FDP.cutoff <- cbind(
+  BH = pFDP.mat.BH[, loc],
+  qvalue = pFDP.mat.qvalue[, loc],
+  ASH = pFDP.mat.ash[, loc],
+  CASH = pFDP.mat.gdash[, loc]
+)
+FDP.cutoff <- as.data.frame(FDP.cutoff)
+
+ggplot(data = melt(FDP.cutoff),
+        aes(x = variable, y = value, col = variable, fill = variable)) +
+  geom_violin(trim = TRUE) +
+  stat_summary(fun.data = "mean_sdp", geom = "pointrange", col = "black") +
+  scale_color_manual(values = method.col[c(1, 2, 4, 5)]) +
+  scale_fill_manual(values = method.col[c(1, 2, 4, 5)]) +
+  geom_hline(yintercept = cutoff, col = "red", linetype = "dashed") +
+  labs(title = bquote(atop(paste("False Discovery Proportions at ", q == .(cutoff), " Cutoff"), "All Data Sets")), x = "", y = "False Discovery Proportion") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5))
+```
+
+```{r cor FDR variability, echo = FALSE, fig.width = 10}
+Noise <- rep("In-Between", length(sd.z))
+Noise[sd.z >= 1.1] = "Strong Overdispersion"
+Noise[sd.z <= 0.9] = "Strong Underdispersion"
+Noise <- factor(Noise, levels = c("Strong Overdispersion", "In-Between", "Strong Underdispersion"), ordered = TRUE)
+FDP.cutoff.annot <- cbind(Noise, FDP.cutoff)
+
+ggplot(data = melt(FDP.cutoff.annot, id.vars = "Noise"),
+       aes(x = variable, y = value, col = variable)) +
+  geom_violin(trim = TRUE) +
+  stat_summary(fun.data = "mean_sdp", geom = "pointrange") +
+  scale_fill_manual(values = method.col[c(1, 2, 4, 5)], guide = FALSE) +
+  facet_wrap(~ Noise) +
+  geom_hline(yintercept = cutoff, col = "red", linetype = "dashed") +
+  labs(title = bquote(atop(paste("False Discovery Proportions at ", q == .(cutoff), " Cutoff"), "Data Sets Comparison")), x = "", y = "False Discovery Proportion") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5))
+```
+
+```{r cor FDR tail, fig.asp = 1, echo = FALSE}
+cutoff <- 0.01
+loc <- FDR.nominal == cutoff
+FDP.cutoff <- cbind(
+  BH = pFDP.mat.BH[, loc],
+  qvalue = pFDP.mat.qvalue[, loc],
+  ASH = pFDP.mat.ash[, loc],
+  CASH = pFDP.mat.gdash[, loc]
+)
+plot(FDP.cutoff[, "BH"], FDP.cutoff[, "CASH"],
+     col = rgb(sd.z >= 1.1, 0, sd.z <= 0.9, (sd.z - min(sd.z)) / (max(sd.z) - min(sd.z)) * 0.8 + 0.2),
+     xlim = range(FDP.cutoff[, c("BH", "CASH")]),
+     ylim = range(FDP.cutoff[, c("BH", "CASH")]),
+     xlab = "BH",
+     ylab = "CASH",
+     main = bquote(paste("False Discovery Proportions at ", q == .(cutoff), " Cutoff")),
+     pch = 19,
+     cex = 0.5)
+abline(h = cutoff, lty = "dashed", col = "green")
+abline(v = cutoff, lty = "dashed", col = "green")
+abline(0, 1, lty = "dashed", col = "green")
+legend("top", col = c("red", "blue", "gray"), c("Strong Overdispersion", "Strong Underdispersion", "In-between"), pch = 19, bty = "n")
+
+plot(FDP.cutoff[, "ASH"], FDP.cutoff[, "CASH"],
+     col = rgb(sd.z >= 1.1, 0, sd.z <= 0.9, (sd.z - min(sd.z)) / (max(sd.z) - min(sd.z)) * 0.8 + 0.2),
+     xlim = range(FDP.cutoff[, c("ASH", "CASH")]),
+     ylim = range(FDP.cutoff[, c("ASH", "CASH")]),
+     xlab = "ASH",
+     ylab = "CASH",
+     main = bquote(paste("False Discovery Proportions at ", q == .(cutoff), " Cutoff")),
+     pch = 19,
+     cex = 0.5)
+abline(h = cutoff, lty = "dashed", col = "green")
+abline(v = cutoff, lty = "dashed", col = "green")
+abline(0, 1, lty = "dashed", col = "green")
+legend("top", col = c("red", "blue", "gray"), c("Strong Overdispersion", "Strong Underdispersion", "In-between"), pch = 19, bty = "n")
+
+cutoff <- 0.05
+loc <- FDR.nominal == cutoff
+FDP.cutoff <- cbind(
+  BH = pFDP.mat.BH[, loc],
+  qvalue = pFDP.mat.qvalue[, loc],
+  ASH = pFDP.mat.ash[, loc],
+  CASH = pFDP.mat.gdash[, loc]
+)
+plot(FDP.cutoff[, "BH"], FDP.cutoff[, "CASH"],
+     col = rgb(sd.z >= 1.1, 0, sd.z <= 0.9, (sd.z - min(sd.z)) / (max(sd.z) - min(sd.z)) * 0.8 + 0.2),
+     xlim = range(FDP.cutoff[, c("BH", "CASH")]),
+     ylim = range(FDP.cutoff[, c("BH", "CASH")]),
+     xlab = "BH",
+     ylab = "CASH",
+     main = bquote(paste("False Discovery Proportions at ", q == .(cutoff), " Cutoff")),
+     pch = 19,
+     cex = 0.5)
+abline(h = cutoff, lty = "dashed", col = "green")
+abline(v = cutoff, lty = "dashed", col = "green")
+abline(0, 1, lty = "dashed", col = "green")
+legend("top", col = c("red", "blue", "gray"), c("Strong Overdispersion", "Strong Underdispersion", "In-between"), pch = 19, bty = "n")
+
+plot(FDP.cutoff[, "ASH"], FDP.cutoff[, "CASH"],
+     col = rgb(sd.z >= 1.1, 0, sd.z <= 0.9, (sd.z - min(sd.z)) / (max(sd.z) - min(sd.z)) * 0.8 + 0.2),
+     xlim = range(FDP.cutoff[, c("ASH", "CASH")]),
+     ylim = range(FDP.cutoff[, c("ASH", "CASH")]),
+     xlab = "ASH",
+     ylab = "CASH",
+     main = bquote(paste("False Discovery Proportions at ", q == .(cutoff), " Cutoff")),
+     pch = 19,
+     cex = 0.5)
+abline(h = cutoff, lty = "dashed", col = "green")
+abline(v = cutoff, lty = "dashed", col = "green")
+abline(0, 1, lty = "dashed", col = "green")
+legend("top", col = c("red", "blue", "gray"), c("Strong Overdispersion", "Strong Underdispersion", "In-between"), pch = 19, bty = "n")
+```
+
+## Independent data
+
+```{r indep fitting, echo = FALSE, cache = TRUE}
+pihat0.ash = pihat0.gdash = pihat0.qvalue = c()
+beta = qvalue.BH = qvalue.qvalue = qvalue.ash = qvalue.gdash = list()
+
+set.seed(777)
+for (i in 1 : nsim) {
+  ## generate data
+  sd.n <- 1
+  z <- rnorm(ngene, 0, sd.n)
+  beta[[i]] <- sample(c(rep(0, pi0 * ngene), rnorm((1 - pi0) * ngene, 0, snr * sd.n)))
+  sebetahat <- sqrt(rchisq(ngene, 1))
+  betahat <- beta[[i]] + z * sebetahat
+  p = (1 - pnorm(abs(betahat / sebetahat))) * 2
+
+  ## different methods
+  fit.ash = ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+  fit.gdash = gdash(betahat, sebetahat)
+  fit.qvalue = qvalue::qvalue(p)
+  fit.BH = p.adjust(p, method = "BH")
+
+  ## pihat0
+  pihat0.ash[i] = ashr::get_pi0(fit.ash)
+  pihat0.gdash[i] = ashr::get_pi0(fit.gdash)
+  pihat0.qvalue[i] = fit.qvalue$pi0
+  
+  ## FDR
+  qvalue.BH[[i]] = fit.BH
+  qvalue.qvalue[[i]] = fit.qvalue$qvalues
+  qvalue.ash[[i]] = ashr::get_qvalue(fit.ash)
+  qvalue.gdash[[i]] = fit.gdash$qvalue
+}
+```
+
+```{r indep pihat0, echo = FALSE}
+pihat0 <- cbind(
+  qvalue = pihat0.qvalue,
+  ASH = pihat0.ash,
+  CASH = pihat0.gdash
+)
+ggplot(data = melt(pihat0),
+        aes(x = Var2, y = value, col = Var2, fill = Var2)) +
+  geom_violin(trim = TRUE) +
+  stat_summary(fun.data = "mean_sdl", geom = "pointrange", col = "black") +
+  scale_color_manual(values = method.col[c(2, 4, 5)]) +
+  scale_fill_manual(values = method.col[c(2, 4, 5)]) +
+  geom_hline(yintercept = pi0, col = "red", linetype = "dashed") +
+  labs(title = expression(paste("Estimation of ", pi[0])), x = "", y = expression(hat(pi)[0])) +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5))
+```
+
+```{r indep FDR plotting, fig.asp = 1, echo = FALSE}
+plot(0, 0, xlim = range(FDR.nominal), ylim = range(FDR.nominal), type = "n", xlab = "nominal", ylab = "Average", main = "FDR")
+pFDP.mat.BH <- pFDP.matrix(beta, qvalue.BH, FDR.nominal)
+FDP.polygon.plot(pFDP.mat.BH, pFDR = FALSE, FDR.nominal, col = method.col[1])
+pFDP.mat.qvalue <- pFDP.matrix(beta, qvalue.qvalue, FDR.nominal)
+FDP.polygon.plot(pFDP.mat.qvalue, pFDR = FALSE, FDR.nominal, col = method.col[2])
+pFDP.mat.ash <- pFDP.matrix(beta, qvalue.ash, FDR.nominal)
+FDP.polygon.plot(pFDP.mat.ash, pFDR = FALSE, FDR.nominal, col = method.col[4])
+pFDP.mat.gdash <- pFDP.matrix(beta, qvalue.gdash, FDR.nominal)
+FDP.polygon.plot(pFDP.mat.gdash, pFDR = FALSE, FDR.nominal, col = method.col[5])
+lines(0 : 1, 0 : 1, lty = 2, lwd = 2)
+legend("topleft", lty = 1, col = method.col[c(1, 2, 4, 5)], c("BH", "qvalue", "ASH", "CASH"), bty = "n")
+```
+
+## Correlated, synthetic data
+
+```{r syn fitting, echo = FALSE, cache = TRUE}
+pihat0.ash = pihat0.gdash = pihat0.qvalue = c()
+beta = qvalue.BH = qvalue.qvalue = qvalue.ash = qvalue.gdash = list()
+
+set.seed(777)
+for (i in 1 : nsim) {
+  ## generate data
+  L <- matrix(rnorm(ngene * 5), ncol = ngene)
+  z <- colSums(L * rnorm(ncol(L))) / sqrt(colSums(L^2))
+  sd.n <- sqrt(mean(z^2))
+  beta[[i]] <- sample(c(rep(0, pi0 * ngene), rnorm((1 - pi0) * ngene, 0, snr * sd.n)))
+  sebetahat <- sqrt(rchisq(ngene, 1))
+  betahat <- beta[[i]] + z * sebetahat
+  p = (1 - pnorm(abs(betahat / sebetahat))) * 2
+  
+  ## different methods
+  fit.ash = ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+  fit.gdash = gdash(betahat, sebetahat)
+  fit.qvalue = qvalue::qvalue(p)
+  fit.BH = p.adjust(p, method = "BH")
+
+  ## pihat0
+  pihat0.ash[i] = ashr::get_pi0(fit.ash)
+  pihat0.gdash[i] = ashr::get_pi0(fit.gdash)
+  pihat0.qvalue[i] = fit.qvalue$pi0
+  
+  ## FDR
+  qvalue.BH[[i]] = fit.BH
+  qvalue.qvalue[[i]] = fit.qvalue$qvalues
+  qvalue.ash[[i]] = ashr::get_qvalue(fit.ash)
+  qvalue.gdash[[i]] = fit.gdash$qvalue
+}
+```
+
+```{r syn pihat0, echo = FALSE}
+pihat0 <- cbind(
+  qvalue = pihat0.qvalue,
+  ASH = pihat0.ash,
+  CASH = pihat0.gdash
+)
+ggplot(data = melt(pihat0),
+        aes(x = Var2, y = value, col = Var2, fill = Var2)) +
+  geom_violin(trim = TRUE) +
+  stat_summary(fun.data = "mean_sdl", geom = "pointrange", col = "black") +
+  scale_color_manual(values = method.col[c(2, 4, 5)]) +
+  scale_fill_manual(values = method.col[c(2, 4, 5)]) +
+  geom_hline(yintercept = pi0, col = "red", linetype = "dashed") +
+  labs(title = expression(paste("Estimation of ", pi[0])), x = "", y = expression(hat(pi)[0])) +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5))
+```
+
+```{r syn FDR plotting, fig.asp = 1, echo = FALSE}
+plot(0, 0, xlim = range(FDR.nominal), ylim = range(FDR.nominal), type = "n", xlab = "nominal", ylab = "Average", main = "FDR")
+pFDP.mat.BH <- pFDP.matrix(beta, qvalue.BH, FDR.nominal)
+FDP.polygon.plot(pFDP.mat.BH, pFDR = FALSE, FDR.nominal, col = method.col[1])
+pFDP.mat.qvalue <- pFDP.matrix(beta, qvalue.qvalue, FDR.nominal)
+FDP.polygon.plot(pFDP.mat.qvalue, pFDR = FALSE, FDR.nominal, col = method.col[2])
+pFDP.mat.ash <- pFDP.matrix(beta, qvalue.ash, FDR.nominal)
+FDP.polygon.plot(pFDP.mat.ash, pFDR = FALSE, FDR.nominal, col = method.col[4])
+pFDP.mat.gdash <- pFDP.matrix(beta, qvalue.gdash, FDR.nominal)
+FDP.polygon.plot(pFDP.mat.gdash, pFDR = FALSE, FDR.nominal, col = method.col[5])
+lines(0 : 1, 0 : 1, lty = 2, lwd = 2)
+legend("topleft", lty = 1, col = method.col[c(1, 2, 4, 5)], c("BH", "qvalue", "ASH", "CASH"), bty = "n")
+```
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```

@@ -176,15 +176,31 @@ A more in-depth look into the [primal vs dual](mosek_reg.html) problem in `Rmose
 
 A close look at Efron's classic BRCA data, used in many of his papers to illustrate the empirical Bayes idea which inspires this project.
 
-* [CASH Simulation, Part 1: Overall data sets](cash_sim_1.html)
-* [CASH Simulation, Part 2: Over-dispersed data sets](cash_sim_2.html)
-* [CASH Simulation, Part 3: Under-dispersed data sets](cash_sim_3.html)
-* [CASH Simulation, Part 4: Different effect size distributions](cash_sim_4.html)
-* [CASH Simulation, Part 5: pFDP variability](cash_sim_5.html)
-* [CASH Simulation, Part 6: Synthetic vs real data](cash_sim_6.html)
-* [CASH Simulation, Part 7: More on synthetic data](cash_sim_7.html)
+* [`CASH` Simulation, Part 1: Overall data sets](cash_sim_1.html)
+* [`CASH` Simulation, Part 2: Over-dispersed data sets](cash_sim_2.html)
+* [`CASH` Simulation, Part 3: Under-dispersed data sets](cash_sim_3.html)
+* [`CASH` Simulation, Part 4: Different effect size distributions](cash_sim_4.html)
+* [`CASH` Simulation, Part 5: pFDP variability](cash_sim_5.html)
+* [`CASH` Simulation, Part 6: Synthetic vs real data](cash_sim_6.html)
+* [`CASH` Simulation, Part 7: More on synthetic data](cash_sim_7.html)
 
 Using the same framework of [Gaussian derivative likelihood](gd_lik_2.html), extensive simulations are performed to compare `CASH` with other methods, smaller simulations are used to facilitate the exploration, different visualization methods are explored to illustrate the advantages of `CASH`.
+
+* [`CASH` on FDR, Part 1: $g = 0.5\delta_0 + 0.5N(0, \sigma_n^2)$](cash_fdr_1.html)
+* [`CASH` on FDR, Part 2: $g = 0.5\delta_0 + 0.5N(0, (2\sigma_n)^2)$](cash_fdr_2.html)
+* [`CASH` on FDR, Part 3: $g = 0.9\delta_0 + 0.1N(0, \sigma_n^2)$](cash_fdr_3.html)
+* [`CASH` on FDR, Part 4: $g = 0.9\delta_0 + 0.1N(0, (2\sigma_n)^2)$](cash_fdr_4.html)
+* [`CASH` on FDR, Part 5: $g = 0.5\delta_0 + 0.25N(-2\sigma_n, \sigma_n^2) + 0.25N(2\sigma_n, \sigma_n^2)$](cash_fdr_5.html)
+
+An extensive study of `CASH` and other methods in different scenarios shows that
+
+1. `CASH` produces more accurate $\hat\pi_0$;
+
+2. `CASH` produces less variable false discovery proportions at nominal FDR cutoff;
+
+3. `CASH` tends to overfit when the noise is under-dispersed or looks like independent;
+
+4. `CASH` doesn't work well when *Unimodal Assumption (UA)* is broken.
 
 [`ashr`]: https://github.com/stephens999/ashr
 
