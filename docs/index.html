@@ -372,15 +372,29 @@ $(document).ready(function () {
 </ul>
 <p>A close look at Efron’s classic BRCA data, used in many of his papers to illustrate the empirical Bayes idea which inspires this project.</p>
 <ul>
-<li><a href="cash_sim_1.html">CASH Simulation, Part 1: Overall data sets</a></li>
-<li><a href="cash_sim_2.html">CASH Simulation, Part 2: Over-dispersed data sets</a></li>
-<li><a href="cash_sim_3.html">CASH Simulation, Part 3: Under-dispersed data sets</a></li>
-<li><a href="cash_sim_4.html">CASH Simulation, Part 4: Different effect size distributions</a></li>
-<li><a href="cash_sim_5.html">CASH Simulation, Part 5: pFDP variability</a></li>
-<li><a href="cash_sim_6.html">CASH Simulation, Part 6: Synthetic vs real data</a></li>
-<li><a href="cash_sim_7.html">CASH Simulation, Part 7: More on synthetic data</a></li>
+<li><a href="cash_sim_1.html"><code>CASH</code> Simulation, Part 1: Overall data sets</a></li>
+<li><a href="cash_sim_2.html"><code>CASH</code> Simulation, Part 2: Over-dispersed data sets</a></li>
+<li><a href="cash_sim_3.html"><code>CASH</code> Simulation, Part 3: Under-dispersed data sets</a></li>
+<li><a href="cash_sim_4.html"><code>CASH</code> Simulation, Part 4: Different effect size distributions</a></li>
+<li><a href="cash_sim_5.html"><code>CASH</code> Simulation, Part 5: pFDP variability</a></li>
+<li><a href="cash_sim_6.html"><code>CASH</code> Simulation, Part 6: Synthetic vs real data</a></li>
+<li><a href="cash_sim_7.html"><code>CASH</code> Simulation, Part 7: More on synthetic data</a></li>
 </ul>
 <p>Using the same framework of <a href="gd_lik_2.html">Gaussian derivative likelihood</a>, extensive simulations are performed to compare <code>CASH</code> with other methods, smaller simulations are used to facilitate the exploration, different visualization methods are explored to illustrate the advantages of <code>CASH</code>.</p>
+<ul>
+<li><a href="cash_fdr_1.html"><code>CASH</code> on FDR, Part 1: <span class="math inline">\(g = 0.5\delta_0 + 0.5N(0, \sigma_n^2)\)</span></a></li>
+<li><a href="cash_fdr_2.html"><code>CASH</code> on FDR, Part 2: <span class="math inline">\(g = 0.5\delta_0 + 0.5N(0, (2\sigma_n)^2)\)</span></a></li>
+<li><a href="cash_fdr_3.html"><code>CASH</code> on FDR, Part 3: <span class="math inline">\(g = 0.9\delta_0 + 0.1N(0, \sigma_n^2)\)</span></a></li>
+<li><a href="cash_fdr_4.html"><code>CASH</code> on FDR, Part 4: <span class="math inline">\(g = 0.9\delta_0 + 0.1N(0, (2\sigma_n)^2)\)</span></a></li>
+<li><a href="cash_fdr_5.html"><code>CASH</code> on FDR, Part 5: <span class="math inline">\(g = 0.5\delta_0 + 0.25N(-2\sigma_n, \sigma_n^2) + 0.25N(2\sigma_n, \sigma_n^2)\)</span></a></li>
+</ul>
+<p>An extensive study of <code>CASH</code> and other methods in different scenarios shows that</p>
+<ol style="list-style-type: decimal">
+<li><p><code>CASH</code> produces more accurate <span class="math inline">\(\hat\pi_0\)</span>;</p></li>
+<li><p><code>CASH</code> produces less variable false discovery proportions at nominal FDR cutoff;</p></li>
+<li><p><code>CASH</code> tends to overfit when the noise is under-dispersed or looks like independent;</p></li>
+<li><p><code>CASH</code> doesn’t work well when <em>Unimodal Assumption (UA)</em> is broken.</p></li>
+</ol>
 <!-- The goal of this new template is to simplify the setup and maintenance of a research website. -->
 <!-- Specifically, -->
 <!-- *  Easier to build and extend the website using the new tools in the [rmarkdown][] package and [latest RStudio release][rstudio] -->
