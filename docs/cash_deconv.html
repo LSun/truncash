@@ -318,18 +318,18 @@ shared across the workflowr files. -->
 <p><strong>Last updated:</strong> 2017-11-29</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 387a0e4</p>
+<p><strong>Code version:</strong> 4b168a0</p>
 <!-- Add your analysis here -->
-<div id="average-standard-error-of-the-noise" class="section level2">
-<h2>Average standard error of the noise</h2>
+<div id="average-hat-s_i-simulated-from-real-data" class="section level2">
+<h2>Average <span class="math inline">\(\hat s_i\)</span> simulated from real data</h2>
 <p><span class="math display">\[
-\bar\sigma_n = \sqrt{\bar{\hat s_i^2}} \ .
+\sigma_n^2 := \bar{\hat s_i^2} \ .
 \]</span></p>
 <p><img src="figure/cash_deconv.rmd/sd.n%20plotting-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>We’ll take <span class="math inline">\(\sigma_n = 0.5\)</span> in the simulations.</p>
 </div>
-<div id="correlated" class="section level2">
-<h2>Correlated</h2>
+<div id="correlated-cases" class="section level2">
+<h2>Correlated cases</h2>
 <div id="g-0.5delta_0-0.5n0-2sigma_n2" class="section level3">
 <h3><span class="math inline">\(g = 0.5\delta_0 + 0.5N(0, (2\sigma_n)^2)\)</span></h3>
 <p><img src="figure/cash_deconv.rmd/cor%20plotting%203-1.png" width="1440" style="display: block; margin: auto;" /></p>
@@ -343,8 +343,8 @@ shared across the workflowr files. -->
 <p><img src="figure/cash_deconv.rmd/cor%20plotting%202-1.png" width="1440" style="display: block; margin: auto;" /></p>
 </div>
 </div>
-<div id="independent" class="section level2">
-<h2>Independent</h2>
+<div id="independent-cases" class="section level2">
+<h2>Independent cases</h2>
 <div id="g-0.5delta_0-0.5n0-2sigma_n2-1" class="section level3">
 <h3><span class="math inline">\(g = 0.5\delta_0 + 0.5N(0, (2\sigma_n)^2)\)</span></h3>
 <p><img src="figure/cash_deconv.rmd/indep%20plotting%203-1.png" width="1440" style="display: block; margin: auto;" /></p>
@@ -377,11 +377,10 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] vioplot_0.2       sm_2.2-5.4        edgeR_3.20.1     
- [4] limma_3.34.0      ashr_2.1-27       Rmosek_7.1.3     
- [7] PolynomF_0.94     cvxr_0.0.0.9009   REBayes_0.85     
-[10] Matrix_1.2-11     SQUAREM_2017.10-1 EQL_1.0-0        
-[13] ttutils_1.0-1    
+ [1] edgeR_3.20.1      limma_3.34.0      ashr_2.1-27      
+ [4] Rmosek_7.1.3      PolynomF_0.94     cvxr_0.0.0.9009  
+ [7] REBayes_0.85      Matrix_1.2-11     SQUAREM_2017.10-1
+[10] EQL_1.0-0         ttutils_1.0-1    
 
 loaded via a namespace (and not attached):
  [1] Rcpp_0.12.13      knitr_1.17        magrittr_1.5     
