@@ -191,6 +191,7 @@ Using the same framework of [Gaussian derivative likelihood](gd_lik_2.html), ext
 * [`CASH` on FDR, Part 3: $g = 0.9\delta_0 + 0.1N(0, \sigma_n^2)$](cash_fdr_3.html)
 * [`CASH` on FDR, Part 4: $g = 0.9\delta_0 + 0.1N(0, (2\sigma_n)^2)$](cash_fdr_4.html)
 * [`CASH` on FDR, Part 5: $g = 0.5\delta_0 + 0.25N(-2\sigma_n, \sigma_n^2) + 0.25N(2\sigma_n, \sigma_n^2)$](cash_fdr_5.html)
+* [`CASH` on FDR, Part 6: $g = 0.6\delta_0 + 0.3N(0, \sigma_n^2) + 0.1N(0, (2\sigma_n)^2)$](cash_fdr_6.html)
 
 An extensive study of `CASH` and other methods in different scenarios shows that 1. `CASH` produces more accurate $\hat\pi_0$; 2. `CASH` produces less variable false discovery proportions at nominal FDR cutoff; 3. `CASH` tends to overfit when the noise is under-dispersed or looks like independent; 4. `CASH` doesn't work well when *Unimodal Assumption (UA)* is broken.
 
