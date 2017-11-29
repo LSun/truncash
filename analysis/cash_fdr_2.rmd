@@ -109,7 +109,7 @@ snr <- 2
 FDR.nominal <- seq(0, 0.1, 0.001)[-1]
 ```
 
-## Correlated, real data
+## Correlated noise, real data
 
 ```{r read gtex data, echo = FALSE}
 r <- readRDS("../data/liver.rds")
@@ -323,7 +323,7 @@ abline(0, 1, lty = "dashed", col = "green")
 legend("top", col = c("red", "blue", "gray"), c("Strong Overdispersion", "Strong Underdispersion", "In-between"), pch = 19, bty = "n")
 ```
 
-## Independent data
+## Independent noise
 
 ```{r indep fitting, echo = FALSE, cache = TRUE}
 pihat0.ash = pihat0.gdash = pihat0.qvalue = c()
@@ -332,10 +332,10 @@ beta = qvalue.BH = qvalue.qvalue = qvalue.ash = qvalue.gdash = list()
 set.seed(777)
 for (i in 1 : nsim) {
   ## generate data
-  sd.n <- 1
   z <- rnorm(ngene, 0, 1)
-  beta[[i]] <- sample(c(rep(0, pi0 * ngene), rnorm((1 - pi0) * ngene, 0, snr * sd.n)))
   sebetahat <- sqrt(rchisq(ngene, 1))
+  sd.n <- sqrt(mean(sebetahat^2))
+  beta[[i]] <- sample(c(rep(0, pi0 * ngene), rnorm((1 - pi0) * ngene, 0, snr * sd.n)))
   betahat <- beta[[i]] + z * sebetahat
   p = (1 - pnorm(abs(betahat / sebetahat))) * 2
 
@@ -389,7 +389,7 @@ lines(0 : 1, 0 : 1, lty = 2, lwd = 2)
 legend("topleft", lty = 1, col = method.col[c(1, 2, 4, 5)], c("BH", "qvalue", "ASH", "CASH"), bty = "n")
 ```
 
-## Correlated, synthetic data
+## Correlated noise, synthetic data
 
 ```{r syn fitting, echo = FALSE, cache = TRUE}
 pihat0.ash = pihat0.gdash = pihat0.qvalue = c()
@@ -400,9 +400,9 @@ for (i in 1 : nsim) {
   ## generate data
   L <- matrix(rnorm(ngene * 5), ncol = ngene)
   z <- colSums(L * rnorm(ncol(L))) / sqrt(colSums(L^2))
-  sd.n <- 1
-  beta[[i]] <- sample(c(rep(0, pi0 * ngene), rnorm((1 - pi0) * ngene, 0, snr * sd.n)))
   sebetahat <- sqrt(rchisq(ngene, 1))
+  sd.n <- sqrt(mean(sebetahat^2))
+  beta[[i]] <- sample(c(rep(0, pi0 * ngene), rnorm((1 - pi0) * ngene, 0, snr * sd.n)))
   betahat <- beta[[i]] + z * sebetahat
   p = (1 - pnorm(abs(betahat / sebetahat))) * 2
   

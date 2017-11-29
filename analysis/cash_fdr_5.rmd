@@ -32,7 +32,7 @@ $$
 g = 0.5\delta_0 + 0.25N(-2\sigma_n, \sigma_n^2) + 0.25N(2\sigma_n, \sigma_n^2)
 $$
 
-```{r code, message = FALSE, warning = FALSE}
+```{r code, message = FALSE, warning = FALSE, echo = FALSE}
 source("../code/gdash_lik.R")
 ```
 
@@ -101,18 +101,16 @@ method.name <- c("BH", "qvalue", "locfdr", "ASH", "CASH")
 method.col <- rainbow(length(method.name) + 1)[-1]
 ```
 
-## Simulation settings
-
-```{r simulation parameters}
+```{r simulation parameters, echo = FALSE}
 nsim <- 100
 ngene <- 1000
 pi0 <- 0.5
 FDR.nominal <- seq(0, 0.1, 0.001)[-1]
 ```
 
-## Correlated, real data
+## Correlated noise, real data
 
-```{r read gtex data}
+```{r read gtex data, echo = FALSE}
 r <- readRDS("../data/liver.rds")
 ```
 
@@ -146,7 +144,8 @@ for (i in 1 : nsim) {
   design <- model.matrix(~c(rep(0, nsamp), rep(1, nsamp)))
   summary <- count_to_summary(counts, design)
   z <- summary$z
-  sd.n <- sqrt(mean(z^2))
+  sebetahat <- summary$sebetahat
+  sd.n <- sqrt(mean(sebetahat^2))
   beta[[i]] <- sample(
     c(
     rep(0, round(pi0 * ngene)),
@@ -154,7 +153,6 @@ for (i in 1 : nsim) {
     rnorm(round((1 - pi0) / 2 * ngene), 2 * sd.n, sd.n)
     )
   )
-  sebetahat <- summary$sebetahat
   betahat <- beta[[i]] + z * sebetahat
   p = (1 - pnorm(abs(betahat / sebetahat))) * 2
   
@@ -329,7 +327,7 @@ abline(0, 1, lty = "dashed", col = "green")
 legend("top", col = c("red", "blue", "gray"), c("Strong Overdispersion", "Strong Underdispersion", "In-between"), pch = 19, bty = "n")
 ```
 
-## Independent data
+## Independent noise
 
 ```{r indep fitting, echo = FALSE, cache = TRUE}
 pihat0.ash = pihat0.gdash = pihat0.qvalue = c()
@@ -338,8 +336,9 @@ beta = qvalue.BH = qvalue.qvalue = qvalue.ash = qvalue.gdash = list()
 set.seed(777)
 for (i in 1 : nsim) {
   ## generate data
-  sd.n <- 1
-  z <- rnorm(ngene, 0, sd.n)
+  z <- rnorm(ngene, 0, 1)
+  sebetahat <- sqrt(rchisq(ngene, 1))
+  sd.n <- sqrt(mean(sebetahat^2))
   beta[[i]] <- sample(
     c(
     rep(0, round(pi0 * ngene)),
@@ -347,7 +346,6 @@ for (i in 1 : nsim) {
     rnorm(round((1 - pi0) / 2 * ngene), 2 * sd.n, sd.n)
     )
   )
-  sebetahat <- sqrt(rchisq(ngene, 1))
   betahat <- beta[[i]] + z * sebetahat
   p = (1 - pnorm(abs(betahat / sebetahat))) * 2
 
@@ -401,7 +399,7 @@ lines(0 : 1, 0 : 1, lty = 2, lwd = 2)
 legend("topleft", lty = 1, col = method.col[c(1, 2, 4, 5)], c("BH", "qvalue", "ASH", "CASH"), bty = "n")
 ```
 
-## Correlated, synthetic data
+## Correlated noise, synthetic data
 
 ```{r syn fitting, echo = FALSE, cache = TRUE}
 pihat0.ash = pihat0.gdash = pihat0.qvalue = c()
@@ -412,7 +410,8 @@ for (i in 1 : nsim) {
   ## generate data
   L <- matrix(rnorm(ngene * 5), ncol = ngene)
   z <- colSums(L * rnorm(ncol(L))) / sqrt(colSums(L^2))
-  sd.n <- sqrt(mean(z^2))
+  sebetahat <- sqrt(rchisq(ngene, 1))
+  sd.n <- sqrt(mean(sebetahat^2))
   beta[[i]] <- sample(
     c(
     rep(0, round(pi0 * ngene)),
@@ -420,7 +419,6 @@ for (i in 1 : nsim) {
     rnorm(round((1 - pi0) / 2 * ngene), 2 * sd.n, sd.n)
     )
   )
-  sebetahat <- sqrt(rchisq(ngene, 1))
   betahat <- beta[[i]] + z * sebetahat
   p = (1 - pnorm(abs(betahat / sebetahat))) * 2
   

@@ -103,7 +103,7 @@ pi0 <- 0.6
 pi1 <- 0.3
 pi2 <- 0.1
 snr1 <- 1
-snr2 <- 3
+snr2 <- 2
 FDR.nominal <- seq(0, 0.1, 0.001)[-1]
 ```
 
@@ -136,6 +136,7 @@ pihat0.ash = pihat0.gdash = pihat0.qvalue = c()
 beta = qvalue.BH = qvalue.qvalue = qvalue.ash = qvalue.gdash = list()
 sd.z = c()
 err = se = list()
+
 set.seed(777)
 for (i in 1 : nsim) {
   ## generate data
@@ -199,13 +200,13 @@ ggplot(data = melt(pihat0),
 ```{r cor FDR plotting, fig.asp = 1, echo = FALSE}
 plot(0, 0, xlim = range(FDR.nominal), ylim = range(FDR.nominal), type = "n", xlab = "nominal", ylab = "Average", main = "FDR")
 pFDP.mat.BH <- pFDP.matrix(beta, qvalue.BH, FDR.nominal)
-FDP.polygon.plot(pFDP.mat.BH, pFDR = FALSE, FDR.nominal, col = method.col[1])
+FDP.polygon.plot(pFDP.mat.BH, pFDR = TRUE, FDR.nominal, col = method.col[1])
 pFDP.mat.qvalue <- pFDP.matrix(beta, qvalue.qvalue, FDR.nominal)
-FDP.polygon.plot(pFDP.mat.qvalue, pFDR = FALSE, FDR.nominal, col = method.col[2])
+FDP.polygon.plot(pFDP.mat.qvalue, pFDR = TRUE, FDR.nominal, col = method.col[2])
 pFDP.mat.ash <- pFDP.matrix(beta, qvalue.ash, FDR.nominal)
-FDP.polygon.plot(pFDP.mat.ash, pFDR = FALSE, FDR.nominal, col = method.col[4])
+FDP.polygon.plot(pFDP.mat.ash, pFDR = TRUE, FDR.nominal, col = method.col[4])
 pFDP.mat.gdash <- pFDP.matrix(beta, qvalue.gdash, FDR.nominal)
-FDP.polygon.plot(pFDP.mat.gdash, pFDR = FALSE, FDR.nominal, col = method.col[5])
+FDP.polygon.plot(pFDP.mat.gdash, pFDR = TRUE, FDR.nominal, col = method.col[5])
 lines(0 : 1, 0 : 1, lty = 2, lwd = 2)
 legend("topleft", lty = 1, col = method.col[c(1, 2, 4, 5)], c("BH", "qvalue", "ASH", "CASH"), bty = "n")
 ```
@@ -221,7 +222,7 @@ FDP.cutoff <- cbind(
 )
 FDP.cutoff <- as.data.frame(FDP.cutoff)
 
-mean_sdp <- function(x) {
+mean_sdp = function(x) {
    m <- mean(x)
    ymax <- m + sd(x)
    return(c(y = m, ymax = ymax, ymin = m))
@@ -239,12 +240,6 @@ ggplot(data = melt(FDP.cutoff),
 ```
 
 ```{r cor FDR variability, echo = FALSE, fig.width = 10}
-mean_sdp <- function(x) {
-   m <- mean(x)
-   ymax <- m + sd(x)
-   return(c(y = m, ymax = ymax, ymin = m))
-}
-
 Noise <- rep("In-Between", length(sd.z))
 Noise[sd.z >= 1.1] = "Strong Overdispersion"
 Noise[sd.z <= 0.9] = "Strong Underdispersion"
@@ -343,6 +338,7 @@ legend("top", col = c("red", "blue", "gray"), c("Strong Overdispersion", "Strong
 ```{r indep fitting, echo = FALSE, cache = TRUE}
 pihat0.ash = pihat0.gdash = pihat0.qvalue = c()
 beta = qvalue.BH = qvalue.qvalue = qvalue.ash = qvalue.gdash = list()
+
 set.seed(777)
 for (i in 1 : nsim) {
   ## generate data
@@ -414,6 +410,7 @@ legend("topleft", lty = 1, col = method.col[c(1, 2, 4, 5)], c("BH", "qvalue", "A
 ```{r syn fitting, echo = FALSE, cache = TRUE}
 pihat0.ash = pihat0.gdash = pihat0.qvalue = c()
 beta = qvalue.BH = qvalue.qvalue = qvalue.ash = qvalue.gdash = list()
+
 set.seed(777)
 for (i in 1 : nsim) {
   ## generate data
