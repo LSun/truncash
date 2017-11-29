@@ -395,6 +395,10 @@ $(document).ready(function () {
 <li><p><code>CASH</code> tends to overfit when the noise is under-dispersed or looks like independent;</p></li>
 <li><p><code>CASH</code> doesn’t work well when <em>Unimodal Assumption (UA)</em> is broken.</p></li>
 </ol>
+<ul>
+<li><a href="cash_deconv.html"><code>CASH</code> on Deconvolution: Accuracy of <span class="math inline">\(\hat g\)</span></a></li>
+</ul>
+<p>On the deconvolution front, <code>CASH</code> generates more robust <span class="math inline">\(\hat g\)</span> than <code>ASH</code> in the correlated noise case, and doesn’t show noticeable overfitting in the independent noise case.</p>
 <!-- The goal of this new template is to simplify the setup and maintenance of a research website. -->
 <!-- Specifically, -->
 <!-- *  Easier to build and extend the website using the new tools in the [rmarkdown][] package and [latest RStudio release][rstudio] -->
