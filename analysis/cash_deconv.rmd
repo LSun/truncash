@@ -54,22 +54,21 @@ r = r[subset,]
 nsamp = 5
 ```
 
-## Average standard error of the noise
+## Average $\hat s_i$ simulated from real data
 
 $$
-\bar\sigma_n = \sqrt{\bar{\hat s_i^2}} \ .
+\sigma_n^2 := \bar{\hat s_i^2} \ .
 $$
 
 ```{r sd.n plotting, echo = FALSE, warning = FALSE, message = FALSE}
-library(vioplot)
 se.mat <- readRDS("../output/sebetahat_null_liver_777.rds")
 sd.n <- sqrt(rowMeans(se.mat^2))
-vioplot::vioplot(sd.n, names = expression(bar(sigma)[n]))
+hist(sd.n, prob = TRUE, breaks = 20, xlab = expression(sigma[n]), main = expression(atop(paste("Distribution of ", sigma[n]), "Real Data Simulation")))
 ```
 
 We'll take $\sigma_n = 0.5$ in the simulations.
 
-## Correlated
+## Correlated cases
 
 ### $g = 0.5\delta_0 + 0.5N(0, (2\sigma_n)^2)$
 
@@ -270,7 +269,7 @@ for (i in 1 : nsim) {
 legend("bottomright", lty = 1, lwd = 0.75, col = c("blue", "maroon"), c("ASH", "CASH"), bty = "n")
 ```
 
-## Independent
+## Independent cases
 
 ### $g = 0.5\delta_0 + 0.5N(0, (2\sigma_n)^2)$
 
