@@ -1,0 +1,468 @@
+---
+title: "`CASH` on Deconvolution"
+author: "Lei Sun"
+date: 2017-11-28
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+```{r code, message = FALSE, warning = FALSE, echo = FALSE}
+source("../code/gdash_lik.R")
+```
+
+```{r read gtex data, echo = FALSE}
+r <- readRDS("../data/liver.rds")
+nsim <- 100
+ngene <- 1000
+```
+
+```{r gtex counts to summary, echo = FALSE}
+library(limma)
+library(edgeR)
+source("../code/count_to_summary.R")
+#extract top g genes from G by n matrix X of expression
+top_genes_index = function (g, X)
+{return(order(rowSums(X), decreasing = TRUE)[1 : g])
+}
+lcpm = function (r) {
+  R = colSums(r)
+  t(log2(((t(r) + 0.5) / (R + 1)) * 10^6))
+}
+Y = lcpm(r)
+subset = top_genes_index(ngene, Y)
+r = r[subset,]
+nsamp = 5
+```
+
+## Average standard error of the noise
+
+$$
+\bar\sigma_n = \sqrt{\bar{\hat s_i^2}} \ .
+$$
+
+```{r sd.n plotting, echo = FALSE, warning = FALSE, message = FALSE}
+library(vioplot)
+se.mat <- readRDS("../output/sebetahat_null_liver_777.rds")
+sd.n <- sqrt(rowMeans(se.mat^2))
+vioplot::vioplot(sd.n, names = expression(bar(sigma)[n]))
+```
+
+We'll take $\sigma_n = 0.5$ in the simulations.
+
+## Correlated
+
+### $g = 0.5\delta_0 + 0.5N(0, (2\sigma_n)^2)$
+
+```{r cor parameters 3, echo = FALSE}
+pi0 <- 0.5
+sd1 <- 1
+g <- ashr::normalmix(pi <- c(pi0, 1 - pi0), mean = 0, sd = c(0, sd1))
+xplot <- seq(-5 * max(g$sd), 5 * max(g$sd), length = 1000)
+yplot.true <- ashr::mixcdf(g, xplot)
+```
+
+```{r cor fitting 3, echo = FALSE, cache = TRUE}
+yplot.ash <- yplot.cash <- list()
+
+set.seed(777)
+for (i in 1 : nsim) {
+  ## generate data
+  counts <- r[, sample(ncol(r), 2 * nsamp)]
+  design <- model.matrix(~c(rep(0, nsamp), rep(1, nsamp)))
+  summary <- count_to_summary(counts, design)
+  z <- summary$z
+  beta <- sample(
+    c(
+      rnorm(round(g$pi[1] * ngene), g$mean[1], g$sd[1]),
+      rnorm(round(g$pi[2] * ngene), g$mean[2], g$sd[2])
+    )
+  )
+  sebetahat <- summary$sebetahat
+  betahat <- beta + z * sebetahat
+
+  ## different methods
+  fit.ash = ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+  fit.cash = gdash(betahat, sebetahat)
+
+  ## pihat0
+  yplot.ash[[i]] <- ashr::mixcdf(ashr::get_fitted_g(fit.ash), xplot)
+  yplot.cash[[i]] <- ashr::mixcdf(ashr::get_fitted_g(fit.cash), xplot)
+}
+```
+
+```{r cor plotting 3, echo = FALSE, fig.width = 15}
+par(mfrow = c(1, 3))
+
+plot(xplot, yplot.true, type = "n", xlim = c(-2 * max(g$sd), 2 * max(g$sd)), xlab = "", ylab = "CDF", main = "Estimation of g")
+for (i in 1 : nsim) {
+  lines(xplot, yplot.ash[[i]], col = "blue", lwd = 0.75)
+  lines(xplot, yplot.true, lwd = 2)
+}
+legend("bottomright", lty = 1, lwd = 0.75, col = "blue", "ASH", bty = "n")
+
+plot(xplot, yplot.true, type = "n", xlim = c(-2 * max(g$sd), 2 * max(g$sd)), xlab = "", ylab = "CDF", main = "Estimation of g")
+for (i in 1 : nsim) {
+  lines(xplot, yplot.cash[[i]], col = "maroon", lwd = 0.75)
+  lines(xplot, yplot.true, lwd = 2)
+}
+legend("bottomright", lty = 1, lwd = 0.75, col = "maroon", "CASH", bty = "n")
+
+plot(xplot, yplot.true, type = "n", xlim = c(-2 * max(g$sd), 2 * max(g$sd)), xlab = "", ylab = "CDF", main = "Estimation of g")
+for (i in 1 : nsim) {
+  lines(xplot, yplot.ash[[i]], col = "blue", lwd = 0.75)
+  lines(xplot, yplot.cash[[i]], col = "maroon", lwd = 0.75)
+  lines(xplot, yplot.true, lwd = 2)
+}
+legend("bottomright", lty = 1, lwd = 0.75, col = c("blue", "maroon"), c("ASH", "CASH"), bty = "n")
+```
+
+### $g = 0.6\delta_0 + 0.3N(0, \sigma_n^2) + 0.1N(0, (2\sigma_n)^2)$
+
+```{r cor parameters 1, echo = FALSE}
+pi0 <- 0.6
+pi1 <- 0.3
+sd1 <- 0.5
+sd2 <- 1
+g <- ashr::normalmix(pi <- c(pi0, pi1, 1 - pi0 - pi1), mean = 0, sd = c(0, sd1, sd2))
+xplot <- seq(-5 * max(g$sd), 5 * max(g$sd), length = 1000)
+yplot.true <- ashr::mixcdf(g, xplot)
+```
+
+```{r cor fitting 1, echo = FALSE, cache = TRUE}
+yplot.ash <- yplot.cash <- list()
+
+set.seed(777)
+for (i in 1 : nsim) {
+  ## generate data
+  counts <- r[, sample(ncol(r), 2 * nsamp)]
+  design <- model.matrix(~c(rep(0, nsamp), rep(1, nsamp)))
+  summary <- count_to_summary(counts, design)
+  z <- summary$z
+  sebetahat <- summary$sebetahat
+  sd.n[i] <- sqrt(mean(sebetahat^2))
+  beta <- sample(
+    c(
+      rnorm(round(g$pi[1] * ngene), g$mean[1], g$sd[1]),
+      rnorm(round(g$pi[2] * ngene), g$mean[2], g$sd[2]),
+      rnorm(round(g$pi[3] * ngene), g$mean[3], g$sd[3])
+    )
+  )
+  betahat <- beta + z * sebetahat
+
+  ## different methods
+  fit.ash = ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+  fit.cash = gdash(betahat, sebetahat)
+
+  ## pihat0
+  yplot.ash[[i]] <- ashr::mixcdf(ashr::get_fitted_g(fit.ash), xplot)
+  yplot.cash[[i]] <- ashr::mixcdf(ashr::get_fitted_g(fit.cash), xplot)
+}
+```
+
+```{r cor plotting 1, echo = FALSE, fig.width = 15}
+par(mfrow = c(1, 3))
+
+plot(xplot, yplot.true, type = "n", xlim = c(-2 * max(g$sd), 2 * max(g$sd)), xlab = "", ylab = "CDF", main = "Estimation of g")
+for (i in 1 : nsim) {
+  lines(xplot, yplot.ash[[i]], col = "blue", lwd = 0.75)
+  lines(xplot, yplot.true, lwd = 2)
+}
+legend("bottomright", lty = 1, lwd = 0.75, col = "blue", "ASH", bty = "n")
+
+plot(xplot, yplot.true, type = "n", xlim = c(-2 * max(g$sd), 2 * max(g$sd)), xlab = "", ylab = "CDF", main = "Estimation of g")
+for (i in 1 : nsim) {
+  lines(xplot, yplot.cash[[i]], col = "maroon", lwd = 0.75)
+  lines(xplot, yplot.true, lwd = 2)
+}
+legend("bottomright", lty = 1, lwd = 0.75, col = "maroon", "CASH", bty = "n")
+
+plot(xplot, yplot.true, type = "n", xlim = c(-2 * max(g$sd), 2 * max(g$sd)), xlab = "", ylab = "CDF", main = "Estimation of g")
+for (i in 1 : nsim) {
+  lines(xplot, yplot.ash[[i]], col = "blue", lwd = 0.75)
+  lines(xplot, yplot.cash[[i]], col = "maroon", lwd = 0.75)
+  lines(xplot, yplot.true, lwd = 2)
+}
+legend("bottomright", lty = 1, lwd = 0.75, col = c("blue", "maroon"), c("ASH", "CASH"), bty = "n")
+```
+
+### $g = 0.9\delta_0 + 0.1N(0, \sigma_n^2)$
+
+```{r cor parameters 2, echo = FALSE}
+pi0 <- 0.9
+sd1 <- 0.5
+g <- ashr::normalmix(pi <- c(pi0, 1 - pi0), mean = 0, sd = c(0, sd1))
+xplot <- seq(-5 * max(g$sd), 5 * max(g$sd), length = 1000)
+yplot.true <- ashr::mixcdf(g, xplot)
+```
+
+```{r cor fitting 2, echo = FALSE, cache = TRUE}
+yplot.ash <- yplot.cash <- list()
+
+set.seed(777)
+for (i in 1 : nsim) {
+  ## generate data
+  counts <- r[, sample(ncol(r), 2 * nsamp)]
+  design <- model.matrix(~c(rep(0, nsamp), rep(1, nsamp)))
+  summary <- count_to_summary(counts, design)
+  z <- summary$z
+  beta <- sample(
+    c(
+      rnorm(round(g$pi[1] * ngene), g$mean[1], g$sd[1]),
+      rnorm(round(g$pi[2] * ngene), g$mean[2], g$sd[2])
+    )
+  )
+  sebetahat <- summary$sebetahat
+  betahat <- beta + z * sebetahat
+
+  ## different methods
+  fit.ash = ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+  fit.cash = gdash(betahat, sebetahat)
+
+  ## pihat0
+  yplot.ash[[i]] <- ashr::mixcdf(ashr::get_fitted_g(fit.ash), xplot)
+  yplot.cash[[i]] <- ashr::mixcdf(ashr::get_fitted_g(fit.cash), xplot)
+}
+```
+
+```{r cor plotting 2, echo = FALSE, fig.width = 15}
+par(mfrow = c(1, 3))
+
+plot(xplot, yplot.true, type = "n", xlim = c(-2 * max(g$sd), 2 * max(g$sd)), xlab = "", ylab = "CDF", main = "Estimation of g")
+for (i in 1 : nsim) {
+  lines(xplot, yplot.ash[[i]], col = "blue", lwd = 0.75)
+  lines(xplot, yplot.true, lwd = 2)
+}
+legend("bottomright", lty = 1, lwd = 0.75, col = "blue", "ASH", bty = "n")
+
+plot(xplot, yplot.true, type = "n", xlim = c(-2 * max(g$sd), 2 * max(g$sd)), xlab = "", ylab = "CDF", main = "Estimation of g")
+for (i in 1 : nsim) {
+  lines(xplot, yplot.cash[[i]], col = "maroon", lwd = 0.75)
+  lines(xplot, yplot.true, lwd = 2)
+}
+legend("bottomright", lty = 1, lwd = 0.75, col = "maroon", "CASH", bty = "n")
+
+plot(xplot, yplot.true, type = "n", xlim = c(-2 * max(g$sd), 2 * max(g$sd)), xlab = "", ylab = "CDF", main = "Estimation of g")
+for (i in 1 : nsim) {
+  lines(xplot, yplot.ash[[i]], col = "blue", lwd = 0.75)
+  lines(xplot, yplot.cash[[i]], col = "maroon", lwd = 0.75)
+  lines(xplot, yplot.true, lwd = 2)
+}
+legend("bottomright", lty = 1, lwd = 0.75, col = c("blue", "maroon"), c("ASH", "CASH"), bty = "n")
+```
+
+## Independent
+
+### $g = 0.5\delta_0 + 0.5N(0, (2\sigma_n)^2)$
+
+```{r indep parameters 3, echo = FALSE}
+pi0 <- 0.5
+sd1 <- 1
+g <- ashr::normalmix(pi <- c(pi0, 1 - pi0), mean = 0, sd = c(0, sd1))
+xplot <- seq(-5 * max(g$sd), 5 * max(g$sd), length = 1000)
+yplot.true <- ashr::mixcdf(g, xplot)
+```
+
+```{r indep fitting 3, echo = FALSE, cache = TRUE}
+yplot.ash <- yplot.cash <- list()
+
+set.seed(777)
+for (i in 1 : nsim) {
+  ## generate data
+  z <- rnorm(ngene)
+  beta <- sample(
+    c(
+      rnorm(round(g$pi[1] * ngene), g$mean[1], g$sd[1]),
+      rnorm(round(g$pi[2] * ngene), g$mean[2], g$sd[2])
+    )
+  )
+  sebetahat <- sqrt(rchisq(ngene, 1))
+  betahat <- beta + z * sebetahat
+
+  ## different methods
+  fit.ash = ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+  fit.cash = gdash(betahat, sebetahat)
+
+  ## pihat0
+  yplot.ash[[i]] <- ashr::mixcdf(ashr::get_fitted_g(fit.ash), xplot)
+  yplot.cash[[i]] <- ashr::mixcdf(ashr::get_fitted_g(fit.cash), xplot)
+}
+```
+
+```{r indep plotting 3, echo = FALSE, fig.width = 15}
+par(mfrow = c(1, 3))
+
+plot(xplot, yplot.true, type = "n", xlim = c(-2 * max(g$sd), 2 * max(g$sd)), xlab = "", ylab = "CDF", main = "Estimation of g")
+for (i in 1 : nsim) {
+  lines(xplot, yplot.ash[[i]], col = "blue", lwd = 0.75)
+  lines(xplot, yplot.true, lwd = 2)
+}
+legend("bottomright", lty = 1, lwd = 0.75, col = "blue", "ASH", bty = "n")
+
+plot(xplot, yplot.true, type = "n", xlim = c(-2 * max(g$sd), 2 * max(g$sd)), xlab = "", ylab = "CDF", main = "Estimation of g")
+for (i in 1 : nsim) {
+  lines(xplot, yplot.cash[[i]], col = "maroon", lwd = 0.75)
+  lines(xplot, yplot.true, lwd = 2)
+}
+legend("bottomright", lty = 1, lwd = 0.75, col = "maroon", "CASH", bty = "n")
+
+plot(xplot, yplot.true, type = "n", xlim = c(-2 * max(g$sd), 2 * max(g$sd)), xlab = "", ylab = "CDF", main = "Estimation of g")
+for (i in 1 : nsim) {
+  lines(xplot, yplot.ash[[i]], col = "blue", lwd = 0.75)
+  lines(xplot, yplot.cash[[i]], col = "maroon", lwd = 0.75)
+  lines(xplot, yplot.true, lwd = 2)
+}
+legend("bottomright", lty = 1, lwd = 0.75, col = c("blue", "maroon"), c("ASH", "CASH"), bty = "n")
+```
+
+### $g = 0.6\delta_0 + 0.3N(0, \sigma_n^2) + 0.1N(0, (2\sigma_n)^2)$
+
+```{r indep parameters 1, echo = FALSE}
+pi0 <- 0.6
+pi1 <- 0.3
+sd1 <- 0.5
+sd2 <- 1
+g <- ashr::normalmix(pi <- c(pi0, pi1, 1 - pi0 - pi1), mean = 0, sd = c(0, sd1, sd2))
+xplot <- seq(-5 * max(g$sd), 5 * max(g$sd), length = 1000)
+yplot.true <- ashr::mixcdf(g, xplot)
+```
+
+```{r indep fitting 1, echo = FALSE, cache = TRUE}
+yplot.ash <- yplot.cash <- list()
+
+set.seed(777)
+for (i in 1 : nsim) {
+  ## generate data
+  z <- rnorm(ngene)
+  beta <- sample(
+    c(
+      rnorm(round(g$pi[1] * ngene), g$mean[1], g$sd[1]),
+      rnorm(round(g$pi[2] * ngene), g$mean[2], g$sd[2]),
+      rnorm(round(g$pi[3] * ngene), g$mean[3], g$sd[3])
+    )
+  )
+  sebetahat <- sqrt(rchisq(ngene, 1))
+  betahat <- beta + z * sebetahat
+
+  ## different methods
+  fit.ash = ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+  fit.cash = gdash(betahat, sebetahat)
+
+  ## pihat0
+  yplot.ash[[i]] <- ashr::mixcdf(ashr::get_fitted_g(fit.ash), xplot)
+  yplot.cash[[i]] <- ashr::mixcdf(ashr::get_fitted_g(fit.cash), xplot)
+}
+```
+
+```{r indep plotting 1, echo = FALSE, fig.width = 15}
+par(mfrow = c(1, 3))
+
+plot(xplot, yplot.true, type = "n", xlim = c(-2 * max(g$sd), 2 * max(g$sd)), xlab = "", ylab = "CDF", main = "Estimation of g")
+for (i in 1 : nsim) {
+  lines(xplot, yplot.ash[[i]], col = "blue", lwd = 0.75)
+  lines(xplot, yplot.true, lwd = 2)
+}
+legend("bottomright", lty = 1, lwd = 0.75, col = "blue", "ASH", bty = "n")
+
+plot(xplot, yplot.true, type = "n", xlim = c(-2 * max(g$sd), 2 * max(g$sd)), xlab = "", ylab = "CDF", main = "Estimation of g")
+for (i in 1 : nsim) {
+  lines(xplot, yplot.cash[[i]], col = "maroon", lwd = 0.75)
+  lines(xplot, yplot.true, lwd = 2)
+}
+legend("bottomright", lty = 1, lwd = 0.75, col = "maroon", "CASH", bty = "n")
+
+plot(xplot, yplot.true, type = "n", xlim = c(-2 * max(g$sd), 2 * max(g$sd)), xlab = "", ylab = "CDF", main = "Estimation of g")
+for (i in 1 : nsim) {
+  lines(xplot, yplot.ash[[i]], col = "blue", lwd = 0.75)
+  lines(xplot, yplot.cash[[i]], col = "maroon", lwd = 0.75)
+  lines(xplot, yplot.true, lwd = 2)
+}
+legend("bottomright", lty = 1, lwd = 0.75, col = c("blue", "maroon"), c("ASH", "CASH"), bty = "n")
+```
+
+### $g = 0.9\delta_0 + 0.1N(0, 1)$
+
+```{r indep parameters 2, echo = FALSE}
+pi0 <- 0.9
+sd1 <- 0.5
+g <- ashr::normalmix(pi <- c(pi0, 1 - pi0), mean = 0, sd = c(0, sd1))
+xplot <- seq(-5 * max(g$sd), 5 * max(g$sd), length = 1000)
+yplot.true <- ashr::mixcdf(g, xplot)
+```
+
+```{r indep fitting 2, echo = FALSE, cache = TRUE}
+yplot.ash <- yplot.cash <- list()
+
+set.seed(777)
+for (i in 1 : nsim) {
+  ## generate data
+  z <- rnorm(ngene)
+  beta <- sample(
+    c(
+      rnorm(round(g$pi[1] * ngene), g$mean[1], g$sd[1]),
+      rnorm(round(g$pi[2] * ngene), g$mean[2], g$sd[2])
+    )
+  )
+  sebetahat <- sqrt(rchisq(ngene, 1))
+  betahat <- beta + z * sebetahat
+
+  ## different methods
+  fit.ash = ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+  fit.cash = gdash(betahat, sebetahat)
+
+  ## pihat0
+  yplot.ash[[i]] <- ashr::mixcdf(ashr::get_fitted_g(fit.ash), xplot)
+  yplot.cash[[i]] <- ashr::mixcdf(ashr::get_fitted_g(fit.cash), xplot)
+}
+```
+
+```{r indep plotting 2, echo = FALSE, fig.width = 15}
+par(mfrow = c(1, 3))
+
+plot(xplot, yplot.true, type = "n", xlim = c(-2 * max(g$sd), 2 * max(g$sd)), xlab = "", ylab = "CDF", main = "Estimation of g")
+for (i in 1 : nsim) {
+  lines(xplot, yplot.ash[[i]], col = "blue", lwd = 0.75)
+  lines(xplot, yplot.true, lwd = 2)
+}
+legend("bottomright", lty = 1, lwd = 0.75, col = "blue", "ASH", bty = "n")
+
+plot(xplot, yplot.true, type = "n", xlim = c(-2 * max(g$sd), 2 * max(g$sd)), xlab = "", ylab = "CDF", main = "Estimation of g")
+for (i in 1 : nsim) {
+  lines(xplot, yplot.cash[[i]], col = "maroon", lwd = 0.75)
+  lines(xplot, yplot.true, lwd = 2)
+}
+legend("bottomright", lty = 1, lwd = 0.75, col = "maroon", "CASH", bty = "n")
+
+plot(xplot, yplot.true, type = "n", xlim = c(-2 * max(g$sd), 2 * max(g$sd)), xlab = "", ylab = "CDF", main = "Estimation of g")
+for (i in 1 : nsim) {
+  lines(xplot, yplot.ash[[i]], col = "blue", lwd = 0.75)
+  lines(xplot, yplot.cash[[i]], col = "maroon", lwd = 0.75)
+  lines(xplot, yplot.true, lwd = 2)
+}
+legend("bottomright", lty = 1, lwd = 0.75, col = c("blue", "maroon"), c("ASH", "CASH"), bty = "n")
+```
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```
