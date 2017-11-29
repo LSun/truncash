@@ -202,6 +202,10 @@ An extensive study of `CASH` and other methods in different scenarios shows that
 
 4. `CASH` doesn't work well when *Unimodal Assumption (UA)* is broken.
 
+* [`CASH` on Deconvolution: Accuracy of $\hat g$](cash_deconv.html)
+
+On the deconvolution front, `CASH` generates more robust $\hat g$ than `ASH` in the correlated noise case, and doesn't show noticeable overfitting in the independent noise case.
+
 [`ashr`]: https://github.com/stephens999/ashr
 
 <!-- The goal of this new template is to simplify the setup and maintenance of a research website. -->

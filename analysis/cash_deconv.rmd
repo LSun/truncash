@@ -68,7 +68,7 @@ hist(sd.n, prob = TRUE, breaks = 20, xlab = expression(sigma[n]), main = express
 
 We'll take $\sigma_n = 0.5$ in the simulations.
 
-## Correlated cases
+## Correlated noise cases
 
 ### $g = 0.5\delta_0 + 0.5N(0, (2\sigma_n)^2)$
 
@@ -269,7 +269,7 @@ for (i in 1 : nsim) {
 legend("bottomright", lty = 1, lwd = 0.75, col = c("blue", "maroon"), c("ASH", "CASH"), bty = "n")
 ```
 
-## Independent cases
+## Independent noise cases
 
 ### $g = 0.5\delta_0 + 0.5N(0, (2\sigma_n)^2)$
 
