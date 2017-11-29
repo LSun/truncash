@@ -315,10 +315,10 @@ shared across the workflowr files. -->
 <!-- Insert the date the file was last updated -->
 <pre><code>Warning in as.POSIXlt.POSIXct(Sys.time()): unknown timezone &#39;zone/tz/2017c.
 1.0/zoneinfo/America/Chicago&#39;</code></pre>
-<p><strong>Last updated:</strong> 2017-11-28</p>
+<p><strong>Last updated:</strong> 2017-11-29</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> e3da93d</p>
+<p><strong>Code version:</strong> 697ce5f</p>
 <!-- Add your analysis here -->
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
@@ -329,24 +329,29 @@ shared across the workflowr files. -->
 z_j \sim N(0, 1) \ ,
 \]</span> where <span class="math display">\[
 g = 0.5\delta_0 + 0.5N(0, \sigma_n^2) \ .
-\]</span> We consider three scenarios for the noise <span class="math inline">\(z_j\)</span>: 1. Correlated, simulated from real data; 2. Independent; 3. Correlated, simulated from synthetic data.</p>
-<pre class="r"><code>source(&quot;../code/gdash_lik.R&quot;)</code></pre>
-</div>
-<div id="simulation-settings" class="section level2">
-<h2>Simulation settings</h2>
+\]</span> We consider three scenarios for the noise <span class="math inline">\(z_j\)</span>: 1. Correlated noise, simulated from real data; 2. Independent noise; 3. Correlated noise, simulated from artificial data.</p>
 <pre class="r"><code>nsim &lt;- 100
 ngene &lt;- 1000
 pi0 &lt;- 0.5
 snr &lt;- 1
 FDR.nominal &lt;- seq(0, 0.1, 0.001)[-1]</code></pre>
 </div>
-<div id="correlated-real-data" class="section level2">
-<h2>Correlated, real data</h2>
-<pre class="r"><code>r &lt;- readRDS(&quot;../data/liver.rds&quot;)</code></pre>
+<div id="correlated-noise-real-data" class="section level2">
+<h2>Correlated noise, real data</h2>
 <p><img src="figure/cash_fdr_1.rmd/cor%20pihat0-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p><img src="figure/cash_fdr_1.rmd/cor%20FDR%20plotting-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre><code>No id variables; using all as measure variables</code></pre>
+<pre><code>Warning: Computation failed in `stat_summary()`:
+object &#39;mean_sdp&#39; of mode &#39;function&#39; was not found</code></pre>
 <p><img src="figure/cash_fdr_1.rmd/cor%20FDR%20violin-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Warning: Computation failed in `stat_summary()`:
+object &#39;mean_sdp&#39; of mode &#39;function&#39; was not found
+
+Warning: Computation failed in `stat_summary()`:
+object &#39;mean_sdp&#39; of mode &#39;function&#39; was not found
+
+Warning: Computation failed in `stat_summary()`:
+object &#39;mean_sdp&#39; of mode &#39;function&#39; was not found</code></pre>
 <p><img src="figure/cash_fdr_1.rmd/cor%20FDR%20variability-1.png" width="960" style="display: block; margin: auto;" /></p>
 <p><img src="figure/cash_fdr_1.rmd/cor%20FDR%20tail-1.png" width="960" style="display: block; margin: auto;" /><img src="figure/cash_fdr_1.rmd/cor%20FDR%20tail-2.png" width="960" style="display: block; margin: auto;" /></p>
 </div>
@@ -386,24 +391,24 @@ other attached packages:
 [13] ttutils_1.0-1    
 
 loaded via a namespace (and not attached):
- [1] locfit_1.5-9.1      splines_3.4.2       lattice_0.20-35    
- [4] colorspace_1.3-2    htmltools_0.3.6     yaml_2.1.14        
- [7] base64enc_0.1-3     survival_2.41-3     rlang_0.1.4        
-[10] foreign_0.8-69      RColorBrewer_1.1-2  foreach_1.4.3      
-[13] plyr_1.8.4          stringr_1.2.0       munsell_0.4.3      
-[16] gtable_0.2.0        htmlwidgets_0.9     codetools_0.2-15   
-[19] evaluate_0.10.1     labeling_0.3        latticeExtra_0.6-28
-[22] knitr_1.17          pscl_1.5.2          doParallel_1.0.11  
-[25] parallel_3.4.2      htmlTable_1.9       Rcpp_0.12.13       
-[28] acepack_1.4.1       checkmate_1.8.5     scales_0.5.0       
-[31] backports_1.1.1     Hmisc_4.0-3         truncnorm_1.0-7    
-[34] gridExtra_2.3       digest_0.6.12       stringi_1.1.5      
-[37] grid_3.4.2          rprojroot_1.2       tools_3.4.2        
-[40] magrittr_1.5        lazyeval_0.2.1      tibble_1.3.4       
-[43] Formula_1.2-2       cluster_2.0.6       MASS_7.3-47        
-[46] data.table_1.10.4-3 rmarkdown_1.6       iterators_1.0.8    
-[49] rpart_4.1-11        nnet_7.3-12         git2r_0.19.0       
-[52] compiler_3.4.2     </code></pre>
+ [1] qvalue_2.10.0       locfit_1.5-9.1      splines_3.4.2      
+ [4] lattice_0.20-35     colorspace_1.3-2    htmltools_0.3.6    
+ [7] yaml_2.1.14         base64enc_0.1-3     survival_2.41-3    
+[10] rlang_0.1.4         foreign_0.8-69      RColorBrewer_1.1-2 
+[13] foreach_1.4.3       plyr_1.8.4          stringr_1.2.0      
+[16] munsell_0.4.3       gtable_0.2.0        htmlwidgets_0.9    
+[19] codetools_0.2-15    evaluate_0.10.1     labeling_0.3       
+[22] latticeExtra_0.6-28 knitr_1.17          pscl_1.5.2         
+[25] doParallel_1.0.11   parallel_3.4.2      htmlTable_1.9      
+[28] Rcpp_0.12.13        acepack_1.4.1       checkmate_1.8.5    
+[31] scales_0.5.0        backports_1.1.1     Hmisc_4.0-3        
+[34] truncnorm_1.0-7     gridExtra_2.3       digest_0.6.12      
+[37] stringi_1.1.5       grid_3.4.2          rprojroot_1.2      
+[40] tools_3.4.2         magrittr_1.5        lazyeval_0.2.1     
+[43] tibble_1.3.4        Formula_1.2-2       cluster_2.0.6      
+[46] MASS_7.3-47         data.table_1.10.4-3 assertthat_0.2.0   
+[49] rmarkdown_1.6       iterators_1.0.8     rpart_4.1-11       
+[52] nnet_7.3-12         git2r_0.19.0        compiler_3.4.2     </code></pre>
 </div>
 
 <hr>
