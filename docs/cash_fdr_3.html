@@ -315,43 +315,37 @@ shared across the workflowr files. -->
 <!-- Insert the date the file was last updated -->
 <pre><code>Warning in as.POSIXlt.POSIXct(Sys.time()): unknown timezone &#39;zone/tz/2017c.
 1.0/zoneinfo/America/Chicago&#39;</code></pre>
-<p><strong>Last updated:</strong> 2017-11-28</p>
+<p><strong>Last updated:</strong> 2017-11-29</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> e3da93d</p>
+<p><strong>Code version:</strong> 32adf96</p>
 <!-- Add your analysis here -->
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
 <p><span class="math display">\[
 g = 0.9\delta_0 + 0.1N(0, \sigma_n^2)
 \]</span></p>
-<pre class="r"><code>source(&quot;../code/gdash_lik.R&quot;)</code></pre>
 </div>
-<div id="simulation-settings" class="section level2">
-<h2>Simulation settings</h2>
-<pre class="r"><code>nsim &lt;- 100
-ngene &lt;- 1000
-pi0 &lt;- 0.9
-snr &lt;- 1
-FDR.nominal &lt;- seq(0, 0.1, 0.001)[-1]</code></pre>
-</div>
-<div id="correlated-real-data" class="section level2">
-<h2>Correlated, real data</h2>
-<pre class="r"><code>r &lt;- readRDS(&quot;../data/liver.rds&quot;)</code></pre>
+<div id="correlated-noise-real-data" class="section level2">
+<h2>Correlated noise, real data</h2>
 <p><img src="figure/cash_fdr_3.rmd/cor%20pihat0-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p><img src="figure/cash_fdr_3.rmd/cor%20FDR%20plotting-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre><code>No id variables; using all as measure variables</code></pre>
+<pre><code>Warning: Removed 49 rows containing non-finite values (stat_ydensity).</code></pre>
+<pre><code>Warning: Removed 49 rows containing non-finite values (stat_summary).</code></pre>
 <p><img src="figure/cash_fdr_3.rmd/cor%20FDR%20violin-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Warning: Removed 49 rows containing non-finite values (stat_ydensity).</code></pre>
+<pre><code>Warning: Removed 49 rows containing non-finite values (stat_summary).</code></pre>
 <p><img src="figure/cash_fdr_3.rmd/cor%20FDR%20variability-1.png" width="960" style="display: block; margin: auto;" /></p>
 <p><img src="figure/cash_fdr_3.rmd/cor%20FDR%20tail-1.png" width="960" style="display: block; margin: auto;" /><img src="figure/cash_fdr_3.rmd/cor%20FDR%20tail-2.png" width="960" style="display: block; margin: auto;" /></p>
 </div>
-<div id="independent-data" class="section level2">
-<h2>Independent data</h2>
+<div id="independent-noise" class="section level2">
+<h2>Independent noise</h2>
 <p><img src="figure/cash_fdr_3.rmd/indep%20pihat0-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p><img src="figure/cash_fdr_3.rmd/indep%20FDR%20plotting-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
-<div id="correlated-synthetic-data" class="section level2">
-<h2>Correlated, synthetic data</h2>
+<div id="correlated-noise-synthetic-data" class="section level2">
+<h2>Correlated noise, synthetic data</h2>
 <p><img src="figure/cash_fdr_3.rmd/syn%20pihat0-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p><img src="figure/cash_fdr_3.rmd/syn%20FDR%20plotting-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
