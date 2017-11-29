@@ -32,7 +32,7 @@ $$
 g = 0.5\delta_0 + 0.5N(0, (2\sigma_n)^2)
 $$
 
-```{r code, message = FALSE, warning = FALSE}
+```{r code, message = FALSE, warning = FALSE, echo = FALSE}
 source("../code/gdash_lik.R")
 ```
 
@@ -101,9 +101,7 @@ method.name <- c("BH", "qvalue", "locfdr", "ASH", "CASH")
 method.col <- rainbow(length(method.name) + 1)[-1]
 ```
 
-## Simulation settings
-
-```{r simulation parameters}
+```{r simulation parameters, echo = FALSE}
 nsim <- 100
 ngene <- 1000
 pi0 <- 0.5
@@ -113,7 +111,7 @@ FDR.nominal <- seq(0, 0.1, 0.001)[-1]
 
 ## Correlated, real data
 
-```{r read gtex data}
+```{r read gtex data, echo = FALSE}
 r <- readRDS("../data/liver.rds")
 ```
 
@@ -148,9 +146,9 @@ for (i in 1 : nsim) {
   design <- model.matrix(~c(rep(0, nsamp), rep(1, nsamp)))
   summary <- count_to_summary(counts, design)
   z <- summary$z
-  sd.n <- sqrt(mean(z^2))
-  beta[[i]] <- sample(c(rep(0, pi0 * ngene), rnorm((1 - pi0) * ngene, 0, snr * sd.n)))
   sebetahat <- summary$sebetahat
+  sd.n <- sqrt(mean(sebetahat^2))
+  beta[[i]] <- sample(c(rep(0, pi0 * ngene), rnorm((1 - pi0) * ngene, 0, snr * sd.n)))
   betahat <- beta[[i]] + z * sebetahat
   p = (1 - pnorm(abs(betahat / sebetahat))) * 2
   
@@ -261,8 +259,8 @@ FDP.cutoff <- cbind(
 )
 plot(FDP.cutoff[, "BH"], FDP.cutoff[, "CASH"],
      col = rgb(sd.z >= 1.1, 0, sd.z <= 0.9, (sd.z - min(sd.z)) / (max(sd.z) - min(sd.z)) * 0.8 + 0.2),
-     xlim = range(FDP.cutoff[, c("BH", "CASH")]),
-     ylim = range(FDP.cutoff[, c("BH", "CASH")]),
+     xlim = range(FDP.cutoff[, c("BH", "CASH")], na.rm = TRUE),
+     ylim = range(FDP.cutoff[, c("BH", "CASH")], na.rm = TRUE),
      xlab = "BH",
      ylab = "CASH",
      main = bquote(paste("False Discovery Proportions at ", q == .(cutoff), " Cutoff")),
@@ -275,8 +273,8 @@ legend("top", col = c("red", "blue", "gray"), c("Strong Overdispersion", "Strong
 
 plot(FDP.cutoff[, "ASH"], FDP.cutoff[, "CASH"],
      col = rgb(sd.z >= 1.1, 0, sd.z <= 0.9, (sd.z - min(sd.z)) / (max(sd.z) - min(sd.z)) * 0.8 + 0.2),
-     xlim = range(FDP.cutoff[, c("ASH", "CASH")]),
-     ylim = range(FDP.cutoff[, c("ASH", "CASH")]),
+     xlim = range(FDP.cutoff[, c("ASH", "CASH")], na.rm = TRUE),
+     ylim = range(FDP.cutoff[, c("ASH", "CASH")], na.rm = TRUE),
      xlab = "ASH",
      ylab = "CASH",
      main = bquote(paste("False Discovery Proportions at ", q == .(cutoff), " Cutoff")),
@@ -298,8 +296,8 @@ FDP.cutoff <- cbind(
 )
 plot(FDP.cutoff[, "BH"], FDP.cutoff[, "CASH"],
      col = rgb(sd.z >= 1.1, 0, sd.z <= 0.9, (sd.z - min(sd.z)) / (max(sd.z) - min(sd.z)) * 0.8 + 0.2),
-     xlim = range(FDP.cutoff[, c("BH", "CASH")]),
-     ylim = range(FDP.cutoff[, c("BH", "CASH")]),
+     xlim = range(FDP.cutoff[, c("BH", "CASH")], na.rm = TRUE),
+     ylim = range(FDP.cutoff[, c("BH", "CASH")], na.rm = TRUE),
      xlab = "BH",
      ylab = "CASH",
      main = bquote(paste("False Discovery Proportions at ", q == .(cutoff), " Cutoff")),
@@ -312,8 +310,8 @@ legend("top", col = c("red", "blue", "gray"), c("Strong Overdispersion", "Strong
 
 plot(FDP.cutoff[, "ASH"], FDP.cutoff[, "CASH"],
      col = rgb(sd.z >= 1.1, 0, sd.z <= 0.9, (sd.z - min(sd.z)) / (max(sd.z) - min(sd.z)) * 0.8 + 0.2),
-     xlim = range(FDP.cutoff[, c("ASH", "CASH")]),
-     ylim = range(FDP.cutoff[, c("ASH", "CASH")]),
+     xlim = range(FDP.cutoff[, c("ASH", "CASH")], na.rm = TRUE),
+     ylim = range(FDP.cutoff[, c("ASH", "CASH")], na.rm = TRUE),
      xlab = "ASH",
      ylab = "CASH",
      main = bquote(paste("False Discovery Proportions at ", q == .(cutoff), " Cutoff")),
@@ -335,7 +333,7 @@ set.seed(777)
 for (i in 1 : nsim) {
   ## generate data
   sd.n <- 1
-  z <- rnorm(ngene, 0, sd.n)
+  z <- rnorm(ngene, 0, 1)
   beta[[i]] <- sample(c(rep(0, pi0 * ngene), rnorm((1 - pi0) * ngene, 0, snr * sd.n)))
   sebetahat <- sqrt(rchisq(ngene, 1))
   betahat <- beta[[i]] + z * sebetahat
@@ -402,7 +400,7 @@ for (i in 1 : nsim) {
   ## generate data
   L <- matrix(rnorm(ngene * 5), ncol = ngene)
   z <- colSums(L * rnorm(ncol(L))) / sqrt(colSums(L^2))
-  sd.n <- sqrt(mean(z^2))
+  sd.n <- 1
   beta[[i]] <- sample(c(rep(0, pi0 * ngene), rnorm((1 - pi0) * ngene, 0, snr * sd.n)))
   sebetahat <- sqrt(rchisq(ngene, 1))
   betahat <- beta[[i]] + z * sebetahat
