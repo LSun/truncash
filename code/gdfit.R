@@ -1,3 +1,5 @@
+library(PolynomF)
+
 gdfit = function (z, gd.ord, w.lambda = NULL, w.rho = 0.5) {
   if (is.null(w.lambda)) {
     w_prior = rep(0, gd.ord)
@@ -33,7 +35,7 @@ gdfit.mom = function (z, gd.ord) {
   return(list(gd.ord = gd.ord, w = w))
 }
 
-plot.gdfit = function (z, w, gd.ord, symm = TRUE, breaks = 100, std.norm = TRUE) {
+plot.gdfit = function (z, w, gd.ord, symm = TRUE, breaks = 100, std.norm = TRUE, main, legend = TRUE) {
   if (symm) {
     x.plot = seq(- max(abs(z)) - 2, max(abs(z)) + 2, length = 1000)
   } else {
@@ -53,11 +55,19 @@ plot.gdfit = function (z, w, gd.ord, symm = TRUE, breaks = 100, std.norm = TRUE)
   } else {
     y.max = max(z.hist$density, y.plot)
   }
-  hist(z, breaks, prob = TRUE, ylim = c(0, y.max))
+  if (!missing(main)) {
+    hist(z, breaks, prob = TRUE, ylim = c(0, y.max), main = main)
+  } else {
+    hist(z, breaks, prob = TRUE, ylim = c(0, y.max))
+  }
   lines(x.plot, y.plot, col = "blue")
-  legend("topright", lty = 1, col = "blue", "GD")
+  if (legend) {
+    legend("topright", lty = 1, col = "blue", "Gaussian Derivatives")
+  }
   if (std.norm) {
     lines(x.plot, dnorm(x.plot), col = "red")
-    legend("topleft", lty = 1, col = "red", "N(0, 1)")
+    if (legend) {
+      legend("topleft", lty = 1, col = "red", "N(0, 1)")
+    }
   }
 }
