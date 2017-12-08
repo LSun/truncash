@@ -1,0 +1,502 @@
+---
+title: "Plots for O-Bayes 17"
+author: "Lei Sun"
+date: 2017-11-30
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+## Correlated null
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+source("../code/gdash_lik.R")
+source("../code/gdfit.R")
+z.mat <- readRDS("../output/z_null_liver_777.rds")
+sel = c(32, 327, 355, 483)
+gd.ord <- c(4, 9, 9, 4)
+
+par(mfrow = c(2, 2)) # 2-by-2 grid of plots
+par(oma = c(0.5, 2.5, 0, 0)) # make room (i.e. the 4's) for the overall x and y axis titles
+par(mar = c(2, 2, 3.5, 1)) # make the plots be closer together
+
+z = z.mat[sel[4], ]
+w <- gdfit(z, gd.ord[4])$w
+x.plot = seq(- max(abs(z)) - 2, max(abs(z)) + 2, length = 1000)
+hermite = Hermite(gd.ord[4])
+gd0.std = dnorm(x.plot)
+matrix_lik_plot = cbind(gd0.std)
+for (j in 1 : gd.ord[4]) {
+  gd.std = (-1)^j * hermite[[j]](x.plot) * gd0.std / sqrt(factorial(j))
+  matrix_lik_plot = cbind(matrix_lik_plot, gd.std)
+}
+y.plot = matrix_lik_plot %*% w
+z.hist = hist(z, breaks = 100, plot = FALSE)
+y.max = max(z.hist$density, y.plot, dnorm(0))
+
+# now plot the graphs with the appropriate axes removed (via xaxt and yaxt),
+# remove axis labels (so that they are not redundant with overall labels,
+# and set some other nice choices for graphics parameters
+for (i in 1 : 4) {
+  z = z.mat[sel[i], ]
+  w <- gdfit(z, gd.ord[i])$w
+  x.plot = seq(- max(abs(z)) - 2, max(abs(z)) + 2, length = 1000)
+  hermite = Hermite(gd.ord[i])
+  gd0.std = dnorm(x.plot)
+  matrix_lik_plot = cbind(gd0.std)
+  for (j in 1 : gd.ord[i]) {
+    gd.std = (-1)^j * hermite[[j]](x.plot) * gd0.std / sqrt(factorial(j))
+    matrix_lik_plot = cbind(matrix_lik_plot, gd.std)
+  }
+  y.plot = matrix_lik_plot %*% w
+  z.hist = hist(z, breaks = 100, plot = FALSE)
+  hist(z, breaks = 100, prob = TRUE, ylim = c(0, y.max), main = NULL, xlab = "", xlim = range(c(abs(z.mat), -abs(z.mat))))
+  lines(x.plot, dnorm(x.plot), col = "blue", lwd = 2)
+  lines(x.plot, y.plot, col = "red", lwd = 2)
+}
+
+# print the overall labels
+mtext('Density', side = 2, outer = TRUE, line = 1)
+mtext("Histograms of Correlated N(0,1) Variates", line = -2, outer = TRUE)
+
+legend("topleft", inset = c(-0.7, -0.25), legend = c("N(0, 1)", "Gaussian Derivatives"), lty = 1, lwd = 2, xpd = NA, col = c("blue", "red"), ncol = 2)
+```
+
+## Peculiarities of correlation
+
+```{r, echo = FALSE}
+z = readRDS("../output/z_null_liver_777_select.RDS")
+z = z$typical[[5]]
+par(mfrow = c(1, 2))
+par(oma = c(0.5, 0.5, 0.5, 0.5)) # make room (i.e. the 4's) for the overall x and y axis titles
+par(mar = c(2, 3, 1, 2)) # make the plots be closer together
+hist(z, breaks = 100, prob = TRUE, xlab = "", main = "Histogram of Correlated Z Scores: Left Tail", xlim = c(-5, -2.5), ylim = c(0, 0.07))
+lines(seq(-6, 6, 0.01), dnorm(seq(-6, 6, 0.01)), col = "red")
+
+xplot <- seq(-10, 10, length = 1000)
+hermite = Hermite(4)
+gd0.std = dnorm(xplot)
+matrix_lik_w = cbind(gd0.std)
+for (i in 1 : 2) {
+  gd.std = (-1)^i * hermite[[i]](xplot) * gd0.std
+  matrix_lik_w = cbind(matrix_lik_w, gd.std)
+}
+plot(xplot, xplot, type = "n", xlim = c(-5, 5), ylim = range(matrix_lik_w[, 1 : 3]), bty = "n", xlab = "", ylab = "", main = "The First 2 Gaussian Derivatives")
+col = c(2, 3, 4)
+for (i in 1 : 3) {
+  lines(xplot, matrix_lik_w[, i], col = i + 1)
+}
+legend("topright", col = 2 : 4, lty = 1, c(expression(
+    varphi,
+    paste(varphi, "'"),
+    paste(varphi, '"')
+  )
+), bty = "n"
+)
+```
+
+```{r code, message = FALSE, warning = FALSE, echo = FALSE}
+source("../code/gdash_lik.R")
+```
+
+```{r read gtex data, echo = FALSE}
+r <- readRDS("../data/liver.rds")
+ngene <- 1000
+nsim <- 200
+```
+
+```{r gtex counts to summary, echo = FALSE}
+library(limma)
+library(edgeR)
+source("../code/count_to_summary.R")
+#extract top g genes from G by n matrix X of expression
+top_genes_index = function (g, X) {
+  return(order(rowSums(X), decreasing = TRUE)[1 : g])
+}
+lcpm = function (r) {
+  R = colSums(r)
+  t(log2(((t(r) + 0.5) / (R + 1)) * 10^6))
+}
+Y = lcpm(r)
+subset = top_genes_index(ngene, Y)
+r = r[subset,]
+nsamp = 5
+```
+
+```{r pFDR calibration function, echo = FALSE}
+## Calculate positive FDP for one data set and one nominal FDR threshold
+## positive FDP: proportion of null among all selected
+## return NA if none selected
+pFDP = function (FDR, response, predictor) {
+  return(1 - mean(response[predictor <= FDR]))
+}
+
+## Calculate average positive FDP for a simulation of a list of many data sets
+## and a vector of nominal FDR thresholds
+## Return a matrix, rows are data sets, columns are FDR thresholds
+pFDP.matrix <- function (beta, qvalue, FDR.nominal) {
+  pFDP.list = list()
+  for (i in 1 : length(beta))
+    pFDP.list[[i]] = sapply(FDR.nominal,
+                            pFDP,
+                            response = (beta[[i]] != 0),
+                            predictor = qvalue[[i]])
+  pFDP.mat = matrix(unlist(pFDP.list), nrow = length(pFDP.list), byrow = TRUE)
+  return(pFDP.mat)
+}
+
+## Calculate summary statistics of positive false discovery proportions
+## including mean and sd of the mean
+## over a simulation of a list of many data sets
+## and a vector of nominal FDR thresholds
+FDP.summary <- function (pFDP.mat, pFDR = TRUE) {
+  if (!pFDR) {
+    pFDP.mat[is.na(pFDP.mat)] <- 0
+  }
+  FDP.samplesize = colSums(!is.na(pFDP.mat))
+  FDP.mean = colMeans(pFDP.mat, na.rm = TRUE)
+  FDP.mean.sd = apply(pFDP.mat, 2, sd, na.rm = TRUE) / sqrt(FDP.samplesize)
+  return(list(FDP.mean = FDP.mean, FDP.mean.sd = FDP.mean.sd))
+}
+
+## plot a polygon of average false discovery proportion
+## with the line indicating average false discovery proportion or estimated FDR
+## polygon indicating standard error of the average
+FDP.polygon.plot <- function (pFDP.mat, pFDR = TRUE, FDR.nominal, col) {
+  FDP.sum <- FDP.summary(pFDP.mat, pFDR)
+  mean <- FDP.sum$FDP.mean
+  sd <- FDP.sum$FDP.mean.sd
+  lines(FDR.nominal, mean, col = col, lwd = 2)
+  polygon.color.rgb = as.vector(grDevices::col2rgb(col))
+  polygon(x = c(FDR.nominal, rev(FDR.nominal)),
+          y = c(mean - 2 * sd, rev(mean + 2 * sd)),
+          col = grDevices::rgb(polygon.color.rgb[1], polygon.color.rgb[2], polygon.color.rgb[3], alpha = 100, max = 255),
+          border = col,
+          lty = 2)
+}
+```
+
+```{r discovery function, echo = FALSE}
+## Calculate number of true discoveries for one data set and one nominal FDR threshold
+TD = function (FDR, response, predictor) {
+  return(sum(response[predictor <= FDR]))
+}
+
+## Calculate true discoveries for a simulation of a list of many data sets
+## and a vector of nominal FDR thresholds
+## Return a matrix, rows are data sets, columns are FDR thresholds
+TD.matrix <- function (beta, qvalue, FDR.nominal) {
+  TD.list = list()
+  for (i in 1 : length(beta))
+    TD.list[[i]] = sapply(FDR.nominal,
+                            TD,
+                            response = (beta[[i]] != 0),
+                            predictor = qvalue[[i]])
+  TD.mat = matrix(unlist(TD.list), nrow = length(TD.list), byrow = TRUE)
+  return(TD.mat)
+}
+```
+
+```{r ggplot2 settings, echo = FALSE}
+library(reshape2)
+library(ggplot2)
+mean_sdp <- function(x) {
+   m <- mean(x)
+   ymax <- m + sd(x)
+   return(c(y = m, ymax = ymax, ymin = m))
+}
+method.name <- c("BH", "qvalue", "ASH", "CASH")
+method.col <- c("orange", "green", "blue", "red")
+```
+
+```{r simulation parameters, echo = FALSE}
+FDR.nominal <- seq(0, 0.1, 0.001)[-1]
+```
+
+```{r cor parameters 1, echo = FALSE}
+pi0 <- 0.5
+sd1 <- 1
+g <- ashr::normalmix(pi <- c(pi0, 1 - pi0), mean = 0, sd = c(0, sd1))
+xplot <- seq(-5 * max(g$sd), 5 * max(g$sd), length = 1000)
+yplot.true <- ashr::mixcdf(g, xplot)
+```
+
+```{r cor fitting 1, echo = FALSE, cache = TRUE}
+yplot.ash <- yplot.cash <- list()
+pihat0.ash = pihat0.gdash = pihat0.qvalue = c()
+beta = qvalue.BH = qvalue.qvalue = qvalue.ash = qvalue.gdash = list()
+sd.z = c()
+err = se = list()
+
+set.seed(777)
+for (i in 1 : nsim) {
+  ## generate data
+  counts <- r[, sample(ncol(r), 2 * nsamp)]
+  design <- model.matrix(~c(rep(0, nsamp), rep(1, nsamp)))
+  summary <- count_to_summary(counts, design)
+  z <- summary$z
+  sebetahat <- summary$sebetahat
+  beta[[i]] <- sample(
+    c(
+      rnorm(round(g$pi[1] * ngene), g$mean[1], g$sd[1]),
+      rnorm(round(g$pi[2] * ngene), g$mean[2], g$sd[2])
+    )
+  )
+  betahat <- beta[[i]] + z * sebetahat
+  p = (1 - pnorm(abs(betahat / sebetahat))) * 2
+
+  ## different methods
+  fit.ash = ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+  fit.gdash = gdash(betahat, sebetahat)
+  fit.qvalue = qvalue::qvalue(p)
+  fit.BH = p.adjust(p, method = "BH")
+  
+  ## pihat0
+  pihat0.ash[i] = ashr::get_pi0(fit.ash)
+  pihat0.gdash[i] = ashr::get_pi0(fit.gdash)
+  pihat0.qvalue[i] = fit.qvalue$pi0
+
+  ## FDR
+  qvalue.BH[[i]] = fit.BH
+  qvalue.qvalue[[i]] = fit.qvalue$qvalues
+  qvalue.ash[[i]] = ashr::get_qvalue(fit.ash)
+  qvalue.gdash[[i]] = fit.gdash$qvalue
+  
+  ## CDF
+  yplot.ash[[i]] <- ashr::mixcdf(ashr::get_fitted_g(fit.ash), xplot)
+  yplot.cash[[i]] <- ashr::mixcdf(ashr::get_fitted_g(fit.gdash), xplot)
+
+  ## store the data
+  sd.z[i] <- sd(z)
+  err[[i]] <- z
+  se[[i]] <- sebetahat
+}
+```
+
+```{r deconv 1, echo = FALSE}
+xplot.1 <- xplot
+yplot.ash.1 <- yplot.ash
+yplot.cash.1 <- yplot.cash
+yplot.true.1 <- yplot.true
+```
+
+## FDR \& Power
+
+```{r FDP 1, echo = FALSE}
+pFDP.mat.BH <- pFDP.matrix(beta, qvalue.BH, FDR.nominal)
+pFDP.mat.qvalue <- pFDP.matrix(beta, qvalue.qvalue, FDR.nominal)
+pFDP.mat.ash <- pFDP.matrix(beta, qvalue.ash, FDR.nominal)
+pFDP.mat.gdash <- pFDP.matrix(beta, qvalue.gdash, FDR.nominal)
+
+cutoff <- 0.05
+loc <- FDR.nominal == cutoff
+FDP.cutoff <- cbind(
+  BH = pFDP.mat.BH[, loc],
+  qvalue = pFDP.mat.qvalue[, loc],
+  ASH = pFDP.mat.ash[, loc],
+  CASH = pFDP.mat.gdash[, loc]
+)
+FDP.cutoff <- as.data.frame(FDP.cutoff)
+
+
+ggplot(data = melt(FDP.cutoff),
+        aes(x = variable, y = value, col = variable)) +
+  geom_violin(trim = TRUE) +
+  stat_summary(fun.data = "mean_sdp", geom = "pointrange") +
+  scale_color_manual(values = method.col) +
+  geom_hline(yintercept = cutoff, col = "maroon", linetype = "dashed", size = 1) +
+  labs(title = bquote(paste("False Discovery Proportions at ", FDR == .(cutoff), " Cutoff")), x = "", y = "Actual False Discovery Proportion (FDP)") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 20), axis.title.y = element_text(size = 20), axis.text.x = element_text(size = 20), axis.text.y = element_text(size = 15))
+```
+
+```{r power 1, echo = FALSE}
+TD.mat.BH <- TD.matrix(beta, qvalue.BH, FDR.nominal)
+TD.mat.qvalue <- TD.matrix(beta, qvalue.qvalue, FDR.nominal)
+TD.mat.ash <- TD.matrix(beta, qvalue.ash, FDR.nominal)
+TD.mat.cash <- TD.matrix(beta, qvalue.gdash, FDR.nominal)
+TD.cutoff <- cbind(
+  BH = TD.mat.BH[, loc],
+  qvalue = TD.mat.qvalue[, loc],
+  ASH = TD.mat.ash[, loc],
+  CASH = TD.mat.cash[, loc]
+)
+TD.cutoff <- as.data.frame(TD.cutoff)
+
+ggplot(data = melt(TD.cutoff),
+        aes(x = variable, y = value, col = variable)) +
+  geom_violin(trim = TRUE) +
+  stat_summary(fun.data = "mean_sdp", geom = "pointrange") +
+  scale_color_manual(values = method.col) +
+  labs(title = bquote(paste("Number of True Discoveries at ", FDR == .(cutoff), " Cutoff")), x = "", y = "Number of True Discoveries") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 20), axis.title.y = element_text(size = 20), axis.text.x = element_text(size = 20), axis.text.y = element_text(size = 15))
+```
+
+```{r cor parameters 2, echo = FALSE}
+pi0 <- 0.9
+sd1 <- 1
+g <- ashr::normalmix(pi <- c(pi0, 1 - pi0), mean = 0, sd = c(0, sd1))
+xplot <- seq(-5 * max(g$sd), 5 * max(g$sd), length = 1000)
+yplot.true <- ashr::mixcdf(g, xplot)
+```
+
+```{r cor fitting 2, echo = FALSE, cache = TRUE}
+yplot.ash <- yplot.cash <- list()
+pihat0.ash = pihat0.gdash = pihat0.qvalue = c()
+beta = qvalue.BH = qvalue.qvalue = qvalue.ash = qvalue.gdash = list()
+sd.z = c()
+err = se = list()
+
+set.seed(777)
+for (i in 1 : nsim) {
+  ## generate data
+  counts <- r[, sample(ncol(r), 2 * nsamp)]
+  design <- model.matrix(~c(rep(0, nsamp), rep(1, nsamp)))
+  summary <- count_to_summary(counts, design)
+  z <- summary$z
+  sebetahat <- summary$sebetahat
+  beta[[i]] <- sample(
+    c(
+      rnorm(round(g$pi[1] * ngene), g$mean[1], g$sd[1]),
+      rnorm(round(g$pi[2] * ngene), g$mean[2], g$sd[2])
+    )
+  )
+  betahat <- beta[[i]] + z * sebetahat
+  p = (1 - pnorm(abs(betahat / sebetahat))) * 2
+
+  ## different methods
+  fit.ash = ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+  fit.gdash = gdash(betahat, sebetahat)
+  fit.qvalue = qvalue::qvalue(p)
+  fit.BH = p.adjust(p, method = "BH")
+  
+  ## pihat0
+  pihat0.ash[i] = ashr::get_pi0(fit.ash)
+  pihat0.gdash[i] = ashr::get_pi0(fit.gdash)
+  pihat0.qvalue[i] = fit.qvalue$pi0
+
+  ## FDR
+  qvalue.BH[[i]] = fit.BH
+  qvalue.qvalue[[i]] = fit.qvalue$qvalues
+  qvalue.ash[[i]] = ashr::get_qvalue(fit.ash)
+  qvalue.gdash[[i]] = fit.gdash$qvalue
+  
+  ## CDF
+  yplot.ash[[i]] <- ashr::mixcdf(ashr::get_fitted_g(fit.ash), xplot)
+  yplot.cash[[i]] <- ashr::mixcdf(ashr::get_fitted_g(fit.gdash), xplot)
+
+  ## store the data
+  sd.z[i] <- sd(z)
+  err[[i]] <- z
+  se[[i]] <- sebetahat
+}
+```
+
+```{r deconv 2, echo = FALSE}
+xplot.2 <- xplot
+yplot.ash.2 <- yplot.ash
+yplot.cash.2 <- yplot.cash
+yplot.true.2 <- yplot.true
+```
+
+```{r FDP 2, echo = FALSE}
+pFDP.mat.BH <- pFDP.matrix(beta, qvalue.BH, FDR.nominal)
+pFDP.mat.qvalue <- pFDP.matrix(beta, qvalue.qvalue, FDR.nominal)
+pFDP.mat.ash <- pFDP.matrix(beta, qvalue.ash, FDR.nominal)
+pFDP.mat.gdash <- pFDP.matrix(beta, qvalue.gdash, FDR.nominal)
+
+cutoff <- 0.05
+loc <- FDR.nominal == cutoff
+FDP.cutoff <- cbind(
+  BH = pFDP.mat.BH[, loc],
+  qvalue = pFDP.mat.qvalue[, loc],
+  ASH = pFDP.mat.ash[, loc],
+  CASH = pFDP.mat.gdash[, loc]
+)
+FDP.cutoff <- as.data.frame(FDP.cutoff)
+
+ggplot(data = melt(FDP.cutoff),
+        aes(x = variable, y = value, col = variable)) +
+  geom_violin(trim = TRUE) +
+  stat_summary(fun.data = "mean_sdp", geom = "pointrange") +
+  scale_color_manual(values = method.col) +
+  geom_hline(yintercept = cutoff, col = "maroon", linetype = "dashed", size = 1) +
+  labs(title = bquote(paste("False Discovery Proportions at ", FDR == .(cutoff), " Cutoff")), x = "", y = "Actual False Discovery Proportion (FDP)") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 20), axis.title.y = element_text(size = 20), axis.text.x = element_text(size = 20), axis.text.y = element_text(size = 15))
+```
+
+```{r power 2, echo = FALSE}
+TD.mat.BH <- TD.matrix(beta, qvalue.BH, FDR.nominal)
+TD.mat.qvalue <- TD.matrix(beta, qvalue.qvalue, FDR.nominal)
+TD.mat.ash <- TD.matrix(beta, qvalue.ash, FDR.nominal)
+TD.mat.cash <- TD.matrix(beta, qvalue.gdash, FDR.nominal)
+TD.cutoff <- cbind(
+  BH = TD.mat.BH[, loc],
+  qvalue = TD.mat.qvalue[, loc],
+  ASH = TD.mat.ash[, loc],
+  CASH = TD.mat.cash[, loc]
+)
+TD.cutoff <- as.data.frame(TD.cutoff)
+
+ggplot(data = melt(TD.cutoff),
+        aes(x = variable, y = value, col = variable)) +
+  geom_violin(trim = TRUE) +
+  stat_summary(fun.data = "mean_sdp", geom = "pointrange") +
+  scale_color_manual(values = method.col) +
+  labs(title = bquote(paste("Number of True Discoveries at ", FDR == .(cutoff), " Cutoff")), x = "", y = "Number of True Discoveries") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 20), axis.title.y = element_text(size = 20), axis.text.x = element_text(size = 20), axis.text.y = element_text(size = 15))
+```
+
+```{r deconv plot, echo = FALSE, fig.asp = 0.5, fig.width = 10}
+par(mfrow = c(1, 2)) # 2-by-2 grid of plots
+par(oma = c(0.5, 2.5, 0, 0)) # make room (i.e. the 4's) for the overall x and y axis titles
+par(mar = c(2, 2, 3.5, 1)) # make the plots be closer together
+
+plot(xplot.1, yplot.true.1, type = "n", xlim = c(-2 * max(g$sd), 2 * max(g$sd)), xlab = "", ylab = "", main = expression(
+  g == 0.5~delta[0] + 0.5~N(0,1)
+))
+for (i in 1 : nsim) {
+  lines(xplot.1, yplot.ash.1[[i]], col = "blue", lwd = 0.75)
+  lines(xplot.1, yplot.cash.1[[i]], col = "red", lwd = 0.5)
+}
+lines(xplot.1, yplot.true.1, lwd = 2)
+legend("right", inset = c(0.05, 0), lty = 1, lwd = 2, col = c("black", "blue", "red"), c(
+"g (True)", expression(paste(hat(g), " (ASH)")), expression(paste(hat(g), " (CASH)"))), y.intersp = 1.5
+)
+
+plot(xplot.2, yplot.true.2, type = "n", xlim = c(-2 * max(g$sd), 2 * max(g$sd)), xlab = "", ylab = "", main = expression(
+  g == 0.9~delta[0] + 0.1~N(0,1)
+))
+for (i in 1 : nsim) {
+  lines(xplot.2, yplot.ash.2[[i]], col = "blue", lwd = 0.75)
+  lines(xplot.2, yplot.cash.2[[i]], col = "red", lwd = 0.5)
+}
+lines(xplot.2, yplot.true.2, lwd = 2)
+legend("right", inset = c(0.05, 0), lty = 1, lwd = 2, col = c("black", "blue", "red"), c(
+"g (True)", expression(paste(hat(g), " (ASH)")), expression(paste(hat(g), " (CASH)"))), y.intersp = 1.5)
+mtext('Cumulative Distribution Function (CDF)', side = 2, outer = TRUE, line = 1)
+```
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```
