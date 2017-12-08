@@ -81,38 +81,7 @@ mtext("Histograms of Correlated N(0,1) Variates", line = -2, outer = TRUE)
 legend("topleft", inset = c(-0.7, -0.25), legend = c("N(0, 1)", "Gaussian Derivatives"), lty = 1, lwd = 2, xpd = NA, col = c("blue", "red"), ncol = 2)
 ```
 
-## Peculiarities of correlation
-
-```{r, echo = FALSE}
-z = readRDS("../output/z_null_liver_777_select.RDS")
-z = z$typical[[5]]
-par(mfrow = c(1, 2))
-par(oma = c(0.5, 0.5, 0.5, 0.5)) # make room (i.e. the 4's) for the overall x and y axis titles
-par(mar = c(2, 3, 1, 2)) # make the plots be closer together
-hist(z, breaks = 100, prob = TRUE, xlab = "", main = "Histogram of Correlated Z Scores: Left Tail", xlim = c(-5, -2.5), ylim = c(0, 0.07))
-lines(seq(-6, 6, 0.01), dnorm(seq(-6, 6, 0.01)), col = "red")
-
-xplot <- seq(-10, 10, length = 1000)
-hermite = Hermite(4)
-gd0.std = dnorm(xplot)
-matrix_lik_w = cbind(gd0.std)
-for (i in 1 : 2) {
-  gd.std = (-1)^i * hermite[[i]](xplot) * gd0.std
-  matrix_lik_w = cbind(matrix_lik_w, gd.std)
-}
-plot(xplot, xplot, type = "n", xlim = c(-5, 5), ylim = range(matrix_lik_w[, 1 : 3]), bty = "n", xlab = "", ylab = "", main = "The First 2 Gaussian Derivatives")
-col = c(2, 3, 4)
-for (i in 1 : 3) {
-  lines(xplot, matrix_lik_w[, i], col = i + 1)
-}
-legend("topright", col = 2 : 4, lty = 1, c(expression(
-    varphi,
-    paste(varphi, "'"),
-    paste(varphi, '"')
-  )
-), bty = "n"
-)
-```
+## FDR \& Power
 
 ```{r code, message = FALSE, warning = FALSE, echo = FALSE}
 source("../code/gdash_lik.R")
@@ -299,8 +268,6 @@ yplot.cash.1 <- yplot.cash
 yplot.true.1 <- yplot.true
 ```
 
-## FDR \& Power
-
 ```{r FDP 1, echo = FALSE}
 pFDP.mat.BH <- pFDP.matrix(beta, qvalue.BH, FDR.nominal)
 pFDP.mat.qvalue <- pFDP.matrix(beta, qvalue.qvalue, FDR.nominal)
@@ -465,6 +432,8 @@ ggplot(data = melt(TD.cutoff),
   theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 20), axis.title.y = element_text(size = 20), axis.text.x = element_text(size = 20), axis.text.y = element_text(size = 15))
 ```
 
+## Deconvolution
+
 ```{r deconv plot, echo = FALSE, fig.asp = 0.5, fig.width = 10}
 par(mfrow = c(1, 2)) # 2-by-2 grid of plots
 par(oma = c(0.5, 2.5, 0, 0)) # make room (i.e. the 4's) for the overall x and y axis titles
@@ -493,6 +462,206 @@ lines(xplot.2, yplot.true.2, lwd = 2)
 legend("right", inset = c(0.05, 0), lty = 1, lwd = 2, col = c("black", "blue", "red"), c(
 "g (True)", expression(paste(hat(g), " (ASH)")), expression(paste(hat(g), " (CASH)"))), y.intersp = 1.5)
 mtext('Cumulative Distribution Function (CDF)', side = 2, outer = TRUE, line = 1)
+```
+
+## Corr vs Indep
+
+The following plots show that although the performance of `CASH` is not ideal for the more sparse case ($\pi_0 = 0.9$), it gives results under correlation similar to what other methods give under independence.
+
+```{r cor parameters 3, echo = FALSE}
+pi0 <- 0.9
+sd1 <- 1
+g <- ashr::normalmix(pi <- c(pi0, 1 - pi0), mean = 0, sd = c(0, sd1))
+xplot <- seq(-5 * max(g$sd), 5 * max(g$sd), length = 1000)
+yplot.true <- ashr::mixcdf(g, xplot)
+```
+
+```{r cor fitting 3, echo = FALSE, cache = TRUE}
+yplot.ash <- yplot.cash <- list()
+pihat0.ash = pihat0.gdash = pihat0.qvalue = c()
+pihat0.ash.indep = pihat0.gdash.indep = pihat0.qvalue.indep = c()
+beta = err = se = list()
+err.indep <- list()
+qvalue.BH = qvalue.qvalue = qvalue.ash = qvalue.gdash = list()
+qvalue.BH.indep = qvalue.qvalue.indep = qvalue.ash.indep = qvalue.gdash.indep = list()
+sd.z = c()
+
+set.seed(777)
+for (i in 1 : nsim) {
+  ## generate data
+  counts <- r[, sample(ncol(r), 2 * nsamp)]
+  design <- model.matrix(~c(rep(0, nsamp), rep(1, nsamp)))
+  summary <- count_to_summary(counts, design)
+  z <- summary$z
+  sebetahat <- summary$sebetahat
+  beta[[i]] <- sample(
+    c(
+      rnorm(round(g$pi[1] * ngene), g$mean[1], g$sd[1]),
+      rnorm(round(g$pi[2] * ngene), g$mean[2], g$sd[2])
+    )
+  )
+  betahat <- beta[[i]] + z * sebetahat
+  p = (1 - pnorm(abs(betahat / sebetahat))) * 2
+  z.indep <- rnorm(ngene)
+  betahat.indep <- beta[[i]] + z.indep * sebetahat
+  p.indep <- (1 - pnorm(abs(betahat.indep / sebetahat))) * 2
+
+  ## different methods
+  fit.ash = ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+  fit.gdash = gdash(betahat, sebetahat)
+  fit.qvalue = qvalue::qvalue(p)
+  fit.BH = p.adjust(p, method = "BH")
+  
+  fit.ash.indep <- ashr::ash(betahat.indep, sebetahat, mixcompdist = "normal", method = "fdr")
+  fit.gdash.indep <- gdash(betahat.indep, sebetahat)
+  fit.qvalue.indep <- qvalue::qvalue(p.indep)
+  fit.BH.indep <- p.adjust(p.indep, method = "BH")
+
+  ## pihat0
+  pihat0.ash[i] = ashr::get_pi0(fit.ash)
+  pihat0.gdash[i] = ashr::get_pi0(fit.gdash)
+  pihat0.qvalue[i] = fit.qvalue$pi0
+  
+  pihat0.ash.indep[i] = ashr::get_pi0(fit.ash.indep)
+  pihat0.gdash.indep[i] = ashr::get_pi0(fit.gdash.indep)
+  pihat0.qvalue.indep[i] = fit.qvalue.indep$pi0
+
+  ## FDR
+  qvalue.BH[[i]] = fit.BH
+  qvalue.qvalue[[i]] = fit.qvalue$qvalues
+  qvalue.ash[[i]] = ashr::get_qvalue(fit.ash)
+  qvalue.gdash[[i]] = fit.gdash$qvalue
+  
+  qvalue.BH.indep[[i]] = fit.BH.indep
+  qvalue.qvalue.indep[[i]] = fit.qvalue.indep$qvalues
+  qvalue.ash.indep[[i]] = ashr::get_qvalue(fit.ash.indep)
+  qvalue.gdash.indep[[i]] = fit.gdash.indep$qvalue
+
+  ## CDF
+  yplot.ash[[i]] <- ashr::mixcdf(ashr::get_fitted_g(fit.ash), xplot)
+  yplot.cash[[i]] <- ashr::mixcdf(ashr::get_fitted_g(fit.gdash), xplot)
+
+  ## store the data
+  sd.z[i] <- sd(z)
+  err[[i]] <- z
+  se[[i]] <- sebetahat
+  err.indep[[i]] <- z.indep
+}
+```
+
+```{r FDP 3, echo = FALSE, fig.asp = 0.5, fig.width = 12}
+pFDP.mat.BH <- pFDP.matrix(beta, qvalue.BH, FDR.nominal)
+pFDP.mat.qvalue <- pFDP.matrix(beta, qvalue.qvalue, FDR.nominal)
+pFDP.mat.ash <- pFDP.matrix(beta, qvalue.ash, FDR.nominal)
+pFDP.mat.gdash <- pFDP.matrix(beta, qvalue.gdash, FDR.nominal)
+
+pFDP.mat.BH.indep <- pFDP.matrix(beta, qvalue.BH.indep, FDR.nominal)
+pFDP.mat.qvalue.indep <- pFDP.matrix(beta, qvalue.qvalue.indep, FDR.nominal)
+pFDP.mat.ash.indep <- pFDP.matrix(beta, qvalue.ash.indep, FDR.nominal)
+pFDP.mat.gdash.indep <- pFDP.matrix(beta, qvalue.gdash.indep, FDR.nominal)
+
+cutoff <- 0.05
+loc <- FDR.nominal == cutoff
+FDP.cutoff <- rbind(cbind(
+  BH = pFDP.mat.BH[, loc],
+  qvalue = pFDP.mat.qvalue[, loc],
+  ASH = pFDP.mat.ash[, loc],
+  CASH = pFDP.mat.gdash[, loc]
+), cbind(
+  BH = pFDP.mat.BH.indep[, loc],
+  qvalue = pFDP.mat.qvalue.indep[, loc],
+  ASH = pFDP.mat.ash.indep[, loc],
+  CASH = pFDP.mat.gdash.indep[, loc]
+))
+FDP.cutoff <- as.data.frame(FDP.cutoff)
+Noise <- c(rep("Correlated", length(pFDP.mat.BH[, loc])), rep("Independent", length(pFDP.mat.BH.indep[, loc])))
+FDP.cutoff <- cbind(FDP.cutoff, Noise)
+
+ggplot(data = melt(FDP.cutoff, id.vars = "Noise"),
+        aes(x = variable, y = value, col = variable,
+            fill = Noise
+            )) +
+  geom_violin(trim = TRUE) +
+  stat_summary(fun.data = "mean_sdp", geom = "pointrange",
+               position = position_dodge(width = 0.9)
+               ) +
+  scale_color_manual(values = method.col, guide = FALSE) +
+  scale_fill_manual(values = c("#767676", "#D6D6CE")) +
+#  facet_wrap(~ Noise) +
+  geom_hline(yintercept = cutoff, col = "maroon", linetype = "dashed", size = 1) +
+  labs(title = bquote(paste("False Discovery Proportions at ", FDR == .(cutoff), " Cutoff")), x = "", y = "Actual False Discovery Proportion (FDP)") +
+  theme(legend.position = "bottom",
+        legend.text = element_text(size = 15),
+        plot.title = element_text(hjust = 0.5, size = 20), axis.title.y = element_text(size = 20), axis.text.x = element_text(size = 20), axis.text.y = element_text(size = 15))
+```
+
+```{r power 3, echo = FALSE, fig.asp = 0.5, fig.width = 10}
+TD.mat.BH <- TD.matrix(beta, qvalue.BH, FDR.nominal)
+TD.mat.qvalue <- TD.matrix(beta, qvalue.qvalue, FDR.nominal)
+TD.mat.ash <- TD.matrix(beta, qvalue.ash, FDR.nominal)
+TD.mat.cash <- TD.matrix(beta, qvalue.gdash, FDR.nominal)
+
+TD.mat.BH.indep <- TD.matrix(beta, qvalue.BH.indep, FDR.nominal)
+TD.mat.qvalue.indep <- TD.matrix(beta, qvalue.qvalue.indep, FDR.nominal)
+TD.mat.ash.indep <- TD.matrix(beta, qvalue.ash.indep, FDR.nominal)
+TD.mat.cash.indep <- TD.matrix(beta, qvalue.gdash.indep, FDR.nominal)
+
+TD.cutoff <- rbind(cbind(
+  indep = rep(0, length(TD.mat.BH[, loc])),
+  BH = TD.mat.BH[, loc],
+  qvalue = TD.mat.qvalue[, loc],
+  ASH = TD.mat.ash[, loc],
+  CASH = TD.mat.cash[, loc]
+), cbind(
+  indep = rep(1, length(TD.mat.BH.indep[, loc])),
+  BH = TD.mat.BH.indep[, loc],
+  qvalue = TD.mat.qvalue.indep[, loc],
+  ASH = TD.mat.ash.indep[, loc],
+  CASH = TD.mat.cash.indep[, loc]
+))
+TD.cutoff <- as.data.frame(TD.cutoff)
+
+ggplot(data = melt(TD.cutoff, id.vars = "indep"),
+        aes(x = variable, y = value, col = variable)) +
+  geom_violin(trim = TRUE) +
+  stat_summary(fun.data = "mean_sdp", geom = "pointrange") +
+  scale_color_manual(values = method.col) +
+  facet_wrap(~ indep) +
+  labs(title = bquote(paste("Number of True Discoveries at ", FDR == .(cutoff), " Cutoff")), x = "", y = "Number of True Discoveries") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 20), axis.title.y = element_text(size = 20), axis.text.x = element_text(size = 20), axis.text.y = element_text(size = 15))
+```
+
+## Peculiarities of correlation
+
+```{r, echo = FALSE, fig.asp = 0.5, fig.width = 10}
+z = readRDS("../output/z_null_liver_777_select.RDS")
+z = z$typical[[5]]
+par(mfrow = c(1, 2))
+par(oma = c(0.5, 0.5, 0.5, 0.5)) # make room (i.e. the 4's) for the overall x and y axis titles
+par(mar = c(2, 3, 1, 2)) # make the plots be closer together
+hist(z, breaks = 100, prob = TRUE, xlab = "", main = "Histogram of Correlated Z Scores: Left Tail", xlim = c(-5, -2.5), ylim = c(0, 0.07))
+lines(seq(-6, 6, 0.01), dnorm(seq(-6, 6, 0.01)), col = "red")
+
+xplot <- seq(-10, 10, length = 1000)
+hermite = Hermite(4)
+gd0.std = dnorm(xplot)
+matrix_lik_w = cbind(gd0.std)
+for (i in 1 : 2) {
+  gd.std = (-1)^i * hermite[[i]](xplot) * gd0.std
+  matrix_lik_w = cbind(matrix_lik_w, gd.std)
+}
+plot(xplot, xplot, type = "n", xlim = c(-5, 5), ylim = range(matrix_lik_w[, 1 : 3]), bty = "n", xlab = "", ylab = "", main = "The First 2 Gaussian Derivatives")
+col = c(2, 3, 4)
+for (i in 1 : 3) {
+  lines(xplot, matrix_lik_w[, i], col = i + 1)
+}
+legend("topright", col = 2 : 4, lty = 1, c(expression(
+    varphi,
+    paste(varphi, "'"),
+    paste(varphi, '"')
+  )
+), bty = "n"
+)
 ```
 
 ## Session information
