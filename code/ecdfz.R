@@ -126,7 +126,7 @@ loglikecdfz = function (w, ord, z) {
 w.cvxr.uncns = function (H) {
   p = ncol(H)
   w <- Variable(p)
-  objective <- Maximize(SumEntries(Log(H %*% w + 1)))
+  objective <- Maximize(CVXR::sum_entries(Log(H %*% w + 1)))
   prob <- Problem(objective)
   capture.output(result <- solve(prob), file = "/dev/null")
   return(result)
@@ -139,7 +139,7 @@ w.cvxr.cns = function (H) {
   w <- Variable(p)
   y <- Variable(l)
   # Hp <- sapply(1 : p, EQL::hermite, x = c(min(z) - 1, max(z) + 1))
-  objective <- Maximize(SumEntries(Log(y)))
+  objective <- Maximize(CVXR::sum_entries(Log(y)))
   constraint <- list(H %*% w + 1 == y
                      #, Hp %*% w > -1
                      )
