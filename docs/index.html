@@ -20,8 +20,8 @@
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
-<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -31,10 +31,12 @@
   }
 </style>
 <script type="text/javascript">
-if (window.hljs && document.readyState && document.readyState === "complete") {
-   window.setTimeout(function() {
-      hljs.initHighlighting();
-   }, 0);
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
 }
 </script>
 
@@ -255,7 +257,7 @@ $(document).ready(function () {
 <li><a href="correlated_z_3.html">Histogram of correlated <span class="math inline">\(z\)</span> scores, <code>BH</code>-hostile data sets</a></li>
 </ul>
 <p>An implicit key question of this inquiry is: what’s the behavior of <span class="math inline">\(z\)</span> scores under dependency? We take a look at their histograms. First for randomly sampled data sets. Second for those most “hostile” to <code>ash</code>. Third for those most “hostile” to <code>BH</code>. The bottom line is we are reproducing what Efron observed in microarray data, that “the theoretical null may fail” in different ways. Now the key questions are</p>
-<ol style="list-style-type: decimal">
+<ol type="1">
 <li><p>Why the theoretical null may fail? What does it mean by <strong>correlation</strong>?</p></li>
 <li><p>Can <code>truncash</code> make <code>ash</code> more robust against some of the foes that make the theoretical null fail?</p></li>
 <li><p>Generally, how robust is empirical Bayes? Is empirical Bayes robust or non-robust to certain kinds of correlation?</p></li>
@@ -351,7 +353,7 @@ $(document).ready(function () {
 <ul>
 <li><a href="group_meeting_0608.html">Group meeting presentation on <code>GD-ASH</code></a></li>
 </ul>
-<p>Talked about using Gaussian derivatives to handle correlation at Matthew’s group meeting.</p>
+<p>Talked about using Gaussian derivatives to handle correlation on Matthew’s group meeting.</p>
 <ul>
 <li><a href="smemo.html"><code>GD-ASH</code> applied to Smemo et al 2014 data</a></li>
 <li><a href="smemo_2.html"><code>GD-ASH</code> applied to Smemo et al 2014 data: Fitting <code>ASH</code> first</a></li>
@@ -397,6 +399,7 @@ $(document).ready(function () {
 <ul>
 <li><a href="poster_obayes17.html">Poster for O’Bayes 2017</a></li>
 </ul>
+<p>First public presentation of <code>CASH</code>.</p>
 <!-- The goal of this new template is to simplify the setup and maintenance of a research website. -->
 <!-- Specifically, -->
 <!-- *  Easier to build and extend the website using the new tools in the [rmarkdown][] package and [latest RStudio release][rstudio] -->
