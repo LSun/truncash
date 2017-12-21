@@ -25,8 +25,8 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
-<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -36,10 +36,12 @@
   }
 </style>
 <script type="text/javascript">
-if (window.hljs && document.readyState && document.readyState === "complete") {
-   window.setTimeout(function() {
-      hljs.initHighlighting();
-   }, 0);
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
 }
 </script>
 
@@ -309,15 +311,15 @@ div.tocify {
 </div>
 
 
-<p><strong>Last updated:</strong> 2017-11-07</p>
-<p><strong>Code version:</strong> 2c05d59</p>
-<div id="introduction" class="section level2">
+<p><strong>Last updated:</strong> 2017-12-21</p>
+<p><strong>Code version:</strong> 6e42447</p>
+<section id="introduction" class="level2">
 <h2>Introduction</h2>
 <p>During a conversation with Matthew on correlated <span class="math inline">\(z\)</span>-scores, <a href="https://galton.uchicago.edu/~stein/">Prof. Michael Stein</a> remarked that “if the marginal distribution is correct then the expected number exceeding any threshold should be correct… so if the tail is ‘usually’ deflated, it should be that with some small probability there are many large <span class="math inline">\(z\)</span>-scores (even in the tail).” So we are running this simulation to check that insight, that is, “if there are usually not enough in the tail then there must be some probability of too many in the tail,” based on the assumption that, on average, the <span class="math inline">\(p\)</span>-values are uniform after <code>voom</code> transformation.</p>
 <p>Using <a href="https://github.com/LSun/truncash/tree/master/data/liver.csv">GTex/Liver</a> data, we sample <span class="math inline">\(N = 10\)</span>K genes from a <span class="math inline">\(5\)</span> vs <span class="math inline">\(5\)</span> study, and keep the correlation among genes. The data for each gene can then be transformed by <code>voom</code> to a <span class="math inline">\(p\)</span>-value; thus we get <span class="math inline">\(10\)</span>K <span class="math inline">\(p\)</span>-values for each simulation run. A total of <span class="math inline">\(m = 1\)</span>K runs generate a <span class="math inline">\(m \times N\)</span> matrix of <span class="math inline">\(p\)</span>-values, each row an independent simulation run with <span class="math inline">\(10\)</span>K genes.</p>
 <p>With different pre-specified thresholds <span class="math inline">\(T_p\)</span>, we record, for each of the <span class="math inline">\(m = 1000\)</span> runs, the number of extreme observations with <span class="math inline">\(p \leq T_p\)</span>. The occurrence table is stored in <a href="https://github.com/LSun/truncash/tree/master/output/p_null_liver_extreme.txt"><code>p_null_liver_extreme.txt</code></a>.</p>
-</div>
-<div id="result" class="section level2">
+</section>
+<section id="result" class="level2">
 <h2>Result</h2>
 <pre class="r"><code># load extreme observation count table
 p_extreme = read.table(&quot;../output/p_null_liver_extreme.txt&quot;, header = TRUE, check.names = FALSE)
@@ -349,13 +351,13 @@ for(j in 1:J) {
 <p>As Prof. Stein pointed, if the marginal distribution is correct then the expected number exceeding any threshold should be correct. So if the tail is “usually”&quot; deflated, it should be that with some small probability there are many large <span class="math inline">\(z\)</span>-scores (even in the tail). Therefore, if “on average” we have the right number of large <span class="math inline">\(z\)</span>-scores/small <span class="math inline">\(p\)</span>-values, and “usually” we have too few, then “rarely” we should have too many.</p>
 <p>For the first plot, for example, each simulation run we have <span class="math inline">\(10\)</span>K <span class="math inline">\(p\)</span>-values from <span class="math inline">\(10\)</span>K genes simulated under the global null by sampling 5 livers vs 5 livers. We are using threshold <span class="math inline">\(= 5e-4\)</span>. The <span class="math inline">\(p\)</span>-values, as shown by the previous simulations, should be generally inflated, but the extreme p-values should be deflated more often than inflated. Therefore, under the global null, on average, we should observe <span class="math inline">\(5e-4 \times 10K = 5\)</span> extreme p-values under the threshold, yet most of the time we should observe less than this average, and only occasionally we should observe far more than this average. This is exactly what we have seen from 1000 simulation runs. The red dotted line is 5, the expected number. Out of 1000 runs, most of them generated less than 5 extreme p-values, yet occasionally we have far more than 5 extreme p-values, some of which could be as many as 300. On average we have 5.33 extreme p-values, which is close to the expected 5. Other plots are similar.</p>
 <p>The <code>R</code> code to generate both <span class="math inline">\(p\)</span>-value tables is in <a href="https://github.com/LSun/truncash/tree/master/code/p_null_liver.R"><code>p_null_liver.R</code></a></p>
-</div>
-<div id="session-information" class="section level2">
+</section>
+<section id="session-information" class="level2">
 <h2>Session Information</h2>
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 3.4.2 (2017-09-28)
+<pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS Sierra 10.12.6
+Running under: macOS High Sierra 10.13.2
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -368,11 +370,11 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 loaded via a namespace (and not attached):
- [1] compiler_3.4.2  backports_1.1.1 magrittr_1.5    rprojroot_1.2  
- [5] tools_3.4.2     htmltools_0.3.6 yaml_2.1.14     Rcpp_0.12.13   
- [9] stringi_1.1.5   rmarkdown_1.6   knitr_1.17      git2r_0.19.0   
-[13] stringr_1.2.0   digest_0.6.12   workflowr_0.7.0 evaluate_0.10.1</code></pre>
-</div>
+ [1] compiler_3.4.3  backports_1.1.2 magrittr_1.5    rprojroot_1.3-1
+ [5] tools_3.4.3     htmltools_0.3.6 yaml_2.1.16     Rcpp_0.12.14   
+ [9] stringi_1.1.6   rmarkdown_1.8   knitr_1.17      git2r_0.20.0   
+[13] stringr_1.2.0   digest_0.6.13   workflowr_0.8.0 evaluate_0.10.1</code></pre>
+</section>
 
 <hr>
 <p>

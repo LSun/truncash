@@ -25,8 +25,8 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
-<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -36,10 +36,12 @@
   }
 </style>
 <script type="text/javascript">
-if (window.hljs && document.readyState && document.readyState === "complete") {
-   window.setTimeout(function() {
-      hljs.initHighlighting();
-   }, 0);
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
 }
 </script>
 
@@ -309,9 +311,9 @@ div.tocify {
 </div>
 
 
-<p><strong>Last updated:</strong> 2017-11-07</p>
-<p><strong>Code version:</strong> 2c05d59</p>
-<div id="introduction" class="section level2">
+<p><strong>Last updated:</strong> 2017-12-21</p>
+<p><strong>Code version:</strong> 6e42447</p>
+<section id="introduction" class="level2">
 <h2>Introduction</h2>
 <p>Suppose we have <span class="math inline">\(m + n\)</span> observations of <span class="math inline">\((\hat\beta_j, \hat s_j)\)</span> in two groups such that, with a pre-specified <span class="math inline">\(t\)</span>.</p>
 <p><span class="math display">\[
@@ -336,7 +338,7 @@ div.tocify {
 \]</span></p>
 <p>where <span class="math inline">\(\Phi(\cdot)\)</span> is the cdf of <span class="math inline">\(N(0, 1)\)</span>, and <span class="math inline">\(N(\cdot; 0, \sigma_k^2 + \hat s_{m + l}^2)\)</span> is the pdf of <span class="math inline">\(N(0, \sigma_k^2+\hat s_j^2)\)</span>.</p>
 <p>Note that</p>
-<ol style="list-style-type: decimal">
+<ol type="1">
 <li><p>The second part of the objective function is the standard objective function for the regular ASH. The first part of the objective function is new, but it would be as if we are using a different likelihood, so it wouldn’t make any difference numerically.</p></li>
 <li><p>The first part of the objective,</p></li>
 </ol>
@@ -348,15 +350,15 @@ div.tocify {
 m\log(\sum_k\pi_k(2\Phi(\frac{t}{\sqrt{\sigma_k^2+1}}) - 1))
 \]</span></p>
 <p>will move more weight to <span class="math inline">\(\hat\pi_1\)</span>. Customarily, we assume <span class="math inline">\(\sigma_1 \leq \cdots \leq \sigma_K\)</span>, so to maximize this first part alone will be essentially to maximize <span class="math inline">\(\hat\pi_1\)</span>. In other words, if we only have Group 1 and no “extreme” observations in Group 2, the estimated prior of <span class="math inline">\(\beta\)</span> will be a point mass at <span class="math inline">\(0\)</span>. This is true no matter whether we are using <span class="math inline">\(z\)</span>-scores (thus making <span class="math inline">\(\hat s_j \equiv 1\)</span> effectively) or not, although using <span class="math inline">\(z\)</span>-scores will make the case more obviously.</p>
-</div>
-<div id="implementation" class="section level2">
+</section>
+<section id="implementation" class="level2">
 <h2>Implementation</h2>
 <p>Here is the main <code>truncash</code> function, utilizing <code>autoselect.mixsd</code>, <code>mixIP</code>, <code>normalmix</code> from <code>ashr</code>.</p>
 <p><a href="https://github.com/LSun/truncash/tree/master/code/truncash.R"><code>truncash</code></a></p>
-</div>
-<div id="simulation" class="section level2">
+</section>
+<section id="simulation" class="level2">
 <h2>Simulation</h2>
-<div id="the-simplest-case-g-0.9delta_0-0.1n0-1-independent-observations" class="section level4">
+<section id="the-simplest-case-g-0.9delta_0-0.1n0-1-independent-observations" class="level4">
 <h4>The simplest case: <span class="math inline">\(g = 0.9\delta_0 + 0.1N(0, 1)\)</span>, independent observations</h4>
 <p><span class="math inline">\(1000\)</span> pairs of <span class="math inline">\((\hat\beta, \hat s \equiv 1)\)</span> are simulated, so that <span class="math inline">\(900\)</span> of them come from <span class="math inline">\(N(0, 1)\)</span> and another 100 from <span class="math inline">\(N(\beta, 1)\)</span> with <span class="math inline">\(\beta \sim N(0, 1)\)</span>. The <span class="math inline">\(1000\)</span> pairs of observations are fed to both <code>ash</code> and <code>truncash</code>; <span class="math inline">\(\hat\pi_0\)</span> and MSE are obtained. Results from 100 runs are plotted below.</p>
 <pre class="r"><code>source(&quot;../code/truncash.R&quot;)
@@ -414,14 +416,14 @@ points(0.9, 0.9, col = &quot;red&quot;, cex = 1.5, pch = 19)</code></pre>
      )
 abline(0, 1, lty = 3, col = &quot;blue&quot;)</code></pre>
 <p><img src="figure/truncash.Rmd/unnamed-chunk-1-3.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-</div>
-<div id="session-information" class="section level2">
+</section>
+</section>
+<section id="session-information" class="level2">
 <h2>Session Information</h2>
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 3.4.2 (2017-09-28)
+<pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS Sierra 10.12.6
+Running under: macOS High Sierra 10.13.2
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -434,20 +436,20 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] SQUAREM_2017.10-1 ashr_2.1-27      
+[1] SQUAREM_2017.10-1 ashr_2.2-2       
 
 loaded via a namespace (and not attached):
- [1] Rcpp_0.12.13      knitr_1.17        magrittr_1.5     
- [4] workflowr_0.7.0   REBayes_0.85      MASS_7.3-47      
+ [1] Rcpp_0.12.14      knitr_1.17        magrittr_1.5     
+ [4] workflowr_0.8.0   REBayes_1.2       MASS_7.3-47      
  [7] doParallel_1.0.11 pscl_1.5.2        lattice_0.20-35  
-[10] foreach_1.4.3     stringr_1.2.0     tools_3.4.2      
-[13] parallel_3.4.2    grid_3.4.2        git2r_0.19.0     
-[16] htmltools_0.3.6   iterators_1.0.8   assertthat_0.2.0 
-[19] yaml_2.1.14       rprojroot_1.2     digest_0.6.12    
-[22] Matrix_1.2-11     codetools_0.2-15  evaluate_0.10.1  
-[25] rmarkdown_1.6     stringi_1.1.5     compiler_3.4.2   
-[28] Rmosek_7.1.3      backports_1.1.1   truncnorm_1.0-7  </code></pre>
-</div>
+[10] foreach_1.4.4     stringr_1.2.0     tools_3.4.3      
+[13] parallel_3.4.3    grid_3.4.3        git2r_0.20.0     
+[16] htmltools_0.3.6   iterators_1.0.9   assertthat_0.2.0 
+[19] yaml_2.1.16       rprojroot_1.3-1   digest_0.6.13    
+[22] Matrix_1.2-12     codetools_0.2-15  evaluate_0.10.1  
+[25] rmarkdown_1.8     stringi_1.1.6     compiler_3.4.3   
+[28] Rmosek_8.0.69     backports_1.1.2   truncnorm_1.0-7  </code></pre>
+</section>
 
 <hr>
 <p>

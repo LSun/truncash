@@ -25,8 +25,8 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
-<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -36,10 +36,12 @@
   }
 </style>
 <script type="text/javascript">
-if (window.hljs && document.readyState && document.readyState === "complete") {
-   window.setTimeout(function() {
-      hljs.initHighlighting();
-   }, 0);
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
 }
 </script>
 
@@ -313,16 +315,16 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2017-11-07</p>
+<p><strong>Last updated:</strong> 2017-12-21</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 2c05d59</p>
+<p><strong>Code version:</strong> 6e42447</p>
 <!-- Add your analysis here -->
-<div id="introduction" class="section level2">
+<section id="introduction" class="level2">
 <h2>Introduction</h2>
 <p>Suppose we have <span class="math inline">\(n\)</span> iid samples presumably from <span class="math inline">\(\text{Uniform}\left[0, 1\right]\)</span>. Our goal is to make a diagnostic plot to check if they are truly coming from <span class="math inline">\(\text{Uniform}\left[0, 1\right]\)</span>.</p>
-</div>
-<div id="plotting-positions" class="section level2">
+</section>
+<section id="plotting-positions" class="level2">
 <h2>Plotting positions</h2>
 <p>The basic tool is the <a href="https://en.wikipedia.org/wiki/Q%E2%80%93Q_plot">Q-Q plot</a>. Basically, we are ploting the sample quantiles against their theoretical quantiles, also called “plotting positions.” But it turns out it’s more complicated than what it appears, because it’s not clear what are the best “theoretical quantiles” or plotting positions. For example, <span class="math inline">\(\left\{1/n, 2/n, \ldots, n/n\right\}\)</span> appears an obvious option, but if the distribution is normal, the quantile of <span class="math inline">\(n/n = 1\)</span> is <span class="math inline">\(\infty\)</span>. Even if the distribution is compactly supported, like <span class="math inline">\(\text{Uniform}\left[0, 1\right]\)</span>, the quantile of <span class="math inline">\(1\)</span> is <span class="math inline">\(1\)</span>, yet the largest sample will always be strictly less than <span class="math inline">\(1\)</span>.</p>
 <p>This is called the “plotting positions problem.” It has a long history and a rich literature. <a href="http://www.tandfonline.com/doi/abs/10.1080/03610928408828781">Harter 1984</a> and <a href="http://www.tandfonline.com/doi/abs/10.1080/03610920701653094">Makkonen 2008</a> seem to be two good reviews. Popular choices include <span class="math inline">\(\left\{\frac{k-0.5}{n}\right\}\)</span>, <span class="math inline">\(\left\{\frac{k}{n+1}\right\}\)</span>, <span class="math inline">\(\left\{\frac{k - 0.3}{n+0.4}\right\}\)</span>, or in general, <span class="math inline">\(\left\{\frac{k-\alpha}{n+1-2\alpha}\right\}\)</span>, <span class="math inline">\(\alpha\in\left[0, 1\right]\)</span>, which approximates <span class="math inline">\(F\left(E\left[X_{(k)}\right]\right)\)</span> for certain <span class="math inline">\(\alpha\)</span>, and includes all above as special cases.</p>
@@ -331,15 +333,15 @@ shared across the workflowr files. -->
 \displaystyle
 F\left(E\left[X_{(k)}\right]\right)
 = E\left[F\left(X_{(k)}\right)\right]
-= \frac{k}{n + 1} \ ,
+= \frac{k}{n + 1} \  ,
 \]</span> where <span class="math inline">\(X_{(k)}\)</span> is the order statistic.</p>
-</div>
-<div id="de-trending-the-0-1-line" class="section level2">
+</section>
+<section id="de-trending-the-0-1-line" class="level2">
 <h2>De-trending the <span class="math inline">\(0\)</span>-<span class="math inline">\(1\)</span> line</h2>
 <p>Another problem is also related to Q-Q plots in general, and especially to the problem we have right now. In uniform Q-Q plots, in Matthew’s words, “current plots are dominated by the trend from 0 to 1,” so it’ would be better to “remove that trend to better highlight the deviations from the expectation.”</p>
 <p>The order statistics <span class="math inline">\(X_{(k)}\)</span> for <span class="math inline">\(\text{Uniform}\left[0, 1\right]\)</span> <a href="https://en.wikipedia.org/wiki/Order_statistic#Order_statistics_sampled_from_a_uniform_distribution">follows a beta distribution</a>,</p>
 <p><span class="math display">\[
-X_{(k)} \sim \text{Beta}\left(k, n+1-k\right) \ ,
+X_{(k)} \sim \text{Beta}\left(k, n+1-k\right) \  ,
 \]</span></p>
 <p>which has the <a href="https://en.wikipedia.org/wiki/Uniform_distribution_(continuous)#Order_statistics">mean and variance</a> as</p>
 <p><span class="math display">\[
@@ -357,7 +359,7 @@ fit = ash.workhorse(z.33, 1, method = &quot;fdr&quot;, mixcompdist = &quot;norma
 cdfhat = plot_diagnostic(fit, plot.it = FALSE)</code></pre>
 <p>The histogram of the data set is plotted as follows, as compared with the density of <span class="math inline">\(N(0, 1)\)</span>. In this case since <span class="math inline">\(\hat s\equiv 1\)</span>, all <span class="math inline">\(\hat z_j\)</span> share the same estimated predictive density, defined as</p>
 <p><span class="math display">\[
-\hat f = \hat g * N(0, \hat s_j^2 \equiv 1) \ .
+\hat f = \hat g * N(0, \hat s_j^2 \equiv 1) \  .
 \]</span></p>
 <p><span class="math inline">\(\hat f(x)\)</span> at a given set of <span class="math inline">\(x\)</span> positions can be evaluated using the following <code>R</code> code.</p>
 <pre class="r"><code>fhat = function(ash.fit, x, sebetahat = 1) {
@@ -368,39 +370,39 @@ cdfhat = plot_diagnostic(fit, plot.it = FALSE)</code></pre>
 <p><img src="figure/diagnostic_plot_2.rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>The predictive CDF of this data set should be far from <span class="math inline">\(\text{Uniform}\left[0, 1\right]\)</span>, so the diagnostic Q-Q plot should be conspicuously deviating from the <span class="math inline">\(0\)</span>-<span class="math inline">\(1\)</span> straight line. And we’ve also seen many points outside of the error bounds in the de-trended plot. We can also see that the two choices of error bounds don’t make too much difference.</p>
 <p><img src="figure/diagnostic_plot_2.rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/unnamed-chunk-6-2.png" width="672" style="display: block; margin: auto;" /></p>
-<div id="correlated-multiple-comparison" class="section level3">
+<section id="correlated-multiple-comparison" class="level3">
 <h3>Correlated multiple comparison</h3>
 <p>However, this simple de-trended plot has drawbacks. Suppose we apply <code>ASH</code> to independent <span class="math inline">\(z\)</span> scores. <code>ASH</code> should correctly estimate <span class="math inline">\(\hat g\)</span> to be a point mass at <span class="math inline">\(0\)</span> or something very close to it. Then the predictive cdf should be approximately uniformly distributed, which means we shouldn’t observe too many points outside the error bounds. However, here we do this simulation <span class="math inline">\(10\)</span> times, and it’s more common than expected to observe points outside the bounds.</p>
 <p><img src="figure/diagnostic_plot_2.rmd/multiple-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/multiple-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/multiple-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/multiple-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/multiple-5.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/multiple-6.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/multiple-7.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/multiple-8.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/multiple-9.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/multiple-10.png" width="672" style="display: block; margin: auto;" /></p>
 <p>It happens because the de-trended plot has an inherent <em>multiple testing under correlation</em> issue. First we are comparing <span class="math inline">\(n\)</span> sample quantiles, and then these quantiles are correlated. It may have connection with multiple testing in time series. Like in all multiple testing problems, we need to obtain a better error bound.</p>
 <p>Here are some ideas.</p>
-</div>
-</div>
-<div id="idea-1-ignore-it" class="section level2">
+</section>
+</section>
+<section id="idea-1-ignore-it" class="level2">
 <h2>Idea 1: Ignore it</h2>
 <p>Take a look at the non-uniform plot and the ten uniform plots. It’s true that the uniform ones are not-uncommonly outside the error bounds, but they are not going too far, compared with that non-uniform one. So maybe we can just ignore the “casual” bound-crossings and accept them as uniform. Of course this will generate a lot of ambiguity for borderline cases, but borderline cases are difficult any way.</p>
-</div>
-<div id="idea-2-bonferroni-correction" class="section level2">
+</section>
+<section id="idea-2-bonferroni-correction" class="level2">
 <h2>Idea 2: Bonferroni correction</h2>
 <p>Instead of using an error bound that’s at <span class="math inline">\(\alpha\)</span> level for each order statistic, we can use Bonferroni correction at <span class="math inline">\(\alpha / n\)</span> level. Hopefully it will control false positives whereas still be powerful. Let’s take a look at the previously run examples.</p>
-<div id="non-uniform" class="section level3">
+<section id="non-uniform" class="level3">
 <h3>Non-uniform</h3>
 <p>In the presence of strong non-uniformity, the de-trended plot is still well outside the Bonferroni-corrected error bounds.</p>
 <p><img src="figure/diagnostic_plot_2.rmd/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/unnamed-chunk-7-2.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="uniform" class="section level3">
+</section>
+<section id="uniform" class="level3">
 <h3>Uniform</h3>
 <p>As always with Bonferroni correction, it could seem under-powered, or over-controlling the type I error.</p>
 <p><img src="figure/diagnostic_plot_2.rmd/multiple bonferroni-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/multiple bonferroni-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/multiple bonferroni-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/multiple bonferroni-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/multiple bonferroni-5.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/multiple bonferroni-6.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/multiple bonferroni-7.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/multiple bonferroni-8.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/multiple bonferroni-9.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/multiple bonferroni-10.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-</div>
-<div id="idea-3-predictive-density-on-top-of-histogram" class="section level2">
+</section>
+</section>
+<section id="idea-3-predictive-density-on-top-of-histogram" class="level2">
 <h2>Idea 3: Predictive density on top of histogram</h2>
 <p>As discussed above, when we have constant <span class="math inline">\(\hat s_j\equiv s\)</span>, the estimated predictive density <span class="math inline">\(\hat f = \hat g * N\left(0, s^2\right)\)</span> is the same for all observations. Therefore, we could plot <span class="math inline">\(\hat f\left(\hat \beta_j\right)\)</span> on top of the histogram of all <span class="math inline">\(\hat \beta_j\)</span> to see if <code>ASH</code> fits the data and estimates the prior <span class="math inline">\(g\)</span> well.</p>
 <p>We are selecting four data sets with <span class="math inline">\(N(0, 1)\)</span> <span class="math inline">\(z\)</span> scores distorted by correlation. The first two are inflated, and the latter two mildly deflated. <code>ASH</code> has a hard time handling both cases, and the fitted predictive density curves can show that.</p>
 <p><img src="figure/diagnostic_plot_2.rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/unnamed-chunk-8-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/unnamed-chunk-8-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/unnamed-chunk-8-4.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="idea-4-kolmogorov-smirnov-k-s-test" class="section level2">
+</section>
+<section id="idea-4-kolmogorov-smirnov-k-s-test" class="level2">
 <h2>Idea 4: Kolmogorov-Smirnov (K-S) test</h2>
 <p>As explained in <a href="https://en.wikipedia.org/wiki/Kolmogorov%E2%80%93Smirnov_test">Wikipedia</a>,</p>
 <blockquote>
@@ -409,24 +411,24 @@ cdfhat = plot_diagnostic(fit, plot.it = FALSE)</code></pre>
 <p>The K-S test gives a <span class="math inline">\(p\)</span>-value, which can be displayed alongside all kinds of diagnostic plots mentioned above, as below.</p>
 <p><img src="figure/diagnostic_plot_2.rmd/KS-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p><img src="figure/diagnostic_plot_2.rmd/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="idea-5-empirical-cdf-and-dkw-inequality" class="section level2">
+</section>
+<section id="idea-5-empirical-cdf-and-dkw-inequality" class="level2">
 <h2>Idea 5: Empirical CDF and DKW inequality</h2>
 <p>The K-S test is related to <a href="https://en.wikipedia.org/wiki/Dvoretzky%E2%80%93Kiefer%E2%80%93Wolfowitz_inequality">the DKW inequality</a> for the empirical CDF. Let <span class="math inline">\(X_1, \ldots, X_n\)</span> be <span class="math inline">\(n\)</span> iid samples from <span class="math inline">\(F\)</span>. Let <span class="math inline">\(F_n\)</span> denote the empirical cumulative distribution function estimated from them. Then</p>
 <p><span class="math display">\[
-\Pr\left(\sup\limits_{x\in\mathbb{R}}\left|F_n\left(x\right) - F\left(x\right)\right| &gt; \epsilon\right) \leq 2e^{-2n\epsilon^2} \ .
+\Pr\left(\sup\limits_{x\in\mathbb{R}}\left|F_n\left(x\right) - F\left(x\right)\right| &gt; \epsilon\right) \leq 2e^{-2n\epsilon^2} \  .
 \]</span></p>
 <p>Therefore, we can set <span class="math inline">\(\epsilon\)</span> so that <span class="math inline">\(\alpha = 2e^{-2n\epsilon^2}\)</span>, and plot <span class="math inline">\(F_n\left(X_{(k)}\right) - F\left(X_{(k)}\right) = \frac kn - X_{(k)}\)</span> against <span class="math inline">\(\pm\epsilon\)</span>. Note that in this case we are plotting <span class="math inline">\(F_n\left(X_{(k)}\right) - F\left(X_{(k)}\right)\)</span>, not <span class="math inline">\(X_{(k)} - E\left[X_{(k)}\right]\)</span>, but under uniform they are very close, with no practical difference.</p>
 <p><img src="figure/diagnostic_plot_2.rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p><img src="figure/diagnostic_plot_2.rmd/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="session-information" class="section level2">
+</section>
+<section id="session-information" class="level2">
 <h2>Session information</h2>
 <!-- Insert the session information into the document -->
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 3.4.2 (2017-09-28)
+<pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS Sierra 10.12.6
+Running under: macOS High Sierra 10.13.2
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -439,11 +441,11 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 loaded via a namespace (and not attached):
- [1] compiler_3.4.2  backports_1.1.1 magrittr_1.5    rprojroot_1.2  
- [5] tools_3.4.2     htmltools_0.3.6 yaml_2.1.14     Rcpp_0.12.13   
- [9] stringi_1.1.5   rmarkdown_1.6   knitr_1.17      git2r_0.19.0   
-[13] stringr_1.2.0   digest_0.6.12   evaluate_0.10.1</code></pre>
-</div>
+ [1] compiler_3.4.3  backports_1.1.2 magrittr_1.5    rprojroot_1.3-1
+ [5] tools_3.4.3     htmltools_0.3.6 yaml_2.1.16     Rcpp_0.12.14   
+ [9] stringi_1.1.6   rmarkdown_1.8   knitr_1.17      git2r_0.20.0   
+[13] stringr_1.2.0   digest_0.6.13   evaluate_0.10.1</code></pre>
+</section>
 
 <hr>
 <p>

@@ -25,8 +25,8 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
-<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -36,10 +36,12 @@
   }
 </style>
 <script type="text/javascript">
-if (window.hljs && document.readyState && document.readyState === "complete") {
-   window.setTimeout(function() {
-      hljs.initHighlighting();
-   }, 0);
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
 }
 </script>
 
@@ -313,23 +315,23 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2017-11-07</p>
+<p><strong>Last updated:</strong> 2017-12-21</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 2c05d59</p>
+<p><strong>Code version:</strong> 6e42447</p>
 <!-- Add your analysis here -->
-<div id="introduction" class="section level2">
+<section id="introduction" class="level2">
 <h2>Introduction</h2>
 <p>It’s a classic microarray data set used many times by Efron to illustrate his “empirical null” idea. The data set is <a href="http://myweb.uiowa.edu/pbreheny/data/hedenfalk.html">downloaded online</a></p>
-</div>
-<div id="sanity-check" class="section level2">
+</section>
+<section id="sanity-check" class="level2">
 <h2>Sanity check</h2>
 <p>Pipeline can generate null <span class="math inline">\(z\)</span> scores when it’s null?</p>
 <pre class="r"><code>brca.ratio &lt;- read.table(&quot;../data/hedenfalk.txt&quot;, header = TRUE)
 brca.logratio &lt;- as.matrix(log2(brca.ratio[, c(1 : 6, 17, 7 : 10, 18 : 21)]))</code></pre>
 <p><img src="figure/brca.rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/brca.rmd/unnamed-chunk-4-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/brca.rmd/unnamed-chunk-4-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/brca.rmd/unnamed-chunk-4-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/brca.rmd/unnamed-chunk-4-5.png" width="672" style="display: block; margin: auto;" /><img src="figure/brca.rmd/unnamed-chunk-4-6.png" width="672" style="display: block; margin: auto;" /><img src="figure/brca.rmd/unnamed-chunk-4-7.png" width="672" style="display: block; margin: auto;" /><img src="figure/brca.rmd/unnamed-chunk-4-8.png" width="672" style="display: block; margin: auto;" /><img src="figure/brca.rmd/unnamed-chunk-4-9.png" width="672" style="display: block; margin: auto;" /><img src="figure/brca.rmd/unnamed-chunk-4-10.png" width="672" style="display: block; margin: auto;" /><img src="figure/brca.rmd/unnamed-chunk-4-11.png" width="672" style="display: block; margin: auto;" /><img src="figure/brca.rmd/unnamed-chunk-4-12.png" width="672" style="display: block; margin: auto;" /><img src="figure/brca.rmd/unnamed-chunk-4-13.png" width="672" style="display: block; margin: auto;" /><img src="figure/brca.rmd/unnamed-chunk-4-14.png" width="672" style="display: block; margin: auto;" /><img src="figure/brca.rmd/unnamed-chunk-4-15.png" width="672" style="display: block; margin: auto;" /><img src="figure/brca.rmd/unnamed-chunk-4-16.png" width="672" style="display: block; margin: auto;" /><img src="figure/brca.rmd/unnamed-chunk-4-17.png" width="672" style="display: block; margin: auto;" /><img src="figure/brca.rmd/unnamed-chunk-4-18.png" width="672" style="display: block; margin: auto;" /><img src="figure/brca.rmd/unnamed-chunk-4-19.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="data-analysis" class="section level2">
+</section>
+<section id="data-analysis" class="level2">
 <h2>Data analysis</h2>
 <p><img src="figure/brca.rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>source(&quot;../code/gdash_lik.R&quot;)
@@ -339,14 +341,14 @@ cat(fit$w)</code></pre>
 <pre class="r"><code>sum(fit$qvalue &lt;= 0.1)</code></pre>
 <pre><code>[1] 0</code></pre>
 <p><img src="figure/brca.rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="session-information" class="section level2">
+</section>
+<section id="session-information" class="level2">
 <h2>Session information</h2>
 <!-- Insert the session information into the document -->
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 3.4.2 (2017-09-28)
+<pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS Sierra 10.12.6
+Running under: macOS High Sierra 10.13.2
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -359,11 +361,11 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 loaded via a namespace (and not attached):
- [1] compiler_3.4.2  backports_1.1.1 magrittr_1.5    rprojroot_1.2  
- [5] tools_3.4.2     htmltools_0.3.6 yaml_2.1.14     Rcpp_0.12.13   
- [9] stringi_1.1.5   rmarkdown_1.6   knitr_1.17      git2r_0.19.0   
-[13] stringr_1.2.0   digest_0.6.12   evaluate_0.10.1</code></pre>
-</div>
+ [1] compiler_3.4.3  backports_1.1.2 magrittr_1.5    rprojroot_1.3-1
+ [5] tools_3.4.3     htmltools_0.3.6 yaml_2.1.16     Rcpp_0.12.14   
+ [9] stringi_1.1.6   rmarkdown_1.8   knitr_1.17      git2r_0.20.0   
+[13] stringr_1.2.0   digest_0.6.13   evaluate_0.10.1</code></pre>
+</section>
 
 <hr>
 <p>

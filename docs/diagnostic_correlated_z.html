@@ -25,8 +25,8 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
-<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -36,10 +36,12 @@
   }
 </style>
 <script type="text/javascript">
-if (window.hljs && document.readyState && document.readyState === "complete") {
-   window.setTimeout(function() {
-      hljs.initHighlighting();
-   }, 0);
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
 }
 </script>
 
@@ -313,17 +315,17 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2017-11-07</p>
+<p><strong>Last updated:</strong> 2017-12-21</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 2c05d59</p>
+<p><strong>Code version:</strong> 6e42447</p>
 <!-- Add your analysis here -->
-<div id="correlation-makes-ash-fit-less-well" class="section level2">
+<section id="correlation-makes-ash-fit-less-well" class="level2">
 <h2>Correlation makes <code>ASH</code> fit less well</h2>
 <p><a href="diagnostic_plot.html">Diagnostic plots for <code>ASH</code></a> can be used to measure the goodness of fit of <code>ASH</code>. Breaking any of <a href="diagnostic_plot.html#goodness_of_fit_for_ash">the assumptions behind <code>ASH</code></a> would make its fit less well, as shown in the non-uniformness of <span class="math inline">\(\left\{\hat F_j\right\}\)</span>, among which some cases have been discussed.</p>
 <p>A special case closely related to this project is about correlation. The presence of correlation could affects the accuracy of estimating <span class="math inline">\(g\)</span>, as <a href="correlated_z_2.html">shown before</a>. Moreover, the correlation will inflate the empirical distribution of the correlated noise, making it less regular, thus less able to be captured by the mixture of normals or uniforms as in <code>ASH</code>.</p>
-</div>
-<div id="dignostic-plots-for-all-bh-hostile-data-sets" class="section level2">
+</section>
+<section id="dignostic-plots-for-all-bh-hostile-data-sets" class="level2">
 <h2>Dignostic plots for all <code>BH</code>-hostile data sets</h2>
 <p>Here we get <span class="math inline">\(1K\)</span> simulated, correlated null data sets, each having <span class="math inline">\(10K\)</span> <span class="math inline">\(z\)</span> scores, <span class="math inline">\(p\)</span> values associated <span class="math inline">\(10K\)</span> genes. We choose those data sets most hostile to <span class="math inline">\(BH\)</span> procedure – those which produce at least false discovery under <code>BH</code> using <span class="math inline">\(\alpha = 0.05\)</span>. And then feed <span class="math inline">\(\hat\beta_j = z_j, \hat s_j \equiv 1\)</span> to <code>ASH</code>, using a prior of normal mixtures and uniform mixtures, respectively.</p>
 <p>If these <span class="math inline">\(z\)</span> scores are independent, <code>ASH</code> should be able to estimated <span class="math inline">\(\hat g =\delta_0\)</span> reasonably well. However, with correlation, estimated <span class="math inline">\(\hat g\)</span> will be different from <span class="math inline">\(\delta_0\)</span>. <strong>Moreover, with this estimated <span class="math inline">\(\hat g\)</span>, <span class="math inline">\(\left\{\hat F_j\right\}\)</span> might not behave like <span class="math inline">\(\text{Unif}\left[0, 1\right]\)</span>.</strong></p>
@@ -426,18 +428,18 @@ m = ncol(z)</code></pre>
 <p><img src="figure/diagnostic_correlated_z.rmd/unnamed-chunk-4-397.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z.rmd/unnamed-chunk-4-398.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z.rmd/unnamed-chunk-4-399.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z.rmd/unnamed-chunk-4-400.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z.rmd/unnamed-chunk-4-401.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z.rmd/unnamed-chunk-4-402.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z.rmd/unnamed-chunk-4-403.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z.rmd/unnamed-chunk-4-404.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z.rmd/unnamed-chunk-4-405.png" width="672" style="display: block; margin: auto;" /></p>
 <pre><code>N0. 46 : Data Set 997 ; Number of False Discoveries: 1 ; pihat0 = 0.1018171</code></pre>
 <p><img src="figure/diagnostic_correlated_z.rmd/unnamed-chunk-4-406.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z.rmd/unnamed-chunk-4-407.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z.rmd/unnamed-chunk-4-408.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z.rmd/unnamed-chunk-4-409.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z.rmd/unnamed-chunk-4-410.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z.rmd/unnamed-chunk-4-411.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z.rmd/unnamed-chunk-4-412.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z.rmd/unnamed-chunk-4-413.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z.rmd/unnamed-chunk-4-414.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="remarks-on-goodness-of-fit" class="section level2">
+</section>
+<section id="remarks-on-goodness-of-fit" class="level2">
 <h2>Remarks on goodness of fit</h2>
 <p>The simulation shows that oftentimes, <code>ASH</code>, no matter what kind of mixture prior is used, would only be able to produce a bad fit for the pseudo-effects due to correlation-induced inflation. However, occasionally, if <code>uniform</code> or <code>halfuniform</code> is used as the mixture component for the prior, the model may have a good fit, as indicated by the uniformness of <span class="math inline">\(\left\{\hat F_j\right\}\)</span>.</p>
-</div>
-<div id="session-information" class="section level2">
+</section>
+<section id="session-information" class="level2">
 <h2>Session information</h2>
 <!-- Insert the session information into the document -->
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 3.4.2 (2017-09-28)
+<pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS Sierra 10.12.6
+Running under: macOS High Sierra 10.13.2
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -450,11 +452,11 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 loaded via a namespace (and not attached):
- [1] compiler_3.4.2  backports_1.1.1 magrittr_1.5    rprojroot_1.2  
- [5] tools_3.4.2     htmltools_0.3.6 yaml_2.1.14     Rcpp_0.12.13   
- [9] stringi_1.1.5   rmarkdown_1.6   knitr_1.17      git2r_0.19.0   
-[13] stringr_1.2.0   digest_0.6.12   evaluate_0.10.1</code></pre>
-</div>
+ [1] compiler_3.4.3  backports_1.1.2 magrittr_1.5    rprojroot_1.3-1
+ [5] tools_3.4.3     htmltools_0.3.6 yaml_2.1.16     Rcpp_0.12.14   
+ [9] stringi_1.1.6   rmarkdown_1.8   knitr_1.17      git2r_0.20.0   
+[13] stringr_1.2.0   digest_0.6.13   evaluate_0.10.1</code></pre>
+</section>
 
 <hr>
 <p>

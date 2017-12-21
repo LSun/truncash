@@ -25,8 +25,8 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
-<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -36,10 +36,12 @@
   }
 </style>
 <script type="text/javascript">
-if (window.hljs && document.readyState && document.readyState === "complete") {
-   window.setTimeout(function() {
-      hljs.initHighlighting();
-   }, 0);
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
 }
 </script>
 
@@ -313,12 +315,12 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2017-11-07</p>
+<p><strong>Last updated:</strong> 2017-12-21</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 2c05d59</p>
+<p><strong>Code version:</strong> 6e42447</p>
 <!-- Add your analysis here -->
-<div id="introduction" class="section level2">
+<section id="introduction" class="level2">
 <h2>Introduction</h2>
 <p><a href="http://www.nature.com/nature/journal/v507/n7492/abs/nature13138.html">Smemo et al 2014</a> provides a mouse heart RNA-seq data set. The data set contains 2 conditions, and each condition has only 2 samples. We’ll see if Gaussian derivatives can handle this difficult situation.</p>
 <pre class="r"><code>counts = read.table(&quot;../data/smemo.txt&quot;, header = T, row.name = 1)
@@ -342,8 +344,8 @@ Fam71e2     0    0     0     0
 Eif2b2    736  762  3081  3601
 Mks1       77   82   398   685
 Hebp2     203  205   732   921</code></pre>
-</div>
-<div id="preprocessing" class="section level2">
+</section>
+<section id="preprocessing" class="level2">
 <h2>Preprocessing</h2>
 <p>In the first exploratory investigation, we only choose genes whose expression levels are not all zero for all 4 samples. This is to prevent the complications brought by “non-expressed” genes.</p>
 <pre class="r"><code>counts.nonzero = counts[rowSums(counts) &gt;= 1, ]
@@ -366,16 +368,12 @@ nrow(counts.nonzero)</code></pre>
   sebetahat = betahat / z
   return (list(betahat = betahat, sebetahat = sebetahat, z = z))
 }</code></pre>
-</div>
-<div id="fitting-z-with-gaussian-derivatives" class="section level2">
+</section>
+<section id="fitting-z-with-gaussian-derivatives" class="level2">
 <h2>Fitting <span class="math inline">\(z\)</span> with Gaussian derivatives</h2>
 <p>Suppose <span class="math inline">\(z\)</span> are correlated null, will they be well fitted by 10 Gaussian derivatives?</p>
-<pre class="r"><code>source(&quot;../code/gdash.R&quot;)</code></pre>
-<pre><code>Warning: replacing previous import &#39;Matrix::crossprod&#39; by &#39;gmp::crossprod&#39;
-when loading &#39;cvxr&#39;</code></pre>
-<pre><code>Warning: replacing previous import &#39;Matrix::tcrossprod&#39; by
-&#39;gmp::tcrossprod&#39; when loading &#39;cvxr&#39;</code></pre>
-<pre class="r"><code>source(&quot;../code/gdfit.R&quot;)
+<pre class="r"><code>source(&quot;../code/gdash.R&quot;)
+source(&quot;../code/gdfit.R&quot;)
 w.fit = gdfit(z, gd.ord = 10)
 plot.gdfit(z, w.fit$w, w.fit$gd.ord, breaks = 100)</code></pre>
 <p><img src="figure/smemo.rmd/nonzero%20fitting%20and%20plotting-1.png" width="672" style="display: block; margin: auto;" /></p>
@@ -387,8 +385,8 @@ plot.gdfit(z, w.fit$w, w.fit$gd.ord, breaks = 100)</code></pre>
 <p><img src="figure/smemo.rmd/nonzero%20fitting%20and%20plotting-4.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>plot.gdfit(z, w.fit$w, w.fit$gd.ord, std.norm = FALSE, breaks = &quot;Sturges&quot;)</code></pre>
 <p><img src="figure/smemo.rmd/nonzero%20fitting%20and%20plotting-5.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="remove-two-peaks" class="section level2">
+</section>
+<section id="remove-two-peaks" class="level2">
 <h2>Remove two peaks</h2>
 <pre class="r"><code>## Remove all singletons
 counts.nonsingleton = counts[rowSums(counts) &gt; 1, ]
@@ -402,8 +400,8 @@ plot.gdfit(z, w.fit$w, w.fit$gd.ord, breaks = 100)</code></pre>
 <p><img src="figure/smemo.rmd/non-singleton%20fitting%20and%20plotting-2.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>plot(ecdf(z))</code></pre>
 <p><img src="figure/smemo.rmd/non-singleton%20fitting%20and%20plotting-3.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="higher-expression" class="section level2">
+</section>
+<section id="higher-expression" class="level2">
 <h2>Higher expression</h2>
 <pre class="r"><code>## Remove all zeros
 counts.pos = counts[apply(counts, 1, min) &gt; 0, ]
@@ -412,7 +410,7 @@ nrow(counts.pos)</code></pre>
 <pre><code>[1] 15573</code></pre>
 <pre class="r"><code>w.fit = gdfit(z, gd.ord = 10)
 cat(rbind(paste(0 : w.fit$gd.ord, &quot;:&quot;), paste(w.fit$w, &quot;;&quot;)))</code></pre>
-<pre><code>0 : 1 ; 1 : 0.0728018367613569 ; 2 : 1.90276901242463 ; 3 : 0.487348637367052 ; 4 : 2.25733510399704 ; 5 : 0.946549908952083 ; 6 : 1.49164087236149 ; 7 : 0.902213125512891 ; 8 : 0.427623049883572 ; 9 : 0.342914618843359 ; 10 : 0.011101038914766 ;</code></pre>
+<pre><code>0 : 1 ; 1 : 0.0728018367613604 ; 2 : 1.90276901242466 ; 3 : 0.487348637367077 ; 4 : 2.25733510399727 ; 5 : 0.946549908952156 ; 6 : 1.49164087236214 ; 7 : 0.902213125512984 ; 8 : 0.427623049884403 ; 9 : 0.342914618843403 ; 10 : 0.0111010389151735 ;</code></pre>
 <pre class="r"><code>plot.gdfit(z, w.fit$w, w.fit$gd.ord, breaks = 100)</code></pre>
 <p><img src="figure/smemo.rmd/positive%20fitting%20and%20plotting-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>plot.gdfit(z, w.fit$w, w.fit$gd.ord, std.norm = FALSE, breaks = 100)</code></pre>
@@ -427,11 +425,11 @@ cat(rbind(paste(0 : w.fit$gd.ord, &quot;:&quot;), paste(w.fit$w, &quot;;&quot;))
 fit.gdash</code></pre>
 <pre><code>$fitted_g
 $pi
- [1] 1.000000e+00 2.528802e-09 2.400118e-09 2.176700e-09 1.830511e-09
- [6] 1.379624e-09 9.118214e-10 5.331526e-10 2.878238e-10 1.520977e-10
-[11] 8.278542e-11 4.833395e-11 3.156007e-11 2.470504e-11 2.695689e-11
-[16] 5.699028e-11 1.271587e-10 5.089537e-11 1.086289e-11 4.376792e-12
-[21] 2.589195e-12 1.842740e-12 1.463606e-12
+ [1] 1.000000e+00 2.528805e-09 2.400121e-09 2.176702e-09 1.830513e-09
+ [6] 1.379626e-09 9.118223e-10 5.331532e-10 2.878241e-10 1.520978e-10
+[11] 8.278550e-11 4.833400e-11 3.156011e-11 2.470507e-11 2.695691e-11
+[16] 5.699032e-11 1.271588e-10 5.089540e-11 1.086290e-11 4.376797e-12
+[21] 2.589198e-12 1.842743e-12 1.463609e-12
 
 $mean
  [1] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
@@ -470,14 +468,14 @@ sum(lfsr.gdash.ash &lt;= 0.05)</code></pre>
 pval.BH = p.adjust(pval, method = &quot;BH&quot;)
 sum(pval.BH &lt;= 0.05)</code></pre>
 <pre><code>[1] 3087</code></pre>
-</div>
-<div id="session-information" class="section level2">
+</section>
+<section id="session-information" class="level2">
 <h2>Session information</h2>
 <!-- Insert the session information into the document -->
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 3.4.2 (2017-09-28)
+<pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS Sierra 10.12.6
+Running under: macOS High Sierra 10.13.2
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -490,22 +488,25 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] Rmosek_7.1.3      PolynomF_0.94     cvxr_0.0.0.9400   REBayes_0.85     
-[5] Matrix_1.2-11     SQUAREM_2017.10-1 EQL_1.0-0         ttutils_1.0-1    
+[1] Rmosek_8.0.69     PolynomF_1.0-1    CVXR_0.94-4       REBayes_1.2      
+[5] Matrix_1.2-12     SQUAREM_2017.10-1 EQL_1.0-0         ttutils_1.0-1    
 
 loaded via a namespace (and not attached):
- [1] Rcpp_0.12.13      knitr_1.17        magrittr_1.5     
- [4] edgeR_3.20.1      MASS_7.3-47       pscl_1.5.2       
- [7] doParallel_1.0.11 lattice_0.20-35   foreach_1.4.3    
-[10] ashr_2.1-27       stringr_1.2.0     tools_3.4.2      
-[13] parallel_3.4.2    grid_3.4.2        git2r_0.19.0     
-[16] iterators_1.0.8   htmltools_0.3.6   assertthat_0.2.0 
-[19] yaml_2.1.14       rprojroot_1.2     digest_0.6.12    
-[22] gmp_0.5-13.1      codetools_0.2-15  evaluate_0.10.1  
-[25] rmarkdown_1.6     limma_3.34.0      stringi_1.1.5    
-[28] compiler_3.4.2    backports_1.1.1   locfit_1.5-9.1   
-[31] truncnorm_1.0-7  </code></pre>
-</div>
+ [1] gmp_0.5-13.1      Rcpp_0.12.14      compiler_3.4.3   
+ [4] git2r_0.20.0      R.methodsS3_1.7.1 R.utils_2.6.0    
+ [7] iterators_1.0.9   tools_3.4.3       digest_0.6.13    
+[10] bit_1.1-12        evaluate_0.10.1   lattice_0.20-35  
+[13] foreach_1.4.4     yaml_2.1.16       parallel_3.4.3   
+[16] Rmpfr_0.6-1       ECOSolveR_0.3-2   stringr_1.2.0    
+[19] knitr_1.17        locfit_1.5-9.1    rprojroot_1.3-1  
+[22] bit64_0.9-7       grid_3.4.3        R6_2.2.2         
+[25] rmarkdown_1.8     limma_3.34.4      ashr_2.2-2       
+[28] edgeR_3.20.2      magrittr_1.5      MASS_7.3-47      
+[31] backports_1.1.2   codetools_0.2-15  htmltools_0.3.6  
+[34] scs_1.1-1         assertthat_0.2.0  stringi_1.1.6    
+[37] pscl_1.5.2        doParallel_1.0.11 truncnorm_1.0-7  
+[40] R.oo_1.21.0      </code></pre>
+</section>
 
 <hr>
 <p>

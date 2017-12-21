@@ -25,8 +25,8 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
-<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -36,10 +36,12 @@
   }
 </style>
 <script type="text/javascript">
-if (window.hljs && document.readyState && document.readyState === "complete") {
-   window.setTimeout(function() {
-      hljs.initHighlighting();
-   }, 0);
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
 }
 </script>
 
@@ -313,34 +315,34 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2017-11-07</p>
+<p><strong>Last updated:</strong> 2017-12-21</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 2c05d59</p>
+<p><strong>Code version:</strong> 6e42447</p>
 <!-- Add your analysis here -->
-<div id="introduction" class="section level2">
+<section id="introduction" class="level2">
 <h2>Introduction</h2>
 <p>We usually use <a href="https://en.wikipedia.org/wiki/Receiver_operating_characteristic#Area_under_the_curve">AUC (area under the receiver operating characteristic curve)</a> to measure the performance of a statistical testing procedure. In essence, AUC is solely determined by how the hypotheses are ranked by the procedure. Thus, Matthew’s intuition is that the three methods based on <span class="math inline">\(p\)</span> values, <span class="math inline">\(p\)</span> values, Benjamini-Hochberg, and <code>qvalue</code> should give the equivalent AUC. However, <a href="simulation_real_se.html">it doesn’t appear so in our simulation</a>. It turns out there is a simple explanation for the difference bwteen <code>BH</code> and <span class="math inline">\(p\)</span> values.</p>
-</div>
-<div id="a-simple-illustration" class="section level2">
+</section>
+<section id="a-simple-illustration" class="level2">
 <h2>A simple illustration</h2>
 <p>Given a nominal FDR level <span class="math inline">\(\alpha\)</span>, and <span class="math inline">\(m\)</span> <span class="math inline">\(p\)</span> values, <code>BH</code> starts with the least significant or largest <span class="math inline">\(p\)</span> value and compares each ordered <span class="math inline">\(p\)</span> value <span class="math inline">\(p_{(k)}\)</span> with <span class="math inline">\(\frac{\alpha}mk\)</span>. Now suppose we have 6 <span class="math inline">\(p\)</span> values in the increasing order, <span class="math inline">\(\left\{0.005, 0.006, 0.007, 0.008, 0.009, 0.010\right\}\)</span>, plotted as follows. These <span class="math inline">\(p\)</span> values correpond with hypotheses of true positives (“T”) or false positives (“F”). In this example, the hypotheses associated with the ordered <span class="math inline">\(p\)</span> values are set to be <span class="math inline">\(\left\{T, T, F, F, T, F\right\}\)</span>.</p>
 <p><img src="figure/auc_pvalue.rmd/unnamed-chunk-1-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>The three dotted lines in the plot show the three scenarios with <code>BH</code> applied to this data set. The critical decision boundary is when we have the nominal FDR <span class="math inline">\(\alpha = 0.01\)</span> in red. When <span class="math inline">\(\alpha &lt; 0.01\)</span>, like the green line, no <span class="math inline">\(p\)</span> value falls below the line and thus no discovery is declared. On the other hand, when <span class="math inline">\(\alpha &gt; 0.01\)</span>, like the blue line, the largest <span class="math inline">\(p\)</span> value falls below the line and thus all hypotheses would be declared as discoveries. Therefore, under <code>BH</code>, at different nominal FDR levels, we either fail to reject any null hypothesis, or reject all of <span class="math inline">\(6\)</span> together. In another word, we either have false positive rate (FPR) <span class="math inline">\(=\)</span> true positive rate (TPR) <span class="math inline">\(=\)</span> 0, or FRP <span class="math inline">\(=\)</span> TPR <span class="math inline">\(=\)</span> 1. Below we plot the two ROC curves by <code>BH</code> and by simply thresholding <span class="math inline">\(p\)</span> values. In this case using <span class="math inline">\(p\)</span> values (AUC <span class="math inline">\(=\)</span> 0.78) is actually better than using <code>BH</code> (AUC = 0.5).</p>
 <p><img src="figure/auc_pvalue.rmd/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
-<ol style="list-style-type: decimal">
+<ol type="1">
 <li>Note that <code>BH</code> <strong>indeed doesn’t change the order</strong> of hypotheses set by <span class="math inline">\(p\)</span> values. As in this exmaple, if a hypothesis with a larger <span class="math inline">\(p\)</span> value is rejected, all hypotheses with smaller <span class="math inline">\(p\)</span> values will also be rejected; meanwhile, when a hypothesis with a smaller <span class="math inline">\(p\)</span> value is not rejected, all hypotheses with larger <span class="math inline">\(p\)</span> values won’t be rejected either.</li>
 <li>However, <code>BH</code> is capable of <strong>generating ties in hypotheses</strong>. As in this exmaple, all <span class="math inline">\(6\)</span> hypothese have distinctive <span class="math inline">\(p\)</span> values, yet they are essentially equivalent under <code>BH</code>.</li>
 </ol>
 <p>This simple illustration shows why we would have different AUC with <span class="math inline">\(p\)</span> values and <code>BH</code>.</p>
-</div>
-<div id="session-information" class="section level2">
+</section>
+<section id="session-information" class="level2">
 <h2>Session information</h2>
 <!-- Insert the session information into the document -->
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 3.4.2 (2017-09-28)
+<pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS Sierra 10.12.6
+Running under: macOS High Sierra 10.13.2
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -356,14 +358,14 @@ other attached packages:
 [1] pROC_1.10.0
 
 loaded via a namespace (and not attached):
- [1] Rcpp_0.12.13     digest_0.6.12    rprojroot_1.2    plyr_1.8.4      
- [5] grid_3.4.2       gtable_0.2.0     backports_1.1.1  git2r_0.19.0    
+ [1] Rcpp_0.12.14     digest_0.6.13    rprojroot_1.3-1  plyr_1.8.4      
+ [5] grid_3.4.3       gtable_0.2.0     backports_1.1.2  git2r_0.20.0    
  [9] magrittr_1.5     scales_0.5.0     evaluate_0.10.1  ggplot2_2.2.1   
-[13] rlang_0.1.4      stringi_1.1.5    lazyeval_0.2.1   rmarkdown_1.6   
-[17] tools_3.4.2      stringr_1.2.0    munsell_0.4.3    yaml_2.1.14     
-[21] compiler_3.4.2   colorspace_1.3-2 htmltools_0.3.6  knitr_1.17      
+[13] rlang_0.1.4      stringi_1.1.6    lazyeval_0.2.1   rmarkdown_1.8   
+[17] tools_3.4.3      stringr_1.2.0    munsell_0.4.3    yaml_2.1.16     
+[21] compiler_3.4.3   colorspace_1.3-2 htmltools_0.3.6  knitr_1.17      
 [25] tibble_1.3.4    </code></pre>
-</div>
+</section>
 
 <hr>
 <p>

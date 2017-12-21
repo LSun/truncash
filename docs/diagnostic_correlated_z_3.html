@@ -25,8 +25,8 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
-<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -36,10 +36,12 @@
   }
 </style>
 <script type="text/javascript">
-if (window.hljs && document.readyState && document.readyState === "complete") {
-   window.setTimeout(function() {
-      hljs.initHighlighting();
-   }, 0);
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
 }
 </script>
 
@@ -313,12 +315,12 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2017-11-07</p>
+<p><strong>Last updated:</strong> 2017-12-21</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 2c05d59</p>
+<p><strong>Code version:</strong> 6e42447</p>
 <!-- Add your analysis here -->
-<div id="introduction" class="section level2">
+<section id="introduction" class="level2">
 <h2>Introduction</h2>
 <p>We take a look at those data sets where <code>BH</code> produces few (false) discoveries, and at the same time, <code>ASH</code>’s <code>lfsr</code> produces many (false) discoveries. For each data set, <span class="math inline">\(z\)</span> scores, <span class="math inline">\(p\)</span> values, and diagnostic <span class="math inline">\(\hat F_j\)</span> are plotted.</p>
 <pre class="r"><code>library(ashr)
@@ -327,8 +329,8 @@ p = read.table(&quot;../output/p_null_liver_777.txt&quot;)
 pihat0 = as.numeric(unlist(read.table(&quot;../output/pihat0_z_null_liver_777.txt&quot;)))
 fd.bh = as.numeric(unlist(read.table(&quot;../output/fd.bh.0.05_null_liver_777.txt&quot;)))
 fd.lfsr = as.numeric(unlist(read.table(&quot;../output/fd.lfsr.0.05.z.normal_null_liver_777.txt&quot;)))</code></pre>
-</div>
-<div id="the-118-data-sets-where-bh-didnt-produce-false-discoveries-but-lfsr-does." class="section level2">
+</section>
+<section id="the-118-data-sets-where-bh-didnt-produce-false-discoveries-but-lfsr-does." class="level2">
 <h2>The 118 data sets where <code>BH</code> didn’t produce false discoveries but <code>lfsr</code> does.</h2>
 <p>In this simulation, <code>BH</code> used the FDR level <span class="math inline">\(\alpha = 0.05\)</span>, whereas <code>ASH</code> declared a discovery when <code>lfsr</code> <span class="math inline">\(\leq 0.05\)</span>.</p>
 <pre><code>N0. 1 : Data Set 693 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 1890 ; pihat0 = 0.01296388</code></pre>
@@ -567,8 +569,8 @@ fd.lfsr = as.numeric(unlist(read.table(&quot;../output/fd.lfsr.0.05.z.normal_nul
 <p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-697.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-698.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-699.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-700.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-701.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-702.png" width="672" style="display: block; margin: auto;" /></p>
 <pre><code>N0. 118 : Data Set 892 ; Number of False Discoveries by BH: 0 ; Number of False Discoveries by ASH&#39;s lfsr: 1 ; pihat0 = 0.2868517</code></pre>
 <p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-703.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-704.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-705.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-706.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-707.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-4-708.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="the-7-data-sets-where-lfsr-is-more-conservative-than-bh." class="section level2">
+</section>
+<section id="the-7-data-sets-where-lfsr-is-more-conservative-than-bh." class="level2">
 <h2>The 7 data sets where <code>lfsr</code> is more conservative than <code>BH</code>.</h2>
 <pre><code>N0. 1 : Data Set 901 ; Number of False Discoveries by BH: 2 ; Number of False Discoveries by ASH&#39;s lfsr: 0 ; pihat0 = 0.9997685</code></pre>
 <p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-5.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-6.png" width="672" style="display: block; margin: auto;" /></p>
@@ -584,19 +586,19 @@ fd.lfsr = as.numeric(unlist(read.table(&quot;../output/fd.lfsr.0.05.z.normal_nul
 <p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-31.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-32.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-33.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-34.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-35.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-36.png" width="672" style="display: block; margin: auto;" /></p>
 <pre><code>N0. 7 : Data Set 955 ; Number of False Discoveries by BH: 1 ; Number of False Discoveries by ASH&#39;s lfsr: 0 ; pihat0 = 0.9998902</code></pre>
 <p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-37.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-38.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-39.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-40.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-41.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-5-42.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="comparison-of-false-discoveries-by-bh-and-lfsr" class="section level2">
+</section>
+<section id="comparison-of-false-discoveries-by-bh-and-lfsr" class="level2">
 <h2>Comparison of false discoveries by <code>BH</code> and <code>lfsr</code></h2>
 <p>To get a more comprehensive picture, we plot as follows the numbers of false discoveries by <code>BH</code> and <code>lfsr</code> for each data set. These data sets were selected out of <span class="math inline">\(1000\)</span> of them, because they produced at least one false discoveries by either method. Note that for every data set there are <span class="math inline">\(10K\)</span> correlated null statistics.</p>
 <p><img src="figure/diagnostic_correlated_z_3.rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="session-information" class="section level2">
+</section>
+<section id="session-information" class="level2">
 <h2>Session information</h2>
 <!-- Insert the session information into the document -->
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 3.4.2 (2017-09-28)
+<pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS Sierra 10.12.6
+Running under: macOS High Sierra 10.13.2
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -609,11 +611,11 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 loaded via a namespace (and not attached):
- [1] compiler_3.4.2  backports_1.1.1 magrittr_1.5    rprojroot_1.2  
- [5] tools_3.4.2     htmltools_0.3.6 yaml_2.1.14     Rcpp_0.12.13   
- [9] stringi_1.1.5   rmarkdown_1.6   knitr_1.17      git2r_0.19.0   
-[13] stringr_1.2.0   digest_0.6.12   evaluate_0.10.1</code></pre>
-</div>
+ [1] compiler_3.4.3  backports_1.1.2 magrittr_1.5    rprojroot_1.3-1
+ [5] tools_3.4.3     htmltools_0.3.6 yaml_2.1.16     Rcpp_0.12.14   
+ [9] stringi_1.1.6   rmarkdown_1.8   knitr_1.17      git2r_0.20.0   
+[13] stringr_1.2.0   digest_0.6.13   evaluate_0.10.1</code></pre>
+</section>
 
 <hr>
 <p>

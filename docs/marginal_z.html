@@ -25,8 +25,8 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
-<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -36,10 +36,12 @@
   }
 </style>
 <script type="text/javascript">
-if (window.hljs && document.readyState && document.readyState === "complete") {
-   window.setTimeout(function() {
-      hljs.initHighlighting();
-   }, 0);
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
 }
 </script>
 
@@ -313,13 +315,13 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2017-11-07</p>
+<p><strong>Last updated:</strong> 2017-12-21</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 2c05d59</p>
+<p><strong>Code version:</strong> 6e42447</p>
 <!-- Add your analysis here -->
 <p><strong>This simulation can be seen as an enhanced version of <a href="ExtremeOccurrence.html">a previous simulation</a>.</strong></p>
-<div id="introduction" class="section level2">
+<section id="introduction" class="level2">
 <h2>Introduction</h2>
 <p>An assumption of using <a href="gaussian_derivatives.html">Gaussian derivatives</a> to fit correlated null <span class="math inline">\(z\)</span> scores is that each of these <span class="math inline">\(z\)</span> scores should actually be null. That is, for <span class="math inline">\(n\)</span> <span class="math inline">\(z\)</span> scores <span class="math inline">\(z_1, \ldots, z_n\)</span>, although the correlation between <span class="math inline">\(z_i\)</span> and <span class="math inline">\(z_j\)</span> are not necessarily zero, the marginal distribution of <span class="math inline">\(z_i\)</span>, <span class="math inline">\(\forall i\)</span>, should be <span class="math inline">\(N\left(0, 1\right)\)</span>.</p>
 <p>However, in practice, it’s not easy to check whether these correlated <span class="math inline">\(z\)</span> scores are truly marginally <span class="math inline">\(N\left(0, 1\right)\)</span>. <a href="correlated_z.html">We’ve seen</a> that their historgram could be far from normal. Further more, <span class="math inline">\(z\)</span> scores in different data sets are distorted by different correlation structures. Therefore, we don’t have replicates here; that is, each data set is one single realization of a lot of random variables under correlation.</p>
@@ -331,45 +333,45 @@ n = ncol(z.null)
 m = nrow(z.null)</code></pre>
 <pre class="r"><code>set.seed(777)
 z.sim = matrix(rnorm(m * n), nrow = m, ncol = n)</code></pre>
-</div>
-<div id="row-wise-eleftf_nleftzrightright-phileftzright" class="section level2">
+</section>
+<section id="row-wise-eleftf_nleftzrightright-phileftzright" class="level2">
 <h2>Row-wise: <span class="math inline">\(E\left[F_n\left(z\right)\right] = \Phi\left(z\right)\)</span></h2>
 <p>Let <span class="math inline">\(F_n^{R_i}\left(z\right)\)</span> be the empirical CDF of <span class="math inline">\(p\)</span> correlated <span class="math inline">\(z\)</span> scores in row <span class="math inline">\(i\)</span>. For any <span class="math inline">\(i\)</span>, <span class="math inline">\(F_n^{R_i}\left(z\right)\)</span> should be conspicuously different from <span class="math inline">\(\Phi\left(z\right)\)</span>, yet on average, <span class="math inline">\(E\left[F_n^{R_i}\left(z\right)\right]\)</span> should be equal to <span class="math inline">\(\Phi\left(z\right)\)</span>, if all <span class="math inline">\(z\)</span> scores are marginally <span class="math inline">\(N\left(0, 1\right)\)</span>.</p>
 <p>In order to check that, we can borrow <a href="index.html">Prof. Michael Stein’s insight</a> to look at the tail events, or empirical CDF.</p>
 <p>For each row, let <span class="math inline">\(\alpha\)</span> be a given probability level, <span class="math inline">\(z_\alpha = \Phi^{-1}\left(\alpha\right)\)</span> be the associated quantile, and we record a number <span class="math inline">\(R_i^\alpha\)</span> defined as follows.</p>
 <p>If <span class="math inline">\(\alpha \leq 0.5\)</span>, <span class="math inline">\(R_\alpha^i\)</span> is the number of <span class="math inline">\(z\)</span> scores in row <span class="math inline">\(i\)</span> that are smaller than <span class="math inline">\(z_\alpha\)</span>; otherwise, if <span class="math inline">\(\alpha &gt; 0.5\)</span>, <span class="math inline">\(R_\alpha^i\)</span> is the number of <span class="math inline">\(z\)</span> scores in row <span class="math inline">\(i\)</span> that are larger than <span class="math inline">\(z_\alpha\)</span>.</p>
 <p>Defined this way, <span class="math inline">\(R_\alpha^i\)</span> should be a sample from <span class="math inline">\(n \times F_n^{R_i}\left(z_\alpha\right)\)</span> or <span class="math inline">\(n \times \left(1- F_n^{R_i}\left(z_\alpha\right)\right)\)</span>. We can check if <span class="math inline">\(E\left[F_n\left(z\right)\right] = \Phi\left(z\right)\)</span> by looking at if the average <span class="math display">\[
-\bar R_\alpha \approx \begin{cases} n\Phi\left(z_\alpha\right) = n\alpha &amp; \alpha \leq 0.5 \\ n\left(1-\Phi\left(z_\alpha\right)\right) = n\left(1 - \alpha\right) &amp; \alpha &gt; 0.5\end{cases} \ .
+\bar R_\alpha \approx \begin{cases} n\Phi\left(z_\alpha\right) = n\alpha &amp; \alpha \leq 0.5 \\ n\left(1-\Phi\left(z_\alpha\right)\right) = n\left(1 - \alpha\right) &amp; \alpha &gt; 0.5\end{cases} \  .
 \]</span> We may also compare the frequencies of <span class="math inline">\(R_\alpha^i\)</span> with their theoretical expected values <span class="math inline">\(m \times \text{Binomial}\left(n, \alpha\right)\)</span> (in blue) assuming <span class="math inline">\(z_{ij}\)</span> are independent.</p>
 <p><img src="figure/marginal_z.rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-5-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-5-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-5-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-5-5.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-5-6.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-5-7.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-5-8.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-5-9.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-5-10.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-5-11.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-5-12.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-5-13.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-5-14.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-5-15.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-5-16.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-5-17.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-5-18.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-5-19.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-5-20.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-5-21.png" width="672" style="display: block; margin: auto;" /></p>
-<div id="independent-case-row-wise" class="section level3">
+<section id="independent-case-row-wise" class="level3">
 <h3>Independent case: row-wise</h3>
 <p><img src="figure/marginal_z.rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-6-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-6-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-6-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-6-5.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-6-6.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-6-7.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-6-8.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-6-9.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-6-10.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-6-11.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-6-12.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-6-13.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-6-14.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-6-15.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-6-16.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-6-17.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-6-18.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-6-19.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-6-20.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-6-21.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-</div>
-<div id="column-wise-closer-to-nleft0-1right" class="section level2">
+</section>
+</section>
+<section id="column-wise-closer-to-nleft0-1right" class="level2">
 <h2>Column-wise: closer to <span class="math inline">\(N\left(0, 1\right)\)</span></h2>
 <p>Each column of <span class="math inline">\(z\)</span> should be seen as <span class="math inline">\(z\)</span> scores of a non-differentially expressed gene in different data sets. Therefore, column-wise, the empirical distribution <span class="math inline">\(F_m^{C_j}\left(z\right)\)</span> should be closer to <span class="math inline">\(\Phi\left(z\right)\)</span> than <span class="math inline">\(F_m^{R_i}\left(z\right)\)</span>.</p>
 <p>Similarly, we are plotting <span class="math inline">\(C_\alpha^i\)</span>, compared with their theoretical frequencies as follows.</p>
 <p><img src="figure/marginal_z.rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-8-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-8-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-8-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-8-5.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-8-6.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-8-7.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-8-8.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-8-9.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-8-10.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-8-11.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-8-12.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-8-13.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-8-14.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-8-15.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-8-16.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-8-17.png" width="672" style="display: block; margin: auto;" /></p>
-<div id="independent-case-column-wise" class="section level3">
+<section id="independent-case-column-wise" class="level3">
 <h3>Independent case: column wise</h3>
 <p><img src="figure/marginal_z.rmd/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-9-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-9-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-9-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-9-5.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-9-6.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-9-7.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-9-8.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-9-9.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-9-10.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-9-11.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-9-12.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-9-13.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-9-14.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-9-15.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-9-16.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z.rmd/unnamed-chunk-9-17.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-</div>
-<div id="conclusion" class="section level2">
+</section>
+</section>
+<section id="conclusion" class="level2">
 <h2>Conclusion</h2>
 <p>The empirical distribution and the indicated marginal distribution of the correlated null <span class="math inline">\(z\)</span> scores are behaving not different from the expectation.</p>
 <p>Row-wise, the number of tail observations averages to what would be expected from correlated marginally <span class="math inline">\(N\left(0, 1\right)\)</span> random samples, validating Prof. Stein’s intuition.</p>
 <p>Column-wise, the distribution of the number of tail observations is closer to normal, closer to what would be expected under corelated marginally <span class="math inline">\(N\left(0, 1\right)\)</span>. Moreover, the distribution seems unimodal, and peaked at <span class="math inline">\(m\alpha\)</span> when <span class="math inline">\(\alpha \leq0.5\)</span> or <span class="math inline">\(m\left(1-\alpha\right)\)</span> when <span class="math inline">\(\alpha\geq0.5\)</span>. It suggests that the marginal distribution of the null <span class="math inline">\(z\)</span> scores for a certain gene is usually centered at <span class="math inline">\(0\)</span>, and more often than not, close to <span class="math inline">\(N\left(0, 1\right)\)</span>.</p>
-</div>
-<div id="session-information" class="section level2">
+</section>
+<section id="session-information" class="level2">
 <h2>Session information</h2>
 <!-- Insert the session information into the document -->
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 3.4.2 (2017-09-28)
+<pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS Sierra 10.12.6
+Running under: macOS High Sierra 10.13.2
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -382,11 +384,11 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 loaded via a namespace (and not attached):
- [1] compiler_3.4.2  backports_1.1.1 magrittr_1.5    rprojroot_1.2  
- [5] tools_3.4.2     htmltools_0.3.6 yaml_2.1.14     Rcpp_0.12.13   
- [9] stringi_1.1.5   rmarkdown_1.6   knitr_1.17      git2r_0.19.0   
-[13] stringr_1.2.0   digest_0.6.12   evaluate_0.10.1</code></pre>
-</div>
+ [1] compiler_3.4.3  backports_1.1.2 magrittr_1.5    rprojroot_1.3-1
+ [5] tools_3.4.3     htmltools_0.3.6 yaml_2.1.16     Rcpp_0.12.14   
+ [9] stringi_1.1.6   rmarkdown_1.8   knitr_1.17      git2r_0.20.0   
+[13] stringr_1.2.0   digest_0.6.13   evaluate_0.10.1</code></pre>
+</section>
 
 <hr>
 <p>

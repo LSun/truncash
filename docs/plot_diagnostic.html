@@ -25,8 +25,8 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
-<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -36,10 +36,12 @@
   }
 </style>
 <script type="text/javascript">
-if (window.hljs && document.readyState && document.readyState === "complete") {
-   window.setTimeout(function() {
-      hljs.initHighlighting();
-   }, 0);
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
 }
 </script>
 
@@ -313,18 +315,18 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2017-11-07</p>
+<p><strong>Last updated:</strong> 2017-12-21</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 2c05d59</p>
+<p><strong>Code version:</strong> 6e42447</p>
 <!-- Add your analysis here -->
-<div id="introduction" class="section level2">
+<section id="introduction" class="level2">
 <h2>Introduction</h2>
 <p>This file documents some simulations done for a May 12, 2017, NHS presentation on the diagnostic plots for ASH implemented by <code>ashr::plot_diagnostic()</code>.</p>
 <pre class="r"><code>library(ashr)
 library(qvalue)</code></pre>
-</div>
-<div id="the-concept-of-a-q-q-plot" class="section level2">
+</section>
+<section id="the-concept-of-a-q-q-plot" class="level2">
 <h2>The concept of a Q-Q plot</h2>
 <pre class="r"><code>set.seed(777)
 x = rnorm(100)
@@ -335,8 +337,8 @@ qqline(x)</code></pre>
 qqnorm(y)
 qqline(y)</code></pre>
 <p><img src="figure/plot_diagnostic.rmd/unnamed-chunk-2-2.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="diagnostic-plots-for-ash-applied-to-different-data-sets" class="section level2">
+</section>
+<section id="diagnostic-plots-for-ash-applied-to-different-data-sets" class="level2">
 <h2>Diagnostic plots for <code>ASH</code> applied to different data sets</h2>
 <pre class="r"><code>beta = runif(10000)
 betahat = beta + rnorm(10000)
@@ -364,8 +366,8 @@ plot_diagnostic(fit, breaks = 100)</code></pre>
 <pre><code>Press [enter] to see next plot</code></pre>
 <pre><code>Press [enter] to see next plot</code></pre>
 <p><img src="figure/plot_diagnostic.rmd/unnamed-chunk-3-6.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="the-peculiarities-of-the-correlated-null" class="section level2">
+</section>
+<section id="the-peculiarities-of-the-correlated-null" class="level2">
 <h2>The peculiarities of the correlated null</h2>
 <pre class="r"><code>z = readRDS(&quot;../output/z_null_liver_777_select.RDS&quot;)
 z = z$typical[[5]]
@@ -382,8 +384,8 @@ hist(pval, breaks = 100, main = &quot;Histogram of Correlated Z Scores&#39; p-va
 abline(h = q$pi0, col = &quot;red&quot;, lty = 2)
 legend(&quot;topright&quot;, lty = 2, col = &quot;red&quot;, expression(paste(hat(pi)[0], &quot; by qvalue&quot;)))</code></pre>
 <p><img src="figure/plot_diagnostic.rmd/unnamed-chunk-4-3.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="diagnostic-plots-for-ash-applied-to-the-correlated-null." class="section level2">
+</section>
+<section id="diagnostic-plots-for-ash-applied-to-the-correlated-null." class="level2">
 <h2>Diagnostic plots for <code>ASH</code> applied to the correlated null.</h2>
 <pre class="r"><code>library(ashr)
 fit = ashr::ash(z, 1, mixcompdist = &quot;normal&quot;, method = &quot;fdr&quot;)
@@ -393,14 +395,14 @@ plot_diagnostic(fit, breaks = 100)</code></pre>
 <pre><code>Press [enter] to see next plot</code></pre>
 <pre><code>Press [enter] to see next plot</code></pre>
 <p><img src="figure/plot_diagnostic.rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="session-information" class="section level2">
+</section>
+<section id="session-information" class="level2">
 <h2>Session information</h2>
 <!-- Insert the session information into the document -->
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 3.4.2 (2017-09-28)
+<pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS Sierra 10.12.6
+Running under: macOS High Sierra 10.13.2
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -413,24 +415,24 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] qvalue_2.10.0 ashr_2.1-27  
+[1] qvalue_2.10.0 ashr_2.2-2   
 
 loaded via a namespace (and not attached):
- [1] Rcpp_0.12.13      compiler_3.4.2    git2r_0.19.0     
- [4] plyr_1.8.4        iterators_1.0.8   tools_3.4.2      
- [7] digest_0.6.12     evaluate_0.10.1   tibble_1.3.4     
+ [1] Rcpp_0.12.14      compiler_3.4.3    git2r_0.20.0     
+ [4] plyr_1.8.4        iterators_1.0.9   tools_3.4.3      
+ [7] digest_0.6.13     evaluate_0.10.1   tibble_1.3.4     
 [10] gtable_0.2.0      lattice_0.20-35   rlang_0.1.4      
-[13] Matrix_1.2-11     foreach_1.4.3     yaml_2.1.14      
-[16] parallel_3.4.2    stringr_1.2.0     knitr_1.17       
-[19] REBayes_0.85      rprojroot_1.2     grid_3.4.2       
-[22] rmarkdown_1.6     ggplot2_2.2.1     reshape2_1.4.2   
-[25] magrittr_1.5      backports_1.1.1   scales_0.5.0     
+[13] Matrix_1.2-12     foreach_1.4.4     yaml_2.1.16      
+[16] parallel_3.4.3    stringr_1.2.0     knitr_1.17       
+[19] REBayes_1.2       rprojroot_1.3-1   grid_3.4.3       
+[22] rmarkdown_1.8     ggplot2_2.2.1     reshape2_1.4.3   
+[25] magrittr_1.5      backports_1.1.2   scales_0.5.0     
 [28] codetools_0.2-15  htmltools_0.3.6   MASS_7.3-47      
-[31] splines_3.4.2     assertthat_0.2.0  colorspace_1.3-2 
-[34] stringi_1.1.5     Rmosek_7.1.3      lazyeval_0.2.1   
+[31] splines_3.4.3     assertthat_0.2.0  colorspace_1.3-2 
+[34] stringi_1.1.6     Rmosek_8.0.69     lazyeval_0.2.1   
 [37] pscl_1.5.2        doParallel_1.0.11 munsell_0.4.3    
 [40] truncnorm_1.0-7   SQUAREM_2017.10-1</code></pre>
-</div>
+</section>
 
 <hr>
 <p>

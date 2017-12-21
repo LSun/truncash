@@ -25,8 +25,8 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
-<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -36,10 +36,12 @@
   }
 </style>
 <script type="text/javascript">
-if (window.hljs && document.readyState && document.readyState === "complete") {
-   window.setTimeout(function() {
-      hljs.initHighlighting();
-   }, 0);
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
 }
 </script>
 
@@ -313,18 +315,18 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2017-11-07</p>
+<p><strong>Last updated:</strong> 2017-12-21</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 2c05d59</p>
+<p><strong>Code version:</strong> 6e42447</p>
 <!-- Add your analysis here -->
-<div id="introduction" class="section level2">
+<section id="introduction" class="level2">
 <h2>Introduction</h2>
 <p>This time the correlated <span class="math inline">\(z\)</span> scores are simulated similar to <a href="simulated_correlated_null.html">the previous low rank example</a> but with different numbers of <span class="math inline">\(k\)</span>.</p>
 <pre class="r"><code>n = 1e4
 L = 100</code></pre>
-</div>
-<div id="k-1" class="section level2">
+</section>
+<section id="k-1" class="level2">
 <h2><span class="math inline">\(k = 1\)</span></h2>
 <pre class="r"><code>set.seed(777)
 k = 1
@@ -333,8 +335,8 @@ for (j in 1 : 2) {
   fit.gd(L, z)
 }</code></pre>
 <p><img src="figure/simulated_correlated_null_3.rmd/1-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/simulated_correlated_null_3.rmd/1-2.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="k-2" class="section level2">
+</section>
+<section id="k-2" class="level2">
 <h2><span class="math inline">\(k = 2\)</span></h2>
 <pre class="r"><code>set.seed(777)
 k = 2
@@ -343,8 +345,8 @@ for (j in 1 : 2) {
   fit.gd(L, z)
 }</code></pre>
 <p><img src="figure/simulated_correlated_null_3.rmd/2-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/simulated_correlated_null_3.rmd/2-2.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="k-3" class="section level2">
+</section>
+<section id="k-3" class="level2">
 <h2><span class="math inline">\(k = 3\)</span></h2>
 <pre class="r"><code>set.seed(777)
 k = 3
@@ -353,8 +355,8 @@ for (j in 1 : 2) {
   fit.gd(L, z)
 }</code></pre>
 <p><img src="figure/simulated_correlated_null_3.rmd/3-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/simulated_correlated_null_3.rmd/3-2.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="k-4" class="section level2">
+</section>
+<section id="k-4" class="level2">
 <h2><span class="math inline">\(k = 4\)</span></h2>
 <pre class="r"><code>set.seed(777)
 k = 4
@@ -363,8 +365,8 @@ for (j in 1 : 2) {
   fit.gd(L, z)
 }</code></pre>
 <p><img src="figure/simulated_correlated_null_3.rmd/4-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/simulated_correlated_null_3.rmd/4-2.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="k-5" class="section level2">
+</section>
+<section id="k-5" class="level2">
 <h2><span class="math inline">\(k = 5\)</span></h2>
 <pre class="r"><code>set.seed(777)
 k = 5
@@ -373,8 +375,8 @@ for (j in 1 : 2) {
   fit.gd(L, z)
 }</code></pre>
 <p><img src="figure/simulated_correlated_null_3.rmd/5-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/simulated_correlated_null_3.rmd/5-2.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="k-6" class="section level2">
+</section>
+<section id="k-6" class="level2">
 <h2><span class="math inline">\(k = 6\)</span></h2>
 <pre class="r"><code>set.seed(777)
 k = 6
@@ -383,8 +385,8 @@ for (j in 1 : 2) {
   fit.gd(L, z)
 }</code></pre>
 <p><img src="figure/simulated_correlated_null_3.rmd/6-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/simulated_correlated_null_3.rmd/6-2.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="k-7" class="section level2">
+</section>
+<section id="k-7" class="level2">
 <h2><span class="math inline">\(k = 7\)</span></h2>
 <pre class="r"><code>set.seed(777)
 k = 7
@@ -393,8 +395,8 @@ for (j in 1 : 2) {
   fit.gd(L, z)
 }</code></pre>
 <p><img src="figure/simulated_correlated_null_3.rmd/7-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/simulated_correlated_null_3.rmd/7-2.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="k-8" class="section level2">
+</section>
+<section id="k-8" class="level2">
 <h2><span class="math inline">\(k = 8\)</span></h2>
 <pre class="r"><code>set.seed(777)
 k = 8
@@ -403,8 +405,8 @@ for (j in 1 : 2) {
   fit.gd(L, z)
 }</code></pre>
 <p><img src="figure/simulated_correlated_null_3.rmd/8-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/simulated_correlated_null_3.rmd/8-2.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="k-9" class="section level2">
+</section>
+<section id="k-9" class="level2">
 <h2><span class="math inline">\(k = 9\)</span></h2>
 <pre class="r"><code>set.seed(777)
 k = 9
@@ -413,8 +415,8 @@ for (j in 1 : 2) {
   fit.gd(L, z)
 }</code></pre>
 <p><img src="figure/simulated_correlated_null_3.rmd/9-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/simulated_correlated_null_3.rmd/9-2.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="k-10" class="section level2">
+</section>
+<section id="k-10" class="level2">
 <h2><span class="math inline">\(k = 10\)</span></h2>
 <pre class="r"><code>set.seed(777)
 k = 10
@@ -423,14 +425,14 @@ for (j in 1 : 2) {
   fit.gd(L, z)
 }</code></pre>
 <p><img src="figure/simulated_correlated_null_3.rmd/10-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/simulated_correlated_null_3.rmd/10-2.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="session-information" class="section level2">
+</section>
+<section id="session-information" class="level2">
 <h2>Session information</h2>
 <!-- Insert the session information into the document -->
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 3.4.2 (2017-09-28)
+<pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS Sierra 10.12.6
+Running under: macOS High Sierra 10.13.2
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -443,11 +445,11 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 loaded via a namespace (and not attached):
- [1] compiler_3.4.2  backports_1.1.1 magrittr_1.5    rprojroot_1.2  
- [5] tools_3.4.2     htmltools_0.3.6 yaml_2.1.14     Rcpp_0.12.13   
- [9] stringi_1.1.5   rmarkdown_1.6   knitr_1.17      git2r_0.19.0   
-[13] stringr_1.2.0   digest_0.6.12   evaluate_0.10.1</code></pre>
-</div>
+ [1] compiler_3.4.3  backports_1.1.2 magrittr_1.5    rprojroot_1.3-1
+ [5] tools_3.4.3     htmltools_0.3.6 yaml_2.1.16     Rcpp_0.12.14   
+ [9] stringi_1.1.6   rmarkdown_1.8   knitr_1.17      git2r_0.20.0   
+[13] stringr_1.2.0   digest_0.6.13   evaluate_0.10.1</code></pre>
+</section>
 
 <hr>
 <p>

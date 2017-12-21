@@ -25,8 +25,8 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
-<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -36,10 +36,12 @@
   }
 </style>
 <script type="text/javascript">
-if (window.hljs && document.readyState && document.readyState === "complete") {
-   window.setTimeout(function() {
-      hljs.initHighlighting();
-   }, 0);
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
 }
 </script>
 
@@ -313,24 +315,20 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2017-11-07</p>
+<p><strong>Last updated:</strong> 2017-12-21</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 2c05d59</p>
+<p><strong>Code version:</strong> 6e42447</p>
 <!-- Add your analysis here -->
-<div id="introduction" class="section level2">
+<section id="introduction" class="level2">
 <h2>Introduction</h2>
 <p>Being in the development stage, <code>cvxr</code> is not very efficient at <a href="gaussian_derivatives.html">the convex optimization</a> in fitting Gaussian derivatives. We are moving to <code>Rmosek</code>.</p>
 <pre class="r"><code>source(&quot;../code/gdash.R&quot;)</code></pre>
-<pre><code>Warning: replacing previous import &#39;Matrix::crossprod&#39; by &#39;gmp::crossprod&#39;
-when loading &#39;cvxr&#39;</code></pre>
-<pre><code>Warning: replacing previous import &#39;Matrix::tcrossprod&#39; by
-&#39;gmp::tcrossprod&#39; when loading &#39;cvxr&#39;</code></pre>
 <pre class="r"><code>z.mat = read.table(&quot;../output/z_null_liver_777.txt&quot;)
 fd.bh = scan(&quot;../output/fd.bh.0.05_null_liver_777.txt&quot;)
 pihat0 = scan(&quot;../output/pihat0_z_null_liver_777.txt&quot;)</code></pre>
-</div>
-<div id="bad" class="section level2">
+</section>
+<section id="bad" class="level2">
 <h2>Bad</h2>
 <p>These data sets are unfriendly for both <code>BH</code> and <code>ASH</code>.</p>
 <pre><code>Data Set  355 :
@@ -453,8 +451,8 @@ Normalized coefficients of Gaussian derivatives:
 Normalized coefficients of Gaussian derivatives:
  1 : 0.0232314826078553 ; 2 : 0.491281828479503 ; 3 : 0.165633823951823 ; 4 : 0 ; 5 : 0 ; 6 : 0 ; 7 : 0 ; 8 : 0 ; 9 : 0 ; 10 : 0 ;</code></pre>
 <p><img src="figure/Rmosek.rmd/gd fitting for bad-39.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd fitting for bad-40.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="good" class="section level2">
+</section>
+<section id="good" class="level2">
 <h2>Good</h2>
 <p>These data sets are friendly for both <code>BH</code> and <code>ASH</code>.</p>
 <pre><code>Data Set  4 :
@@ -619,18 +617,18 @@ Normalized coefficients of Gaussian derivatives:
 Normalized coefficients of Gaussian derivatives:
  1 : 0.0226491329325567 ; 2 : 0 ; 3 : 0 ; 4 : 0.0369913458520336 ;</code></pre>
 <p><img src="figure/Rmosek.rmd/gd fitting for good-53.png" width="672" style="display: block; margin: auto;" /><img src="figure/Rmosek.rmd/gd fitting for good-54.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="remarks" class="section level2">
+</section>
+<section id="remarks" class="level2">
 <h2>Remarks</h2>
 <p>The implementation by <code>Rmosek</code> is more convenient, cleaner, yet more complicated. Need to understand different issues such as initialization, optimal orders, controlling parameters, dual construction, etc.</p>
-</div>
-<div id="session-information" class="section level2">
+</section>
+<section id="session-information" class="level2">
 <h2>Session information</h2>
 <!-- Insert the session information into the document -->
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 3.4.2 (2017-09-28)
+<pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS Sierra 10.12.6
+Running under: macOS High Sierra 10.13.2
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -643,16 +641,20 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] Rmosek_7.1.3      PolynomF_0.94     cvxr_0.0.0.9400   REBayes_0.85     
-[5] Matrix_1.2-11     SQUAREM_2017.10-1 EQL_1.0-0         ttutils_1.0-1    
+[1] Rmosek_8.0.69     PolynomF_1.0-1    CVXR_0.94-4       REBayes_1.2      
+[5] Matrix_1.2-12     SQUAREM_2017.10-1 EQL_1.0-0         ttutils_1.0-1    
 
 loaded via a namespace (and not attached):
- [1] Rcpp_0.12.13    lattice_0.20-35 gmp_0.5-13.1    digest_0.6.12  
- [5] rprojroot_1.2   MASS_7.3-47     grid_3.4.2      backports_1.1.1
- [9] git2r_0.19.0    magrittr_1.5    evaluate_0.10.1 stringi_1.1.5  
-[13] rmarkdown_1.6   tools_3.4.2     stringr_1.2.0   yaml_2.1.14    
-[17] compiler_3.4.2  htmltools_0.3.6 knitr_1.17     </code></pre>
-</div>
+ [1] Rcpp_0.12.14      knitr_1.17        magrittr_1.5     
+ [4] bit_1.1-12        lattice_0.20-35   R6_2.2.2         
+ [7] stringr_1.2.0     tools_3.4.3       grid_3.4.3       
+[10] R.oo_1.21.0       git2r_0.20.0      scs_1.1-1        
+[13] htmltools_0.3.6   bit64_0.9-7       yaml_2.1.16      
+[16] rprojroot_1.3-1   digest_0.6.13     gmp_0.5-13.1     
+[19] ECOSolveR_0.3-2   R.utils_2.6.0     evaluate_0.10.1  
+[22] rmarkdown_1.8     stringi_1.1.6     compiler_3.4.3   
+[25] Rmpfr_0.6-1       backports_1.1.2   R.methodsS3_1.7.1</code></pre>
+</section>
 
 <hr>
 <p>

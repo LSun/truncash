@@ -25,8 +25,8 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
-<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -36,10 +36,12 @@
   }
 </style>
 <script type="text/javascript">
-if (window.hljs && document.readyState && document.readyState === "complete") {
-   window.setTimeout(function() {
-      hljs.initHighlighting();
-   }, 0);
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
 }
 </script>
 
@@ -309,9 +311,9 @@ div.tocify {
 </div>
 
 
-<p><strong>Last updated:</strong> 2017-11-07</p>
-<p><strong>Code version:</strong> 2c05d59</p>
-<div id="introduction" class="section level2">
+<p><strong>Last updated:</strong> 2017-12-21</p>
+<p><strong>Code version:</strong> 6e42447</p>
+<section id="introduction" class="level2">
 <h2>Introduction</h2>
 <p>Now we are moving to handle <span class="math inline">\(t\)</span> likelihood. Suppose we have observations <span class="math display">\[
 (\hat\beta_1, \hat s_1, \nu_1), \ldots, (\hat\beta_n, \hat s_n, \nu_n)
@@ -328,15 +330,15 @@ div.tocify {
 \hat\beta_j / \hat s_j | \beta_j, s_j \sim t_{\nu_j}(\beta_j / s_j)
 \end{array}
 \]</span> where “<span class="math inline">\(\perp\)</span>” means “conditionally independent with,” and <span class="math inline">\(t_{\nu}(\mu)\)</span> is the noncentral <span class="math inline">\(t\)</span> distribution with <span class="math inline">\(\nu\)</span> degrees of freedom and noncentrality parameter <span class="math inline">\(\mu\)</span>. <span class="math inline">\(t_{\nu}(0) = t_\nu\)</span> is the standard <span class="math inline">\(t\)</span> distribution.</p>
-</div>
-<div id="models-for-t-likelihood" class="section level2">
+</section>
+<section id="models-for-t-likelihood" class="level2">
 <h2>Models for <span class="math inline">\(t\)</span> likelihood</h2>
 <p>Since now we are taking into consideration the randomness of both <span class="math inline">\(\hat\beta_j\)</span> and <span class="math inline">\(\hat s_j\)</span>, or at least the fact that <span class="math inline">\(\hat s_j\)</span> is not a precise measure of <span class="math inline">\(s_j\)</span>, the model could become trickier. Idealy we would hope to use the distribution</p>
 <p><span class="math display">\[
 (\hat\beta_j - \beta_j) / \hat s_j | \beta_j\sim t_{\nu_j}
 \]</span></p>
 <p>but it’s not clear how to use it. We need a likelihood for the data, either <span class="math inline">\(\hat\beta_j\)</span> itself or <span class="math inline">\((\hat\beta_j, \hat s_j)\)</span> jointly, but this aforementioned distribution doesn’t give us such a likelihood directly as it does not specify either <span class="math inline">\(p(\hat\beta_j | \beta_j, \hat s_j)\)</span> or <span class="math inline">\(p(\hat\beta_j, \hat s_j | \beta_j)\)</span>.</p>
-<div id="current-implementation-in-ashr" class="section level3">
+<section id="current-implementation-in-ashr" class="level3">
 <h3>1. Current implementation in <a href="https://doi.org/10.1093/biostatistics/kxw041"><code>ashr</code></a></h3>
 <p>The current implementation in <a href="https://doi.org/10.1093/biostatistics/kxw041"><code>ashr</code></a> uses a simplication</p>
 <p><span class="math display">\[
@@ -349,8 +351,8 @@ div.tocify {
 <p><span class="math display">\[
 \hat\beta_j / \hat s_j | \beta_j, s_j \sim t_{\nu_j}(\beta_j / s_j)
 \]</span> is a noncentral <span class="math inline">\(t\)</span> which is not symmetric. So it might have some problem going to <code>truncash</code> when we need to consider the probability of <span class="math inline">\(|\hat\beta_j / \hat s_j|\)</span> smaller than some threshold (more on that below). However, it works satisfactorily well with <code>ashr</code> in practice, and there seems no obviously better alternatives, detailed below.</p>
-</div>
-<div id="pivotal-likelihood" class="section level3">
+</section>
+<section id="pivotal-likelihood" class="level3">
 <h3>2. Pivotal likelihood</h3>
 <p>Using the fact that</p>
 <p><span class="math display">\[
@@ -372,8 +374,8 @@ f_{t_{\nu_j}}((\hat\beta_j - a_k) / \hat s_j), &amp; a_k = b_k
 \end{cases}
 \end{array}
 \]</span> It’s mathematically feasible, yet I cannot quite recognize the meaning of this “expected” probability density <span class="math inline">\(\int p((\hat\beta_j - \beta_j) / \hat s_j | \beta_j) p(\beta_j)\text{d}\beta_j\)</span> and how to use it. It turns out to be related with the pivotal likelihood idea, yet as Matthew put it, “ultimately we did not find it satisfying. It is not a well established concept and it is not clear to me that it ends up being a good idea.”</p>
-</div>
-<div id="joint-ash-jointly-modeling-hatbeta-and-hat-s" class="section level3">
+</section>
+<section id="joint-ash-jointly-modeling-hatbeta-and-hat-s" class="level3">
 <h3>3. Joint ash: Jointly modeling <span class="math inline">\(\hat\beta\)</span> and <span class="math inline">\(\hat s\)</span></h3>
 <p>Taking advantage of the conditional indepedence of <span class="math inline">\(\hat\beta\)</span> and <span class="math inline">\(\hat s\)</span> given <span class="math inline">\(\beta\)</span> and <span class="math inline">\(s\)</span>, we can write a model as</p>
 <p><span class="math display">\[
@@ -386,22 +388,22 @@ s_j \sim \sum_l\rho_lg_l^s
 \end{array}
 \]</span></p>
 <p>This line of “joint ash” is being done by <a href="https://github.com/mengyin">Mengyin</a>.</p>
-</div>
-<div id="sequential-joint-ash" class="section level3">
+</section>
+<section id="sequential-joint-ash" class="level3">
 <h3>4. Sequential joint ash</h3>
 <p>The “better” approach is the one that <a href="https://github.com/mengyin">Mengyin</a> now takes. First appy <a href="https://doi.org/10.1093/bioinformatics/btw483"><code>vash</code></a> to shrink the <span class="math inline">\(\hat s\)</span>, and then apply <a href="https://doi.org/10.1093/biostatistics/kxw041"><code>ashr</code></a> with its currently-implemented <span class="math inline">\(t\)</span> likelihood (taking <span class="math inline">\(\hat s\)</span>) as given) using moderated <span class="math inline">\(\hat s\)</span> (and moderated df). This approach can be formally justified, although not obvious, as Matthew noted. Probably the reason is that since <span class="math inline">\(\hat\beta\)</span> and <span class="math inline">\(\hat s\)</span> are conditionally independent given <span class="math inline">\(\beta\)</span> and <span class="math inline">\(s\)</span>, we could model them separately and sequentially.</p>
-</div>
-<div id="matthews-recommendation" class="section level3">
+</section>
+<section id="matthews-recommendation" class="level3">
 <h3>5. Matthew’s recommendation</h3>
 <p>So the bottom line is that for <code>truncash</code> I think it suffices to implement the same <span class="math inline">\(t\)</span> approach as <a href="https://doi.org/10.1093/biostatistics/kxw041"><code>ashr</code></a>, since then we can use the same trick as in 4. Of course, for testing the implementation you will want to simulate from the assumed model</p>
 <p><span class="math display">\[
 \hat\beta_j | \beta_j, \hat s_j \sim \beta_j + \hat s_j t_{\nu_j}
 \]</span></p>
-</div>
-</div>
-<div id="moving-to-truncash" class="section level2">
+</section>
+</section>
+<section id="moving-to-truncash" class="level2">
 <h2>Moving to <code>truncash</code></h2>
-<div id="problem-setting" class="section level3">
+<section id="problem-setting" class="level3">
 <h3>Problem setting</h3>
 <p>As in Normal likelihood case, suppose we have <span class="math inline">\(m + n\)</span> observations of <span class="math inline">\((\hat\beta_j, \hat s_j, \nu_j)\)</span> in two groups such that, with a pre-specified <span class="math inline">\(t_j\)</span> (related to <span class="math inline">\(\nu_j\)</span>) for each observation</p>
 <p><span class="math display">\[
@@ -411,8 +413,8 @@ s_j \sim \sum_l\rho_lg_l^s
 \text{Group 2: }(\hat\beta_{m+1}, \hat s_{m+1}), \ldots, (\hat\beta_{m+n}, \hat s_{m+n}), \text{with } |\hat\beta_j/\hat s_j| &gt; t_j
 \]</span></p>
 <p>For Group 1, we’ll only use the information that for each one, <span class="math inline">\(|\hat\beta_j/\hat s_j| \leq t_j\)</span>; that is, they are moderate observations. For Group 2, we’ll use the full observation <span class="math inline">\((\hat\beta_j, \hat s_j, \nu_j)\)</span>.</p>
-</div>
-<div id="the-extreme-group-business-as-usual" class="section level3">
+</section>
+<section id="the-extreme-group-business-as-usual" class="level3">
 <h3>The extreme group: business as usual</h3>
 <p>Now for Group 2, the extreme group where we observe the whole thing, we have usual ASH with an approximate <span class="math inline">\(t_{\nu_j}\)</span> likelihood and uniform mixture priors</p>
 <p><span class="math display">\[
@@ -421,8 +423,8 @@ s_j \sim \sum_l\rho_lg_l^s
 \beta_j \sim \sum_k\pi_k \text{Unif}[a_k, b_k]
 \end{array}
 \]</span></p>
-</div>
-<div id="the-moderate-group-two-possible-ways" class="section level3">
+</section>
+<section id="the-moderate-group-two-possible-ways" class="level3">
 <h3>The moderate group: two possible ways</h3>
 <p>For Group 1, the extreme group where the relevant information is <span class="math inline">\(|\hat \beta_j / \hat s_j| \leq t_j\)</span>, we still use the same uniform mixture priors</p>
 <p><span class="math display">\[
@@ -438,16 +440,16 @@ s_j \sim \sum_l\rho_lg_l^s
 t_{\nu_j}(\beta_j / \hat s_j)
 \]</span></p>
 <p>based on a noncentral <span class="math inline">\(t\)</span>. Both use some simplification and approximation, and presumably it shouldn’t make much difference in practice.</p>
-</div>
-<div id="the-rest-back-to-business-as-usual" class="section level3">
+</section>
+<section id="the-rest-back-to-business-as-usual" class="level3">
 <h3>The rest: back to business as usual</h3>
 <p>Then we put both groups together and estimate <span class="math inline">\(\pi_k\)</span> from the marginal probability of the data in both groups.</p>
-</div>
-</div>
-<div id="code" class="section level2">
+</section>
+</section>
+<section id="code" class="level2">
 <h2>Code</h2>
-</div>
-<div id="simulation" class="section level2">
+</section>
+<section id="simulation" class="level2">
 <h2>Simulation</h2>
 <pre class="r"><code>source(&quot;../code/truncash.t.R&quot;)
 source(&quot;../code/truncash.R&quot;)
@@ -457,13 +459,13 @@ fit.normal.original = truncash(betahat, sebetahat, t = qnorm(0.975))
 get_pi0(fit.normal)
 fit.normal.t = truncash.t(betahat, sebetahat, pval.thresh = 0.05, df = rep(2, 100), method = &quot;fdr&quot;, mixcompdist = &quot;uniform&quot;)
 ashr::ash.workhorse(betahat, sebetahat, fixg = TRUE, g = fit.normal.t)</code></pre>
-</div>
-<div id="session-information" class="section level2">
+</section>
+<section id="session-information" class="level2">
 <h2>Session Information</h2>
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 3.4.2 (2017-09-28)
+<pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS Sierra 10.12.6
+Running under: macOS High Sierra 10.13.2
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -476,11 +478,11 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 loaded via a namespace (and not attached):
- [1] compiler_3.4.2  backports_1.1.1 magrittr_1.5    rprojroot_1.2  
- [5] tools_3.4.2     htmltools_0.3.6 yaml_2.1.14     Rcpp_0.12.13   
- [9] stringi_1.1.5   rmarkdown_1.6   knitr_1.17      git2r_0.19.0   
-[13] stringr_1.2.0   digest_0.6.12   workflowr_0.7.0 evaluate_0.10.1</code></pre>
-</div>
+ [1] compiler_3.4.3  backports_1.1.2 magrittr_1.5    rprojroot_1.3-1
+ [5] tools_3.4.3     htmltools_0.3.6 yaml_2.1.16     Rcpp_0.12.14   
+ [9] stringi_1.1.6   rmarkdown_1.8   knitr_1.17      git2r_0.20.0   
+[13] stringr_1.2.0   digest_0.6.13   workflowr_0.8.0 evaluate_0.10.1</code></pre>
+</section>
 
 <hr>
 <p>

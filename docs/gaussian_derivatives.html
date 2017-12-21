@@ -25,8 +25,8 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
-<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -36,10 +36,12 @@
   }
 </style>
 <script type="text/javascript">
-if (window.hljs && document.readyState && document.readyState === "complete") {
-   window.setTimeout(function() {
-      hljs.initHighlighting();
-   }, 0);
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
 }
 </script>
 
@@ -309,9 +311,9 @@ div.tocify {
 </div>
 
 
-<p><strong>Last updated:</strong> 2017-11-07</p>
-<p><strong>Code version:</strong> 2c05d59</p>
-<div id="empirical-null" class="section level2">
+<p><strong>Last updated:</strong> 2017-12-21</p>
+<p><strong>Code version:</strong> 6e42447</p>
+<section id="empirical-null" class="level2">
 <h2>Empirical null</h2>
 <p>Correlation among summary statistics can distort hypothesis testing and signal estimation by making the observed statistics deviate from their theoretical distribution. See previous simulations (<a href="correlated_z.html">here</a>, <a href="correlated_z_2.html">here</a>, and <a href="correlated_z_3.html">here</a>) for illustration.</p>
 <p>Efron is his series of publications proposed an “empirical null” idea to tackle the correlation among <span class="math inline">\(z\)</span> scores in the simultaneous inference setting. Essentially, he assumed that <span class="math inline">\(z\)</span> scores from those null hypotheses among all hypotheses simultaneously considered should follow an “empirical null” distribution that’s different from their marginal <span class="math inline">\(N(0, 1)\)</span>, but still a normal with estimated mean and standard deviation, thus to produce what Efron terms as the “correlation induced inflation.”</p>
@@ -328,8 +330,8 @@ F_0(x) = \Phi^+(x) + \sum\limits_{k = 1}^\infty W_k\varphi^{(k - 1)}(x)
 <p><span class="math display">\[
 f_0(x) = \varphi(x) + \sum\limits_{k = 1}^\infty W_k\varphi^{(k)}(x)
 \]</span> which can be seen as approximating the density of the <em>observed</em> distribution of correlated <span class="math inline">\(z\)</span> scores when the number of them <span class="math inline">\(n\)</span> is large. <strong>Or in other words, <span class="math inline">\(f_0(x)\)</span> can be seen as to describe the histogram of those <span class="math inline">\(z\)</span> scores.</strong></p>
-</div>
-<div id="gaussian-derivatives-and-hermite-polynomials" class="section level2">
+</section>
+<section id="gaussian-derivatives-and-hermite-polynomials" class="level2">
 <h2>Gaussian derivatives and Hermite polynomials</h2>
 <p><span class="math inline">\(f_0(x)\)</span> involves Gaussian derivatives <span class="math inline">\(\varphi^{(k)}\)</span>, and many properties of them have been thoroughly studied. For starters, they are closely related to the <em>probabilists’ Hermite polynomials</em> <span class="math inline">\(h_k\)</span> in that</p>
 <p><span class="math display">\[
@@ -386,14 +388,14 @@ h_{k-1}(x)\varphi(x)\\
 \displaystyle\Phi(x) - \sum\limits_{k = 1}^\infty W_kh_{k-1}(x)\varphi(x)
 \end{array}
 \]</span></p>
-</div>
-<div id="illustration" class="section level2">
+</section>
+<section id="illustration" class="level2">
 <h2>Illustration</h2>
-<div id="first-orders-of-gaussian-derivatives-and-hermite-polynomials" class="section level3">
+<section id="first-orders-of-gaussian-derivatives-and-hermite-polynomials" class="level3">
 <h3>First orders of Gaussian derivatives and Hermite polynomials</h3>
 <p><img src="figure/gaussian_derivatives.Rmd/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/gaussian_derivatives.Rmd/unnamed-chunk-2-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/gaussian_derivatives.Rmd/unnamed-chunk-2-3.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="scaled-and-unscaled-gaussian-derivatives" class="section level3">
+</section>
+<section id="scaled-and-unscaled-gaussian-derivatives" class="level3">
 <h3>Scaled and unscaled Gaussian derivatives</h3>
 <p>The expectation of <span class="math inline">\(W_k^2\)</span> vanishes in the order of <span class="math inline">\(k!\)</span>, and the average <span class="math inline">\(h_k^2\)</span> also scales in the order of <span class="math inline">\(k!\)</span>, and we can define “scaled” version of these functions and quantities:</p>
 <p><span class="math display">\[
@@ -413,9 +415,9 @@ f_0(x) &amp;=&amp;
 \end{array}
 \]</span></p>
 <p><img src="figure/gaussian_derivatives.Rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/gaussian_derivatives.Rmd/unnamed-chunk-3-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/gaussian_derivatives.Rmd/unnamed-chunk-3-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/gaussian_derivatives.Rmd/unnamed-chunk-3-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/gaussian_derivatives.Rmd/unnamed-chunk-3-5.png" width="672" style="display: block; margin: auto;" /><img src="figure/gaussian_derivatives.Rmd/unnamed-chunk-3-6.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-</div>
-<div id="fitting-the-empirical-null" class="section level2">
+</section>
+</section>
+<section id="fitting-the-empirical-null" class="level2">
 <h2>Fitting the empirical null</h2>
 <p>Given <span class="math inline">\(z\)</span> scores <span class="math inline">\(z_1, \ldots, z_n\)</span> with known marginal distribution <span class="math inline">\(N(0, 1)\)</span> but unknown correlation, their (right-sided) empirical cdf <span class="math inline">\(\hat F(x)\)</span> can be observed. Then these <span class="math inline">\(z\)</span> scores can be seen as if they are independently and identically sampled from this observed empirical cdf.</p>
 <p>Furthermore, when <span class="math inline">\(n\)</span> is sufficiently large, this observed empirical cdf approximates a cdf <span class="math inline">\(F_0(x)\)</span> which has a density</p>
@@ -436,11 +438,11 @@ f_0(x) = \varphi(x)\left(1 + \sum\limits_{k = 1}^\infty W_kh_k(x)\right)
 \end{array}
 \]</span> The first constraint is self-satisfied for all <span class="math inline">\(w\)</span>: <span class="math inline">\(\int_{-\infty}^\infty h_k(x)\varphi(x)dx = 0\)</span> for any <span class="math inline">\(k\geq1\)</span> since <span class="math inline">\(h_k\)</span> and <span class="math inline">\(h_0 \equiv1\)</span> are orthogonal with respect to <span class="math inline">\(\varphi\)</span>.</p>
 <p>The second constraint and the objective are intractable in the present form because of the involvement of <span class="math inline">\(\infty\)</span>. Therefore we need to make another two key assumptions as follows.</p>
-<div id="assumption-1-the-pairwise-correlation-rho_ij-are-on-average-moderate-enough-such-that-the-influence-of-w_kh_k-will-vanish-for-sufficiently-large-k." class="section level3">
+<section id="assumption-1-the-pairwise-correlation-rho_ij-are-on-average-moderate-enough-such-that-the-influence-of-w_kh_k-will-vanish-for-sufficiently-large-k." class="level3">
 <h3>Assumption 1: the pairwise correlation <span class="math inline">\(\rho_{ij}\)</span> are on average moderate enough, such that the influence of <span class="math inline">\(W_kh_k\)</span> will vanish for sufficiently large <span class="math inline">\(k\)</span>.</h3>
 <p>We assume that the pairwise correlation <span class="math inline">\(\rho_{ij}\)</span> are on average moderate enough, such that the influence of <span class="math inline">\(W_kh_k\)</span> will vanish for sufficiently large <span class="math inline">\(k\)</span>. Note that it doesn’t hold true in general. Recall that</p>
 <p><span class="math display">\[
-\text{var}(W_k) = \alpha_k / k! = \bar{\rho_{ij}^k} / k! \leq 1/k! \ ,
+\text{var}(W_k) = \alpha_k / k! = \bar{\rho_{ij}^k} / k! \leq 1/k! \  ,
 \]</span> so it seems <strong><span class="math inline">\(W_k^2\)</span> will vanish in factorial order</strong>, yet on the other hand,</p>
 <p><span class="math display">\[
 \int_{-\infty}^\infty h_k^2(x)\varphi(x)dx = k!
@@ -448,13 +450,13 @@ f_0(x) = \varphi(x)\left(1 + \sum\limits_{k = 1}^\infty W_kh_k(x)\right)
 <p>so <strong><span class="math inline">\(h_k^2\)</span> also scales in factorial order</strong>. Therefore, it’s not at all clear that the influence of <span class="math inline">\(W_kh_k\)</span> will decay in the most general case. So the decay of higher orders largely rely on the decay of higher order empirical moments of pairwise correlation <span class="math inline">\(\alpha_k\)</span>, which characterizes <span class="math inline">\(\rho_{ij}^k\)</span>.</p>
 <p>As a result, we here assume that <span class="math inline">\(\rho_{ij}\)</span>’s are on average moderate, so <span class="math inline">\(\alpha_k\)</span> decays faster, leading to faster decaying of <span class="math inline">\(W_k\)</span>, probably as well as that of <span class="math inline">\(W_kh_k\)</span>. <em>Ignoring this assumption would cause problem at least theoretically, as detailed later.</em></p>
 <p>With this assumption, we can stop at a large <span class="math inline">\(K\)</span>; that is, <span class="math inline">\(f_0(x) = \varphi(x)\left(1 + \sum\limits_{k = 1}^K W_kh_k(x)\right)\)</span>. <em>We also need to specify a method to choose <span class="math inline">\(K\)</span> in a systematic way.</em></p>
-</div>
-<div id="assumption-2-we-further-assume-that-the-number-of-observations-n-is-sufficiently-large-so-that-we-can-use-the-n-observed-z-scores-in-place-of-the-intractable-all-xinmathbbr-in-the-second-constraint." class="section level3">
+</section>
+<section id="assumption-2-we-further-assume-that-the-number-of-observations-n-is-sufficiently-large-so-that-we-can-use-the-n-observed-z-scores-in-place-of-the-intractable-all-xinmathbbr-in-the-second-constraint." class="level3">
 <h3>Assumption 2: we further assume that the number of observations <span class="math inline">\(n\)</span> is sufficiently large, so that we can use the <span class="math inline">\(n\)</span> observed <span class="math inline">\(z\)</span> scores in place of the intractable all <span class="math inline">\(x\in\mathbb{R}\)</span> in the second constraint.</h3>
 <p>We further assume that the number of observations <span class="math inline">\(n\)</span> is sufficiently large, so that we can use the <span class="math inline">\(n\)</span> observed <span class="math inline">\(z\)</span> scores in place of the intractable all <span class="math inline">\(x\in\mathbb{R}\)</span> in the second constraint.</p>
 <p>That is, <span class="math inline">\(1 + \sum\limits_{k = 1}^K w_kh_k(z_i) \geq0\)</span>. <em>Ignoring this assumption would also lead to numerical instability, as detailed later.</em></p>
-</div>
-<div id="convex-optimization" class="section level3">
+</section>
+<section id="convex-optimization" class="level3">
 <h3>Convex optimization</h3>
 <p>With these assumptions, the problem is now a convex optimization.</p>
 <p><span class="math display">\[
@@ -472,14 +474,14 @@ f_0(x) = \varphi(x)\left(1 + \sum\limits_{k = 1}^\infty W_kh_k(x)\right)
 \end{array}
 \]</span></p>
 <p>where <span class="math inline">\(H_{ik} = h_k(z_i)\)</span>.</p>
-</div>
-</div>
-<div id="session-information" class="section level2">
+</section>
+</section>
+<section id="session-information" class="level2">
 <h2>Session Information</h2>
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 3.4.2 (2017-09-28)
+<pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS Sierra 10.12.6
+Running under: macOS High Sierra 10.13.2
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -492,11 +494,11 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 loaded via a namespace (and not attached):
- [1] compiler_3.4.2  backports_1.1.1 magrittr_1.5    rprojroot_1.2  
- [5] tools_3.4.2     htmltools_0.3.6 yaml_2.1.14     Rcpp_0.12.13   
- [9] stringi_1.1.5   rmarkdown_1.6   knitr_1.17      git2r_0.19.0   
-[13] stringr_1.2.0   digest_0.6.12   workflowr_0.7.0 evaluate_0.10.1</code></pre>
-</div>
+ [1] compiler_3.4.3  backports_1.1.2 magrittr_1.5    rprojroot_1.3-1
+ [5] tools_3.4.3     htmltools_0.3.6 yaml_2.1.16     Rcpp_0.12.14   
+ [9] stringi_1.1.6   rmarkdown_1.8   knitr_1.17      git2r_0.20.0   
+[13] stringr_1.2.0   digest_0.6.13   workflowr_0.8.0 evaluate_0.10.1</code></pre>
+</section>
 
 <hr>
 <p>

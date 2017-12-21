@@ -25,8 +25,8 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
-<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -36,10 +36,12 @@
   }
 </style>
 <script type="text/javascript">
-if (window.hljs && document.readyState && document.readyState === "complete") {
-   window.setTimeout(function() {
-      hljs.initHighlighting();
-   }, 0);
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
 }
 </script>
 
@@ -309,14 +311,14 @@ div.tocify {
 </div>
 
 
-<p><strong>Last updated:</strong> 2017-11-07</p>
-<p><strong>Code version:</strong> 2c05d59</p>
-<div id="introduction" class="section level2">
+<p><strong>Last updated:</strong> 2017-12-21</p>
+<p><strong>Code version:</strong> 6e42447</p>
+<section id="introduction" class="level2">
 <h2>Introduction</h2>
 <p>Apply two FDR-controlling procedures, Benjamini–Hochberg 1995 (“<a href="https://www.jstor.org/stable/2346101">BH</a>”) and Benjamini-Yekutieli 2001 (“<a href="https://projecteuclid.org/euclid.aos/1013699998">BY</a>”), and two <span class="math inline">\(s\)</span> value models, <code>ash</code> and <code>truncash</code> (with the threshold <span class="math inline">\(T = 1.96\)</span>) to the simulated, correlated null data. The data are obtained from 5 vs 5 GTEx/Liver samples and 10K top expressed genes, and <span class="math inline">\(1000\)</span> independent simulation trials.</p>
 <p>Compare the numbers of false discoveries (by definition, all discoveries should be false) obtained by these four methods, using FDR <span class="math inline">\(\leq 0.05\)</span> and <span class="math inline">\(s\)</span>-value <span class="math inline">\(\leq 0.05\)</span> as cutoffs.</p>
-</div>
-<div id="simulation-p-values-for-bh-and-by-procedures-hatbeta-hatbeta-hat-s-hatbeta-hat-z-for-ash-and-truncash." class="section level2">
+</section>
+<section id="simulation-p-values-for-bh-and-by-procedures-hatbeta-hatbeta-hat-s-hatbeta-hat-z-for-ash-and-truncash." class="level2">
 <h2>Simulation: <span class="math inline">\(p\)</span> values for <a href="https://www.jstor.org/stable/2346101">BH</a> and <a href="https://projecteuclid.org/euclid.aos/1013699998">BY</a> procedures; <span class="math inline">\(\hat\beta = \hat\beta\)</span>, <span class="math inline">\(\hat s = \hat\beta / \hat z\)</span>, for <code>ash</code> and <code>truncash</code>.</h2>
 <p><strong><span class="math inline">\(\hat\beta\)</span> obtained from <a href="nullpipeline.html">the <code>limma::lmFit</code> step of the pipeline</a>, <span class="math inline">\(\hat z\)</span> obtained from <a href="nullpipeline.html">the last step of the pipeline</a>.</strong></p>
 <pre class="r"><code>library(ashr)
@@ -341,11 +343,11 @@ for (i in 1:m) {
   fit.truncash = truncash(betahat_trial, sebetahat_trial, t = qnorm(0.975))
   fd.truncash[i] = sum(get_svalue(fit.truncash) &lt;= 0.05)
 }</code></pre>
-</div>
-<div id="result" class="section level2">
+</section>
+<section id="result" class="level2">
 <h2>Result</h2>
 <p>Simulated under the global null, FWER <span class="math inline">\(=\)</span> FDR.</p>
-<div id="estimated-fwer-or-fdr-by-bh" class="section level3">
+<section id="estimated-fwer-or-fdr-by-bh" class="level3">
 <h3>Estimated FWER or FDR by BH</h3>
 <pre class="r"><code>fdr.bh = mean(fd.bh &gt;= 1)
 fdr.bh</code></pre>
@@ -362,8 +364,8 @@ fdr.ash</code></pre>
 <pre class="r"><code>fdr.truncash = mean(fd.truncash &gt;= 1)
 fdr.truncash</code></pre>
 <pre><code>[1] 0.062</code></pre>
-</div>
-<div id="happenstance-of-false-discoveries-by-four-approaches" class="section level3">
+</section>
+<section id="happenstance-of-false-discoveries-by-four-approaches" class="level3">
 <h3>Happenstance of false discoveries by four approaches</h3>
 <pre class="r"><code>maxcount = max(c(fd.bh, fd.by, fd.ash, fd.truncash))
 xlim = c(0, maxcount)
@@ -377,8 +379,8 @@ plot(table(fd.bh), xlab = &quot;Number of False Discoveries / 10K&quot;, ylab = 
 <p><img src="figure/FDR_null_betahat.Rmd/unnamed-chunk-7-3.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>plot(table(fd.truncash), xlab = &quot;Number of False Discoveries / 10K&quot;, ylab = &quot;Frequency&quot;, main = &quot;truncash&quot;, xlim = xlim, ylim = ylim)</code></pre>
 <p><img src="figure/FDR_null_betahat.Rmd/unnamed-chunk-7-4.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="comparison-of-the-numbers-of-false-discoveries-by-four-approaches" class="section level3">
+</section>
+<section id="comparison-of-the-numbers-of-false-discoveries-by-four-approaches" class="level3">
 <h3>Comparison of the numbers of false discoveries by four approaches</h3>
 <pre class="r"><code>m = length(fd.bh)
 fd.ind = (1:m)[!((fd.bh == 0) &amp; (fd.by == 0) &amp; (fd.ash == 0) &amp; (fd.truncash == 0))]
@@ -388,14 +390,14 @@ points(1:length(fd.ind), fd.ash[fd.ind], pch = 4, col = 3)
 points(1:length(fd.ind), fd.truncash[fd.ind], pch = 4, col = 4)
 legend(&quot;topright&quot;, c(&quot;BH&quot;, &quot;BY&quot;, &quot;ash&quot;, &quot;truncash&quot;), col = 1:4, pch = 4)</code></pre>
 <p><img src="figure/FDR_null_betahat.Rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-</div>
-<div id="session-information" class="section level2">
+</section>
+</section>
+<section id="session-information" class="level2">
 <h2>Session Information</h2>
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 3.4.2 (2017-09-28)
+<pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS Sierra 10.12.6
+Running under: macOS High Sierra 10.13.2
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -408,19 +410,19 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] SQUAREM_2017.10-1 ashr_2.1-27      
+[1] SQUAREM_2017.10-1 ashr_2.2-2       
 
 loaded via a namespace (and not attached):
- [1] Rcpp_0.12.13      knitr_1.17        magrittr_1.5     
- [4] workflowr_0.7.0   MASS_7.3-47       doParallel_1.0.11
- [7] pscl_1.5.2        lattice_0.20-35   foreach_1.4.3    
-[10] stringr_1.2.0     tools_3.4.2       parallel_3.4.2   
-[13] grid_3.4.2        git2r_0.19.0      htmltools_0.3.6  
-[16] iterators_1.0.8   yaml_2.1.14       rprojroot_1.2    
-[19] digest_0.6.12     Matrix_1.2-11     codetools_0.2-15 
-[22] evaluate_0.10.1   rmarkdown_1.6     stringi_1.1.5    
-[25] compiler_3.4.2    backports_1.1.1   truncnorm_1.0-7  </code></pre>
-</div>
+ [1] Rcpp_0.12.14      knitr_1.17        magrittr_1.5     
+ [4] workflowr_0.8.0   MASS_7.3-47       doParallel_1.0.11
+ [7] pscl_1.5.2        lattice_0.20-35   foreach_1.4.4    
+[10] stringr_1.2.0     tools_3.4.3       parallel_3.4.3   
+[13] grid_3.4.3        git2r_0.20.0      htmltools_0.3.6  
+[16] iterators_1.0.9   yaml_2.1.16       rprojroot_1.3-1  
+[19] digest_0.6.13     Matrix_1.2-12     codetools_0.2-15 
+[22] evaluate_0.10.1   rmarkdown_1.8     stringi_1.1.6    
+[25] compiler_3.4.3    backports_1.1.2   truncnorm_1.0-7  </code></pre>
+</section>
 
 <hr>
 <p>

@@ -25,8 +25,8 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
-<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -36,10 +36,12 @@
   }
 </style>
 <script type="text/javascript">
-if (window.hljs && document.readyState && document.readyState === "complete") {
-   window.setTimeout(function() {
-      hljs.initHighlighting();
-   }, 0);
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
 }
 </script>
 
@@ -313,12 +315,12 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2017-11-07</p>
+<p><strong>Last updated:</strong> 2017-12-21</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 2c05d59</p>
+<p><strong>Code version:</strong> 6e42447</p>
 <!-- Add your analysis here -->
-<div id="introduction" class="section level2">
+<section id="introduction" class="level2">
 <h2>Introduction</h2>
 <p>The <span class="math inline">\(w\)</span> optimization problem we hope to solve has two constraints. If we are not imposing these two constraints, chances are the optimization will be <a href="gaussian_derivatives_3.html">unstable</a>, especially when we don’t know <span class="math inline">\(L\)</span> for sure beforehand. However, these two constraints are hard to be converted directly and strictly to convex or even tractable forms.</p>
 <p><span class="math display">\[
@@ -336,59 +338,59 @@ shared across the workflowr files. -->
 <p>On the other hand, as indicated the <a href="gaussian_derivatives.html">theory</a> and <a href="mosek_reg.html">examples</a> of good fitting by Gaussian derivatives, <span class="math inline">\(w_l\)</span> is getting smaller as <span class="math inline">\(l\)</span> increases. Moreover, oftentimes, really small <span class="math inline">\(w_l\)</span> could still make a difference and thus indispensable. Therefore, although we need to stop <span class="math inline">\(\hat w\)</span> getting too large, we cerntainly don’t want to shrink them unnecessarily and unwarrantedly to zero.</p>
 <p>Ideally, the goal of <span class="math inline">\(\sum\limits_{l = 1}^L\lambda_l^w \phi \left(\left|w_l\right|\right)\)</span> regularizing <span class="math inline">\(w\)</span> should be to</p>
 
-</div>
-<div id="ideas-on-lambda_lw-and-phi" class="section level2">
+</section>
+<section id="ideas-on-lambda_lw-and-phi" class="level2">
 <h2>Ideas on <span class="math inline">\(\lambda_l^w\)</span> and <span class="math inline">\(\phi\)</span></h2>
 <p>Remember that in <a href="gaussian_derivatives.html">theory</a>, if we are writing the random empirical density of the correlated marginally <span class="math inline">\(N\left(0, 1\right)\)</span> random samples as</p>
 <p><span class="math display">\[
-f_0\left(z\right) = \varphi\left(z\right) + \sum\limits_{l = 1}^\infty W_k\varphi^{(l)}\left(z\right) \ ,
+f_0\left(z\right) = \varphi\left(z\right) + \sum\limits_{l = 1}^\infty W_k\varphi^{(l)}\left(z\right) \  ,
 \]</span> then</p>
 <p><span class="math display">\[
-\text{var}\left(W_l\right) = \frac{\alpha_l}{l!} \ ,
+\text{var}\left(W_l\right) = \frac{\alpha_l}{l!} \  ,
 \]</span> where</p>
 <p><span class="math display">\[
-\alpha_l = \frac{1}{\frac{n\left(n - 1\right)}{2}}\sum_\limits{i &lt; j}\rho_{ij}^l := \bar{\rho_{ij}^l} \ .
+\alpha_l = \frac{1}{\frac{n\left(n - 1\right)}{2}}\sum_\limits{i &lt; j}\rho_{ij}^l := \bar{\rho_{ij}^l} \  .
 \]</span></p>
 <p>Therefore, naturally <span class="math inline">\(w_l\)</span> should decay somehow in the order of</p>
 <p><span class="math display">\[
 \left|w_l\right| \leadsto \sqrt{\text{var}\left(W_l\right)} =
-\frac{\sqrt{\bar{\rho_{ij}^l}}}{\sqrt{l!}} \ .
+\frac{\sqrt{\bar{\rho_{ij}^l}}}{\sqrt{l!}} \  .
 \]</span></p>
-<div id="normalization" class="section level3">
+<section id="normalization" class="level3">
 <h3>Normalization</h3>
 <p>The order of decay suggests that we should work with <a href="mosek_reg_2.html">normalized coefficients</a>, so that</p>
 <p><span class="math display">\[
 \left|w_l^n\right| = \sqrt{l!}\left|w_l\right| \leadsto 
-\sqrt{\bar{\rho_{ij}^l}} \ .
+\sqrt{\bar{\rho_{ij}^l}} \  .
 \]</span> This piece of information on the order of magnitude of the normalized <span class="math inline">\(w_l^n\)</span> provides a hint to determine <span class="math inline">\(\lambda_l^w\)</span>, for example,</p>
-</div>
-<div id="regularizing-even-orders-only" class="section level3">
+</section>
+<section id="regularizing-even-orders-only" class="level3">
 <h3>Regularizing even orders only</h3>
 <p>Odd orders of Gaussian derivatives are generally associated with mean shift and skewness of <span class="math inline">\(f_0\)</span>, so they are generally very small, but if they are indeed not zero, they are important however they are small.</p>
 <p>Meanwhile, when <span class="math inline">\(l\)</span> is odd, <span class="math inline">\(\bar{\rho_{ij}^l}\)</span> could be very small, and not in order of <span class="math inline">\(\bar{\rho^l}\)</span> for some <span class="math inline">\(\rho \in \left(0, 1\right)\)</span>, so it’s very difficult to come up with a good <span class="math inline">\(\lambda_l^w\)</span> when <span class="math inline">\(l\)</span> is odd.</p>
 <p>Therefore, it might be better to leave the odd orders alone and regularize the even orders only.</p>
-</div>
-<div id="penalty-l_1-and-l_2" class="section level3">
+</section>
+<section id="penalty-l_1-and-l_2" class="level3">
 <h3>Penalty: <span class="math inline">\(l_1\)</span> and <span class="math inline">\(l_2\)</span></h3>
 <p>Generally speaking, <span class="math inline">\(l_1\)</span> imposes sparsity by shrinking small estimates exactly to zero, which is both good and bad for our case, whereas <span class="math inline">\(l_2\)</span> penalizes large estimates severely but doesn’t force exact sparsity, which could also be good or bad.</p>
 <p>We’ll implement both and see what happens.</p>
-</div>
-<div id="lambda_lw" class="section level3">
+</section>
+<section id="lambda_lw" class="level3">
 <h3><span class="math inline">\(\lambda_l^w\)</span></h3>
 <p><span class="math inline">\(\lambda_l^w\)</span> is determined to help ensure</p>
 <p><span class="math display">\[
 \left|w_l^n\right| = \sqrt{l!}\left|w_l\right| \leadsto 
-\sqrt{\bar{\rho_{ij}^l}} \ ,
+\sqrt{\bar{\rho_{ij}^l}} \  ,
 \]</span></p>
 <p>Given <span class="math inline">\(\rho \in \left(0, 1\right)\)</span>, for <span class="math inline">\(l_1\)</span> regularization, <span class="math inline">\(\lambda_l^n \sim \lambda / \sqrt{\rho^l}\)</span>; for <span class="math inline">\(l_2\)</span> regularization, <span class="math inline">\(\lambda_l^n \sim \lambda / \rho^l\)</span>.</p>
-</div>
-<div id="l" class="section level3">
+</section>
+<section id="l" class="level3">
 <h3><span class="math inline">\(L\)</span></h3>
 <p>So far, <span class="math inline">\(L = 9\)</span> has been able to handle all the example we’ve tried. Without constraints or regularization, <span class="math inline">\(L = 9\)</span> is usually too large for cases where, say, <span class="math inline">\(L = 4\)</span> is enough, and a larger than necessary <span class="math inline">\(L\)</span> could lead to numerical instability.</p>
 <p>Hence, we’ll experiment with <span class="math inline">\(L = 12\)</span>, assuming it’s enough for all the correlation induced distortions in practice, and assuming the regularization could prevent the optimization from going crazy.</p>
-</div>
-</div>
-<div id="summary" class="section level2">
+</section>
+</section>
+<section id="summary" class="level2">
 <h2>Summary</h2>
 <p>The <span class="math inline">\(w\)</span> optimization problem becomes</p>
 <p><span class="math display">\[
@@ -401,36 +403,36 @@ f_0\left(z\right) = \varphi\left(z\right) + \sum\limits_{l = 1}^\infty W_k\varph
 \\
 \text{subject to}
 &amp; Aw + a = g \\
-&amp; g \geq 0\ ,
+&amp; g \geq 0\  ,
 \end{array}
 \]</span> where <span class="math inline">\(A_{n \times L} = \left[a_1,\ldots, a_L\right]\)</span> and <span class="math inline">\(a\)</span> are computed with normalized Gaussian derivatives and Hermite polynomials.</p>
 <p>Let <span class="math inline">\(\lambda &gt; 0\)</span>, <span class="math inline">\(\rho \in \left(0, 1\right)\)</span>, the regularization term has two forms as follows.</p>
-<div id="l_1-regularization" class="section level3">
+<section id="l_1-regularization" class="level3">
 <h3><span class="math inline">\(l_1\)</span> regularization</h3>
 <p><span class="math display">\[
 \begin{array}{l}
-\sum\limits_{l = 1}^L\lambda_l^{w^s}\left|w_l^s\right| \ ,\\
+\sum\limits_{l = 1}^L\lambda_l^{w^s}\left|w_l^s\right| \  ,\\
 \lambda_l^{w^s} = \begin{cases}
 0, &amp; l \text{ is odd;} \\
 \lambda / \rho^{l/2}, &amp; l \text{ is even.}
 \end{cases}
 \end{array}
 \]</span></p>
-</div>
-<div id="l_2-regularization" class="section level3">
+</section>
+<section id="l_2-regularization" class="level3">
 <h3><span class="math inline">\(l_2\)</span> regularization</h3>
 <p><span class="math display">\[
 \begin{array}{l}
-\sum\limits_{l = 1}^L \lambda_l^{w^s}{w_l^s}^2 \ ,\\
+\sum\limits_{l = 1}^L \lambda_l^{w^s}{w_l^s}^2 \  ,\\
 \lambda_l^{w^s} = \begin{cases}
 0, &amp; l \text{ is odd;} \\
 \lambda / \rho^{l}, &amp; l \text{ is even.}
 \end{cases}
 \end{array}
 \]</span></p>
-</div>
-</div>
-<div id="dual-problem-for-l_1-regularization." class="section level2">
+</section>
+</section>
+<section id="dual-problem-for-l_1-regularization." class="level2">
 <h2>Dual problem for <span class="math inline">\(l_1\)</span> regularization.</h2>
 <p>The primal form is</p>
 <p><span class="math display">\[
@@ -443,7 +445,7 @@ f_0\left(z\right) = \varphi\left(z\right) + \sum\limits_{l = 1}^\infty W_k\varph
 \\
 \text{subject to}
 &amp; Aw + a = g \\
-&amp; g \geq 0\ ,
+&amp; g \geq 0\  ,
 \end{array}
 \]</span> The dual form is</p>
 <p><span class="math display">\[
@@ -455,11 +457,11 @@ f_0\left(z\right) = \varphi\left(z\right) + \sum\limits_{l = 1}^\infty W_k\varph
 \\
 \text{subject to}
 &amp; -\lambda \leq A^Tv \leq \lambda \\
-&amp; v \geq 0\ .
+&amp; v \geq 0\  .
 \end{array}
 \]</span></p>
-</div>
-<div id="dual-problem-for-l_2-regularization." class="section level2">
+</section>
+<section id="dual-problem-for-l_2-regularization." class="level2">
 <h2>Dual problem for <span class="math inline">\(l_2\)</span> regularization.</h2>
 <p>The primal form is</p>
 <p><span class="math display">\[
@@ -472,7 +474,7 @@ f_0\left(z\right) = \varphi\left(z\right) + \sum\limits_{l = 1}^\infty W_k\varph
 \\
 \text{subject to}
 &amp; Aw + a = g \\
-&amp; g \geq 0\ ,
+&amp; g \geq 0\  ,
 \end{array}
 \]</span> The dual form is</p>
 <p><span class="math display">\[
@@ -484,22 +486,22 @@ f_0\left(z\right) = \varphi\left(z\right) + \sum\limits_{l = 1}^\infty W_k\varph
 + \frac14 v^T \left(A \Lambda^{-1} A^T\right)v
 \\
 \text{subject to}
-&amp; a_j^Tv = 0 \  \text{ if }\lambda_j = 0 \ ,\\
-&amp; v \geq 0\ ,
+&amp; a_j^Tv = 0 \    \text{ if }\lambda_j = 0 \  ,\\
+&amp; v \geq 0\  ,
 \end{array}
 \]</span> where <span class="math inline">\(\Lambda = \begin{bmatrix}\lambda_1 &amp; &amp; \\ &amp; \ddots &amp; \\ &amp; &amp; \lambda_L \end{bmatrix}\)</span>, and <span class="math inline">\({\Lambda^{-1}}_{jj} = 0\)</span> when <span class="math inline">\(\lambda_j = 0\)</span>.</p>
-</div>
-<div id="choosing-lambda-and-rho" class="section level2">
+</section>
+<section id="choosing-lambda-and-rho" class="level2">
 <h2>Choosing <span class="math inline">\(\lambda\)</span> and <span class="math inline">\(\rho\)</span></h2>
 <p>Let’s start with <span class="math inline">\(\rho = 0.9\)</span> and <span class="math inline">\(\lambda = 0.1\)</span>.</p>
-</div>
-<div id="session-information" class="section level2">
+</section>
+<section id="session-information" class="level2">
 <h2>Session information</h2>
 <!-- Insert the session information into the document -->
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 3.4.2 (2017-09-28)
+<pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS Sierra 10.12.6
+Running under: macOS High Sierra 10.13.2
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -512,11 +514,11 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 loaded via a namespace (and not attached):
- [1] compiler_3.4.2  backports_1.1.1 magrittr_1.5    rprojroot_1.2  
- [5] tools_3.4.2     htmltools_0.3.6 yaml_2.1.14     Rcpp_0.12.13   
- [9] stringi_1.1.5   rmarkdown_1.6   knitr_1.17      git2r_0.19.0   
-[13] stringr_1.2.0   digest_0.6.12   evaluate_0.10.1</code></pre>
-</div>
+ [1] compiler_3.4.3  backports_1.1.2 magrittr_1.5    rprojroot_1.3-1
+ [5] tools_3.4.3     htmltools_0.3.6 yaml_2.1.16     Rcpp_0.12.14   
+ [9] stringi_1.1.6   rmarkdown_1.8   knitr_1.17      git2r_0.20.0   
+[13] stringr_1.2.0   digest_0.6.13   evaluate_0.10.1</code></pre>
+</section>
 
 <hr>
 <p>

@@ -25,8 +25,8 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
-<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -36,10 +36,12 @@
   }
 </style>
 <script type="text/javascript">
-if (window.hljs && document.readyState && document.readyState === "complete") {
-   window.setTimeout(function() {
-      hljs.initHighlighting();
-   }, 0);
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
 }
 </script>
 
@@ -313,12 +315,12 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2017-11-07</p>
+<p><strong>Last updated:</strong> 2017-12-21</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 2c05d59</p>
+<p><strong>Code version:</strong> 6e42447</p>
 <!-- Add your analysis here -->
-<div id="problem-setting" class="section level2">
+<section id="problem-setting" class="level2">
 <h2>Problem setting</h2>
 <p>With <a href="gaussian_derivatives.html">all the assumptions</a>, we formulate a convex optimization as follows.</p>
 <p><span class="math display">\[
@@ -336,26 +338,22 @@ shared across the workflowr files. -->
 \end{array}
 \]</span></p>
 <p>where <span class="math inline">\(H_{ik} = h_k(z_i)\)</span>.</p>
-</div>
-<div id="choosing-k" class="section level2">
+</section>
+<section id="choosing-k" class="level2">
 <h2>Choosing <span class="math inline">\(K\)</span></h2>
 <p>With finite <span class="math inline">\(K\)</span> Gaussian derivatives, the fitted log-likelihood <span class="math inline">\(\log\prod\limits_{i = 1}^nf_0(z_i) = \sum\limits_{i = 1}^n\log \varphi(z_i) + \sum\limits_{i = 1}^n\log\left(1 +\sum\limits_{k = 1}^K \hat w_kh_k(z_i)\right)\)</span>. Note that <span class="math inline">\(\hat w_k \equiv 0\)</span> is a feasible solution, so the optimal solution will always have a log-likelihood no less than <span class="math inline">\(\sum\limits_{i = 1}^n\log \varphi(z_i)\)</span>, the log-likelihood of <span class="math inline">\(N(0, 1)\)</span>. Similarly, let <span class="math inline">\(\hat w_K\)</span> be the optimal solution with <span class="math inline">\(K\)</span> Gaussian derivatives, then <span class="math inline">\([\hat w_K, 0]\)</span> will be a feasible solution with <span class="math inline">\(K + 1\)</span> Gaussian derivatives, with the same objective value, which should be no larger than the optimal objective value for <span class="math inline">\(K + 1\)</span>. This fact implies that the fitted log-likelihood should be non-decreasing with respect to <span class="math inline">\(K\)</span>.</p>
 <p>This property implies that for the same data set, multiple models with increasing <span class="math inline">\(K\)</span>’s can be fitted, and the searching stops at a sufficiently large <span class="math inline">\(K\)</span>. Let <span class="math inline">\(\hat g_K = \max\limits_w\sum\limits_{i = 1}^n\log\left(1 +\sum\limits_{k = 1}^K w_kh_k(z_i)\right) = \sum\limits_{i = 1}^n\log\left(1 +\sum\limits_{k = 1}^K \hat w_kh_k(z_i)\right)\)</span>, the optimal objective value for <span class="math inline">\(K\)</span>, drawing on insight from the likelihood ratio test, the optimal <span class="math inline">\(\hat K = \inf\left\{K: 2(\hat g_{K + m} - \hat g_K) \leq \chi_{m, 1-\alpha}^2, m = 1, \ldots, M\right\}\)</span> with pre-specified <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(M\)</span>.</p>
 <p><span class="math inline">\(M\)</span> should be greater than <span class="math inline">\(1\)</span> because odd order Gaussian derivatives and even order ones have distinct properties, especially in lower orders. Odd order Gaussian derivatives are odd functions, more associated with the skewness of the empirical distribution, whereas even order ones are even functions, more associated with its kurtosis. Therefore, it’s not at all impossible that the difference in the log-likelihood objective between <span class="math inline">\(K\)</span> and <span class="math inline">\(K + 1\)</span> is small, yet that between <span class="math inline">\(K\)</span> and <span class="math inline">\(K + 2\)</span> is large.</p>
 <p>The function <code>ecdfz.optimal</code> in the script <a href="https://github.com/LSun/truncash/blob/master/code/ecdfz.R"><code>ecdfz.R</code></a> is using this rule with the default setting <span class="math inline">\(\alpha = 0.05, M = 2\)</span>.</p>
-</div>
-<div id="fitting-with-cvxr" class="section level2">
+</section>
+<section id="fitting-with-cvxr" class="level2">
 <h2>Fitting with <code>cvxr</code></h2>
 <p>The script <a href="https://github.com/LSun/truncash/blob/master/code/ecdfz.R"><code>ecdfz.R</code></a> is using <a href="https://github.com/anqif/cvxr"><code>cvxr</code></a> to find the maximum likelihood estimate of the observed density of correlated null <span class="math inline">\(z\)</span> scores.</p>
 <pre class="r"><code>source(&quot;../code/ecdfz.R&quot;)</code></pre>
-<pre><code>Warning: replacing previous import &#39;Matrix::crossprod&#39; by &#39;gmp::crossprod&#39;
-when loading &#39;cvxr&#39;</code></pre>
-<pre><code>Warning: replacing previous import &#39;Matrix::tcrossprod&#39; by
-&#39;gmp::tcrossprod&#39; when loading &#39;cvxr&#39;</code></pre>
 <pre class="r"><code>z = read.table(&quot;../output/z_null_liver_777.txt&quot;)
 p = read.table(&quot;../output/p_null_liver_777.txt&quot;)</code></pre>
-</div>
-<div id="examples" class="section level2">
+</section>
+<section id="examples" class="level2">
 <h2>Examples</h2>
 <p>Several selected <a href="correlated_z_2.html"><code>ash</code>-hostile</a> and/or <a href="correlated_z_3.Rmd"><code>BH</code>-hostile</a> data sets are fitted as follows. More detailed information of these selected data sets are <a href="correlated_z_2.html">here</a> and <a href="correlated_z_3.Rmd">here</a>.</p>
 <p>For each of these selected data sets, we plot the histogram, the density of <span class="math inline">\(N(0, 1)\)</span> in red line, and that fitted by Gaussian derivatives in blue. We also give the information of the number of false discoveries by Benjamini-Hochberg, and <span class="math inline">\(\hat\pi_0\)</span> estimated by <code>ash</code>. Note that BH’s false discoveries suggests the inflation of the most extreme observations, whereas <code>ash</code>’s <span class="math inline">\(\hat\pi_0\)</span> the empirical distribution’s general deviation from <span class="math inline">\(N(0, 1)\)</span>.</p>
@@ -392,18 +390,18 @@ Optimal weights of Gaussian derivatives w =
 Optimal weights of Gaussian derivatives w =
 1 : 0.00594319611757542 ; 2 : 0.398070908599464 ; 3 : -0.00922245793412396 ; 4 : 0.026306961083798 ;</code></pre>
 <p><img src="figure/gaussian_derivatives_2.rmd/unnamed-chunk-5-9.png" width="672" style="display: block; margin: auto;" /><img src="figure/gaussian_derivatives_2.rmd/unnamed-chunk-5-10.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="conclusion" class="section level2">
+</section>
+<section id="conclusion" class="level2">
 <h2>Conclusion</h2>
 <p>Gaussian derivatives can deal with a variety of empirical null distribution, especially those not close to normal.</p>
-</div>
-<div id="session-information" class="section level2">
+</section>
+<section id="session-information" class="level2">
 <h2>Session information</h2>
 <!-- Insert the session information into the document -->
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 3.4.2 (2017-09-28)
+<pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS Sierra 10.12.6
+Running under: macOS High Sierra 10.13.2
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -416,15 +414,20 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] cvxr_0.0.0.9400 EQL_1.0-0       ttutils_1.0-1  
+[1] CVXR_0.94-4   EQL_1.0-0     ttutils_1.0-1
 
 loaded via a namespace (and not attached):
- [1] Rcpp_0.12.13    lattice_0.20-35 gmp_0.5-13.1    digest_0.6.12  
- [5] rprojroot_1.2   MASS_7.3-47     grid_3.4.2      backports_1.1.1
- [9] git2r_0.19.0    magrittr_1.5    evaluate_0.10.1 stringi_1.1.5  
-[13] Matrix_1.2-11   rmarkdown_1.6   tools_3.4.2     stringr_1.2.0  
-[17] yaml_2.1.14     compiler_3.4.2  htmltools_0.3.6 knitr_1.17     </code></pre>
-</div>
+ [1] Rcpp_0.12.14      knitr_1.17        magrittr_1.5     
+ [4] bit_1.1-12        lattice_0.20-35   R6_2.2.2         
+ [7] stringr_1.2.0     tools_3.4.3       grid_3.4.3       
+[10] R.oo_1.21.0       git2r_0.20.0      scs_1.1-1        
+[13] htmltools_0.3.6   yaml_2.1.16       bit64_0.9-7      
+[16] rprojroot_1.3-1   digest_0.6.13     Matrix_1.2-12    
+[19] gmp_0.5-13.1      ECOSolveR_0.3-2   R.utils_2.6.0    
+[22] evaluate_0.10.1   rmarkdown_1.8     stringi_1.1.6    
+[25] compiler_3.4.3    Rmpfr_0.6-1       backports_1.1.2  
+[28] R.methodsS3_1.7.1</code></pre>
+</section>
 
 <hr>
 <p>

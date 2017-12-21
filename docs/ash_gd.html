@@ -25,8 +25,8 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
-<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -36,10 +36,12 @@
   }
 </style>
 <script type="text/javascript">
-if (window.hljs && document.readyState && document.readyState === "complete") {
-   window.setTimeout(function() {
-      hljs.initHighlighting();
-   }, 0);
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
 }
 </script>
 
@@ -313,31 +315,31 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2017-11-07</p>
+<p><strong>Last updated:</strong> 2017-12-21</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 2c05d59</p>
+<p><strong>Code version:</strong> 6e42447</p>
 <!-- Add your analysis here -->
-<div id="problem-setting" class="section level2">
+<section id="problem-setting" class="level2">
 <h2>Problem setting</h2>
 <p>We are considering the normal means problem with heteroskedastic noise. Furthermore, The noise are not independent, with unknown pairwise correlation <span class="math inline">\(\rho_{ij}\)</span>.</p>
 <p><span class="math display">\[
 \begin{array}{rcl}
-\hat\beta_j |\beta_j, \hat s_j &amp;=&amp; \beta_j + \hat s_j z_j \ ;\\
-z_j &amp;\sim&amp; N(0, 1) \text{ marginally} \ ;\\
-z_j &amp;:&amp; \text{correlated} \ .
+\hat\beta_j |\beta_j, \hat s_j &amp;=&amp; \beta_j + \hat s_j z_j \  ;\\
+z_j &amp;\sim&amp; N(0, 1) \text{ marginally} \  ;\\
+z_j &amp;:&amp; \text{correlated} \  .
 \end{array}
 \]</span></p>
 <p>Under <a href="https://academic.oup.com/biostatistics/article/18/2/275/2557030/False-discovery-rates-a-new-deal"><code>ash</code> framework</a>, a prior is put on exchangeable <span class="math inline">\(\beta_j\)</span>:</p>
 <p><span class="math display">\[
-g(\beta_j) = \sum_k \pi_k g_k(\beta_j)\ .
+g(\beta_j) = \sum_k \pi_k g_k(\beta_j)\  .
 \]</span></p>
 <p>According to <a href="gaussian_derivatives.html">previous exploration</a>, correlated standard normal <span class="math inline">\(z\)</span> scores can be <em>seen as iid from a density composed of Gaussian derivatives</em>.</p>
 <p><span class="math display">\[
-f_0(z_j) = \sum_{l=0}^\infty w_l \varphi^{(l)}(z_j) \ .
+f_0(z_j) = \sum_{l=0}^\infty w_l \varphi^{(l)}(z_j) \  .
 \]</span> By change of variables, the likelihood</p>
 <p><span class="math display">\[
-p(\hat\beta_j | \beta_j, \hat s_j) = \frac{1}{\hat s_j}f_0\left(\frac{\hat\beta_j - \beta_j}{\hat s_j}\right) = \sum_l w_l \frac{1}{\hat s_j}\varphi^{(l)}\left(\frac{\hat\beta_j - \beta_j}{\hat s_j}\right) \ .
+p(\hat\beta_j | \beta_j, \hat s_j) = \frac{1}{\hat s_j}f_0\left(\frac{\hat\beta_j - \beta_j}{\hat s_j}\right) = \sum_l w_l \frac{1}{\hat s_j}\varphi^{(l)}\left(\frac{\hat\beta_j - \beta_j}{\hat s_j}\right) \  .
 \]</span></p>
 <p>Thus for each pair of observation <span class="math inline">\((\hat\beta_j, \hat s_j)\)</span>, the likelihood becomes</p>
 <p><span class="math display">\[
@@ -349,50 +351,50 @@ f(\hat\beta_j|\hat s_j) &amp;=&amp; \displaystyle\int p(\hat\beta_j | \beta_j, \
 \varphi^{(l)}\left(\frac{\hat\beta_j - \beta_j}{\hat s_j}\right)
 g_k(\beta_j)d\beta_j\\
 &amp;:=&amp; \displaystyle \sum_k \sum_l \pi_k w_l
-f_{jkl} \ .
+f_{jkl} \  .
 \end{array}
 \]</span> Hence, it’s all boiled down to calculate <span class="math inline">\(f_{jkl}\)</span>, which is the convolution of a Gaussian derivative <span class="math inline">\(\varphi^{(l)}\)</span> and a prior component <span class="math inline">\(g_k\)</span>, with some change of variables manipulation. Note that in usual <code>ASH</code> settings, <span class="math inline">\(g_k\)</span> is either uniform or normal, both of which can be handled without conceptual difficulty.</p>
 <p>If <span class="math inline">\(g_k\)</span> is a uniform, the convolution of a Gaussian derivative and a uniform is just another Gaussian derivative in a lower order, such as</p>
 <p><span class="math display">\[
-\varphi^{(l)} * \text{Unif} \leadsto \varphi^{(l-1)} \ .
+\varphi^{(l)} * \text{Unif} \leadsto \varphi^{(l-1)} \  .
 \]</span> On the other hand, if <span class="math inline">\(g_k\)</span> is a normal, we can use <a href="https://en.wikipedia.org/wiki/Convolution#Differentiation">a fact about convolution</a> that</p>
 <p><span class="math display">\[
 \begin{array}{rcl}
 &amp;&amp; \frac{d}{dx}(f*g) = \frac{df}{dx} * g = f * \frac{dg}{dx}\\
 &amp;\Rightarrow&amp;
-\varphi^{(l)} * N(\mu, \sigma^2) = \left(\varphi * N(\mu, \sigma^2)\right)^{(l)} \leadsto \tilde\varphi^{(l)} \ .
+\varphi^{(l)} * N(\mu, \sigma^2) = \left(\varphi * N(\mu, \sigma^2)\right)^{(l)} \leadsto \tilde\varphi^{(l)} \  .
 \end{array}
 \]</span> Because the convolution of <span class="math inline">\(\varphi\)</span>, a Gaussian, and another Gaussian is still a Gaussian, the convolution of a Gaussian derivative and a normal gives another Gaussian derivative.</p>
 <p>With <span class="math inline">\(f_{jkl}\)</span> computed, the goal is then to maximize the joint likeliood of the observation <span class="math inline">\(\left\{\left(\hat\beta_1, \hat s_1\right), \cdots,\left(\hat\beta_n, \hat s_n\right) \right\}\)</span> which is <span class="math display">\[
 \max\limits_{\pi, w}\prod_j f(\hat\beta_j|\hat s_j) = \prod_j \left(\displaystyle \sum_k \sum_l \pi_k w_l
-f_{jkl}\right) \ ,
+f_{jkl}\right) \  ,
 \]</span> subject to reasonable, well designed constraints on <span class="math inline">\(\pi_k\)</span> and <a href="gaussian_derivatives_5.html">especially <span class="math inline">\(w_l\)</span></a>.</p>
-</div>
-<div id="characteristic-function-fourier-transform" class="section level2">
+</section>
+<section id="characteristic-function-fourier-transform" class="level2">
 <h2>Characteristic function / Fourier transform</h2>
 <p>The exact form of <span class="math inline">\(f_{jkl}\)</span> can be derived analytically. Below is a method using characteristic functions or Fourier transforms.</p>
 <p>Let <span class="math inline">\(\zeta_X(t) = \zeta_F(t) =\zeta_f(t) := E[e^{itX}]\)</span> be the characteristic function of the random variable <span class="math inline">\(X\sim dF = f\)</span>. Either the random variable, its distribution, or its density function can be put in the subscript, depending on the circumstances.</p>
 <p>On the other hand, the characteristic function of a random variable is also closely related to the Fourier transform of its density. In particular,</p>
 <p><span class="math display">\[
-\zeta_f(t) = E[e^{itX}] = \int e^{itx}dF(x) = \int e^{itx}f(x)dx := \mathscr{F}_f(t) \ .
+\zeta_f(t) = E[e^{itX}] = \int e^{itx}dF(x) = \int e^{itx}f(x)dx := \mathscr{F}_f(t) \  .
 \]</span> Note that in usual definition, the Fourier transform is given by <span class="math display">\[
-\hat f(\xi) := \int f(x)e^{-2\pi ix\xi}dx \ ,
+\hat f(\xi) := \int f(x)e^{-2\pi ix\xi}dx \  ,
 \]</span> with a normalizing factor <span class="math inline">\(2\pi\)</span> and a negative sign. However, even defined in different ways, <span class="math inline">\(\mathscr{F}_f(t)\)</span> carries over many nice properties of <span class="math inline">\(\hat f(\xi)\)</span>, for example, as we’ll show,</p>
 <p><span class="math display">\[
-\mathscr{F}_{f^{(m)}}(t) = (-it)^m\mathscr{F}_f(t) \ ,
+\mathscr{F}_{f^{(m)}}(t) = (-it)^m\mathscr{F}_f(t) \  ,
 \]</span></p>
 <p>where <span class="math inline">\(f^{(m)}\)</span> is the <span class="math inline">\(m^\text{th}\)</span> derivative of <span class="math inline">\(f\)</span>.</p>
 <p>Also, <span class="math display">\[
-\mathscr{F}_{f*g}(t) = \mathscr{F}_f(t)\mathscr{F}_g(t) \ ,
+\mathscr{F}_{f*g}(t) = \mathscr{F}_f(t)\mathscr{F}_g(t) \  ,
 \]</span> where <span class="math inline">\(*\)</span> stands for convolution.</p>
 <p>With these properties, the Fourier transform tool could be very useful when dealing with Gaussian derivatives and their convolution with other (density) functions.</p>
 <p>Under this definition, the inversion formula for the characteristic functions, also known as the inverse Fourier transform, is</p>
 <p><span class="math display">\[
-f(x) = \frac1{2\pi} \int e^{-itx}\zeta_f(t)dt = \frac{1}{2\pi}\int e^{-itx}\mathscr{F}_f(t)dt \ .
+f(x) = \frac1{2\pi} \int e^{-itx}\zeta_f(t)dt = \frac{1}{2\pi}\int e^{-itx}\mathscr{F}_f(t)dt \  .
 \]</span></p>
 <p>Then the characteristic function of <span class="math inline">\(\hat\beta_j | \hat s_j\)</span></p>
 <p><span class="math display">\[
-\zeta_{\hat\beta_j|\hat s_j}(t) = E\left[e^{it\hat\beta_j}\mid\hat s_j\right] = E\left[e^{it(\beta_j + \hat s_j z_j)}\mid\hat s_j\right] = E\left[e^{it\beta_j}\right]E\left[e^{it\hat s_jz_j}\mid\hat s_j\right] = \zeta_{\beta}(t)\zeta_{f_0}\left(\hat s_jt\right) \ .
+\zeta_{\hat\beta_j|\hat s_j}(t) = E\left[e^{it\hat\beta_j}\mid\hat s_j\right] = E\left[e^{it(\beta_j + \hat s_j z_j)}\mid\hat s_j\right] = E\left[e^{it\beta_j}\right]E\left[e^{it\hat s_jz_j}\mid\hat s_j\right] = \zeta_{\beta}(t)\zeta_{f_0}\left(\hat s_jt\right) \  .
 \]</span></p>
 <p>Let’s take care of <span class="math inline">\(\zeta_{\beta}(t)\)</span> and <span class="math inline">\(\zeta_{f_0}\left(\hat s_jt\right)\)</span> one by one. Note that</p>
 <p><span class="math display">\[
@@ -400,7 +402,7 @@ f(x) = \frac1{2\pi} \int e^{-itx}\zeta_f(t)dt = \frac{1}{2\pi}\int e^{-itx}\math
 &amp;\beta_j &amp;\sim&amp; \sum_k\pi_kg_k \\
 \Rightarrow &amp; \zeta_{\beta}(t) &amp;=&amp; \displaystyle\int e^{it\beta_j}p(\beta_j)d\beta_j = \int e^{it\beta_j}\sum_k\pi_kg_k(\beta_j)d\beta_j
 =\sum_k\pi_k\int e^{it\beta_j}g_k(\beta_j)d\beta_j \\
-&amp;&amp;=&amp; \sum_k\pi_k\zeta_{g_k}(t) \ .
+&amp;&amp;=&amp; \sum_k\pi_k\zeta_{g_k}(t) \  .
 \end{array}
 \]</span></p>
 <p>Meanwhile, using the fact that <em>Gaussian derivatives should be absolutely integrable</em>,</p>
@@ -412,7 +414,7 @@ f(x) = \frac1{2\pi} \int e^{-itx}\zeta_f(t)dt = \frac{1}{2\pi}\int e^{-itx}\math
 \int e^{itz_j}f_0(z_j)dz_j = \int e^{itz_j}\sum_lw_l\varphi^{(l)}(z_j)dz_j = 
 \sum_lw_l\int e^{itz_j}\varphi^{(l)}(z_j)dz_j\\
 &amp;&amp;=&amp;
-\sum_l w_l \mathscr{F}_{\varphi^{(l)}}(t) \ . 
+\sum_l w_l \mathscr{F}_{\varphi^{(l)}}(t) \  . 
 \end{array}
 \]</span> Each Fourier transform of gaussian derivatives</p>
 <p><span class="math display">\[
@@ -432,7 +434,7 @@ f(x) = \frac1{2\pi} \int e^{-itx}\zeta_f(t)dt = \frac{1}{2\pi}\int e^{-itx}\math
 &amp;=&amp;(-it)^l \mathscr{F}_{\varphi}(t)\\
 &amp;=&amp;(-it)^l \zeta_\varphi(t)\\
 &amp;=&amp;\displaystyle
-(-it)^l e^{-\frac12t^2} \ .
+(-it)^l e^{-\frac12t^2} \  .
 \end{array}
 \]</span> Thus,</p>
 <p><span class="math display">\[
@@ -453,7 +455,7 @@ e^{-\frac12\hat s_j^2t^2}\\
 \frac1{2\pi}\int e^{-it\hat\beta_j}(-i\hat s_jt)^l \zeta_{g_k}(t)
 \zeta_\varphi(\hat s_jt)dt\\
 &amp;&amp;:=&amp;
-\sum_k\sum_l\pi_kw_lf_{jkl} \ .
+\sum_k\sum_l\pi_kw_lf_{jkl} \  .
 \end{array}
 \]</span> It is essentially the equivalent expression of <span class="math inline">\(f_{jkl}\)</span> as</p>
 <p><span class="math display">\[
@@ -465,10 +467,10 @@ f_{jkl} &amp;=&amp;
 g_k(\beta_j)d\beta_j\\
 &amp;=&amp;
 \displaystyle\frac1{2\pi}\int e^{-it\hat\beta_j}(-i\hat s_jt)^l \zeta_{g_k}(t)
-\zeta_\varphi(\hat s_jt)dt \ .
+\zeta_\varphi(\hat s_jt)dt \  .
 \end{array}
 \]</span></p>
-<div id="uniform-mixture-prior" class="section level3">
+<section id="uniform-mixture-prior" class="level3">
 <h3>Uniform mixture prior</h3>
 <p>If the prior of <span class="math inline">\(\beta\)</span> is a mixture of uniforms, <span class="math inline">\(\beta \sim g = \sum_k\pi_kg_k\)</span> where <span class="math inline">\(g_k = \text{Unif}\left[a_k, b_k\right]\)</span>,</p>
 <p><span class="math display">\[
@@ -484,7 +486,7 @@ g_k(\beta_j)d\beta_j\\
 \zeta_\varphi(\hat s_jt)dt\\
 &amp;&amp;=&amp;
 \displaystyle\frac1{2\pi}\int e^{-it\hat\beta_j}(-i\hat s_jt)^l\displaystyle\frac{e^{itb_k-\frac12\hat s_j^2t^2}}{it(b_k - a_k)}dt - 
-\displaystyle\frac1{2\pi}\int e^{-it\hat\beta_j}(-i\hat s_jt)^l\displaystyle\frac{e^{ita_k-\frac12\hat s_j^2t^2}}{it(b_k - a_k)}dt \ .
+\displaystyle\frac1{2\pi}\int e^{-it\hat\beta_j}(-i\hat s_jt)^l\displaystyle\frac{e^{ita_k-\frac12\hat s_j^2t^2}}{it(b_k - a_k)}dt \  .
 \end{array}
 \]</span></p>
 <p>It looks pretty complicated, but if we take advantage of usual Fourier transform tricks things get clearer.</p>
@@ -495,7 +497,7 @@ g_k(\beta_j)d\beta_j\\
 \Rightarrow &amp; \varphi_{\mu, \sigma^2}^{(m)}(z) = \frac1{\sigma^{m+1}}\varphi^{(m)}\left(\frac{z - \mu}{\sigma}\right) \\
 \Rightarrow &amp; \zeta_{\varphi_{\mu, \sigma^2}}(t)
 =
-e^{it\mu - \frac12\sigma^2t^2} \ .
+e^{it\mu - \frac12\sigma^2t^2} \  .
 \end{array}
 \]</span></p>
 <p>Take the first part of <span class="math inline">\(f_{jkl}\)</span>, <span class="math display">\[
@@ -528,7 +530,7 @@ dt\\
 \frac1{\hat s_j^{l}}\varphi^{(l-1)}\left(\frac{\hat\beta_j- b_k}{\hat s_j}\right)\\
 &amp;&amp;=&amp;\displaystyle
 -
-\frac{\varphi^{(l-1)}\left(\frac{\hat\beta_j- b_k}{\hat s_j}\right)}{b_k-a_k} \ .
+\frac{\varphi^{(l-1)}\left(\frac{\hat\beta_j- b_k}{\hat s_j}\right)}{b_k-a_k} \  .
 \end{array}
 \]</span> Therefore,</p>
 <p><span class="math display">\[
@@ -547,8 +549,8 @@ f_{jkl} &amp;=&amp; \displaystyle
 \frac{\varphi^{(l-1)}\left(\frac{\hat\beta_j- a_k}{\hat s_j}\right) - \varphi^{(l-1)}\left(\frac{\hat\beta_j- b_k}{\hat s_j}\right)}{b_k-a_k}
 \end{array}
 \]</span></p>
-</div>
-<div id="normal-mixture-prior" class="section level3">
+</section>
+<section id="normal-mixture-prior" class="level3">
 <h3>Normal mixture prior</h3>
 <p>Likewise, if the prior of <span class="math inline">\(\beta\)</span> is a mixture of normals, <span class="math inline">\(\beta \sim g = \sum_k\pi_kg_k\)</span> where <span class="math inline">\(g_k = N(\mu_k, \sigma_k^2)\)</span>,</p>
 <p><span class="math display">\[
@@ -596,33 +598,33 @@ e^{it\mu_k - \frac12\left(\sigma_k^2+\hat s_j^2\right)t^2}
 \varphi^{(l)}\left(\frac{\hat\beta_j - \mu_k}{\sqrt{\sigma_k^2 + \hat s_j^2}}\right)\\
 &amp;&amp;=&amp; \displaystyle
 \frac{\hat s_j^l}{\left(\sqrt{\sigma_k^2 + \hat s_j^2}\right)^{l+1}}
-\varphi^{(l)}\left(\frac{\hat\beta_j - \mu_k}{\sqrt{\sigma_k^2 + \hat s_j^2}}\right) \ .
+\varphi^{(l)}\left(\frac{\hat\beta_j - \mu_k}{\sqrt{\sigma_k^2 + \hat s_j^2}}\right) \  .
 \end{array}
 \]</span> In common applications, <span class="math inline">\(\mu_k\equiv\mu\equiv0\)</span>.</p>
-</div>
-</div>
-<div id="optimization-problem" class="section level2">
+</section>
+</section>
+<section id="optimization-problem" class="level2">
 <h2>Optimization problem</h2>
 <p>The problem is now boiled down to maximize the joint likelihood</p>
 <p><span class="math display">\[
 \begin{array}{rcl}
 \max\limits_{\pi, w}\prod\limits_j f(\hat\beta_j|\hat s_j) &amp;=&amp; \max\limits_{\pi, w}\prod\limits_j \left(\sum_k\sum_l\pi_k w_l f_{jkl}\right)\\
 &amp;\Leftrightarrow&amp;
-\max\limits_{\pi, w}\sum_j\log\left(\sum_k\sum_l\pi_k w_l f_{jkl}\right) \ ,
+\max\limits_{\pi, w}\sum_j\log\left(\sum_k\sum_l\pi_k w_l f_{jkl}\right) \  ,
 \end{array}
 \]</span></p>
 <p>subject to appropriate constraints on <span class="math inline">\(\pi_k\)</span> and <a href="gaussian_derivatives_5.html">especially <span class="math inline">\(w_l\)</span></a>, where the specific form of <span class="math inline">\(f_{jkl}\)</span> depends on the mixture component of the prior <span class="math inline">\(g\)</span> of <span class="math inline">\(\beta_j\)</span>. Here we consider two cases.</p>
-<div id="uniform-mixture-prior-1" class="section level3">
+<section id="uniform-mixture-prior-1" class="level3">
 <h3>Uniform mixture prior</h3>
 <p><span class="math display">\[
 \begin{array}{rrcl}
 &amp;\beta_j &amp;\sim &amp; \sum_k \pi_k \text{ Unif }[a_k, b_k]\\
 \Rightarrow &amp; f_{jkl} &amp;= &amp;
-\displaystyle\frac{\varphi^{(l-1)}\left(\frac{\hat\beta_j-a_k}{\hat s_j}\right) - \varphi^{(l-1)}\left(\frac{\hat\beta_j-b_k}{\hat s_j}\right)}{b_k - a_k} \ .
+\displaystyle\frac{\varphi^{(l-1)}\left(\frac{\hat\beta_j-a_k}{\hat s_j}\right) - \varphi^{(l-1)}\left(\frac{\hat\beta_j-b_k}{\hat s_j}\right)}{b_k - a_k} \  .
 \end{array}
 \]</span></p>
-</div>
-<div id="normal-mixture-prior-1" class="section level3">
+</section>
+<section id="normal-mixture-prior-1" class="level3">
 <h3>Normal mixture prior</h3>
 <p><span class="math display">\[
 \begin{array}{rrcl}
@@ -633,11 +635,11 @@ e^{it\mu_k - \frac12\left(\sigma_k^2+\hat s_j^2\right)t^2}
 \hat\beta_j - \mu_k
 }{
 \sqrt{\sigma_k^2 + \hat s_j^2}
-}\right) \ .
+}\right) \  .
 \end{array}
 \]</span></p>
-</div>
-<div id="biconvex-optimization" class="section level3">
+</section>
+<section id="biconvex-optimization" class="level3">
 <h3>Biconvex optimization</h3>
 <p>Our goal is then to estimate <span class="math inline">\(\hat\pi\)</span> by solving the following constrained biconvex optimization problem</p>
 <p><span class="math display">\[
@@ -649,8 +651,8 @@ e^{it\mu_k - \frac12\left(\sigma_k^2+\hat s_j^2\right)t^2}
 &amp; w_l \text{ decay reasonably fast.}
 \end{array}
 \]</span></p>
-</div>
-</div>
+</section>
+</section>
 
 <hr>
 <p>

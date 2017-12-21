@@ -25,8 +25,8 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
-<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -36,10 +36,12 @@
   }
 </style>
 <script type="text/javascript">
-if (window.hljs && document.readyState && document.readyState === "complete") {
-   window.setTimeout(function() {
-      hljs.initHighlighting();
-   }, 0);
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
 }
 </script>
 
@@ -313,22 +315,18 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2017-11-07</p>
+<p><strong>Last updated:</strong> 2017-12-21</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 2c05d59</p>
+<p><strong>Code version:</strong> 6e42447</p>
 <!-- Add your analysis here -->
-<div id="introduction-instability-and-overfitting-k-can-be-too-large" class="section level2">
+<section id="introduction-instability-and-overfitting-k-can-be-too-large" class="level2">
 <h2>Introduction: instability and overfitting – <span class="math inline">\(K\)</span> can be too large</h2>
 <p>Things can go wrong in choosing the optimal <span class="math inline">\(\hat K\)</span>. We are using <a href="gaussian_derivatives_2.html">an automated rule</a>, yet sometimes the objective (log-likelihood) could fail to pass the optimal criterion before the optimization becomes unstable.</p>
 <p>Recall that we make <a href="gaussian_derivatives.html">two key assumptions</a> to make the problem tractable. <em>In place of the original second constraint of non-negativity, we use <span class="math inline">\(n\)</span> observed <span class="math inline">\(z\)</span> scores instead of all <span class="math inline">\(x\in\mathbb{R}\)</span>.</em> Therefore, when <span class="math inline">\(K\)</span> gets larger, and the higher order Gaussian derivatives involved get more complicated, it’s possible that the optimal solution will satisfy the non-negativity constraint for all <span class="math inline">\(n\)</span> observed <span class="math inline">\(z\)</span> scores, <strong>but not the whole real line.</strong> <em>This issue also happens to <a href="gaussian_derivatives_2.html">some well-behaved examples</a> if looked closely.</em></p>
 <p>Meanwhile, sometimes an optimal <span class="math inline">\(\hat K\)</span> can be found according to <a href="gaussian_derivatives_2.html">the rule</a>, but it looks like overfitting. A <span class="math inline">\(K &lt; \hat K\)</span> appears better.</p>
 <p>Here we have two examples.</p>
 <pre class="r"><code>source(&quot;../code/ecdfz.R&quot;)</code></pre>
-<pre><code>Warning: replacing previous import &#39;Matrix::crossprod&#39; by &#39;gmp::crossprod&#39;
-when loading &#39;cvxr&#39;</code></pre>
-<pre><code>Warning: replacing previous import &#39;Matrix::tcrossprod&#39; by
-&#39;gmp::tcrossprod&#39; when loading &#39;cvxr&#39;</code></pre>
 <pre class="r"><code>z = read.table(&quot;../output/z_null_liver_777.txt&quot;)
 p = read.table(&quot;../output/p_null_liver_777.txt&quot;)</code></pre>
 <pre class="r"><code>library(ashr)
@@ -346,30 +344,30 @@ for (i in 1:length(DataSet)) {
 <pre class="r"><code>library(EQL)
 x.pt = seq(-5, 5, 0.01)
 H.pt = sapply(1:15, EQL::hermite, x = x.pt)</code></pre>
-</div>
-<div id="example-1-numerical-instability-when-k-is-too-large" class="section level2">
+</section>
+<section id="example-1-numerical-instability-when-k-is-too-large" class="level2">
 <h2>Example 1: Numerical instability when <span class="math inline">\(K\)</span> is too large</h2>
 <pre><code>Data Set 724 : Number of BH&#39;s False Discoveries: 79 ; ASH&#39;s pihat0 = 0.01606004</code></pre>
 <p><img src="figure/gaussian_derivatives_3.rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/gaussian_derivatives_3.rmd/unnamed-chunk-5-2.png" width="672" style="display: block; margin: auto;" /></p>
 <p>In this example <a href="gaussian_derivatives_2.html">the automated rule</a> fails to find an optimal <span class="math inline">\(\hat K\)</span>. Note that the fitted log-likelihood increased until seemingly reached a plateau, but didn’t quite make the cut. After that, as <span class="math inline">\(K\)</span> keeps getting larger, the optimization becomes unstable. The blue <span class="math inline">\(K = 14\)</span> line obviously breaks <a href="gaussian_derivatives.html">the non-negativity constraint</a> for <span class="math inline">\(x \neq z_i\)</span>, the <span class="math inline">\(n\)</span> observed <span class="math inline">\(z\)</span> scores.</p>
-</div>
-<div id="example-2-overfitting-when-k-is-larger-than-what-appears-necessary" class="section level2">
+</section>
+<section id="example-2-overfitting-when-k-is-larger-than-what-appears-necessary" class="level2">
 <h2>Example 2: Overfitting when <span class="math inline">\(K\)</span> is larger than what appears necessary</h2>
 <pre><code>Data Set 522 : Number of BH&#39;s False Discoveries: 4 ; ASH&#39;s pihat0 = 0.02083846</code></pre>
 <p><img src="figure/gaussian_derivatives_3.rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/gaussian_derivatives_3.rmd/unnamed-chunk-6-2.png" width="672" style="display: block; margin: auto;" /></p>
 <p>In this example <a href="gaussian_derivatives_2.html">the automated rule</a> is able to find an optimal <span class="math inline">\(\hat K = 8\)</span>. However, the green <span class="math inline">\(K = 6\)</span> lines seems better visually. Their difference in the fitted log-likelihood is very small, although larger than what the rule requires.</p>
-</div>
-<div id="conclusion" class="section level2">
+</section>
+<section id="conclusion" class="level2">
 <h2>Conclusion</h2>
 <p>Things can go very wrong when the number of fitted Gaussian derivatives <span class="math inline">\(K\)</span> is too large, and it implies that we cannot blindly fit ever growing <span class="math inline">\(K\)</span> and hope the fitted log-likelihood converges. On the other hand, the good news is oftentimes we can still reach a pattern of increasing log-likelihoods, which gives a reasonable <span class="math inline">\(K\)</span>, before the optimization becomes unstable, although it might be not the optimal <span class="math inline">\(K\)</span> we would find by the current log-likelihood ratio test motivated rule.</p>
-</div>
-<div id="session-information" class="section level2">
+</section>
+<section id="session-information" class="level2">
 <h2>Session information</h2>
 <!-- Insert the session information into the document -->
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 3.4.2 (2017-09-28)
+<pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS Sierra 10.12.6
+Running under: macOS High Sierra 10.13.2
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -382,15 +380,20 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] cvxr_0.0.0.9400 EQL_1.0-0       ttutils_1.0-1  
+[1] CVXR_0.94-4   EQL_1.0-0     ttutils_1.0-1
 
 loaded via a namespace (and not attached):
- [1] Rcpp_0.12.13    lattice_0.20-35 gmp_0.5-13.1    digest_0.6.12  
- [5] rprojroot_1.2   MASS_7.3-47     grid_3.4.2      backports_1.1.1
- [9] git2r_0.19.0    magrittr_1.5    evaluate_0.10.1 stringi_1.1.5  
-[13] Matrix_1.2-11   rmarkdown_1.6   tools_3.4.2     stringr_1.2.0  
-[17] yaml_2.1.14     compiler_3.4.2  htmltools_0.3.6 knitr_1.17     </code></pre>
-</div>
+ [1] Rcpp_0.12.14      knitr_1.17        magrittr_1.5     
+ [4] bit_1.1-12        lattice_0.20-35   R6_2.2.2         
+ [7] stringr_1.2.0     tools_3.4.3       grid_3.4.3       
+[10] R.oo_1.21.0       git2r_0.20.0      scs_1.1-1        
+[13] htmltools_0.3.6   yaml_2.1.16       bit64_0.9-7      
+[16] rprojroot_1.3-1   digest_0.6.13     Matrix_1.2-12    
+[19] gmp_0.5-13.1      ECOSolveR_0.3-2   R.utils_2.6.0    
+[22] evaluate_0.10.1   rmarkdown_1.8     stringi_1.1.6    
+[25] compiler_3.4.3    Rmpfr_0.6-1       backports_1.1.2  
+[28] R.methodsS3_1.7.1</code></pre>
+</section>
 
 <hr>
 <p>

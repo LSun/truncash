@@ -25,8 +25,8 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
-<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -36,10 +36,12 @@
   }
 </style>
 <script type="text/javascript">
-if (window.hljs && document.readyState && document.readyState === "complete") {
-   window.setTimeout(function() {
-      hljs.initHighlighting();
-   }, 0);
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
 }
 </script>
 
@@ -313,24 +315,24 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2017-11-07</p>
+<p><strong>Last updated:</strong> 2017-12-21</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 2c05d59</p>
+<p><strong>Code version:</strong> 6e42447</p>
 <!-- Add your analysis here -->
-<div id="introduction" class="section level2">
+<section id="introduction" class="level2">
 <h2>Introduction</h2>
 <p>Similar to <a href="mosek_reg_4.html">previous simulations</a>, where correlated null <span class="math inline">\(z\)</span> scores are fitted by <span class="math inline">\(10\)</span> Gaussian derivatives with regularization, we are now <a href="ash_gd.html">fitting data sets simulated with correlated noise and true signals</a> by both <code>ASH</code> and Gaussian derivatives <strong>using the same regularization</strong> and see what happens.</p>
-</div>
-<div id="the-model" class="section level2">
+</section>
+<section id="the-model" class="level2">
 <h2>The model</h2>
 <p><span class="math display">\[
 \begin{array}{c}
-\beta_j \sim g = \sum\limits_{k=0}^K\pi_kg_k \ ;\\
-g \text{ is unimodal} \ ; \\
-\hat\beta_j | \beta_j, \hat s_j = \beta_j + \hat s_jz_j \ ;\\
-z_j \sim N(0, 1) \text{, marginally} \ ; \\
-z_j \text{ correlated} \ .
+\beta_j \sim g = \sum\limits_{k=0}^K\pi_kg_k \  ;\\
+g \text{ is unimodal} \  ; \\
+\hat\beta_j | \beta_j, \hat s_j = \beta_j + \hat s_jz_j \  ;\\
+z_j \sim N(0, 1) \text{, marginally} \  ; \\
+z_j \text{ correlated} \  .
 \end{array}
 \]</span> ## Fitting the model</p>
 <p><span class="math display">\[
@@ -340,21 +342,21 @@ z_j \text{ correlated} \ .
 - \sum\limits_{k = 0}^K\left(\lambda_k^\pi - 1\right)\log\left(\pi_k\right)
 + \sum\limits_{l = 1}^L\lambda_l^w\left|w_l\right|
 \\
-\text{subject to} &amp; \sum\limits_{k = 0}^K\pi_k = 1 \ ;\\
-&amp; \pi_k \geq 0 \ .\\
+\text{subject to} &amp; \sum\limits_{k = 0}^K\pi_k = 1 \  ;\\
+&amp; \pi_k \geq 0 \  .\\
 \end{array}
 \]</span> where <span class="math inline">\(f_{jkl}\)</span> <a href="ash_gd.html#optimization_problem">have an analytic form</a> for both <span class="math inline">\(g_k\)</span> being normal and uniform, and <strong>should be normalized</strong>.</p>
-<div id="uniform-mixture-prior" class="section level3">
+<section id="uniform-mixture-prior" class="level3">
 <h3>Uniform mixture prior</h3>
 <p><span class="math display">\[
 \begin{array}{rrcl}
 &amp;\beta_j &amp;\sim &amp; \sum_k \pi_k \text{ Unif }[a_k, b_k]\\
 \Rightarrow &amp; f_{jkl} &amp;= &amp;
-\displaystyle\frac{\varphi^{(l-1)}\left(\frac{\hat\beta_j-a_k}{\hat s_j}\right) - \varphi^{(l-1)}\left(\frac{\hat\beta_j-b_k}{\hat s_j}\right)}{\sqrt{l!}\left(b_k - a_k\right)} \ .
+\displaystyle\frac{\varphi^{(l-1)}\left(\frac{\hat\beta_j-a_k}{\hat s_j}\right) - \varphi^{(l-1)}\left(\frac{\hat\beta_j-b_k}{\hat s_j}\right)}{\sqrt{l!}\left(b_k - a_k\right)} \  .
 \end{array}
 \]</span></p>
-</div>
-<div id="normal-mixture-prior" class="section level3">
+</section>
+<section id="normal-mixture-prior" class="level3">
 <h3>Normal mixture prior</h3>
 <p><span class="math display">\[
 \begin{array}{rrcl}
@@ -365,11 +367,11 @@ z_j \text{ correlated} \ .
 \hat\beta_j - \mu_k
 }{
 \sqrt{\sigma_k^2 + \hat s_j^2}
-}\right) \ .
+}\right) \  .
 \end{array}
 \]</span></p>
 <p>In the following simulation, the parameters are set in the following way.</p>
-<ol style="list-style-type: decimal">
+<ol type="1">
 <li><span class="math inline">\(K\)</span> is chosen by the default function in <code>ashr</code>.</li>
 <li>The prior mixture always include a point mass at <span class="math inline">\(0\)</span>; that is, <span class="math inline">\(g_0 = \delta_0\)</span>.</li>
 <li>The estimate of <span class="math inline">\(g\)</span> is biased against underestimating <span class="math inline">\(\hat\pi_0\)</span>, by setting <span class="math inline">\(\lambda_0^\pi = 10\)</span>, <span class="math inline">\(\lambda_k^\pi = 1\)</span>, <span class="math inline">\(k \geq 1\)</span>. The previous two are implemented by setting <strong><code>method = &quot;fdr&quot;</code></strong>.</li>
@@ -378,19 +380,15 @@ z_j \text{ correlated} \ .
 </ol>
 <pre class="r"><code>library(ashr)
 source(&quot;../code/gdash.R&quot;)</code></pre>
-<pre><code>Warning: replacing previous import &#39;Matrix::crossprod&#39; by &#39;gmp::crossprod&#39;
-when loading &#39;cvxr&#39;</code></pre>
-<pre><code>Warning: replacing previous import &#39;Matrix::tcrossprod&#39; by
-&#39;gmp::tcrossprod&#39; when loading &#39;cvxr&#39;</code></pre>
 <pre class="r"><code>L = 10
 lambda = 10
 rho = 0.5</code></pre>
-</div>
-</div>
-<div id="the-data" class="section level2">
+</section>
+</section>
+<section id="the-data" class="level2">
 <h2>The data</h2>
 <p>The data are simulated on top of the real correlated null <span class="math inline">\(z\)</span> scores in three steps.</p>
-<ol style="list-style-type: decimal">
+<ol type="1">
 <li>The true signals <span class="math inline">\(\beta_j\)</span> are simulated from four kinds of <span class="math inline">\(g\)</span>, the global null <span class="math inline">\(g_n\)</span>, small effects <span class="math inline">\(g_s\)</span>, medium effects <span class="math inline">\(g_m\)</span>, and large effects <span class="math inline">\(g_l\)</span>.</li>
 </ol>
 <p><span class="math display">\[
@@ -405,21 +403,21 @@ g_l &amp;=&amp; 0.6\delta_0 + 0.3N\left(0, 3\right) + 0.1N\left(0, 6^2\right)\\
 g.s.n = normalmix(pi = c(0.6, 0.3, 0.1), mean = 0, sd = c(0, 1, 2))
 g.m.n = normalmix(pi = c(0.6, 0.3, 0.1), mean = 0, sd = c(0, 2, 4))
 g.l.n = normalmix(pi = c(0.6, 0.3, 0.1), mean = 0, sd = c(0, 3, 6))</code></pre>
-<ol start="2" style="list-style-type: decimal">
+<ol start="2" type="1">
 <li><span class="math inline">\(\hat s_j^2\)</span> are either constant <span class="math inline">\(1\)</span> or randomly simulated from a distribution. Right now we are only working on the <strong>homoscedastic <span class="math inline">\(\hat s_j^2 \equiv 1\)</span></strong> case.</li>
 </ol>
 <pre class="r"><code>se = &quot;constant&quot;</code></pre>
-<ol start="3" style="list-style-type: decimal">
+<ol start="3" type="1">
 <li>With selected data sets of correlated null <span class="math inline">\(z\)</span> scores, obtain <strong><span class="math inline">\(\hat\beta_j = \beta_j + \hat s_j z_j\)</span></strong>. These selected data sets are put into <a href="mosek_reg_4.html">four categories</a>: typical, hostile, friendly, iid.</li>
 </ol>
 <p>Now we are fitting the model to these data sets, which contain simulated, known true signals, as well as noises with real, unknown correlations.</p>
 <pre class="r"><code>z.list = readRDS(&quot;../output/z_null_liver_777_select.RDS&quot;)
 z.index = readRDS(&quot;../output/z_null_liver_777_select_index.RDS&quot;)</code></pre>
-</div>
-<div id="category-i-typical" class="section level2">
+</section>
+<section id="category-i-typical" class="level2">
 <h2>Category I: Typical</h2>
 <pre class="r"><code>label = &quot;typical&quot;</code></pre>
-<div id="global-null-g_n" class="section level3">
+<section id="global-null-g_n" class="level3">
 <h3>Global null <span class="math inline">\(g_n\)</span></h3>
 <pre class="r"><code>g = g.null</code></pre>
 <pre><code>Data Set 32 ;
@@ -472,8 +470,8 @@ Converged: TRUE ;
 Time: 6.173 Seconds;
 Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
 <p><img src="figure/mosek_reg_5.rmd/unnamed-chunk-9-5.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="small-effects-g_s" class="section level3">
+</section>
+<section id="small-effects-g_s" class="level3">
 <h3>Small effects <span class="math inline">\(g_s\)</span></h3>
 <pre class="r"><code>g = g.s.n</code></pre>
 <pre><code>Data Set 32 ;
@@ -526,8 +524,8 @@ Converged: TRUE ;
 Time: 42.477 Seconds;
 Normalized w: 0 - 1 ; 1 - -0.00546 ; 2 - 0.45141 ; 3 - -0.06237 ; 4 - 0 ; 5 - -4e-04 ; 6 - 0 ; 7 - -0.02274 ; 8 - 0 ; 9 - -0.05261 ; 10 - 0 ; </code></pre>
 <p><img src="figure/mosek_reg_5.rmd/unnamed-chunk-11-5.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="medium-effects-g_m" class="section level3">
+</section>
+<section id="medium-effects-g_m" class="level3">
 <h3>Medium effects <span class="math inline">\(g_m\)</span></h3>
 <pre class="r"><code>g = g.m.n</code></pre>
 <pre><code>Data Set 32 ;
@@ -580,8 +578,8 @@ Converged: TRUE ;
 Time: 57.331 Seconds;
 Normalized w: 0 - 1 ; 1 - 0.01578 ; 2 - 0.43421 ; 3 - -0.06533 ; 4 - 1e-05 ; 5 - -0.13096 ; 6 - -1e-05 ; 7 - -0.10166 ; 8 - 0 ; 9 - -0.07965 ; 10 - 0 ; </code></pre>
 <p><img src="figure/mosek_reg_5.rmd/unnamed-chunk-13-5.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="large-effects-g_l" class="section level3">
+</section>
+<section id="large-effects-g_l" class="level3">
 <h3>Large effects <span class="math inline">\(g_l\)</span></h3>
 <pre class="r"><code>g = g.l.n</code></pre>
 <pre><code>Data Set 32 ;
@@ -634,12 +632,12 @@ Converged: TRUE ;
 Time: 47.521 Seconds;
 Normalized w: 0 - 1 ; 1 - 0.02782 ; 2 - 0.41227 ; 3 - 0.14056 ; 4 - 2e-05 ; 5 - 0.52279 ; 6 - -1e-05 ; 7 - 0.72455 ; 8 - 0 ; 9 - 0.39068 ; 10 - 0 ; </code></pre>
 <p><img src="figure/mosek_reg_5.rmd/unnamed-chunk-15-5.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-</div>
-<div id="category-ii-hostile" class="section level2">
+</section>
+</section>
+<section id="category-ii-hostile" class="level2">
 <h2>Category II: Hostile</h2>
 <pre class="r"><code>label = &quot;hostile&quot;</code></pre>
-<div id="global-null-g_n-1" class="section level3">
+<section id="global-null-g_n-1" class="level3">
 <h3>Global null <span class="math inline">\(g_n\)</span></h3>
 <pre class="r"><code>g = g.null</code></pre>
 <pre><code>Data Set 355 ;
@@ -842,8 +840,8 @@ Converged: TRUE ;
 Time: 4.688 Seconds;
 Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
 <p><img src="figure/mosek_reg_5.rmd/unnamed-chunk-18-20.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="small-effects-g_s-1" class="section level3">
+</section>
+<section id="small-effects-g_s-1" class="level3">
 <h3>Small effects <span class="math inline">\(g_s\)</span></h3>
 <pre class="r"><code>g = g.s.n</code></pre>
 <pre><code>Data Set 355 ;
@@ -1046,8 +1044,8 @@ Converged: TRUE ;
 Time: 64.396 Seconds;
 Normalized w: 0 - 1 ; 1 - 0.01518 ; 2 - 0.51743 ; 3 - 0.13297 ; 4 - 1e-05 ; 5 - -0.08609 ; 6 - -1e-05 ; 7 - -0.27966 ; 8 - 0 ; 9 - -0.1633 ; 10 - 0 ; </code></pre>
 <p><img src="figure/mosek_reg_5.rmd/unnamed-chunk-20-20.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="medium-effects-g_m-1" class="section level3">
+</section>
+<section id="medium-effects-g_m-1" class="level3">
 <h3>Medium effects <span class="math inline">\(g_m\)</span></h3>
 <pre class="r"><code>g = g.m.n</code></pre>
 <pre><code>Data Set 355 ;
@@ -1250,8 +1248,8 @@ Converged: TRUE ;
 Time: 39.657 Seconds;
 Normalized w: 0 - 1 ; 1 - 0.01078 ; 2 - 0.51478 ; 3 - 0.16499 ; 4 - 0 ; 5 - 0.00335 ; 6 - 0 ; 7 - -0.19617 ; 8 - 0 ; 9 - -0.11882 ; 10 - 0 ; </code></pre>
 <p><img src="figure/mosek_reg_5.rmd/unnamed-chunk-22-20.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="large-effects-g_l-1" class="section level3">
+</section>
+<section id="large-effects-g_l-1" class="level3">
 <h3>Large effects <span class="math inline">\(g_l\)</span></h3>
 <pre class="r"><code>g = g.l.n</code></pre>
 <pre><code>Data Set 355 ;
@@ -1454,12 +1452,12 @@ Converged: TRUE ;
 Time: 34.66 Seconds;
 Normalized w: 0 - 1 ; 1 - 0.0369 ; 2 - 0.52344 ; 3 - 0.16537 ; 4 - 0 ; 5 - -0.13339 ; 6 - 0 ; 7 - -0.44877 ; 8 - 0 ; 9 - -0.23269 ; 10 - 0 ; </code></pre>
 <p><img src="figure/mosek_reg_5.rmd/unnamed-chunk-24-20.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-</div>
-<div id="category-iii-friendly" class="section level2">
+</section>
+</section>
+<section id="category-iii-friendly" class="level2">
 <h2>Category III: Friendly</h2>
 <pre class="r"><code>label = &quot;friendly&quot;</code></pre>
-<div id="global-null-g_n-2" class="section level3">
+<section id="global-null-g_n-2" class="level3">
 <h3>Global null <span class="math inline">\(g_n\)</span></h3>
 <pre class="r"><code>g = g.null</code></pre>
 <pre><code>Data Set 4 ;
@@ -1714,8 +1712,8 @@ Number of iterations: 2 ;
 Converged: TRUE ;
 Time: 4.985 Seconds;
 Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
-</div>
-<div id="small-effects-g_s-2" class="section level3">
+</section>
+<section id="small-effects-g_s-2" class="level3">
 <h3>Small effects <span class="math inline">\(g_s\)</span></h3>
 <pre class="r"><code>g = g.s.n</code></pre>
 <pre><code>Data Set 4 ;
@@ -1988,8 +1986,8 @@ Converged: TRUE ;
 Time: 40.702 Seconds;
 Normalized w: 0 - 1 ; 1 - 0.01673 ; 2 - -1e-05 ; 3 - -0.01073 ; 4 - 0.06691 ; 5 - -0.13847 ; 6 - 0 ; 7 - -0.26718 ; 8 - 0 ; 9 - -0.17156 ; 10 - 0 ; </code></pre>
 <p><img src="figure/mosek_reg_5.rmd/unnamed-chunk-29-27.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="medium-effects-g_m-2" class="section level3">
+</section>
+<section id="medium-effects-g_m-2" class="level3">
 <h3>Medium effects <span class="math inline">\(g_m\)</span></h3>
 <pre class="r"><code>g = g.m.n</code></pre>
 <pre><code>Data Set 4 ;
@@ -2262,8 +2260,8 @@ Converged: TRUE ;
 Time: 78.558 Seconds;
 Normalized w: 0 - 1 ; 1 - -0.01614 ; 2 - -0.12656 ; 3 - -0.16532 ; 4 - 0.03757 ; 5 - -0.39897 ; 6 - 0 ; 7 - -0.50568 ; 8 - 0 ; 9 - -0.2648 ; 10 - 0 ; </code></pre>
 <p><img src="figure/mosek_reg_5.rmd/unnamed-chunk-31-27.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="large-effects-g_l-2" class="section level3">
+</section>
+<section id="large-effects-g_l-2" class="level3">
 <h3>Large effects <span class="math inline">\(g_l\)</span></h3>
 <pre class="r"><code>g = g.l.n</code></pre>
 <pre><code>Data Set 4 ;
@@ -2536,12 +2534,12 @@ Converged: TRUE ;
 Time: 42.11 Seconds;
 Normalized w: 0 - 1 ; 1 - 0.01863 ; 2 - -0.25293 ; 3 - -0.07759 ; 4 - 0.00025 ; 5 - -0.25252 ; 6 - -1e-05 ; 7 - -0.26616 ; 8 - 0 ; 9 - -0.15442 ; 10 - 0 ; </code></pre>
 <p><img src="figure/mosek_reg_5.rmd/unnamed-chunk-33-27.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-</div>
-<div id="category-iii-iid" class="section level2">
+</section>
+</section>
+<section id="category-iii-iid" class="level2">
 <h2>Category III: iid</h2>
 <pre class="r"><code>label = &quot;iid&quot;</code></pre>
-<div id="global-null-g_n-3" class="section level3">
+<section id="global-null-g_n-3" class="level3">
 <h3>Global null <span class="math inline">\(g_n\)</span></h3>
 <pre class="r"><code>g = g.null</code></pre>
 <pre><code>Data Set NA ;
@@ -2641,8 +2639,8 @@ Number of iterations: 2 ;
 Converged: TRUE ;
 Time: 6.369 Seconds;
 Normalized w: 0 - 1 ; 1 - 0 ; 2 - 0 ; 3 - 0 ; 4 - 0 ; 5 - 0 ; 6 - 0 ; 7 - 0 ; 8 - 0 ; 9 - 0 ; 10 - 0 ; </code></pre>
-</div>
-<div id="small-effects-g_s-3" class="section level3">
+</section>
+<section id="small-effects-g_s-3" class="level3">
 <h3>Small effects <span class="math inline">\(g_s\)</span></h3>
 <pre class="r"><code>g = g.s.n</code></pre>
 <pre><code>Data Set NA ;
@@ -2745,8 +2743,8 @@ Converged: TRUE ;
 Time: 65.451 Seconds;
 Normalized w: 0 - 1 ; 1 - -0.01754 ; 2 - 0.05134 ; 3 - -0.04266 ; 4 - 0 ; 5 - -0.02455 ; 6 - 0 ; 7 - 0.03403 ; 8 - 0 ; 9 - 0.08948 ; 10 - 0 ; </code></pre>
 <p><img src="figure/mosek_reg_5.rmd/unnamed-chunk-38-10.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="medium-effects-g_m-3" class="section level3">
+</section>
+<section id="medium-effects-g_m-3" class="level3">
 <h3>Medium effects <span class="math inline">\(g_m\)</span></h3>
 <pre class="r"><code>g = g.m.n</code></pre>
 <pre><code>Data Set NA ;
@@ -2849,8 +2847,8 @@ Converged: TRUE ;
 Time: 46.043 Seconds;
 Normalized w: 0 - 1 ; 1 - -0.00574 ; 2 - 0.02839 ; 3 - 0.05334 ; 4 - -1e-05 ; 5 - 0.24599 ; 6 - 0 ; 7 - 0.31199 ; 8 - 0 ; 9 - 0.18351 ; 10 - 0 ; </code></pre>
 <p><img src="figure/mosek_reg_5.rmd/unnamed-chunk-40-10.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="large-effects-g_l-3" class="section level3">
+</section>
+<section id="large-effects-g_l-3" class="level3">
 <h3>Large effects <span class="math inline">\(g_l\)</span></h3>
 <pre class="r"><code>g = g.l.n</code></pre>
 <pre><code>Data Set NA ;
@@ -2953,15 +2951,15 @@ Converged: TRUE ;
 Time: 27.507 Seconds;
 Normalized w: 0 - 1 ; 1 - 0.01377 ; 2 - 0.01957 ; 3 - 0.07945 ; 4 - -2e-05 ; 5 - 0.12671 ; 6 - 0 ; 7 - 0.07457 ; 8 - 0 ; 9 - 0.06591 ; 10 - 0 ; </code></pre>
 <p><img src="figure/mosek_reg_5.rmd/unnamed-chunk-42-10.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-</div>
-<div id="session-information" class="section level2">
+</section>
+</section>
+<section id="session-information" class="level2">
 <h2>Session information</h2>
 <!-- Insert the session information into the document -->
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 3.4.2 (2017-09-28)
+<pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS Sierra 10.12.6
+Running under: macOS High Sierra 10.13.2
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -2974,21 +2972,24 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] Rmosek_7.1.3      PolynomF_0.94     cvxr_0.0.0.9400   REBayes_0.85     
-[5] Matrix_1.2-11     SQUAREM_2017.10-1 EQL_1.0-0         ttutils_1.0-1    
-[9] ashr_2.1-27      
+[1] Rmosek_8.0.69     PolynomF_1.0-1    CVXR_0.94-4       REBayes_1.2      
+[5] Matrix_1.2-12     SQUAREM_2017.10-1 EQL_1.0-0         ttutils_1.0-1    
+[9] ashr_2.2-2       
 
 loaded via a namespace (and not attached):
- [1] Rcpp_0.12.13      knitr_1.17        magrittr_1.5     
- [4] MASS_7.3-47       doParallel_1.0.11 pscl_1.5.2       
- [7] lattice_0.20-35   foreach_1.4.3     stringr_1.2.0    
-[10] tools_3.4.2       parallel_3.4.2    grid_3.4.2       
-[13] git2r_0.19.0      htmltools_0.3.6   iterators_1.0.8  
-[16] yaml_2.1.14       rprojroot_1.2     digest_0.6.12    
-[19] gmp_0.5-13.1      codetools_0.2-15  evaluate_0.10.1  
-[22] rmarkdown_1.6     stringi_1.1.5     compiler_3.4.2   
-[25] backports_1.1.1   truncnorm_1.0-7  </code></pre>
-</div>
+ [1] gmp_0.5-13.1      Rcpp_0.12.14      compiler_3.4.3   
+ [4] git2r_0.20.0      R.methodsS3_1.7.1 R.utils_2.6.0    
+ [7] iterators_1.0.9   tools_3.4.3       digest_0.6.13    
+[10] bit_1.1-12        evaluate_0.10.1   lattice_0.20-35  
+[13] foreach_1.4.4     yaml_2.1.16       parallel_3.4.3   
+[16] Rmpfr_0.6-1       ECOSolveR_0.3-2   stringr_1.2.0    
+[19] knitr_1.17        rprojroot_1.3-1   bit64_0.9-7      
+[22] grid_3.4.3        R6_2.2.2          rmarkdown_1.8    
+[25] magrittr_1.5      backports_1.1.2   codetools_0.2-15 
+[28] htmltools_0.3.6   scs_1.1-1         MASS_7.3-47      
+[31] stringi_1.1.6     pscl_1.5.2        doParallel_1.0.11
+[34] truncnorm_1.0-7   R.oo_1.21.0      </code></pre>
+</section>
 
 <hr>
 <p>

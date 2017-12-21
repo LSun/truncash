@@ -25,8 +25,8 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
-<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -36,10 +36,12 @@
   }
 </style>
 <script type="text/javascript">
-if (window.hljs && document.readyState && document.readyState === "complete") {
-   window.setTimeout(function() {
-      hljs.initHighlighting();
-   }, 0);
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
 }
 </script>
 
@@ -313,12 +315,12 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2017-11-07</p>
+<p><strong>Last updated:</strong> 2017-12-21</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 2c05d59</p>
+<p><strong>Code version:</strong> 6e42447</p>
 <!-- Add your analysis here -->
-<div id="ash-and-empirical-bayes" class="section level2">
+<section id="ash-and-empirical-bayes" class="level2">
 <h2><code>ASH</code> and empirical Bayes</h2>
 <p>Under <a href="https://academic.oup.com/biostatistics/article/18/2/275/2557030/False-discovery-rates-a-new-deal">ASH setting</a>, the observations <span class="math inline">\(\left\{\left(\hat\beta_j, \hat s_j\right)\right\}\)</span> come from a likelihood <span class="math inline">\(p\left(\hat\beta_j\mid\beta_j,\hat s_j\right)\)</span> which could be <span class="math inline">\(N\left(\beta_j, \hat s_j^2\right)\)</span> or <a href="t-likelihood.html">a noncentral-<span class="math inline">\(t\)</span></a>. Recently, a likelihood of <a href="ash_gd.html">Gaussian derivative composition</a> has also been proposed.</p>
 <p>Further, as essentially all empirical Bayes approaches go, a hierarchical model assumes that all <span class="math inline">\(\left\{\beta_j\right\}\)</span> come exchangeably from a prior of effect size distribution <span class="math inline">\(g\)</span>. Therefore, the likelihood of <span class="math inline">\(\hat\beta_j | \hat s_j\)</span> is given by</p>
@@ -327,7 +329,7 @@ shared across the workflowr files. -->
 =
 \int
 p\left(\hat\beta_j\mid\beta_j,\hat s_j\right)
-g(\beta_j)d\beta_j\ \ .
+g(\beta_j)d\beta_j\  \  .
 \]</span></p>
 <p>Then <span class="math inline">\(\hat g\)</span> is estimated by</p>
 <p><span class="math display">\[
@@ -338,7 +340,7 @@ g(\beta_j)d\beta_j\ \ .
 \arg\max_g
 \prod_j\int
 p\left(\hat\beta_j\mid\beta_j,\hat s_j\right)
-g(\beta_j)d\beta_j \ \ .
+g(\beta_j)d\beta_j \  \  .
 \]</span></p>
 <p>Under ASH framework in particular, the unimodal <span class="math inline">\(g = \sum_k\pi_kg_k\)</span> is a mixture of normal or a mixture of uniform, and</p>
 <p><span class="math display">\[
@@ -354,34 +356,34 @@ p\left(\hat\beta_j\mid\beta_j,\hat s_j\right)
 \displaystyle\sum_k\pi_k\int
 p\left(\hat\beta_j\mid\beta_j,\hat s_j\right)
 g_k(\beta_j)d\beta_j\\
-&amp;:=&amp;\displaystyle\sum_k\pi_kf_{jk}\ \ .
+&amp;:=&amp;\displaystyle\sum_k\pi_kf_{jk}\  \  .
 \end{array}
 \]</span></p>
-</div>
-<div id="goodness-of-fit-for-empirical-bayes" class="section level2">
+</section>
+<section id="goodness-of-fit-for-empirical-bayes" class="level2">
 <h2>Goodness of fit for empirical Bayes</h2>
 <p>In empirical Bayes, if <span class="math inline">\(g\left(\beta\right)\)</span> is the true effect size distribution, and equally important, if <span class="math inline">\(p\left(\hat\beta_j\mid\beta_j, \hat s_j\right)\)</span> is the true observation likelihood, <span class="math inline">\(f\left(\hat\beta_j\mid\hat s_j\right)\)</span> should be the true distribution of <span class="math inline">\(\hat\beta_j\)</span> given <span class="math inline">\(\hat s_j\)</span>. Thus <span class="math inline">\(\hat\beta_j\)</span> can be seen as independent samples from their perspective distribution <span class="math inline">\(f\left(\hat\beta_j\mid\hat s_j\right)\)</span>, given <span class="math inline">\(\hat s_j\)</span>. Or to write it more formally,</p>
 <p><span class="math display">\[
-\hat\beta_j | \hat s_j \sim f_{\hat\beta_j|\hat s_j}(\cdot|\hat s_j) \ \ .
+\hat\beta_j | \hat s_j \sim f_{\hat\beta_j|\hat s_j}(\cdot|\hat s_j) \  \  .
 \]</span> Note that <a href="https://en.wikipedia.org/wiki/Probability_integral_transform">the cumulative distribution function of a continuous random variable should itself be a random variable following <span class="math inline">\(\text{Unif }[0, 1]\)</span></a>. Therefore, the cumulative distribution function at <span class="math inline">\(\hat\beta_j\)</span>,</p>
 <p><span class="math display">\[
 \displaystyle F_j := F_{\hat\beta_j|\hat s_j}
 \left(\hat\beta_j|\hat s_j\right)
 =
 \int_{-\infty}^{\hat\beta_j}
-f_{\hat\beta_j|\hat s_j}\left(t|\hat s_j\right)dt \ ,
+f_{\hat\beta_j|\hat s_j}\left(t|\hat s_j\right)dt \  ,
 \]</span> should be a random sample from <span class="math inline">\(\text{Unif}\left[0, 1\right]\)</span>.</p>
 <p>In other words, in empirical Bayes models, <span class="math inline">\(\left\{F_{\hat\beta_1|\hat s_1}(\hat\beta_1|\hat s_1), \ldots, F_{\hat\beta_n|\hat s_n}(\hat\beta_n|\hat s_n)\right\}\)</span> should behave like <span class="math inline">\(n\)</span> independent samples from <span class="math inline">\(\text{Unif}\left[0, 1\right]\)</span> if the hierarchical model assumption holds.</p>
 <p>In practice, a <span class="math inline">\(\hat g\)</span> is then estimated by maximizing the joint likelihood <span class="math inline">\(\displaystyle\prod_j f_{\hat\beta_j|\hat s_j}\left(\hat\beta_j\mid\hat s_j\right) = \prod_j \int p\left(\hat\beta_j\mid\beta_j,\hat s_j\right) g(\beta_j)d\beta_j\)</span>. <span class="math inline">\(\displaystyle\hat F_j := \hat F_{\hat\beta_j|\hat s_j}\left(\hat\beta_j|\hat s_j\right) = \int_{-\infty}^{\hat\beta_j}\hat f_{\hat\beta_j|\hat s_j}\left(t|\hat s_j\right)dt = \int_{-\infty}^{\hat\beta_j}\int p\left(\hat\beta_j\mid\beta_j,\hat s_j\right)\hat g(\beta_j)d\beta_jdt\)</span> can thus be calculated.</p>
 <p>If all of the following there statments hold,</p>
-<ol style="list-style-type: decimal">
+<ol type="1">
 <li>The hierarchical model assumption is sufficiently valid.</li>
 <li>The assumptions inposed on <span class="math inline">\(g\)</span> are sufficiently accurate.</li>
 <li>The estimate of <span class="math inline">\(\hat g\)</span> is sufficiently satisfactory.</li>
 </ol>
 <p>then <strong><span class="math inline">\(\left\{\hat F_{\hat\beta_1|\hat s_1}(\hat\beta_1|\hat s_1), \ldots, \hat F_{\hat\beta_n|\hat s_n}(\hat\beta_n|\hat s_n)\right\}\)</span> should look like <span class="math inline">\(n\)</span> independent random samples from <span class="math inline">\(\text{Unif }[0, 1]\)</span></strong>, and their behavior can be used to gauge the goodness of fit of an empirical Bayes model.</p>
-</div>
-<div id="goodness-of-fit-for-ash" class="section level2">
+</section>
+<section id="goodness-of-fit-for-ash" class="level2">
 <h2>Goodness of fit for <code>ASH</code></h2>
 <p>In ASH setting,</p>
 <p><span class="math display">\[
@@ -404,17 +406,17 @@ p\left(t\mid\beta_j,\hat s_j\right)
 \hat g_k(\beta_j)d\beta_j dt\\
 &amp;:=&amp;
 \displaystyle\sum_k\hat\pi_k
-\hat F_{jk}\ \ .
+\hat F_{jk}\  \  .
 \end{array}
 \]</span> A diagnostic procedure of <code>ASH</code> can be produced in the following steps.</p>
-<ol style="list-style-type: decimal">
+<ol type="1">
 <li>Fit <code>ASH</code>, get <span class="math inline">\(\hat g_k\)</span>, <span class="math inline">\(\hat \pi_k\)</span>.</li>
 <li>Compute <span class="math inline">\(\displaystyle\hat F_{jk} = \int_{-\infty}^{\hat\beta_j}\int p\left(t\mid\beta_j,\hat s_j\right)\hat g_k(\beta_j)d\beta_j dt\)</span>. Note the computation doesn’t have to be expensive, because as detailed below, usually intermediate results in <code>ASH</code> can be recycled.</li>
 <li>Compute <span class="math inline">\(\hat F_j = \hat F_{\hat\beta_j|\hat s_j}\left(\hat\beta_j|\hat s_j\right) = \displaystyle\sum_k\hat\pi_k\hat F_{jk}\)</span>.</li>
 <li>Compare the calculated <span class="math inline">\(\left\{\hat F_1 = \hat F_{\hat\beta_1|\hat s_1}(\hat\beta_1|\hat s_1), \ldots, \hat F_n = \hat F_{\hat\beta_n|\hat s_n}(\hat\beta_n|\hat s_n)\right\}\)</span> with <span class="math inline">\(n\)</span> random samples from <span class="math inline">\(\text{Unif}\left[0, 1\right]\)</span> by the histogram, Q-Q plot, statistical tests, etc.</li>
 </ol>
-</div>
-<div id="ash-normal-likelihood-normal-mixture-prior" class="section level2">
+</section>
+<section id="ash-normal-likelihood-normal-mixture-prior" class="level2">
 <h2><code>ASH</code>: normal likelihood, normal mixture prior</h2>
 <p><span class="math inline">\(g = \sum_k\pi_kg_k\)</span>, where <span class="math inline">\(g_k\)</span> is <span class="math inline">\(N\left(\mu_k, \sigma_k^2\right)\)</span>. Let <span class="math inline">\(\varphi_{\mu, \sigma^2}\left(\cdot\right)\)</span> be the probability density function (pdf) of <span class="math inline">\(N\left(\mu, \sigma^2\right)\)</span>.</p>
 <p><span class="math display">\[
@@ -457,14 +459,14 @@ g_k(\beta_j)d\beta_j = \varphi_{\mu_k, \sigma_k^2 + \hat s_j^2}\left(\hat\beta_j
 =
 \frac{1}{\sqrt{\sigma_k^2 + \hat s_j^2}}\varphi\left(\frac{\hat\beta_j - \mu_k}{\sqrt{\sigma_k^2 + \hat s_j^2}}\right).
 \]</span> Therefore, the matrix of <span class="math inline">\(\left[\frac{\hat\beta_j - \mu_k}{\sqrt{\sigma_k^2 + \hat s_j^2}}\right]_{jk}\)</span> should be created when fitting <code>ASH</code>. We can re-use it when calculating <span class="math inline">\(\hat F_{jk}\)</span> and <span class="math inline">\(\hat F_j = \hat F_{\hat\beta_j|\hat s_j}\left(\hat\beta_j|\hat s_j\right)\)</span>.</p>
-<div id="illustrative-example" class="section level3">
+<section id="illustrative-example" class="level3">
 <h3>Illustrative Example</h3>
 <p><span class="math inline">\(n = 1000\)</span> observations <span class="math inline">\(\left\{\left(\hat\beta_1, \hat s_1\right), \ldots, \left(\hat\beta_n, \hat s_n\right)\right\}\)</span> are generated as follows</p>
 <p><span class="math display">\[
 \begin{array}{rcl}
 \hat s_j &amp;\equiv&amp; 1 \\
 \beta_j &amp;\sim&amp; 0.5\delta_0 + 0.5N(0, 1)\\
-\hat\beta_j | \beta_j, \hat s_j \equiv 1 &amp;\sim&amp; N\left(\beta_j, \hat s_j^2 \equiv1\right)\ .
+\hat\beta_j | \beta_j, \hat s_j \equiv 1 &amp;\sim&amp; N\left(\beta_j, \hat s_j^2 \equiv1\right)\  .
 \end{array}
 \]</span></p>
 <pre class="r"><code>set.seed(100)
@@ -485,9 +487,9 @@ Fjktrue = pnorm(outer(data$x, gtrue$mean, &quot;-&quot;) / sqrt(outer((data$s)^2
 Ftrue = Fjktrue %*% gtrue$pi</code></pre>
 <p>Plot the histogram of <span class="math inline">\(\left\{\hat F_j\right\}\)</span> and ordered <span class="math inline">\(\left\{\hat F_{\left(j\right)}\right\} = \left\{\hat F_{(1)}, \ldots, \hat F_{(n)}\right\}\)</span>. Under goodness of fit, the histogram of <span class="math inline">\(\left\{\hat F_j\right\}\)</span> should look like <span class="math inline">\(\text{Unif}\left[0, 1\right]\)</span> and <span class="math inline">\(\left\{\hat F_{(j)}\right\}\)</span> should look like a straight line from <span class="math inline">\(0\)</span> to <span class="math inline">\(1\)</span>. Oracle <span class="math inline">\(\left\{F_j\right\}\)</span> and <span class="math inline">\(\left\{F_{\left(j\right)}\right\}\)</span> under true <span class="math inline">\(g\)</span> are also plotted in the same way for comparison.</p>
 <p><img src="figure/diagnostic_plot.rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot.rmd/unnamed-chunk-5-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot.rmd/unnamed-chunk-5-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot.rmd/unnamed-chunk-5-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot.rmd/unnamed-chunk-5-5.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-</div>
-<div id="ash-normal-likelihood-uniform-mixture-prior" class="section level2">
+</section>
+</section>
+<section id="ash-normal-likelihood-uniform-mixture-prior" class="level2">
 <h2><code>ASH</code>: normal likelihood, uniform mixture prior</h2>
 <p><span class="math inline">\(g = \sum_k\pi_kg_k\)</span>, where <span class="math inline">\(g_k\)</span> is <span class="math inline">\(\text{Unif}\left[a_k, b_k\right]\)</span>. Let <span class="math inline">\(U_{a, b}\)</span> be the probability density function (pdf) of <span class="math inline">\(\text{Unif}\left[a, b\right]\)</span>. An important fact regarding the integral of the cumulative distribution function of the standard normal <span class="math inline">\(\Phi\)</span> is as follows,</p>
 <p><span class="math display">\[
@@ -606,14 +608,14 @@ g_k(\beta_j)d\beta_j
 \end{cases}.
 \]</span></p>
 <p>Therefore, both matrices of <span class="math inline">\(\left[\frac{\hat\beta_j - a_k}{\hat s_j}\right]_{jk}\)</span> and <span class="math inline">\(\left[\frac{\hat\beta_j - b_k}{\hat s_j}\right]_{jk}\)</span> should be created when fitting <code>ASH</code>. We can re-use them when calculating <span class="math inline">\(\hat F_{jk}\)</span> and <span class="math inline">\(\hat F_{\hat\beta_j|\hat s_j}\left(\hat\beta_j|\hat s_j\right)\)</span>.</p>
-<div id="illustrative-example-1" class="section level3">
+<section id="illustrative-example-1" class="level3">
 <h3>Illustrative Example</h3>
 <p><span class="math inline">\(n = 1000\)</span> observations <span class="math inline">\(\left\{\left(\hat\beta_1, \hat s_1\right), \ldots, \left(\hat\beta_n, \hat s_n\right)\right\}\)</span> are generated as follows</p>
 <p><span class="math display">\[
 \begin{array}{rcl}
 \hat s_j &amp;\equiv&amp; 1 \\
 \beta_j &amp;\sim&amp; 0.5\delta_0 + 0.5\text{Unif}\left[-1, 1\right]\\
-\hat\beta_j | \beta_j, \hat s_j \equiv 1 &amp;\sim&amp; N\left(\beta_j, \hat s_j^2 \equiv1\right)\ .
+\hat\beta_j | \beta_j, \hat s_j \equiv 1 &amp;\sim&amp; N\left(\beta_j, \hat s_j^2 \equiv1\right)\  .
 \end{array}
 \]</span></p>
 <pre class="r"><code>set.seed(100)
@@ -640,9 +642,9 @@ Fjktrue[a_mat == b_mat] = pnorm(a_mat[a_mat == b_mat])
 Ftrue = Fjktrue %*% gtrue$pi</code></pre>
 <p>Plot the histogram of <span class="math inline">\(\left\{\hat F_j\right\}\)</span> and ordered <span class="math inline">\(\left\{\hat F_{\left(j\right)}\right\} = \left\{\hat F_{(1)}, \ldots, \hat F_{(n)}\right\}\)</span>. Under goodness of fit, the histogram of <span class="math inline">\(\left\{\hat F_j\right\}\)</span> should look like <span class="math inline">\(\text{Unif}\left[0, 1\right]\)</span> and <span class="math inline">\(\left\{\hat F_{(j)}\right\}\)</span> should look like a straight line from <span class="math inline">\(0\)</span> to <span class="math inline">\(1\)</span>. Oracle <span class="math inline">\(\left\{F_j\right\}\)</span> and <span class="math inline">\(\left\{F_{\left(j\right)}\right\}\)</span> under true <span class="math inline">\(g\)</span> are also plotted in the same way for comparison.</p>
 <p><img src="figure/diagnostic_plot.rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot.rmd/unnamed-chunk-10-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot.rmd/unnamed-chunk-10-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot.rmd/unnamed-chunk-10-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot.rmd/unnamed-chunk-10-5.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-</div>
-<div id="ash-t-likelihood-uniform-mixture-prior" class="section level2">
+</section>
+</section>
+<section id="ash-t-likelihood-uniform-mixture-prior" class="level2">
 <h2><code>ASH</code>: <span class="math inline">\(t\)</span> likelihood, uniform mixture prior</h2>
 <p>In this case, <span class="math inline">\(\hat F_j = \hat F_{\hat\beta_j|\hat s_j}\left(\hat\beta_j|\hat s_j\right)\)</span> involves calculting an integral of the cumulative distribution function (CDF) of Student’s <span class="math inline">\(t\)</span> distribution, which does not have an analytical expression.</p>
 <p>Let <span class="math inline">\(t_{\nu}\)</span> and <span class="math inline">\(T_{\nu}\)</span> denote the pdf and cdf of Student’s <span class="math inline">\(t\)</span> distribution with <span class="math inline">\(\nu\)</span> degrees of freedom. <a href="t-likelihood.html">Current implementation when dealing with <span class="math inline">\(t\)</span> likelihood</a> assumes that</p>
@@ -691,7 +693,7 @@ a_k = b_k = \mu_k
 \end{cases}.
 \end{array}
 \]</span> Thus, in order to evaluate <span class="math inline">\(\hat F_{jk}\)</span>, we need to evaluate as many as <span class="math inline">\(n \times K\)</span> integrals of the CDF of Student’s <span class="math inline">\(t\)</span> distribution. The operation is not difficult to code but might be expensive to compute.</p>
-<div id="illustrative-example-2" class="section level3">
+<section id="illustrative-example-2" class="level3">
 <h3>Illustrative Example</h3>
 <p><span class="math inline">\(n = 1000\)</span> observations <span class="math inline">\(\left\{\left(\hat\beta_1, \hat s_1\right), \ldots, \left(\hat\beta_n, \hat s_n\right)\right\}\)</span> are generated as follows</p>
 <p><span class="math display">\[
@@ -700,7 +702,7 @@ a_k = b_k = \mu_k
 \hat \nu_j &amp;\equiv&amp; 5 \\
 t_j|\hat\nu_j \equiv5 &amp;\sim&amp; t_{\hat\nu_j\equiv5} \\
 \beta_j &amp;\sim&amp; 0.5\delta_0 + 0.5\text{Unif}\left[-1, 1\right]\\
-\hat\beta_j | \beta_j, \hat s_j \equiv 1, t_j &amp;=&amp; \beta_j + \hat s_jt_j \ .
+\hat\beta_j | \beta_j, \hat s_j \equiv 1, t_j &amp;=&amp; \beta_j + \hat s_jt_j \  .
 \end{array}
 \]</span></p>
 <pre class="r"><code>set.seed(100)
@@ -764,60 +766,60 @@ abline(-1/(n-1), 1/(n-1), col = &quot;red&quot;)</code></pre>
 <pre class="r"><code>plot(sort(Ftrue), cex = 0.25, pch = 19, xlab = &quot;Order m&quot;, ylab = expression(paste(&quot;Ordered &quot;, &quot;F&quot;[&quot;(m)&quot;])), main = expression(paste(&quot;Ordered true &quot;, &quot;F&quot;)))
 abline(-1/(n-1), 1/(n-1), col = &quot;red&quot;)</code></pre>
 <p><img src="figure/diagnostic_plot.rmd/unnamed-chunk-15-5.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-</div>
-<div id="exchangeability-assumption" class="section level2">
+</section>
+</section>
+<section id="exchangeability-assumption" class="level2">
 <h2>Exchangeability assumption</h2>
 <p>Now we are discussing several occasions when the diagnostic plots may show a conspicuous deviation from <span class="math inline">\(\text{Unif}\left[0, 1\right]\)</span>.</p>
 <p>The above numerical illustrations show that when data are generated exactly as <code>ASH</code>’s assumptions, <span class="math inline">\(\hat F_{j}\)</span> don’t deviate from <span class="math inline">\(\text{Unif}\left[0, 1\right]\)</span> more so than <span class="math inline">\(F_{j}\)</span> do when we know the true exchangeable prior <span class="math inline">\(g\)</span>. This result indicates that <code>ASH</code> does a good job estimating <span class="math inline">\(\hat g\)</span>.</p>
 <p>However, how good is the exchangeability assumption for <span class="math inline">\(\beta_j\)</span>? If individual <span class="math inline">\(g_j\left(\beta_j\right)\)</span> are known, we can obtain the true <span class="math inline">\(F_{j}^o\)</span> (“o” stands for “oracle”) as</p>
 <p><span class="math display">\[
-F_j^o = \int_{-\infty}^{\hat\beta_j}\int p\left(t\mid\beta_j, \hat s_j\right)g_j\left(\beta_j\right)d\beta_jdt \ .
+F_j^o = \int_{-\infty}^{\hat\beta_j}\int p\left(t\mid\beta_j, \hat s_j\right)g_j\left(\beta_j\right)d\beta_jdt \  .
 \]</span> Then the difference in the “uniformness” between <span class="math inline">\(F_j\)</span> and <span class="math inline">\(F_j^o\)</span> indicates the goodness of the exchangeability assumption.</p>
 <p>Here we are generating <span class="math inline">\(n = 10K\)</span> observations according to</p>
 <p><span class="math display">\[
 \begin{array}{rcl}
-\hat s_j &amp;\equiv&amp; 1 \ ;\\
-\beta_j &amp;\sim&amp; 0.5\delta_0 + 0.5N(0, 1)\ ;\\
-\hat\beta_j | \beta_j, \hat s_j \equiv 1 &amp;\sim&amp; N\left(\beta_j, \hat s_j^2 \equiv1\right)\ .
+\hat s_j &amp;\equiv&amp; 1 \  ;\\
+\beta_j &amp;\sim&amp; 0.5\delta_0 + 0.5N(0, 1)\  ;\\
+\hat\beta_j | \beta_j, \hat s_j \equiv 1 &amp;\sim&amp; N\left(\beta_j, \hat s_j^2 \equiv1\right)\  .
 \end{array}
 \]</span> The histograms of <span class="math inline">\(\left\{F_j^o\right\}\)</span>, <span class="math inline">\(\left\{F_j\right\}\)</span>, and <span class="math inline">\(\left\{\hat F_j\right\}\)</span> are plotted together. In this example <span class="math inline">\(\left\{F_j^o\right\}\)</span> are hardly more uniform than <span class="math inline">\(\left\{F_j\right\}\)</span>.</p>
 <p><img src="figure/diagnostic_plot.rmd/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot.rmd/unnamed-chunk-21-2.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="unimodal-assumption" class="section level2">
+</section>
+<section id="unimodal-assumption" class="level2">
 <h2>Unimodal assumption</h2>
 <p>The <span class="math inline">\(n = 1K\)</span> observations are generated such that the unimodal assumption doesn’t hold.</p>
 <p><span class="math display">\[
 \begin{array}{rcl}
-\hat s_j &amp;\equiv&amp; 1 \ ;\\
-\beta_j &amp;\sim&amp; 0.2\delta_0 + 0.4N(5, 1) + 0.4N(-5, 1)\ ;\\
-\hat\beta_j | \beta_j, \hat s_j \equiv 1 &amp;\sim&amp; N\left(\beta_j, \hat s_j^2 \equiv1\right)\ .
+\hat s_j &amp;\equiv&amp; 1 \  ;\\
+\beta_j &amp;\sim&amp; 0.2\delta_0 + 0.4N(5, 1) + 0.4N(-5, 1)\  ;\\
+\hat\beta_j | \beta_j, \hat s_j \equiv 1 &amp;\sim&amp; N\left(\beta_j, \hat s_j^2 \equiv1\right)\  .
 \end{array}
 \]</span> The histograms of <span class="math inline">\(\left\{F_j\right\}\)</span>, and <span class="math inline">\(\left\{\hat F_j\right\}\)</span> are plotted together, as well as the ordered <span class="math inline">\(\left\{F_{(j)}\right\}\)</span> and <span class="math inline">\(\left\{\hat F_{(j)}\right\}\)</span>. <span class="math inline">\(\left\{\hat F_j\right\}\)</span> being conspicuously not uniform provides evidence for lack of goodness of fit.</p>
 <p><img src="figure/diagnostic_plot.rmd/unnamed-chunk-26-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot.rmd/unnamed-chunk-26-2.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="mixture-misspecification" class="section level2">
+</section>
+<section id="mixture-misspecification" class="level2">
 <h2>Mixture misspecification</h2>
 <p>Even if the effect size prior <span class="math inline">\(g\)</span> is unimodal, because <code>ASH</code> implicitly makes the assumption that <span class="math inline">\(g\)</span> is sufficiently regular such that it can be approximated by a limited number of normals or uniforms, <code>ASH</code> can fail when the mixture components are not able to capture the true effect size distribution.</p>
 <p>In this example, the <span class="math inline">\(n = 1K\)</span> observations are generated, such that the true effect size distribution <span class="math inline">\(g\)</span> is uniform and thus can not be satisfactorily approximated by a mixture of normal. We’ll see what happens when the normal mixture prior is still used.</p>
 <p><span class="math display">\[
 \begin{array}{rcl}
-\hat s_j &amp;\equiv&amp; 1 \ ;\\
-\beta_j &amp;\sim&amp; \text{Unif}\left[-10, 10\right]\ ;\\
-\hat\beta_j | \beta_j, \hat s_j \equiv 1 &amp;\sim&amp; N\left(\beta_j, \hat s_j^2 \equiv1\right)\ .
+\hat s_j &amp;\equiv&amp; 1 \  ;\\
+\beta_j &amp;\sim&amp; \text{Unif}\left[-10, 10\right]\  ;\\
+\hat\beta_j | \beta_j, \hat s_j \equiv 1 &amp;\sim&amp; N\left(\beta_j, \hat s_j^2 \equiv1\right)\  .
 \end{array}
 \]</span></p>
 <p>Let <span class="math inline">\(\hat F_{j}^n\)</span> be the estimated <span class="math inline">\(\hat F_{\hat\beta_j|\hat s_j}\left(\hat\beta_j \mid \hat s_j\right)\)</span> by <code>ASH</code> using normal mixtures (<code>mixcompdist = &quot;normal&quot;</code>), and <span class="math inline">\(\hat F_{j}^u\)</span> be that using uniform mixtures (<code>mixcompdist = &quot;uniform&quot;</code>). Both are plotted below, compared with <span class="math inline">\(F_{j}\)</span> using true exchangeable prior <span class="math inline">\(g = \text{Unif}\left[-10, 10\right]\)</span>.</p>
 <p>It can be seen that <code>ASH</code> using normal mixtures is not able to estimate <span class="math inline">\(g\)</span> well and thus is not producing <span class="math inline">\(\text{Unif}\left[0, 1\right]\)</span> <span class="math inline">\(\left\{\hat F_j\right\}\)</span>. <code>ASH</code> using uniform mixtures, on the contrary, is doing fine.</p>
 <p><img src="figure/diagnostic_plot.rmd/unnamed-chunk-33-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot.rmd/unnamed-chunk-33-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot.rmd/unnamed-chunk-33-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot.rmd/unnamed-chunk-33-4.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="session-information" class="section level2">
+</section>
+<section id="session-information" class="level2">
 <h2>Session information</h2>
 <!-- Insert the session information into the document -->
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 3.4.2 (2017-09-28)
+<pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS Sierra 10.12.6
+Running under: macOS High Sierra 10.13.2
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -830,19 +832,19 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] ashr_2.1-27
+[1] ashr_2.2-2
 
 loaded via a namespace (and not attached):
- [1] Rcpp_0.12.13      knitr_1.17        magrittr_1.5     
+ [1] Rcpp_0.12.14      knitr_1.17        magrittr_1.5     
  [4] MASS_7.3-47       doParallel_1.0.11 pscl_1.5.2       
- [7] SQUAREM_2017.10-1 lattice_0.20-35   foreach_1.4.3    
-[10] stringr_1.2.0     tools_3.4.2       parallel_3.4.2   
-[13] grid_3.4.2        git2r_0.19.0      htmltools_0.3.6  
-[16] iterators_1.0.8   yaml_2.1.14       rprojroot_1.2    
-[19] digest_0.6.12     Matrix_1.2-11     codetools_0.2-15 
-[22] evaluate_0.10.1   rmarkdown_1.6     stringi_1.1.5    
-[25] compiler_3.4.2    backports_1.1.1   truncnorm_1.0-7  </code></pre>
-</div>
+ [7] SQUAREM_2017.10-1 lattice_0.20-35   foreach_1.4.4    
+[10] stringr_1.2.0     tools_3.4.3       parallel_3.4.3   
+[13] grid_3.4.3        git2r_0.20.0      htmltools_0.3.6  
+[16] iterators_1.0.9   yaml_2.1.16       rprojroot_1.3-1  
+[19] digest_0.6.13     Matrix_1.2-12     codetools_0.2-15 
+[22] evaluate_0.10.1   rmarkdown_1.8     stringi_1.1.6    
+[25] compiler_3.4.3    backports_1.1.2   truncnorm_1.0-7  </code></pre>
+</section>
 
 <hr>
 <p>

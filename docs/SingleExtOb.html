@@ -25,8 +25,8 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
-<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -36,10 +36,12 @@
   }
 </style>
 <script type="text/javascript">
-if (window.hljs && document.readyState && document.readyState === "complete") {
-   window.setTimeout(function() {
-      hljs.initHighlighting();
-   }, 0);
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
 }
 </script>
 
@@ -309,14 +311,14 @@ div.tocify {
 </div>
 
 
-<p><strong>Last updated:</strong> 2017-11-07</p>
-<p><strong>Code version:</strong> 2c05d59</p>
-<div id="introducation" class="section level2">
+<p><strong>Last updated:</strong> 2017-12-21</p>
+<p><strong>Code version:</strong> 6e42447</p>
+<section id="introducation" class="level2">
 <h2>Introducation</h2>
 <p>Up until now, <code>truncash</code> only uses a threshold that’s pre-specified, that is, independent with the data. So a natrual question is, what will happen if we choose a threshold that is data driven, such as the <span class="math inline">\(n^\text{th}\)</span> most extreme observation or the top <span class="math inline">\(q\%\)</span> quantile?</p>
 <p>For a start, Matthew had an idea that what if the only thing we know is the most extreme observation <span class="math inline">\((\hat\beta_{(n)}, \hat s_{(n)})\)</span>, as well as the total number of observations <span class="math inline">\(n\)</span>. What does this single data point tell us?</p>
-</div>
-<div id="model" class="section level2">
+</section>
+<section id="model" class="level2">
 <h2>Model</h2>
 <p>Start with our usual <code>ash</code> model.</p>
 <p><span class="math display">\[
@@ -330,8 +332,8 @@ div.tocify {
 \]</span> <span class="math display">\[
 \text{Group 2: }(\hat\beta_{n}, \hat s_{n}), \text{ with } |\hat\beta_{(n)}/\hat s_{(n)}| = t
 \]</span> Or in other words, it should be related to <code>truncash</code> using the threshold <span class="math inline">\(t = |\hat\beta_{(n)}/\hat s_{(n)}|\)</span>, at least from the likelihood principle point of view.</p>
-</div>
-<div id="back-of-the-envelope-calculation" class="section level2">
+</section>
+<section id="back-of-the-envelope-calculation" class="level2">
 <h2>Back-of-the-envelope calculation</h2>
 <p>Suppose <span class="math inline">\(X_1 \sim F_1, X_2\sim F_2, \ldots, X_n \sim F_n\)</span>, with <span class="math inline">\(F_i\)</span> being the cdf of the random variable <span class="math inline">\(X_i\)</span>, with a pdf <span class="math inline">\(f_i\)</span>. In <code>ash</code>’s setting, we can think of <span class="math inline">\(X_i = |\hat\beta_i/ \hat s_i|\)</span>, and <span class="math inline">\(f_i\)</span> is the convolution of a common unimodel distribution <span class="math inline">\(g\)</span> (to be estimated) and the idiosyncratic likelihood of <span class="math inline">\(|\hat\beta_j / \hat s_j|\)</span> given <span class="math inline">\(\hat s_j\)</span> (usually related to normal or Student’s t, but could be generalized to others). Let <span class="math inline">\(X_{(n)}:=\max\{X_1, X_2, \ldots, X_n\}\)</span>, the extreme value of these <span class="math inline">\(n\)</span> random variables.</p>
 <p><span class="math display">\[
@@ -341,12 +343,12 @@ div.tocify {
 \prod_{i = 1}^{n-1} F_i(t)f_n(t)
 \end{array}
 \]</span> where <span class="math inline">\(\{1, \ldots, n-1\}\)</span> are the index set of less extreme observations and <span class="math inline">\(n\)</span> of the most extreme one. So these two statements are not equivalent.</p>
-<ol style="list-style-type: decimal">
+<ol type="1">
 <li>The largest value in <span class="math inline">\(\{X_1, X_2, \ldots, X_n\}\)</span> is <span class="math inline">\(t\)</span>.</li>
 <li>We have <span class="math inline">\(n\)</span> random variables and we only observe one; all others are less than it.</li>
 </ol>
-</div>
-<div id="special-case" class="section level2">
+</section>
+<section id="special-case" class="level2">
 <h2>Special case</h2>
 <p>If we have <span class="math inline">\(F_1 = F_2 = \cdots = F_n\)</span>, the two statements are somehow indeed related because <span class="math display">\[
 \begin{array}{rl}
@@ -363,13 +365,13 @@ n(F(t))^{n-1}f(t) \\
 <p><span class="math display">\[
 \beta_j / s_j \sim g
 \]</span> then we’ll arrive at the result that <span class="math inline">\(\hat\beta_j / \hat s_j\)</span> has the same marginal distribution. This assumption is essentially the gold standard everybody implicitly makes, refered to as <span class="math inline">\(\alpha = 1\)</span> assumption in <a href="https://doi.org/10.1093/biostatistics/kxw041"><code>ash</code></a>.</p>
-</div>
-<div id="session-information" class="section level2">
+</section>
+<section id="session-information" class="level2">
 <h2>Session Information</h2>
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 3.4.2 (2017-09-28)
+<pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS Sierra 10.12.6
+Running under: macOS High Sierra 10.13.2
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -382,11 +384,11 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 loaded via a namespace (and not attached):
- [1] compiler_3.4.2  backports_1.1.1 magrittr_1.5    rprojroot_1.2  
- [5] tools_3.4.2     htmltools_0.3.6 yaml_2.1.14     Rcpp_0.12.13   
- [9] stringi_1.1.5   rmarkdown_1.6   knitr_1.17      git2r_0.19.0   
-[13] stringr_1.2.0   digest_0.6.12   workflowr_0.7.0 evaluate_0.10.1</code></pre>
-</div>
+ [1] compiler_3.4.3  backports_1.1.2 magrittr_1.5    rprojroot_1.3-1
+ [5] tools_3.4.3     htmltools_0.3.6 yaml_2.1.16     Rcpp_0.12.14   
+ [9] stringi_1.1.6   rmarkdown_1.8   knitr_1.17      git2r_0.20.0   
+[13] stringr_1.2.0   digest_0.6.13   workflowr_0.8.0 evaluate_0.10.1</code></pre>
+</section>
 
 <hr>
 <p>

@@ -25,8 +25,8 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
-<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -36,10 +36,12 @@
   }
 </style>
 <script type="text/javascript">
-if (window.hljs && document.readyState && document.readyState === "complete") {
-   window.setTimeout(function() {
-      hljs.initHighlighting();
-   }, 0);
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
 }
 </script>
 
@@ -313,12 +315,12 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2017-11-07</p>
+<p><strong>Last updated:</strong> 2017-12-21</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 2c05d59</p>
+<p><strong>Code version:</strong> 6e42447</p>
 <!-- Add your analysis here -->
-<div id="introduction" class="section level2">
+<section id="introduction" class="level2">
 <h2>Introduction</h2>
 <p>Identifiability of small effects from correlation.</p>
 <pre class="r"><code>library(ashr)
@@ -326,68 +328,68 @@ library(edgeR)
 library(limma)
 library(pROC)</code></pre>
 <pre class="r"><code>source(&quot;../code/gdash.R&quot;)</code></pre>
-</div>
-<div id="read-in-data" class="section level2">
+</section>
+<section id="read-in-data" class="level2">
 <h2>Read in data</h2>
 <pre class="r"><code>data = readRDS(&quot;../data/liver.rds&quot;)
 ngene = 1e4
 data = top_gene_selection(ngene, data)$data</code></pre>
-</div>
-<div id="snr--10-sparse-mixture" class="section level2">
+</section>
+<section id="snr--10-sparse-mixture" class="level2">
 <h2>SNR = -10, Sparse mixture</h2>
-<p><span class="math display">\[g = 0.9\delta_0 + 0.1N\left(0, \sigma^2\right) \ .\]</span></p>
+<p><span class="math display">\[g = 0.9\delta_0 + 0.1N\left(0, \sigma^2\right) \  .\]</span></p>
 <p><img src="figure/simulation_real_se_2.rmd/-10 plotting-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/simulation_real_se_2.rmd/-10 plotting-2.png" width="672" style="display: block; margin: auto;" /></p>
 <p><img src="figure/simulation_real_se_2.rmd/-10 auc plotting-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p><img src="figure/simulation_real_se_2.rmd/-10%20average%20fdp%20plotting-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p><img src="figure/simulation_real_se_2.rmd/-10%20average%20fsp%20plotting-1.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="snr--10-sparse-strong" class="section level2">
+</section>
+<section id="snr--10-sparse-strong" class="level2">
 <h2>SNR = -10, Sparse &amp; strong</h2>
-<p><span class="math display">\[g = 0.99\delta_0 + 0.01N\left(0, \left(3.16\sigma\right)^2\right) \ .\]</span></p>
+<p><span class="math display">\[g = 0.99\delta_0 + 0.01N\left(0, \left(3.16\sigma\right)^2\right) \  .\]</span></p>
 <p><img src="figure/simulation_real_se_2.rmd/-10S plotting-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/simulation_real_se_2.rmd/-10S plotting-2.png" width="672" style="display: block; margin: auto;" /></p>
 <p><img src="figure/simulation_real_se_2.rmd/-10S auc plotting-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p><img src="figure/simulation_real_se_2.rmd/-10S%20average%20fdp%20plotting-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p><img src="figure/simulation_real_se_2.rmd/-10S%20average%20fsp%20plotting-1.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="snr--10-dense-weak" class="section level2">
+</section>
+<section id="snr--10-dense-weak" class="level2">
 <h2>SNR = -10, Dense &amp; weak</h2>
-<p><span class="math display">\[g = 0.1\delta_0 + 0.9N\left(0, \left(0.33\sigma\right)^2\right) \ .\]</span></p>
+<p><span class="math display">\[g = 0.1\delta_0 + 0.9N\left(0, \left(0.33\sigma\right)^2\right) \  .\]</span></p>
 <p><img src="figure/simulation_real_se_2.rmd/-10W plotting-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/simulation_real_se_2.rmd/-10W plotting-2.png" width="672" style="display: block; margin: auto;" /></p>
 <p><img src="figure/simulation_real_se_2.rmd/-10W auc plotting-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p><img src="figure/simulation_real_se_2.rmd/-10W%20average%20fdp%20plotting-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p><img src="figure/simulation_real_se_2.rmd/-10W%20average%20fsp%20plotting-1.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="snr--3-sparse-mixture" class="section level2">
+</section>
+<section id="snr--3-sparse-mixture" class="level2">
 <h2>SNR = -3, Sparse mixture</h2>
-<p><span class="math display">\[g = 0.5\delta_0 + 0.5N\left(0, \sigma^2\right) \ .\]</span></p>
+<p><span class="math display">\[g = 0.5\delta_0 + 0.5N\left(0, \sigma^2\right) \  .\]</span></p>
 <p><img src="figure/simulation_real_se_2.rmd/-3 plotting-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/simulation_real_se_2.rmd/-3 plotting-2.png" width="672" style="display: block; margin: auto;" /></p>
 <p><img src="figure/simulation_real_se_2.rmd/-3 auc plotting-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p><img src="figure/simulation_real_se_2.rmd/-3%20average%20fdp%20plotting-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p><img src="figure/simulation_real_se_2.rmd/-3%20average%20fsp%20plotting-1.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="snr--3-sparse-strong" class="section level2">
+</section>
+<section id="snr--3-sparse-strong" class="level2">
 <h2>SNR = -3, Sparse &amp; strong</h2>
-<p><span class="math display">\[g = 0.6\delta_0 + 0.3N\left(0, \left(0.82\sigma\right)^2\right) + 0.1N\left(0, \left(1.73\sigma\right)^2\right) \ .\]</span></p>
+<p><span class="math display">\[g = 0.6\delta_0 + 0.3N\left(0, \left(0.82\sigma\right)^2\right) + 0.1N\left(0, \left(1.73\sigma\right)^2\right) \  .\]</span></p>
 <p><img src="figure/simulation_real_se_2.rmd/-3S plotting-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/simulation_real_se_2.rmd/-3S plotting-2.png" width="672" style="display: block; margin: auto;" /></p>
 <p><img src="figure/simulation_real_se_2.rmd/-3S auc plotting-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p><img src="figure/simulation_real_se_2.rmd/-3S%20average%20fdp%20plotting-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p><img src="figure/simulation_real_se_2.rmd/-3S%20average%20fsp%20plotting-1.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="snr--3-dense-weak" class="section level2">
+</section>
+<section id="snr--3-dense-weak" class="level2">
 <h2>SNR = -3, Dense &amp; weak</h2>
-<p><span class="math display">\[g = 0.1\delta_0 + 0.9N\left(0, \left(0.75\sigma^2\right)^2\right) \ .\]</span></p>
+<p><span class="math display">\[g = 0.1\delta_0 + 0.9N\left(0, \left(0.75\sigma^2\right)^2\right) \  .\]</span></p>
 <p><img src="figure/simulation_real_se_2.rmd/-3W plotting-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/simulation_real_se_2.rmd/-3W plotting-2.png" width="672" style="display: block; margin: auto;" /></p>
 <p><img src="figure/simulation_real_se_2.rmd/-3W auc plotting-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p><img src="figure/simulation_real_se_2.rmd/-3W%20average%20fdp%20plotting-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p><img src="figure/simulation_real_se_2.rmd/-3W%20average%20fsp%20plotting-1.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="session-information" class="section level2">
+</section>
+<section id="session-information" class="level2">
 <h2>Session information</h2>
 <!-- Insert the session information into the document -->
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 3.4.2 (2017-09-28)
+<pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS Sierra 10.12.6
+Running under: macOS High Sierra 10.13.2
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -400,11 +402,11 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 loaded via a namespace (and not attached):
- [1] compiler_3.4.2  backports_1.1.1 magrittr_1.5    rprojroot_1.2  
- [5] tools_3.4.2     htmltools_0.3.6 yaml_2.1.14     Rcpp_0.12.13   
- [9] stringi_1.1.5   rmarkdown_1.6   knitr_1.17      git2r_0.19.0   
-[13] stringr_1.2.0   digest_0.6.12   evaluate_0.10.1</code></pre>
-</div>
+ [1] compiler_3.4.3  backports_1.1.2 magrittr_1.5    rprojroot_1.3-1
+ [5] tools_3.4.3     htmltools_0.3.6 yaml_2.1.16     Rcpp_0.12.14   
+ [9] stringi_1.1.6   rmarkdown_1.8   knitr_1.17      git2r_0.20.0   
+[13] stringr_1.2.0   digest_0.6.13   evaluate_0.10.1</code></pre>
+</section>
 
 <hr>
 <p>

@@ -25,8 +25,8 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
-<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -36,10 +36,12 @@
   }
 </style>
 <script type="text/javascript">
-if (window.hljs && document.readyState && document.readyState === "complete") {
-   window.setTimeout(function() {
-      hljs.initHighlighting();
-   }, 0);
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
 }
 </script>
 
@@ -313,16 +315,16 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2017-11-07</p>
+<p><strong>Last updated:</strong> 2017-12-21</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 2c05d59</p>
+<p><strong>Code version:</strong> 6e42447</p>
 <!-- Add your analysis here -->
-<div id="can-k-be-too-small" class="section level2">
+<section id="can-k-be-too-small" class="level2">
 <h2>Can <span class="math inline">\(K\)</span> be too small?</h2>
 <p><a href="gaussian_derivatives.rmd">Another assumption</a> to make the problem tractable is that the pairwise correlation <span class="math inline">\(\rho_{ij}\)</span> is moderate enough so <span class="math inline">\(W_k\varphi^{(k)}\)</span> vanishes as the order <span class="math inline">\(k\)</span> increases. With this assumption we can stop at a sufficiently large <span class="math inline">\(K\)</span> without consideration higher order Gaussian derivatives. But what if <span class="math inline">\(\rho_{ij}\)</span> is large?</p>
-</div>
-<div id="extreme-case-rho_ij-equiv-1" class="section level2">
+</section>
+<section id="extreme-case-rho_ij-equiv-1" class="level2">
 <h2>Extreme case: <span class="math inline">\(\rho_{ij} \equiv 1\)</span></h2>
 <p>When we have perfect correlation among all <span class="math inline">\(z\)</span> scores, the approximate limit observed density <span class="math inline">\(f_0(x)\to\delta_z(x) = \delta(x-z)\)</span>. That is, with probability one, we observe <span class="math inline">\(z_1 = \cdots = z_n = z\)</span>, as <span class="math inline">\(n\to\infty\)</span>, <span class="math inline">\(f_0(x)\)</span> goes to a Dirac delta function peak at the observed <span class="math inline">\(z\)</span>, and zero elsewhere. Now the question is, can this Dirac delta function be decomposed with the Gaussian <span class="math inline">\(\varphi\)</span> and its derivatives <span class="math inline">\(\varphi^{(k)}\)</span>, so that we still have</p>
 <p><span class="math display">\[
@@ -366,14 +368,14 @@ f_0(x) = \varphi(x)\sum\limits_{k = 0}^\infty W_kh_k(x)
 \]</span> when <span class="math display">\[
 W_k = \frac{1}{k!}h_k(z)
 \]</span> Thus we show that the Dirac delta function can be decomposed by Gaussian density and its derivatives.</p>
-<div id="visualization-with-finite-k" class="section level3">
+<section id="visualization-with-finite-k" class="level3">
 <h3>Visualization with finite <span class="math inline">\(K\)</span></h3>
 <p>With Gaussian and its infinite orders of derivatives, we can compose a Dirac delta function at any position, yet what happens if we stop at a finite <span class="math inline">\(K\)</span>? Let <span class="math inline">\(f_0^K\)</span> be the approximation of <span class="math inline">\(f_0 = \delta_z\)</span> with first <span class="math inline">\(K\)</span> Gaussian derivatives. That is,</p>
 <p><span class="math display">\[
-f_0^K(x) = \varphi(x)\sum\limits_{k = 0}^K \frac{1}{k!}h_k(z)h_k(x) \ .
+f_0^K(x) = \varphi(x)\sum\limits_{k = 0}^K \frac{1}{k!}h_k(z)h_k(x) \  .
 \]</span> Meanwhile, let <span class="math inline">\(F_0^K(x) = \int_{-\infty}^x f_0^K(u)du\)</span>. It’s easy to shown that</p>
 <p><span class="math display">\[
-F_0^K(x) = \Phi(x) - \varphi(x)\sum\limits_{k = 1}^K W_k h_{k - 1}(x) = \Phi(x) - \varphi(x) \sum\limits_{k = 1}^K \frac{1}{k!}h_k(z) h_{k - 1}(x) \ .
+F_0^K(x) = \Phi(x) - \varphi(x)\sum\limits_{k = 1}^K W_k h_{k - 1}(x) = \Phi(x) - \varphi(x) \sum\limits_{k = 1}^K \frac{1}{k!}h_k(z) h_{k - 1}(x) \  .
 \]</span></p>
 <p>Theoretically, <span class="math inline">\(f_0^K\)</span> is an approximation to empirical density of perfectly correlated <span class="math inline">\(z\)</span> scores; hence, as <span class="math inline">\(K\to\infty\)</span>, <span class="math inline">\(f_0^K\to\delta_z\)</span>. Similarly, <span class="math inline">\(F_0^K\)</span> is an approximation to empirical cdf of perfectly correlated <span class="math inline">\(z\)</span> scores; hence, as <span class="math inline">\(K\to\infty\)</span>, <span class="math inline">\(f_0^K\)</span> should converge to the <span class="math inline">\(0\)</span>-<span class="math inline">\(1\)</span> step function, and the location of the step is the observed <span class="math inline">\(z\)</span>.</p>
 <p>In practice, the convergence is not fast. As we can see from the following visualization, the difference between <span class="math inline">\(f_0^K\)</span> and <span class="math inline">\(\delta_z\)</span>, as well as that between <span class="math inline">\(F_0^K\)</span> and the step function, is still conspicuous even if <span class="math inline">\(K = 20\)</span>, which is about the highest order <code>R</code> can reasonbly handle in the current implementation. Therefore, at least in theory it’s possible that <span class="math inline">\(K\)</span> can be too small.</p>
@@ -384,9 +386,9 @@ F_0^K(x) = \Phi(x) - \varphi(x)\sum\limits_{k = 1}^K W_k h_{k - 1}(x) = \Phi(x) 
 <p><img src="figure/gaussian_derivatives_4.rmd/unnamed-chunk-2-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/gaussian_derivatives_4.rmd/unnamed-chunk-2-4.png" width="672" style="display: block; margin: auto;" /></p>
 <pre><code>Under perfect correlation, observed z scores = 2 </code></pre>
 <p><img src="figure/gaussian_derivatives_4.rmd/unnamed-chunk-2-5.png" width="672" style="display: block; margin: auto;" /><img src="figure/gaussian_derivatives_4.rmd/unnamed-chunk-2-6.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-</div>
-<div id="fitting-experiments-when-rho_ij-is-large" class="section level2">
+</section>
+</section>
+<section id="fitting-experiments-when-rho_ij-is-large" class="level2">
 <h2>Fitting experiments when <span class="math inline">\(\rho_{ij}\)</span> is large</h2>
 <p>As previous theoretical result indicates, when <span class="math inline">\(\rho\)</span> is large, a large <span class="math inline">\(K\)</span> is probably needed. However, on the other hand, when <span class="math inline">\(\rho\)</span> is large, the effective sample size is small. Indeed when <span class="math inline">\(\rho\equiv1\)</span>, the sample size is essentially <span class="math inline">\(1\)</span>.</p>
 <p>Let’s take a look at some examples with pairwise correlations of <span class="math inline">\(z\)</span> scores <span class="math inline">\(\rho_{ij}\equiv\rho\)</span>, <span class="math inline">\(\rho\)</span> moderate to high. Such <span class="math inline">\(z\)</span> scores can be simulated as <span class="math inline">\(z_i = \epsilon\sqrt{\rho} + e_i\sqrt{1-\rho}\)</span>, where <span class="math inline">\(\epsilon, e_i\)</span> are iid <span class="math inline">\(N(0, 1)\)</span>.</p>
@@ -417,14 +419,14 @@ z = rnorm(1) * sqrt(rho) + rnorm(n) * sqrt(1 - rho)</code></pre>
 fit.ecdfz = ecdfz(z, 2)</code></pre>
 <pre><code>10000 z scores with pairwise correlation = 0.9</code></pre>
 <p><img src="figure/gaussian_derivatives_4.rmd/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="session-information" class="section level2">
+</section>
+<section id="session-information" class="level2">
 <h2>Session information</h2>
 <!-- Insert the session information into the document -->
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 3.4.2 (2017-09-28)
+<pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS Sierra 10.12.6
+Running under: macOS High Sierra 10.13.2
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -437,11 +439,11 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 loaded via a namespace (and not attached):
- [1] compiler_3.4.2  backports_1.1.1 magrittr_1.5    rprojroot_1.2  
- [5] tools_3.4.2     htmltools_0.3.6 yaml_2.1.14     Rcpp_0.12.13   
- [9] stringi_1.1.5   rmarkdown_1.6   knitr_1.17      git2r_0.19.0   
-[13] stringr_1.2.0   digest_0.6.12   evaluate_0.10.1</code></pre>
-</div>
+ [1] compiler_3.4.3  backports_1.1.2 magrittr_1.5    rprojroot_1.3-1
+ [5] tools_3.4.3     htmltools_0.3.6 yaml_2.1.16     Rcpp_0.12.14   
+ [9] stringi_1.1.6   rmarkdown_1.8   knitr_1.17      git2r_0.20.0   
+[13] stringr_1.2.0   digest_0.6.13   evaluate_0.10.1</code></pre>
+</section>
 
 <hr>
 <p>

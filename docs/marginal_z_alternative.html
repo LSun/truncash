@@ -25,8 +25,8 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
-<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -36,10 +36,12 @@
   }
 </style>
 <script type="text/javascript">
-if (window.hljs && document.readyState && document.readyState === "complete") {
-   window.setTimeout(function() {
-      hljs.initHighlighting();
-   }, 0);
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
 }
 </script>
 
@@ -313,12 +315,12 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2017-11-07</p>
+<p><strong>Last updated:</strong> 2017-12-21</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 2c05d59</p>
+<p><strong>Code version:</strong> 6e42447</p>
 <!-- Add your analysis here -->
-<div id="introduction" class="section level2">
+<section id="introduction" class="level2">
 <h2>Introduction</h2>
 <p><a href="marginal_z.html">We’ve seen</a> that when generated from the global null, that is, when the cases and controls have no difference, the <span class="math inline">\(z\)</span> scores’ behavior are what one would expect if simulated from correlated marginally <span class="math inline">\(N\left(0, 1\right)\)</span> random variables.</p>
 <p>But what if the <span class="math inline">\(z\)</span> scores are not simulated from the global null? Are these <span class="math inline">\(z\)</span> scores going to behave significantly different from correlated marginally <span class="math inline">\(N\left(0, 1\right)\)</span> random samples? Let’s take a look at the real data containing true effects.</p>
@@ -352,8 +354,8 @@ counts_to_z = function (counts, condition) {
   z = sign(t) * qnorm(1 - p/2)
   return (z)
 }</code></pre>
-</div>
-<div id="generating-non-null-z-scores-from-real-data" class="section level2">
+</section>
+<section id="generating-non-null-z-scores-from-real-data" class="level2">
 <h2>Generating non-null <span class="math inline">\(z\)</span> scores from real data</h2>
 <p>For convenience and without loss of generality, we are using the liver tissue as an anchor in the simulation, and always choose top expressed genes in livers.</p>
 <pre class="r"><code>r.liver = read.csv(&quot;../data/liver.csv&quot;)
@@ -362,7 +364,7 @@ Y = lcpm(r.liver)
 G = 1e4
 subset = top_genes_index(G, Y)
 r.liver = r.liver[subset, ]</code></pre>
-<div id="liver-vs-heart" class="section level3">
+<section id="liver-vs-heart" class="level3">
 <h3>Liver vs Heart</h3>
 <pre class="r"><code>tissue = &quot;heart&quot;
 r = read.csv(paste0(&quot;../data/&quot;, tissue, &quot;.csv&quot;))
@@ -381,8 +383,8 @@ for (i in 1 : m) {
 }</code></pre>
 <pre class="r"><code>z.mat = matrix(unlist(z.list), nrow = m, byrow = TRUE)
 saveRDS(z.mat, &quot;../output/z_5liver_5heart_777.rds&quot;)</code></pre>
-</div>
-<div id="liver-vs-muscle" class="section level3">
+</section>
+<section id="liver-vs-muscle" class="level3">
 <h3>Liver vs Muscle</h3>
 <pre class="r"><code>tissue = &quot;muscle&quot;
 r = read.csv(paste0(&quot;../data/&quot;, tissue, &quot;.csv&quot;))
@@ -401,52 +403,52 @@ for (i in 1 : m) {
 }</code></pre>
 <pre class="r"><code>z.mat = matrix(unlist(z.list), nrow = m, byrow = TRUE)
 saveRDS(z.mat, &quot;../output/z_5liver_5muscle_777.rds&quot;)</code></pre>
-</div>
-</div>
-<div id="marginal-distributions-of-correlated-non-null-z-scores" class="section level2">
+</section>
+</section>
+<section id="marginal-distributions-of-correlated-non-null-z-scores" class="level2">
 <h2>Marginal distributions of correlated non-null <span class="math inline">\(z\)</span> scores</h2>
 <p>Now following the simulations to explore <a href="marginal_z.html">the marginal distributions of the correlated null <span class="math inline">\(z\)</span> scores</a>, we are taking a look at the marginal distributions of the correlated non-null <span class="math inline">\(z\)</span> scores. The main focus is still the number of tail observations.</p>
-</div>
-<div id="liver-vs-heart-1" class="section level2">
+</section>
+<section id="liver-vs-heart-1" class="level2">
 <h2>Liver vs Heart</h2>
 <pre class="r"><code>z.heart = readRDS(&quot;../output/z_5liver_5heart_777.rds&quot;)
 n = ncol(z.heart)
 m = nrow(z.heart)</code></pre>
-<div id="row-wise" class="section level3">
+<section id="row-wise" class="level3">
 <h3>Row-wise</h3>
 <p><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v heart-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v heart-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v heart-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v heart-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v heart-5.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v heart-6.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v heart-7.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v heart-8.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v heart-9.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v heart-10.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v heart-11.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v heart-12.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v heart-13.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v heart-14.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v heart-15.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v heart-16.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v heart-17.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v heart-18.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v heart-19.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v heart-20.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v heart-21.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="column-wise" class="section level3">
+</section>
+<section id="column-wise" class="level3">
 <h3>Column-wise</h3>
 <p><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v heart-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v heart-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v heart-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v heart-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v heart-5.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v heart-6.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v heart-7.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v heart-8.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v heart-9.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v heart-10.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v heart-11.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v heart-12.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v heart-13.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v heart-14.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v heart-15.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v heart-16.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v heart-17.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-</div>
-<div id="liver-vs-muscle-1" class="section level2">
+</section>
+</section>
+<section id="liver-vs-muscle-1" class="level2">
 <h2>Liver vs Muscle</h2>
 <pre class="r"><code>z.muscle = readRDS(&quot;../output/z_5liver_5muscle_777.rds&quot;)
 n = ncol(z.muscle)
 m = nrow(z.muscle)</code></pre>
-<div id="row-wise-1" class="section level3">
+<section id="row-wise-1" class="level3">
 <h3>Row-wise</h3>
 <p><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v muscle-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v muscle-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v muscle-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v muscle-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v muscle-5.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v muscle-6.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v muscle-7.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v muscle-8.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v muscle-9.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v muscle-10.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v muscle-11.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v muscle-12.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v muscle-13.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v muscle-14.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v muscle-15.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v muscle-16.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v muscle-17.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v muscle-18.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v muscle-19.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v muscle-20.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v muscle-21.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="column-wise-1" class="section level3">
+</section>
+<section id="column-wise-1" class="level3">
 <h3>Column-wise</h3>
 <p><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v muscle-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v muscle-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v muscle-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v muscle-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v muscle-5.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v muscle-6.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v muscle-7.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v muscle-8.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v muscle-9.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v muscle-10.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v muscle-11.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v muscle-12.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v muscle-13.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v muscle-14.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v muscle-15.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v muscle-16.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v muscle-17.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-</div>
-<div id="conclusion" class="section level2">
+</section>
+</section>
+<section id="conclusion" class="level2">
 <h2>Conclusion</h2>
 <p>As expected, the empirical distribution and the indicated marginal distribution of the correlated non-null <span class="math inline">\(z\)</span> scores are starkly different from <a href="marginal_z.html">those of the correlated null ones</a>.</p>
 <p>Particular interesting are the column-wise plots. The distribution of the number of tail observations is not only not close to normal, not close to what would be expected under correlated marginally <span class="math inline">\(N\left(0, 1\right)\)</span>, but also not even unimodal, not even peaked at <span class="math inline">\(m\alpha\)</span> when <span class="math inline">\(\alpha \leq0.5\)</span> or <span class="math inline">\(m\left(1-\alpha\right)\)</span> when <span class="math inline">\(\alpha\geq0.5\)</span>. It suggests that there are indeed plenty of true signals, which make the marginal distribution of the <span class="math inline">\(z\)</span> scores for a certain gene often not centered at <span class="math inline">\(0\)</span>.</p>
-</div>
-<div id="session-information" class="section level2">
+</section>
+<section id="session-information" class="level2">
 <h2>Session information</h2>
 <!-- Insert the session information into the document -->
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 3.4.2 (2017-09-28)
+<pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS Sierra 10.12.6
+Running under: macOS High Sierra 10.13.2
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -459,23 +461,23 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] ashr_2.1-27   qvalue_2.10.0 edgeR_3.20.1  limma_3.34.0 
+[1] ashr_2.2-2    qvalue_2.10.0 edgeR_3.20.2  limma_3.34.4 
 
 loaded via a namespace (and not attached):
- [1] Rcpp_0.12.13      compiler_3.4.2    git2r_0.19.0     
- [4] plyr_1.8.4        iterators_1.0.8   tools_3.4.2      
- [7] digest_0.6.12     evaluate_0.10.1   tibble_1.3.4     
+ [1] Rcpp_0.12.14      compiler_3.4.3    git2r_0.20.0     
+ [4] plyr_1.8.4        iterators_1.0.9   tools_3.4.3      
+ [7] digest_0.6.13     evaluate_0.10.1   tibble_1.3.4     
 [10] gtable_0.2.0      lattice_0.20-35   rlang_0.1.4      
-[13] Matrix_1.2-11     foreach_1.4.3     yaml_2.1.14      
-[16] parallel_3.4.2    stringr_1.2.0     knitr_1.17       
-[19] locfit_1.5-9.1    rprojroot_1.2     grid_3.4.2       
-[22] rmarkdown_1.6     ggplot2_2.2.1     reshape2_1.4.2   
-[25] magrittr_1.5      backports_1.1.1   scales_0.5.0     
-[28] codetools_0.2-15  htmltools_0.3.6   splines_3.4.2    
-[31] MASS_7.3-47       colorspace_1.3-2  stringi_1.1.5    
+[13] Matrix_1.2-12     foreach_1.4.4     yaml_2.1.16      
+[16] parallel_3.4.3    stringr_1.2.0     knitr_1.17       
+[19] locfit_1.5-9.1    rprojroot_1.3-1   grid_3.4.3       
+[22] rmarkdown_1.8     ggplot2_2.2.1     reshape2_1.4.3   
+[25] magrittr_1.5      backports_1.1.2   scales_0.5.0     
+[28] codetools_0.2-15  htmltools_0.3.6   splines_3.4.3    
+[31] MASS_7.3-47       colorspace_1.3-2  stringi_1.1.6    
 [34] lazyeval_0.2.1    munsell_0.4.3     doParallel_1.0.11
 [37] pscl_1.5.2        truncnorm_1.0-7   SQUAREM_2017.10-1</code></pre>
-</div>
+</section>
 
 <hr>
 <p>

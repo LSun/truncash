@@ -25,8 +25,8 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
-<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -36,10 +36,12 @@
   }
 </style>
 <script type="text/javascript">
-if (window.hljs && document.readyState && document.readyState === "complete") {
-   window.setTimeout(function() {
-      hljs.initHighlighting();
-   }, 0);
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
 }
 </script>
 
@@ -313,12 +315,12 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2017-11-07</p>
+<p><strong>Last updated:</strong> 2017-12-21</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 2c05d59</p>
+<p><strong>Code version:</strong> 6e42447</p>
 <!-- Add your analysis here -->
-<div id="introduction" class="section level2">
+<section id="introduction" class="level2">
 <h2>Introduction</h2>
 <p>We are exploring the <a href="ash_gd.html"><code>GD-ASH</code> method</a> to fit <span class="math inline">\(g\)</span> and the empirical null together.</p>
 <pre class="r"><code>z &lt;- read.table(&quot;../output/z_null_liver_777.txt&quot;)
@@ -339,14 +341,14 @@ for (i in 1 : sel.num) {
 }</code></pre>
 <pre class="r"><code>source(&quot;../code/gdash.R&quot;)</code></pre>
 <p><img src="figure/gd-ash.rmd/plotting-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/gd-ash.rmd/plotting-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/gd-ash.rmd/plotting-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/gd-ash.rmd/plotting-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/gd-ash.rmd/plotting-5.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="session-information" class="section level2">
+</section>
+<section id="session-information" class="level2">
 <h2>Session information</h2>
 <!-- Insert the session information into the document -->
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 3.4.2 (2017-09-28)
+<pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS Sierra 10.12.6
+Running under: macOS High Sierra 10.13.2
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -359,17 +361,17 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 loaded via a namespace (and not attached):
- [1] Rcpp_0.12.13      knitr_1.17        magrittr_1.5     
+ [1] Rcpp_0.12.14      knitr_1.17        magrittr_1.5     
  [4] MASS_7.3-47       doParallel_1.0.11 pscl_1.5.2       
- [7] SQUAREM_2017.10-1 lattice_0.20-35   foreach_1.4.3    
-[10] ashr_2.1-27       stringr_1.2.0     tools_3.4.2      
-[13] parallel_3.4.2    grid_3.4.2        git2r_0.19.0     
-[16] htmltools_0.3.6   iterators_1.0.8   yaml_2.1.14      
-[19] rprojroot_1.2     digest_0.6.12     Matrix_1.2-11    
-[22] codetools_0.2-15  evaluate_0.10.1   rmarkdown_1.6    
-[25] stringi_1.1.5     compiler_3.4.2    backports_1.1.1  
+ [7] SQUAREM_2017.10-1 lattice_0.20-35   foreach_1.4.4    
+[10] ashr_2.2-2        stringr_1.2.0     tools_3.4.3      
+[13] parallel_3.4.3    grid_3.4.3        git2r_0.20.0     
+[16] htmltools_0.3.6   iterators_1.0.9   yaml_2.1.16      
+[19] rprojroot_1.3-1   digest_0.6.13     Matrix_1.2-12    
+[22] codetools_0.2-15  evaluate_0.10.1   rmarkdown_1.8    
+[25] stringi_1.1.6     compiler_3.4.3    backports_1.1.2  
 [28] truncnorm_1.0-7  </code></pre>
-</div>
+</section>
 
 <hr>
 <p>

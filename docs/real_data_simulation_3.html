@@ -25,8 +25,8 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
-<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -36,10 +36,12 @@
   }
 </style>
 <script type="text/javascript">
-if (window.hljs && document.readyState && document.readyState === "complete") {
-   window.setTimeout(function() {
-      hljs.initHighlighting();
-   }, 0);
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
 }
 </script>
 
@@ -313,12 +315,12 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2017-11-07</p>
+<p><strong>Last updated:</strong> 2017-12-21</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 2c05d59</p>
+<p><strong>Code version:</strong> 6e42447</p>
 <!-- Add your analysis here -->
-<div id="introduction" class="section level2">
+<section id="introduction" class="level2">
 <h2>Introduction</h2>
 <p>We are comparing our method with <code>ASH</code> and <a href="http://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.0030161"><code>SVA</code></a>.</p>
 <pre class="r"><code>library(ashr)
@@ -334,8 +336,8 @@ library(pROC)</code></pre>
 <pre class="r"><code>ngene = 1e4
 nsamp = 10
 N = 100</code></pre>
-</div>
-<div id="setting-1-pi_0-0.9-sigma2-1" class="section level2">
+</section>
+<section id="setting-1-pi_0-0.9-sigma2-1" class="level2">
 <h2>Setting 1: <span class="math inline">\(\pi_0 = 0.9\)</span>, <span class="math inline">\(\sigma^2 = 1\)</span></h2>
 <pre class="r"><code>pi0 = 0.9
 sd = 1
@@ -343,9 +345,9 @@ set.seed(777)
 system.time(gdash.comp &lt;- N_simulations(N, mat, nsamp, ngene, pi0, sd))</code></pre>
 <pre><code>     user    system   elapsed 
 18421.805  1175.855  3889.120 </code></pre>
-<p><img src="figure/real_data_simulation_3.rmd/plotting%202-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/real_data_simulation_3.rmd/plotting%202-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/real_data_simulation_3.rmd/plotting%202-3.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="setting-2-pi_0-0.9-sigma2-2" class="section level2">
+<p><img src="figure/real_data_simulation_3.rmd/plotting 2-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/real_data_simulation_3.rmd/plotting 2-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/real_data_simulation_3.rmd/plotting 2-3.png" width="672" style="display: block; margin: auto;" /></p>
+</section>
+<section id="setting-2-pi_0-0.9-sigma2-2" class="level2">
 <h2>Setting 2: <span class="math inline">\(\pi_0 = 0.9\)</span>, <span class="math inline">\(\sigma^2 = 2\)</span></h2>
 <pre class="r"><code>pi0 = 0.9
 sd = sqrt(2)
@@ -353,9 +355,9 @@ set.seed(777)
 system.time(gdash.comp &lt;- N_simulations(N, mat, nsamp, ngene, pi0, sd))</code></pre>
 <pre><code>     user    system   elapsed 
 19523.364  1271.100  4140.141 </code></pre>
-<p><img src="figure/real_data_simulation_3.rmd/plotting%204-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/real_data_simulation_3.rmd/plotting%204-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/real_data_simulation_3.rmd/plotting%204-3.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="setting-3-pi_0-0.9-sigma2-3" class="section level2">
+<p><img src="figure/real_data_simulation_3.rmd/plotting 4-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/real_data_simulation_3.rmd/plotting 4-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/real_data_simulation_3.rmd/plotting 4-3.png" width="672" style="display: block; margin: auto;" /></p>
+</section>
+<section id="setting-3-pi_0-0.9-sigma2-3" class="level2">
 <h2>Setting 3: <span class="math inline">\(\pi_0 = 0.9\)</span>, <span class="math inline">\(\sigma^2 = 3\)</span></h2>
 <pre class="r"><code>pi0 = 0.9
 sd = sqrt(3)
@@ -363,15 +365,15 @@ set.seed(777)
 system.time(gdash.comp &lt;- N_simulations(N, mat, nsamp, ngene, pi0, sd))</code></pre>
 <pre><code>     user    system   elapsed 
 17770.699  1169.506  3854.622 </code></pre>
-<p><img src="figure/real_data_simulation_3.rmd/plotting%206-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/real_data_simulation_3.rmd/plotting%206-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/real_data_simulation_3.rmd/plotting%206-3.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="session-information" class="section level2">
+<p><img src="figure/real_data_simulation_3.rmd/plotting 6-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/real_data_simulation_3.rmd/plotting 6-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/real_data_simulation_3.rmd/plotting 6-3.png" width="672" style="display: block; margin: auto;" /></p>
+</section>
+<section id="session-information" class="level2">
 <h2>Session information</h2>
 <!-- Insert the session information into the document -->
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 3.4.2 (2017-09-28)
+<pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS Sierra 10.12.6
+Running under: macOS High Sierra 10.13.2
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -384,11 +386,11 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 loaded via a namespace (and not attached):
- [1] compiler_3.4.2  backports_1.1.1 magrittr_1.5    rprojroot_1.2  
- [5] tools_3.4.2     htmltools_0.3.6 yaml_2.1.14     Rcpp_0.12.13   
- [9] stringi_1.1.5   rmarkdown_1.6   knitr_1.17      git2r_0.19.0   
-[13] stringr_1.2.0   digest_0.6.12   evaluate_0.10.1</code></pre>
-</div>
+ [1] compiler_3.4.3  backports_1.1.2 magrittr_1.5    rprojroot_1.3-1
+ [5] tools_3.4.3     htmltools_0.3.6 yaml_2.1.16     Rcpp_0.12.14   
+ [9] stringi_1.1.6   rmarkdown_1.8   knitr_1.17      git2r_0.20.0   
+[13] stringr_1.2.0   digest_0.6.13   evaluate_0.10.1</code></pre>
+</section>
 
 <hr>
 <p>

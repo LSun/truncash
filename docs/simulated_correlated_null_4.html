@@ -25,8 +25,8 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
-<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -36,10 +36,12 @@
   }
 </style>
 <script type="text/javascript">
-if (window.hljs && document.readyState && document.readyState === "complete") {
-   window.setTimeout(function() {
-      hljs.initHighlighting();
-   }, 0);
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
 }
 </script>
 
@@ -313,15 +315,15 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2017-11-07</p>
+<p><strong>Last updated:</strong> 2017-12-21</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 2c05d59</p>
+<p><strong>Code version:</strong> 6e42447</p>
 <!-- Add your analysis here -->
-<div id="data-generation" class="section level2">
+<section id="data-generation" class="level2">
 <h2>Data generation</h2>
 <p>Let <span class="math inline">\(L_{n \times k} = \left[L_{ij}\right]_{n \times k}\)</span> be a matrix, each entry of which is generated as follows.</p>
-<ol style="list-style-type: decimal">
+<ol type="1">
 <li>Let <span class="math inline">\(L_{ij} \sim N(0, 1)\)</span> independently.</li>
 <li>Let <span class="math inline">\(L_{ij} = \displaystyle\frac {L_{ij}}{\sqrt{L_{i1}^2 + \cdots + L_{ik}^2}}\)</span>. That is, normalizing each row so that each row has a unit <span class="math inline">\(l_2\)</span> norm.</li>
 </ol>
@@ -329,14 +331,14 @@ shared across the workflowr files. -->
 z = Lx \sim N\left(0, LL^T\right)
 \]</span> should be <span class="math inline">\(n\)</span> marginally <span class="math inline">\(N\left(0, 1\right)\)</span> but correlated <span class="math inline">\(z\)</span> scores. Indeed, <span class="math display">\[
 \begin{array}{c}
-\text{var}\left(z_i\right) = l_i^Tl_i = 1 \ ;
+\text{var}\left(z_i\right) = l_i^Tl_i = 1 \  ;
 \\
-\text{cov}\left(z_i, z_j\right) = l_i^Tl_j \neq 0 \text{, in general} \ ;
+\text{cov}\left(z_i, z_j\right) = l_i^Tl_j \neq 0 \text{, in general} \  ;
 \end{array}
 \]</span> where <span class="math inline">\(l_i^T\)</span> and <span class="math inline">\(l_j^T\)</span> are <span class="math inline">\(i^\text{th}\)</span> and <span class="math inline">\(j^\text{th}\)</span> rows of <span class="math inline">\(L\)</span> respectively.</p>
 <p>Then we plot the histogram of <span class="math inline">\(n\)</span> <span class="math inline">\(z\)</span> scores. One interesting thing is we can prove what these histograms would look like when <span class="math inline">\(n\)</span> is sufficiently large.</p>
-</div>
-<div id="k-4" class="section level2">
+</section>
+<section id="k-4" class="level2">
 <h2><span class="math inline">\(k = 4\)</span></h2>
 <p>For example, when <span class="math inline">\(k = 4\)</span>, <span class="math inline">\(n\)</span> is sufficiently large, say, <span class="math inline">\(10^6\)</span>, the histogram of <span class="math inline">\(z\)</span> looks like a <strong>semicircle</strong> almost perfectly, as illustrated in the following simulation. The semicircle is centered at the origin, and has a radius of <span class="math inline">\(\left\|x\right\|_2\)</span>.</p>
 <pre class="r"><code>set.seed(1)
@@ -354,8 +356,8 @@ y.plot = 2 * sqrt(pmax(R^2 - x.plot^2, 0)) / (pi * R^2)
 lines(x.plot, y.plot, col = &quot;red&quot;)</code></pre>
 <p><img src="figure/simulated_correlated_null_4.rmd/unnamed-chunk-1-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>Actually, when <span class="math inline">\(k \neq 4\)</span>, for example, <span class="math inline">\(k = 3\)</span> or <span class="math inline">\(k = 5\)</span>, the histograms of these correlated <span class="math inline">\(z\)</span> scores, simulated the same way, look different, and their shapes when <span class="math inline">\(n \to \infty\)</span> can be mathematically determined.</p>
-</div>
-<div id="k-3" class="section level2">
+</section>
+<section id="k-3" class="level2">
 <h2><span class="math inline">\(k = 3\)</span></h2>
 <pre class="r"><code>set.seed(1)
 n = 1e6
@@ -367,8 +369,8 @@ x = rnorm(k)
 z = L %*% x
 hist(z, breaks = 100, prob = TRUE)</code></pre>
 <p><img src="figure/simulated_correlated_null_4.rmd/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="k-5" class="section level2">
+</section>
+<section id="k-5" class="level2">
 <h2><span class="math inline">\(k = 5\)</span></h2>
 <pre class="r"><code>set.seed(1)
 n = 1e6
@@ -380,14 +382,14 @@ x = rnorm(k)
 z = L %*% x
 hist(z, breaks = 100, prob = TRUE)</code></pre>
 <p><img src="figure/simulated_correlated_null_4.rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="session-information" class="section level2">
+</section>
+<section id="session-information" class="level2">
 <h2>Session information</h2>
 <!-- Insert the session information into the document -->
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 3.4.2 (2017-09-28)
+<pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS Sierra 10.12.6
+Running under: macOS High Sierra 10.13.2
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -400,11 +402,11 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 loaded via a namespace (and not attached):
- [1] compiler_3.4.2  backports_1.1.1 magrittr_1.5    rprojroot_1.2  
- [5] tools_3.4.2     htmltools_0.3.6 yaml_2.1.14     Rcpp_0.12.13   
- [9] stringi_1.1.5   rmarkdown_1.6   knitr_1.17      git2r_0.19.0   
-[13] stringr_1.2.0   digest_0.6.12   evaluate_0.10.1</code></pre>
-</div>
+ [1] compiler_3.4.3  backports_1.1.2 magrittr_1.5    rprojroot_1.3-1
+ [5] tools_3.4.3     htmltools_0.3.6 yaml_2.1.16     Rcpp_0.12.14   
+ [9] stringi_1.1.6   rmarkdown_1.8   knitr_1.17      git2r_0.20.0   
+[13] stringr_1.2.0   digest_0.6.13   evaluate_0.10.1</code></pre>
+</section>
 
 <hr>
 <p>

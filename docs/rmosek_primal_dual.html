@@ -25,8 +25,8 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
-<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -36,10 +36,12 @@
   }
 </style>
 <script type="text/javascript">
-if (window.hljs && document.readyState && document.readyState === "complete") {
-   window.setTimeout(function() {
-      hljs.initHighlighting();
-   }, 0);
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
 }
 </script>
 
@@ -313,23 +315,23 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2017-11-07</p>
+<p><strong>Last updated:</strong> 2017-12-21</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 2c05d59</p>
+<p><strong>Code version:</strong> 6e42447</p>
 <!-- Add your analysis here -->
-<div id="introduction" class="section level2">
+<section id="introduction" class="level2">
 <h2>Introduction</h2>
 <p>It has been <a href="https://lsun.github.io/truncash/mosek_reg.html">noted</a> that in the specific maximum likelihood estimation problem, optimization runs faster in the dual form than in the primal one. We are testing that with a simple numeric example.</p>
-</div>
-<div id="problem" class="section level2">
+</section>
+<section id="problem" class="level2">
 <h2>Problem</h2>
 <p>Let <span class="math inline">\(A_{n \times m}\)</span> be a matrix with <span class="math inline">\(n \gg m\)</span> and <span class="math inline">\(a\)</span> an <span class="math inline">\(n\)</span>-vector. The <a href="mosek_reg.html#basic_form:_primal">prototypical</a> convex optimization problem in my applications is</p>
 <p><span class="math display">\[
 \begin{array}{rl}
-\min\limits_{f \in \mathbb{R}^m, \ \ g \in \mathbb{R}^n} &amp; -\sum\limits_{i = 1}^n\log\left(g_i\right) \\
+\min\limits_{f \in \mathbb{R}^m, \  \  g \in \mathbb{R}^n} &amp; -\sum\limits_{i = 1}^n\log\left(g_i\right) \\
 \text{s.t.} &amp; Af + a = g\\
-&amp; g \geq 0 \ .
+&amp; g \geq 0 \  .
 \end{array}
 \]</span> <strong>Note here the only reason we are adding the latent variable <span class="math inline">\(g\)</span> is that in this way we can code the problem using <code>Rmosek::mosek</code> as a “separable convex optimization” (SCOPT) problem.</strong></p>
 <p>Its dual form is</p>
@@ -337,40 +339,40 @@ shared across the workflowr files. -->
 \begin{array}{rl}
 \min\limits_{\nu \in \mathbb{R}^n} &amp; a^T\nu-\sum\limits_{i = 1}^n\log\left(\nu_i\right) \\
 \text{s.t.} &amp; A^T\nu = 0\\
-&amp; \nu\geq0 \ .
+&amp; \nu\geq0 \  .
 \end{array}
 \]</span></p>
 <p>The idea is that when <span class="math inline">\(n \gg m\)</span>, the dual optimization should be much faster than the primal one using <code>Rmosek::mosek</code>.</p>
-</div>
-<div id="comparison" class="section level2">
+</section>
+<section id="comparison" class="level2">
 <h2>Comparison</h2>
 <p>Let <span class="math inline">\(n = 10^4\)</span>, <span class="math inline">\(m = 10\)</span>, so that indeed <span class="math inline">\(n \gg m\)</span>. We run <span class="math inline">\(1000\)</span> simulation trials. In each trial we feed the primal and the dual with the same <span class="math inline">\(A\)</span> and <span class="math inline">\(a\)</span>. <span class="math inline">\(A\)</span> and <span class="math inline">\(a\)</span> are generated so that both the primal and dual problems are feasible at least in theory. Now we are comparing accuracy, time cost, and numbers of iterations of the two forms.</p>
 <p>In the following comparisons, we only compare the results when both primal and dual reach the optimal. Worthnoting is that out of <span class="math inline">\(1000\)</span> runs, the dual reaches optimal in all of them, whereas the primal doesn’t in 61 of them, or <span class="math inline">\(6.1\%\)</span>.</p>
-<div id="total-time-cost" class="section level3">
+<section id="total-time-cost" class="level3">
 <h3>Total time cost</h3>
 <p><img src="figure/rmosek_primal_dual.rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/rmosek_primal_dual.rmd/unnamed-chunk-3-2.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="number-of-iterations" class="section level3">
+</section>
+<section id="number-of-iterations" class="level3">
 <h3>Number of iterations</h3>
 <p><img src="figure/rmosek_primal_dual.rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/rmosek_primal_dual.rmd/unnamed-chunk-4-2.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="time-per-iteration" class="section level3">
+</section>
+<section id="time-per-iteration" class="level3">
 <h3>Time per iteration</h3>
 <p><img src="figure/rmosek_primal_dual.rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/rmosek_primal_dual.rmd/unnamed-chunk-5-2.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="log-likelihood" class="section level3">
+</section>
+<section id="log-likelihood" class="level3">
 <h3>Log likelihood</h3>
 <p>It appears the dual form also gives better results in the sense that the log-likelihood given by dual is larger than the log-likelihood given by primal, when both reach the optimal. For both forms, the log-likelihood is given by <span class="math inline">\(\sum\log\left(Af + a\right) = \sum\log\left(g\right)\)</span>.</p>
 <p><img src="figure/rmosek_primal_dual.rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-</div>
-<div id="session-information" class="section level2">
+</section>
+</section>
+<section id="session-information" class="level2">
 <h2>Session information</h2>
 <!-- Insert the session information into the document -->
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 3.4.2 (2017-09-28)
+<pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS Sierra 10.12.6
+Running under: macOS High Sierra 10.13.2
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -383,11 +385,11 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 loaded via a namespace (and not attached):
- [1] compiler_3.4.2  backports_1.1.1 magrittr_1.5    rprojroot_1.2  
- [5] tools_3.4.2     htmltools_0.3.6 yaml_2.1.14     Rcpp_0.12.13   
- [9] stringi_1.1.5   rmarkdown_1.6   knitr_1.17      git2r_0.19.0   
-[13] stringr_1.2.0   digest_0.6.12   evaluate_0.10.1</code></pre>
-</div>
+ [1] compiler_3.4.3  backports_1.1.2 magrittr_1.5    rprojroot_1.3-1
+ [5] tools_3.4.3     htmltools_0.3.6 yaml_2.1.16     Rcpp_0.12.14   
+ [9] stringi_1.1.6   rmarkdown_1.8   knitr_1.17      git2r_0.20.0   
+[13] stringr_1.2.0   digest_0.6.13   evaluate_0.10.1</code></pre>
+</section>
 
 <hr>
 <p>
