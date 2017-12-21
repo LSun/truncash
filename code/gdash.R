@@ -1,7 +1,7 @@
 require(EQL)
 require(SQUAREM)
 require(REBayes)
-require(cvxr)
+require(CVXR)
 require(PolynomF)
 require(Rmosek)
 

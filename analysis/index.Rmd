@@ -155,7 +155,7 @@ AUC-wise, $p$ values and $BH$ should perform almost the same, since `BH` doesn't
 
 * [Group meeting presentation on `GD-ASH`](group_meeting_0608.html)
 
-Talked about using Gaussian derivatives to handle correlation at Matthew's group meeting.
+Talked about using Gaussian derivatives to handle correlation on Matthew's group meeting.
 
 * [`GD-ASH` applied to Smemo et al 2014 data](smemo.html)
 * [`GD-ASH` applied to Smemo et al 2014 data: Fitting `ASH` first](smemo_2.html)
@@ -200,6 +200,8 @@ An extensive study of `CASH` and other methods in different scenarios shows that
 On the deconvolution front, `CASH` generates more robust $\hat g$ than `ASH` in the correlated noise case, and doesn't show noticeable overfitting in the independent noise case.
 
 * [Poster for O'Bayes 2017](poster_obayes17.html)
+
+First public presentation of `CASH`.
 
 [`ashr`]: https://github.com/stephens999/ashr
 

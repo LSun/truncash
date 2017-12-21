@@ -1,5 +1,5 @@
 require(EQL)
-require(cvxr)
+require(CVXR)
 
 ecdfz = function (z, ord = 5, method = c("un", "con")) {
   z = as.numeric(z)
