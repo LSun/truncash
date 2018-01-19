@@ -1,0 +1,74 @@
+---
+title: "Comparison with Knockoff"
+author: "Lei Sun"
+date: 2017-01-18
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+## Introduction
+
+Comparison with Knockoff
+
+```{r, echo = FALSE}
+set.seed(1234)
+
+# Problem parameters
+n = 3000           # number of observations
+p = 1000           # number of variables
+k = 100            # number of variables with nonzero coefficients
+amplitude = 4.5    # signal amplitude (for noise level = 1)
+
+# Generate the variables from a multivariate normal distribution
+rho = 0.50
+Sigma = toeplitz(rho^(0 : (p - 1)))
+X = matrix(rnorm(n * p), n) %*% chol(Sigma)
+
+# Generate the response from a linear model
+nonzero = sample(p, k)
+beta = rep(0, p)
+beta[nonzero] <- rnorm(k, 0, amplitude) / sqrt(n)
+y.sample = function(X) X %*% beta + rnorm(n)
+y = y.sample(X)
+
+q = 0.2
+
+library(knockoff)
+result = knockoff::knockoff.filter(X, y, knockoffs = create.fixed, statistic = stat.glmnet_lambdasmax)
+
+fit <- lm(y ~ X)
+betahat <- coef(fit)
+sebetahat <- summary(fit)$coefficients[, 2]
+source("../code/gdash_lik.R")
+cash <- gdash(betahat, sebetahat)
+cash.selected <- (1 : p)[cash$lfdr <= q]
+
+fdp = function(selected) sum(beta[selected] == 0) / max(1, length(selected))
+fdp(result$selected)
+```
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```
