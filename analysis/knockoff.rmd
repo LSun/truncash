@@ -30,41 +30,96 @@ knitr::read_chunk("chunks.R")
 
 Comparison with Knockoff
 
-```{r, echo = FALSE}
-set.seed(1234)
+```{r, echo = FALSE, cache = TRUE}
+set.seed(777)
+
+library(knockoff)
+source("../code/gdash_lik.R")
+
+fdp = function(selected) sum(beta[selected] == 0) / max(1, length(selected))
+tdn = function(selected) sum(beta[selected] != 0)
+
+m <- 100
+
+fdp.mat <- matrix(0, ncol = 3, nrow = m)
+tdn.mat <- matrix(0, ncol = 3, nrow = m)
+time.mat <- matrix(0, ncol = 3, nrow = m)
+
+colnames(fdp.mat) <- c("Knockoff", "Cash", "BH")
+colnames(tdn.mat) <- c("Knockoff", "Cash", "BH")
+colnames(time.mat) <- c("Knockoff", "Cash", "BH")
 
 # Problem parameters
-n = 3000           # number of observations
+n = 2000          # number of observations
 p = 1000           # number of variables
 k = 100            # number of variables with nonzero coefficients
-amplitude = 4.5    # signal amplitude (for noise level = 1)
+amplitude = 5   # signal amplitude (for noise level = 1)
+q = 0.1          # nominal fdr to control for
 
 # Generate the variables from a multivariate normal distribution
-rho = 0.50
+rho = 0.5
 Sigma = toeplitz(rho^(0 : (p - 1)))
+
+for (i in 1 : m) {
 X = matrix(rnorm(n * p), n) %*% chol(Sigma)
 
 # Generate the response from a linear model
 nonzero = sample(p, k)
 beta = rep(0, p)
-beta[nonzero] <- rnorm(k, 0, amplitude) / sqrt(n)
+beta[nonzero] = rnorm(k, 0, amplitude) / sqrt(n)
 y.sample = function(X) X %*% beta + rnorm(n)
 y = y.sample(X)
 
-q = 0.2
+# Knockoff selection
+knockoff.time <- system.time(knockoff.result <- knockoff::knockoff.filter(X, y, knockoffs = create.fixed, statistic = stat.glmnet_lambdasmax, fdr = q))[3]
+knockoff.selected <- knockoff.result$selected
 
-library(knockoff)
-result = knockoff::knockoff.filter(X, y, knockoffs = create.fixed, statistic = stat.glmnet_lambdasmax)
-
-fit <- lm(y ~ X)
-betahat <- coef(fit)
-sebetahat <- summary(fit)$coefficients[, 2]
-source("../code/gdash_lik.R")
+# CASH selection
+cash.time <- proc.time()
+lm.fit <- lm(y ~ X - 1)
+betahat <- coef(lm.fit)
+sebetahat <- summary(lm.fit)$coefficients[, 2]
 cash <- gdash(betahat, sebetahat)
-cash.selected <- (1 : p)[cash$lfdr <= q]
+cash.time <- (proc.time() - cash.time)[3]
+cash.selected <- (1 : p)[cash$qvalue <= q]
 
-fdp = function(selected) sum(beta[selected] == 0) / max(1, length(selected))
-fdp(result$selected)
+# # CASH selection with perfect knowledge
+# sebetahat.perfect <- sqrt(diag(solve(crossprod(X))))
+# betahat.sigma <- cov2cor(solve(crossprod(X)))
+# rho.m <- sapply(c(2, 4, 6, 8, 10), function(x) (sum(betahat.sigma^x) - p) / (p * (p - 1)))
+# w.pen = rep(0, 10)
+# w.pen[c(2, 4, 6, 8, 10)] = 1 / sqrt(rho.m) * 20 / (1 / sqrt(rho.m))[1]
+# cash.perfect <- gdash(betahat, sebetahat, w.pen = w.pen, sebetahat.perfect)
+# cash.perfect.selected <- (1 : p)[cash.perfect$qvalue <= q]
+
+# BH selection
+pvalue <- summary(lm.fit)$coefficients[, 4]
+BH.time <- system.time(BH <- p.adjust(pvalue, method = "BH"))[3]
+BH.selected <- (1 : p)[BH <= q]
+
+fdp.mat[i, ] <- c(
+  fdp(knockoff.selected),
+  fdp(cash.selected),
+  fdp(BH.selected)
+)
+tdn.mat[i, ] <- c(
+  tdn(knockoff.selected),
+  tdn(cash.selected),
+  tdn(BH.selected)
+)
+time.mat[i, ] <- c(
+  knockoff.time,
+  cash.time,
+  BH.time
+)
+}
+```
+
+```{r, echo = FALSE}
+boxplot(fdp.mat, main = "False Discovery Proportion")
+abline(h = q, lty = 2, col = 2)
+boxplot(tdn.mat, main = "Number of True Discoveries")
+boxplot(time.mat, main = "Time Elapsed")
 ```
 
 ## Session information
