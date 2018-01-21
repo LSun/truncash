@@ -9,7 +9,7 @@ require(ashr)
 gdash = function (betahat, sebetahat,
                   mixcompdist = "normal", method = "fdr",
                   gd.normalized = TRUE, primal = FALSE,
-                  gd.ord = 10, w.lambda = 10, w.rho = 0.5,
+                  gd.ord = 10, w.lambda = 10, w.rho = 0.5, w.pen = NULL,
                   gd.priority = FALSE,
                   control = list(maxiter = 50)) {
   if (method == "fdr") {
@@ -21,11 +21,15 @@ gdash = function (betahat, sebetahat,
   }
   array_F = array_f(betahat, sebetahat, sd, gd.ord, mixcompdist, gd.normalized)
   array_F = aperm(array_F, c(2, 3, 1))
-  if (is.null(w.lambda)) {
-    w_prior = rep(0, gd.ord)
+  if (is.null(w.pen)) {
+    if (is.null(w.lambda)) {
+      w_prior = rep(0, gd.ord)
+    } else {
+      w_prior = w.lambda / sqrt(w.rho^(1:gd.ord))
+      w_prior[seq(1, gd.ord, by = 2)] = 0
+    }
   } else {
-    w_prior = w.lambda / sqrt(w.rho^(1:gd.ord))
-    w_prior[seq(1, gd.ord, by = 2)] = 0
+    w_prior = w.pen
   }
   res = biopt(array_F, pi_prior, w_prior, control, primal, gd.priority)
   pihat = res$pihat
