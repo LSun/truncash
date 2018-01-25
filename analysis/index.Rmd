@@ -203,7 +203,10 @@ On the deconvolution front, `CASH` generates more robust $\hat g$ than `ASH` in 
 
 First public presentation of `CASH`.
 
+* [Comparison with other linear regression variable selection false discovery rate control methods including `Knockoff` and `BH`](knockoff.html)
+
 [`ashr`]: https://github.com/stephens999/ashr
+
 
 <!-- The goal of this new template is to simplify the setup and maintenance of a research website. -->
 <!-- Specifically, -->
