@@ -1,0 +1,115 @@
+---
+title: "Comparison with `Knockoff`: Start from $\\Sigma_{\\hat\\beta}$"
+author: "Lei Sun"
+date: 2018-01-27
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+```{r, echo = FALSE, message = FALSE}
+source("~/GitHub/truncash/code/gdash_lik.R")
+library(ashr)
+library(qvalue)
+library(knockoff)
+library(pracma)
+fdp <- function(selected) sum(beta[selected] == 0) / max(length(selected), 1)
+tdn <- function(selected) sum(beta[selected] != 0)
+```
+
+```{r, echo = FALSE, cache = TRUE, warning = FALSE}
+n <- 2000
+p <- 1000
+k <- 100
+q <- 0.1
+m <- 100
+d.max <- 100
+sigma.e <- 1
+sigma.beta <- 3
+fdp.mat <- tdn.mat <- matrix(0, nrow = m, ncol = 4)
+colnames(fdp.mat) <- colnames(tdn.mat) <- c("BH", "qvalue", "ASH", "CASH")
+
+for (i in 1 : m) {
+d <- sample(d.max, 1)
+B <- matrix(rnorm(p * d, 0, 1), p, d)
+Sigma.betahat <- B %*% t(B) + diag(p)
+Sigma.betahat <- Sigma.betahat / mean(diag(Sigma.betahat))
+X <- svd(matrix(rnorm(n * p), n, p))$u %*% chol(solve(Sigma.betahat))
+beta <- rep(0, p)
+nonzero <- sample(p, k)
+beta[nonzero] <- rnorm(k, 0, sigma.beta * sigma.e)
+y <- X %*% beta + rnorm(n, 0, sigma.e)
+
+lm.fit <- lm(y ~ X - 1)
+betahat <- coef(lm.fit)
+sebetahat <- summary(lm.fit)$coefficients[, 2]
+pvalue <- summary(lm.fit)$coefficients[, 4]
+cash.fit <- gdash(betahat, sebetahat)
+cash.selected <- (1 : p)[cash.fit$qvalue <= q]
+ash.fit <- ashr::ash(betahat, sebetahat, method = "fdr", mixcompdist = "normal")
+ash.selected <- (1 : p)[get_qvalue(ash.fit) <= q]
+BH.fit <- p.adjust(pvalue, method = "BH")
+BH.selected <- (1 : p)[BH.fit <= q]
+qvalue.fit <- qvalue::qvalue(pvalue)
+qvalue.selected <- (1 : p)[qvalue.fit$qvalues <= q]
+
+fdp.mat[i, ] <- c(
+  fdp(BH.selected),
+  fdp(qvalue.selected),
+  fdp(ash.selected),
+  fdp(cash.selected)
+)
+tdn.mat[i, ] <- c(
+  tdn(BH.selected),
+  tdn(qvalue.selected),
+  tdn(ash.selected),
+  tdn(cash.selected)
+)
+}
+```
+
+```{r, echo = FALSE}
+boxplot(fdp.mat)
+abline(h = q, lwd = 2, lty = 2, col = 2)
+boxplot(tdn.mat)
+```
+
+```{r, echo = FALSE, cache = TRUE}
+w2.sd <- c()
+
+for (d in 1 : 100) {
+
+B <- matrix(rnorm(p * d, 0, 1), p, d)
+Sigma.betahat <- B %*% t(B) + diag(p)
+Sigma.betahat <- Sigma.betahat / mean(diag(Sigma.betahat))
+
+Rho.betahat <- cov2cor(Sigma.betahat)
+w2.sd[d] <- sqrt((sum(Rho.betahat^2) - p) / (p * (p - 1)))
+
+}
+```
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```
