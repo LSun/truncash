@@ -13,7 +13,7 @@
 
 <meta name="date" content="2017-01-18" />
 
-<title>Comparison with Knockoff</title>
+<title>Comparison with Knockoff: \Sigma_X is Toeplitz</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -304,7 +304,7 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Comparison with Knockoff</h1>
+<h1 class="title toc-ignore">Comparison with <code>Knockoff</code>: <span class="math inline">\(\Sigma_X\)</span> is Toeplitz</h1>
 <h4 class="author"><em>Lei Sun</em></h4>
 <h4 class="date"><em>2017-01-18</em></h4>
 
@@ -315,10 +315,10 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2018-01-25</p>
+<p><strong>Last updated:</strong> 2018-01-30</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> b831895</p>
+<p><strong>Code version:</strong> 5442ab8</p>
 <!-- Add your analysis here -->
 <section id="introduction" class="level2">
 <h2>Introduction</h2>
@@ -327,8 +327,7 @@ shared across the workflowr files. -->
 <section id="simulation-setting" class="level2">
 <h2>Simulation Setting</h2>
 <p>The simulation setting is very similar to what’s used in Knockoff’s <a href="https://cran.r-project.org/web/packages/knockoff/vignettes/fixed.html">vignette</a>. The only notable difference is that the non-zero signals are normally distributed centered at zero, rather than constant.</p>
-<p>Data are simulated by</p>
-<p><span class="math display">\[
+<p>Data are simulated by <span class="math display">\[
 y_n = X_{n \times p}\beta_p + e_n
 \]</span> where <span class="math display">\[
 \begin{array}{c}
