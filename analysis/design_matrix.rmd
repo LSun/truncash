@@ -1,0 +1,357 @@
+---
+title: "Simulating Design Matrix $X$"
+author: "Lei Sun"
+date: 2018-01-25
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+## Introduction
+
+In order to investigate and compare linear regression variable selection methods, we need to construct design matrices $X$. Here we take a look at multiple methods to simulate $X$.
+
+The design matrix $X$ is simulated so that the columns have noticeable correlation structures. In our simulation, each row of $X$ is independently drawn from a $N(0, \Sigma)$ distribution.
+
+## Simulation Setting
+
+Data are generated in a global null setting by
+$$
+y_n = X_{n \times p}\beta_p + e_n
+$$
+where
+$$
+\begin{array}{c}
+n = 2000 \\
+p = 1000 \\
+e_n \sim N(0, 1) \\
+\end{array}
+$$
+and
+$$
+\beta_p \equiv 0
+$$
+
+## Empirical correlated $N(0, 1)$ distribution
+
+After obtaining $p$-values for each $\hat\beta_j$, we transform them to $z$-scores. These $z$-scores should be correlated $N(0, 1)$. We take a look at their empirical distribution and see how different it is from the standard normal.
+
+## $\Sigma = I$
+
+```{r, echo = FALSE, cache = TRUE, fig.height = 4, fig.width = 8}
+n = 2000          # number of observations
+p = 1000          # number of variables
+
+for (i in 1 : 10) {
+X = matrix(rnorm(n * p), n)
+
+# Generate the response independently with the variables
+y = rnorm(n)
+
+# Linear regression
+lm.fit <- lm(y ~ X - 1)
+lm.p <- summary(lm.fit)$coefficients[, 4]
+lm.t <- summary(lm.fit)$coefficients[, 3]
+z <- sign(lm.t) * qnorm(lm.p / 2)
+par(mfrow = c(1, 2))
+hist(z, prob = TRUE)
+lines(sort(z), dnorm(sort(z)), col = 2, lwd = 2)
+qqnorm(z)
+qqline(z)
+}
+```
+
+## $\Sigma$: Toeplitz
+
+$\Sigma_{j,k} = \rho^{|j - k|}$.
+
+### $\rho = 0.2$
+
+```{r, echo = FALSE, cache = TRUE, fig.height = 4, fig.width = 8}
+n = 2000          # number of observations
+p = 1000           # number of variables
+
+# Generate the variables from a multivariate normal distribution
+rho = 0.2
+Sigma = toeplitz(rho^(0 : (p - 1)))
+
+for (i in 1 : 10) {
+X = matrix(rnorm(n * p), n) %*% chol(Sigma)
+
+# Generate the response independently with the variables
+y = rnorm(n)
+
+# Linear regression
+lm.fit <- lm(y ~ X - 1)
+lm.p <- summary(lm.fit)$coefficients[, 4]
+lm.t <- summary(lm.fit)$coefficients[, 3]
+z <- sign(lm.t) * qnorm(lm.p / 2)
+par(mfrow = c(1, 2))
+hist(z, prob = TRUE)
+lines(sort(z), dnorm(sort(z)), col = 2, lwd = 2)
+qqnorm(z)
+qqline(z)
+}
+```
+
+### $\rho = 0.5$
+
+```{r, echo = FALSE, cache = TRUE, fig.height = 4, fig.width = 8}
+n = 2000          # number of observations
+p = 1000           # number of variables
+
+# Generate the variables from a multivariate normal distribution
+rho = 0.5
+Sigma = toeplitz(rho^(0 : (p - 1)))
+
+for (i in 1 : 10) {
+X = matrix(rnorm(n * p), n) %*% chol(Sigma)
+
+# Generate the response independently with the variables
+y = rnorm(n)
+
+# Linear regression
+lm.fit <- lm(y ~ X - 1)
+lm.p <- summary(lm.fit)$coefficients[, 4]
+lm.t <- summary(lm.fit)$coefficients[, 3]
+z <- sign(lm.t) * qnorm(lm.p / 2)
+par(mfrow = c(1, 2))
+hist(z, prob = TRUE)
+lines(sort(z), dnorm(sort(z)), col = 2, lwd = 2)
+qqnorm(z)
+qqline(z)
+}
+```
+
+### $\rho = 0.8$
+
+```{r, echo = FALSE, cache = TRUE, fig.height = 4, fig.width = 8}
+n = 2000          # number of observations
+p = 1000           # number of variables
+
+# Generate the variables from a multivariate normal distribution
+rho = 0.8
+Sigma = toeplitz(rho^(0 : (p - 1)))
+
+for (i in 1 : 10) {
+X = matrix(rnorm(n * p), n) %*% chol(Sigma)
+
+# Generate the response independently with the variables
+y = rnorm(n)
+
+# Linear regression
+lm.fit <- lm(y ~ X - 1)
+lm.p <- summary(lm.fit)$coefficients[, 4]
+lm.t <- summary(lm.fit)$coefficients[, 3]
+z <- sign(lm.t) * qnorm(lm.p / 2)
+par(mfrow = c(1, 2))
+hist(z, prob = TRUE)
+lines(sort(z), dnorm(sort(z)), col = 2, lwd = 2)
+qqnorm(z)
+qqline(z)
+}
+```
+
+## $\Sigma$: high collinearity
+
+$\Sigma = B_{p \times d} \cdot B_{p \times d}^T + I$, where $B_{i, j} \stackrel{\text{iid}}{\sim} N(0, 1)$. Then transform $\Sigma$ to a correlation matrix.
+
+### $d = 5$
+
+```{r, echo = FALSE, cache = TRUE, fig.height = 4, fig.width = 8}
+d = 5
+
+for (i in 1 : 10) {
+B = matrix(rnorm(p * d, 0, 10), ncol = d, nrow = p)
+V = B %*% t(B) + diag(p)
+Sigma <- cov2cor(V)
+
+# Generate the variables from a multivariate normal distribution
+X = matrix(rnorm(n * p), n) %*% chol(Sigma)
+
+# Generate the response independently with the variables
+y = rnorm(n)
+
+# Linear regression
+lm.fit <- lm(y ~ X - 1)
+lm.p <- summary(lm.fit)$coefficients[, 4]
+lm.t <- summary(lm.fit)$coefficients[, 3]
+z <- sign(lm.t) * qnorm(lm.p / 2)
+par(mfrow = c(1, 2))
+hist(z, prob = TRUE)
+lines(seq(-10, 10, length = 1000), dnorm(seq(-10, 10, length = 1000)), col = 2, lwd = 2)
+qqnorm(z)
+qqline(z)
+}
+```
+
+## Start from $\Sigma_{\hat\beta}$
+
+In the $n > p$ setting, $\hat\beta \sim N\left(\beta, \Sigma_{\hat\beta} = \sigma_e^2\left(X^TX\right)^{-1}\right)$. In simulation, we can first construct a desirable $\Sigma_{\hat\beta}$, and build an $X$ from that.
+
+One way is to let $\Sigma_{\hat\beta} / \sigma_e^2 = B_{p \times d} \cdot B_{p \times d}^T + I$, where $B_{i, j} \stackrel{\text{iid}}{\sim} N(0, 1)$. Then rescale the matrix such that the mean of its diagnal $= 1$. Generate $X_{n \times p}$ such that $(X^TX)^{-1} = \Sigma_{\hat\beta} / \sigma_e^2$.
+
+### $d = 1$
+
+```{r, echo = FALSE, cache = TRUE, fig.height = 4, fig.width = 8}
+d <- 1
+for (i in 1 : 10) {
+B <- matrix(rnorm(p * d, 0, 1), p, d)
+Sigma.betahat <- tcrossprod(B) + diag(p)
+Sigma.betahat <- Sigma.betahat / mean(diag(Sigma.betahat))
+
+# Generate the variables from a multivariate normal distribution
+X <- svd(matrix(rnorm(n * p), n, p))$u %*% chol(solve(Sigma.betahat))
+
+# Generate the response independently with the variables
+y <- rnorm(n)
+
+# Linear regression
+lm.fit <- lm(y ~ X - 1)
+lm.p <- summary(lm.fit)$coefficients[, 4]
+lm.t <- summary(lm.fit)$coefficients[, 3]
+z <- sign(lm.t) * qnorm(lm.p / 2)
+par(mfrow = c(1, 2))
+hist(z, prob = TRUE)
+lines(seq(-10, 10, length = 1000), dnorm(seq(-10, 10, length = 1000)), col = 2, lwd = 2)
+qqnorm(z)
+qqline(z)
+}
+```
+
+### $d = 5$
+
+```{r, echo = FALSE, cache = TRUE, fig.height = 4, fig.width = 8}
+d <- 5
+for (i in 1 : 10) {
+B <- matrix(rnorm(p * d, 0, 1), p, d)
+Sigma.betahat <- tcrossprod(B) + diag(p)
+Sigma.betahat <- Sigma.betahat / mean(diag(Sigma.betahat))
+
+# Generate the variables from a multivariate normal distribution
+X <- svd(matrix(rnorm(n * p), n, p))$u %*% chol(solve(Sigma.betahat))
+
+# Generate the response independently with the variables
+y <- rnorm(n)
+
+# Linear regression
+lm.fit <- lm(y ~ X - 1)
+lm.p <- summary(lm.fit)$coefficients[, 4]
+lm.t <- summary(lm.fit)$coefficients[, 3]
+z <- sign(lm.t) * qnorm(lm.p / 2)
+par(mfrow = c(1, 2))
+hist(z, prob = TRUE)
+lines(seq(-10, 10, length = 1000), dnorm(seq(-10, 10, length = 1000)), col = 2, lwd = 2)
+qqnorm(z)
+qqline(z)
+}
+```
+
+### $d = 20$
+
+```{r, echo = FALSE, cache = TRUE, fig.height = 4, fig.width = 8}
+d <- 20
+for (i in 1 : 10) {
+B <- matrix(rnorm(p * d, 0, 1), p, d)
+Sigma.betahat <- tcrossprod(B) + diag(p)
+Sigma.betahat <- Sigma.betahat / mean(diag(Sigma.betahat))
+
+# Generate the variables from a multivariate normal distribution
+X <- svd(matrix(rnorm(n * p), n, p))$u %*% chol(solve(Sigma.betahat))
+
+# Generate the response independently with the variables
+y <- rnorm(n)
+
+# Linear regression
+lm.fit <- lm(y ~ X - 1)
+lm.p <- summary(lm.fit)$coefficients[, 4]
+lm.t <- summary(lm.fit)$coefficients[, 3]
+z <- sign(lm.t) * qnorm(lm.p / 2)
+par(mfrow = c(1, 2))
+hist(z, prob = TRUE)
+lines(seq(-10, 10, length = 1000), dnorm(seq(-10, 10, length = 1000)), col = 2, lwd = 2)
+qqnorm(z)
+qqline(z)
+}
+```
+
+### $d = 50$
+
+```{r, echo = FALSE, cache = TRUE, fig.height = 4, fig.width = 8}
+d <- 50
+for (i in 1 : 10) {
+B <- matrix(rnorm(p * d, 0, 1), p, d)
+Sigma.betahat <- tcrossprod(B) + diag(p)
+Sigma.betahat <- Sigma.betahat / mean(diag(Sigma.betahat))
+
+# Generate the variables from a multivariate normal distribution
+X <- svd(matrix(rnorm(n * p), n, p))$u %*% chol(solve(Sigma.betahat))
+
+# Generate the response independently with the variables
+y <- rnorm(n)
+
+# Linear regression
+lm.fit <- lm(y ~ X - 1)
+lm.p <- summary(lm.fit)$coefficients[, 4]
+lm.t <- summary(lm.fit)$coefficients[, 3]
+z <- sign(lm.t) * qnorm(lm.p / 2)
+par(mfrow = c(1, 2))
+hist(z, prob = TRUE)
+lines(seq(-10, 10, length = 1000), dnorm(seq(-10, 10, length = 1000)), col = 2, lwd = 2)
+qqnorm(z)
+qqline(z)
+}
+```
+
+### $d = 100$
+
+```{r, echo = FALSE, cache = TRUE, fig.height = 4, fig.width = 8}
+d <- 100
+for (i in 1 : 10) {
+B <- matrix(rnorm(p * d, 0, 1), p, d)
+Sigma.betahat <- tcrossprod(B) + diag(p)
+Sigma.betahat <- Sigma.betahat / mean(diag(Sigma.betahat))
+
+# Generate the variables from a multivariate normal distribution
+X <- svd(matrix(rnorm(n * p), n, p))$u %*% chol(solve(Sigma.betahat))
+
+# Generate the response independently with the variables
+y <- rnorm(n)
+
+# Linear regression
+lm.fit <- lm(y ~ X - 1)
+lm.p <- summary(lm.fit)$coefficients[, 4]
+lm.t <- summary(lm.fit)$coefficients[, 3]
+z <- sign(lm.t) * qnorm(lm.p / 2)
+par(mfrow = c(1, 2))
+hist(z, prob = TRUE)
+lines(seq(-10, 10, length = 1000), dnorm(seq(-10, 10, length = 1000)), col = 2, lwd = 2)
+qqnorm(z)
+qqline(z)
+}
+```
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```
