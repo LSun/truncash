@@ -35,7 +35,6 @@ Applying CASH to linear regression variable selection, compared with other popul
 The simulation setting is very similar to what's used in Knockoff's [vignette](https://cran.r-project.org/web/packages/knockoff/vignettes/fixed.html). The only notable difference is that the non-zero signals are normally distributed centered at zero, rather than constant.
 
 Data are simulated by
-
 $$
 y_n = X_{n \times p}\beta_p + e_n
 $$
