@@ -1,5 +1,5 @@
 ---
-title: "Comparison with Knockoff"
+title: "Comparison with `Knockoff`: $\\Sigma_X$ is Toeplitz"
 author: "Lei Sun"
 date: 2017-01-18
 output: html_document
@@ -324,7 +324,6 @@ boxplot(log(time.mat), main = "Time Elapsed in Logarithm", ylab = "Log (Time in 
 
 
 ## $\eta = 0.5$, $\sigma = 4$, $\rho = 0.5$
-
 
 ```{r, echo = FALSE, cache = TRUE}
 set.seed(777)

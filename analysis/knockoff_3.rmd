@@ -26,32 +26,52 @@ knitr::read_chunk("chunks.R")
 
 <!-- Add your analysis here -->
 
+## Introduction
+
+Similar to [previous simulations](knockoff.html), only that the design matrix $X$ is [simulated](design_matrix.html#start_from_(sigma_{hatbeta})) such that $\Sigma_{\hat\beta} = \sigma_e^2(X^TX)^{-1}$ has non negligible off-diagnoal correlations.
+
 ```{r, echo = FALSE, message = FALSE}
 source("~/GitHub/truncash/code/gdash_lik.R")
 library(ashr)
 library(qvalue)
 library(knockoff)
-library(pracma)
+library(reshape2)
+library(ggplot2)
 fdp <- function(selected) sum(beta[selected] == 0) / max(length(selected), 1)
 tdn <- function(selected) sum(beta[selected] != 0)
+mean_sdp <- function(x) {
+   m <- mean(x)
+   ymax <- m + sd(x)
+   return(c(y = m, ymax = ymax, ymin = m))
+}
+method.name <- c("BH", "qvalue", "Knockoff", "ASH", "CASH", "CASH+")
+method.col <- c("blue", "green", "orange", "burlywood4", "red", "maroon")
 ```
 
 ```{r, echo = FALSE, cache = TRUE, warning = FALSE}
 n <- 2000
 p <- 1000
-k <- 100
+k.vec <- 5 : 1 * 100
 q <- 0.1
 m <- 100
-d.max <- 100
+d.max <- 50
 sigma.e <- 1
 sigma.beta <- 3
-fdp.mat <- tdn.mat <- matrix(0, nrow = m, ncol = 4)
-colnames(fdp.mat) <- colnames(tdn.mat) <- c("BH", "qvalue", "ASH", "CASH")
 
+fdp.list <- tdn.list <- time.list <- list()
+
+fdp.mat <- tdn.mat <- matrix(0, nrow = m, ncol = 6)
+colnames(fdp.mat) <- colnames(tdn.mat) <- c("BH", "qvalue", "Knockoff", "ASH", "CASH", "CASH+")
+
+time.mat <- matrix(0, nrow = m, ncol = 6)
+colnames(time.mat) <- c("BH", "qvalue", "Knockoff", "ASH", "CASH", "LS")
+
+for (j in seq(length(k.vec))) {
+k <- k.vec[j]
 for (i in 1 : m) {
 d <- sample(d.max, 1)
 B <- matrix(rnorm(p * d, 0, 1), p, d)
-Sigma.betahat <- B %*% t(B) + diag(p)
+Sigma.betahat <- tcrossprod(B) + diag(p)
 Sigma.betahat <- Sigma.betahat / mean(diag(Sigma.betahat))
 X <- svd(matrix(rnorm(n * p), n, p))$u %*% chol(solve(Sigma.betahat))
 beta <- rep(0, p)
@@ -59,53 +79,346 @@ nonzero <- sample(p, k)
 beta[nonzero] <- rnorm(k, 0, sigma.beta * sigma.e)
 y <- X %*% beta + rnorm(n, 0, sigma.e)
 
-lm.fit <- lm(y ~ X - 1)
+## Knockoff
+knockoff.time <- system.time(knockoff.fit <- knockoff::knockoff.filter(X, y, knockoffs = create.fixed, statistic = stat.glmnet_lambdasmax, fdr = q))[3]
+knockoff.selected <- knockoff.fit$selected
+
+## Least squares
+ls.time <- system.time(lm.fit <- lm(y ~ X - 1))[3]
 betahat <- coef(lm.fit)
 sebetahat <- summary(lm.fit)$coefficients[, 2]
 pvalue <- summary(lm.fit)$coefficients[, 4]
-cash.fit <- gdash(betahat, sebetahat)
+
+## Cash
+cash.time <- system.time(cash.fit <- gdash(betahat, sebetahat))[3]
 cash.selected <- (1 : p)[cash.fit$qvalue <= q]
-ash.fit <- ashr::ash(betahat, sebetahat, method = "fdr", mixcompdist = "normal")
+
+## Cash selection with oracle knowledge
+betahat.Sigma <- solve(crossprod(X)) * sigma.e^2
+betahat.Cor <- cov2cor(betahat.Sigma)
+rho.moment <- sapply(c(2, 4, 6, 8, 10), function(x) (sum(betahat.Cor^x) - p) / (p * (p - 1)))
+w.pen = rep(0, 10)
+w.pen[c(2, 4, 6, 8, 10)] = 1 / sqrt(rho.moment) * 20 / (1 / sqrt(rho.moment))[1]
+sebetahat.perfect <- sqrt(diag(betahat.Sigma))
+cash.oracle <- gdash(betahat, sebetahat.perfect, w.pen = w.pen)
+cash.oracle.selected <- (1 : p)[cash.oracle$qvalue <= q]
+
+## Ash
+ash.time <- system.time(ash.fit <- ashr::ash(betahat, sebetahat, method = "fdr", mixcompdist = "normal"))[3]
 ash.selected <- (1 : p)[get_qvalue(ash.fit) <= q]
-BH.fit <- p.adjust(pvalue, method = "BH")
+
+## BH
+BH.time <- system.time(BH.fit <- p.adjust(pvalue, method = "BH"))[3]
 BH.selected <- (1 : p)[BH.fit <= q]
-qvalue.fit <- qvalue::qvalue(pvalue)
+
+## qvalue
+qvalue.time <- system.time(qvalue.fit <- qvalue::qvalue(pvalue))[3]
 qvalue.selected <- (1 : p)[qvalue.fit$qvalues <= q]
 
 fdp.mat[i, ] <- c(
   fdp(BH.selected),
   fdp(qvalue.selected),
+  fdp(knockoff.selected),
   fdp(ash.selected),
-  fdp(cash.selected)
+  fdp(cash.selected),
+  fdp(cash.oracle.selected)
 )
 tdn.mat[i, ] <- c(
   tdn(BH.selected),
   tdn(qvalue.selected),
+  tdn(knockoff.selected),
   tdn(ash.selected),
-  tdn(cash.selected)
+  tdn(cash.selected),
+  tdn(cash.oracle.selected)
 )
+time.mat[i, ] <- c(
+  ls.time + BH.time,
+  ls.time + qvalue.time,
+  knockoff.time,
+  ls.time + ash.time,
+  ls.time + cash.time,
+  ls.time
+)
+}
+fdp.list[[j]] <- fdp.mat
+tdn.list[[j]] <- tdn.mat
+time.list[[j]] <- time.mat
 }
 ```
 
-```{r, echo = FALSE}
-boxplot(fdp.mat)
-abline(h = q, lwd = 2, lty = 2, col = 2)
-boxplot(tdn.mat)
-```
+## $d$ and $\Sigma_{\hat\beta}$
+
+Let $\Sigma_{\hat\beta} / \sigma_e^2 = B_{p \times d} \cdot B_{p \times d}^T + I$, where $B_{i, j} \stackrel{\text{iid}}{\sim} N(0, 1)$. Then rescale the matrix such that the mean of its diagnal $= 1$. Generate $X_{n \times p}$ such that $(X^TX)^{-1} = \Sigma_{\hat\beta} / \sigma_e^2$.
+
+Recall that the random coefficient of the second order of Gaussian deviative with the empirical distribution of correlated null $W_2$ has the property
+$$
+Var(W_2) = \bar{\rho_{ij}^2}
+$$
+We take a look at how $d$ is related to this quantity.
 
 ```{r, echo = FALSE, cache = TRUE}
 w2.sd <- c()
 
 for (d in 1 : 100) {
-
 B <- matrix(rnorm(p * d, 0, 1), p, d)
 Sigma.betahat <- B %*% t(B) + diag(p)
 Sigma.betahat <- Sigma.betahat / mean(diag(Sigma.betahat))
 
 Rho.betahat <- cov2cor(Sigma.betahat)
 w2.sd[d] <- sqrt((sum(Rho.betahat^2) - p) / (p * (p - 1)))
-
 }
+```
+
+```{r, echo = FALSE}
+par(mar = c(4.5, 5, 2.5, 0.5))
+plot(1 : 100, w2.sd, xlab = "d", ylab = expression(sigma(W[2]) == sqrt(bar(rho[ij]^2))), main = expression(paste("Square root of the average squared correlation among ", hat(beta)[i], " and ", hat(beta)[j])))
+abline(v = c(20, 50), col = c(2, 4), lty = 2, lwd = 2)
+```
+
+## $\eta \in \{0.5, 0.6, 0.7, 0.8, 0.9\}$, $\sigma_\beta / \sigma_e = 3$, $d \sim Unif\{1, 2, \cdots, 50\}$
+
+### Overall FDR and Power comparison
+
+```{r avg, echo = FALSE, message = FALSE, warning = FALSE}
+fdp.avg <- sapply(fdp.list, colMeans)
+tdn.avg <- sapply(tdn.list, colMeans)
+
+plot(1 - k.vec / p, k.vec, type = "n", ylim = range(fdp.avg, q, 0), ylab = "FDR", xlab = "Sparsity")
+for (l in seq(nrow(fdp.avg))) {
+  lines(1 - k.vec / p, fdp.avg[l, ], col = method.col[l], type = "o", pch = l)
+}
+legend("bottomright", lty = 1, pch = seq(nrow(fdp.avg)), col = method.col, legend = method.name, bty = "n")
+abline(h = 0.1, lty = 2, lwd = 2)
+
+plot(1 - k.vec / p, k.vec, type = "n", ylim = range(tdn.avg), ylab = "Number of True Discoveries", xlab = "Sparsity")
+for (l in seq(nrow(tdn.avg))) {
+  lines(1 - k.vec / p, tdn.avg[l, ], col = method.col[l], type = "o", pch = l)
+}
+legend("topright", lty = 1, pch = seq(nrow(fdp.avg)), col = method.col, legend = method.name)
+
+plot(1 - k.vec / p, k.vec, type = "n", ylim = range(t(tdn.avg) / k.vec), ylab = "Power", xlab = "Sparsity")
+for (l in seq(nrow(tdn.avg))) {
+  lines(1 - k.vec / p, tdn.avg[l, ] / k.vec, col = method.col[l], type = "o", pch = l)
+}
+legend("topright", lty = 1, pch = seq(nrow(fdp.avg)), col = method.col, legend = method.name)
+```
+
+### FDR and Power at low sparsity: $50\%$ true signal
+
+```{r 500, echo = FALSE, message = FALSE, warning = FALSE}
+ggplot(data = melt(as.data.frame(fdp.list[[1]])),
+        aes(x = variable, y = value, col = variable)) +
+  geom_violin(trim = TRUE) +
+  stat_summary(fun.data = "mean_sdp", geom = "pointrange") +
+  scale_color_manual(values = method.col) +
+  geom_hline(yintercept = q, col = "maroon", linetype = "dashed", size = 1) +
+  labs(title = bquote(paste("False Discovery Proportions at ", FDR == .(q), " Cutoff")), x = "", y = "Actual False Discovery Proportion (FDP)") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 20), axis.title.y = element_text(size = 20), axis.text.x = element_text(size = 20), axis.text.y = element_text(size = 15))
+
+ggplot(data = melt(as.data.frame(tdn.list[[1]])),
+        aes(x = variable, y = value, col = variable)) +
+  geom_violin(trim = TRUE) +
+  stat_summary(fun.data = "mean_sdp", geom = "pointrange") +
+  scale_color_manual(values = method.col) +
+  labs(title = bquote(paste("Number of True Discoveries at ", FDR == .(q), " Cutoff")), x = "", y = "Number of True Discoveries") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 20), axis.title.y = element_text(size = 20), axis.text.x = element_text(size = 20), axis.text.y = element_text(size = 15))
+
+boxplot(log(time.list[[1]]), main = "Time Elapsed in Logarithm", ylab = "Log (Time in Seconds)", col = c(method.col[1 : 5], 1))
+```
+
+### FDR and Power at high sparsity: $10\%$ true signal
+
+```{r 100, echo = FALSE, message = FALSE, warning = FALSE}
+ggplot(data = melt(as.data.frame(fdp.list[[5]])),
+        aes(x = variable, y = value, col = variable)) +
+  geom_violin(trim = TRUE) +
+  stat_summary(fun.data = "mean_sdp", geom = "pointrange") +
+  scale_color_manual(values = method.col) +
+  geom_hline(yintercept = q, col = "maroon", linetype = "dashed", size = 1) +
+  labs(title = bquote(paste("False Discovery Proportions at ", FDR == .(q), " Cutoff")), x = "", y = "Actual False Discovery Proportion (FDP)") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 20), axis.title.y = element_text(size = 20), axis.text.x = element_text(size = 20), axis.text.y = element_text(size = 15))
+
+ggplot(data = melt(as.data.frame(tdn.list[[5]])),
+        aes(x = variable, y = value, col = variable)) +
+  geom_violin(trim = TRUE) +
+  stat_summary(fun.data = "mean_sdp", geom = "pointrange") +
+  scale_color_manual(values = method.col) +
+  labs(title = bquote(paste("Number of True Discoveries at ", FDR == .(q), " Cutoff")), x = "", y = "Number of True Discoveries") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 20), axis.title.y = element_text(size = 20), axis.text.x = element_text(size = 20), axis.text.y = element_text(size = 15))
+
+boxplot(log(time.list[[5]]), main = "Time Elapsed in Logarithm", ylab = "Log (Time in Seconds)", col = c(method.col[1 : 5], 1))
+```
+
+## $\eta \in \{0.75, 0.80, 0.85, 0.90, 0.95\}$, $\sigma_\beta / \sigma_e = 3$, $d \sim Unif\{1, 2, \cdots, 20\}$
+
+```{r sparse_cor, echo = FALSE, cache = TRUE, warning = FALSE}
+n <- 2000
+p <- 1000
+k.vec <- 5 : 1 * 50
+q <- 0.1
+m <- 100
+d.max <- 20
+sigma.e <- 1
+sigma.beta <- 3
+
+fdp.list <- tdn.list <- time.list <- list()
+
+fdp.mat <- tdn.mat <- matrix(0, nrow = m, ncol = 6)
+colnames(fdp.mat) <- colnames(tdn.mat) <- c("BH", "qvalue", "Knockoff", "ASH", "CASH", "CASH+")
+
+time.mat <- matrix(0, nrow = m, ncol = 6)
+colnames(time.mat) <- c("BH", "qvalue", "Knockoff", "ASH", "CASH", "LS")
+
+for (j in seq(length(k.vec))) {
+k <- k.vec[j]
+for (i in 1 : m) {
+d <- sample(d.max, 1)
+B <- matrix(rnorm(p * d, 0, 1), p, d)
+Sigma.betahat <- tcrossprod(B) + diag(p)
+Sigma.betahat <- Sigma.betahat / mean(diag(Sigma.betahat))
+X <- svd(matrix(rnorm(n * p), n, p))$u %*% chol(solve(Sigma.betahat))
+beta <- rep(0, p)
+nonzero <- sample(p, k)
+beta[nonzero] <- rnorm(k, 0, sigma.beta * sigma.e)
+y <- X %*% beta + rnorm(n, 0, sigma.e)
+
+## Knockoff
+knockoff.time <- system.time(knockoff.fit <- knockoff::knockoff.filter(X, y, knockoffs = create.fixed, statistic = stat.glmnet_lambdasmax, fdr = q))[3]
+knockoff.selected <- knockoff.fit$selected
+
+## Least squares
+ls.time <- system.time(lm.fit <- lm(y ~ X - 1))[3]
+betahat <- coef(lm.fit)
+sebetahat <- summary(lm.fit)$coefficients[, 2]
+pvalue <- summary(lm.fit)$coefficients[, 4]
+
+## Cash
+cash.time <- system.time(cash.fit <- gdash(betahat, sebetahat))[3]
+cash.selected <- (1 : p)[cash.fit$qvalue <= q]
+
+## Cash selection with oracle knowledge
+betahat.Sigma <- solve(crossprod(X)) * sigma.e^2
+betahat.Cor <- cov2cor(betahat.Sigma)
+rho.moment <- sapply(c(2, 4, 6, 8, 10), function(x) (sum(betahat.Cor^x) - p) / (p * (p - 1)))
+w.pen = rep(0, 10)
+w.pen[c(2, 4, 6, 8, 10)] = 1 / sqrt(rho.moment) * 20 / (1 / sqrt(rho.moment))[1]
+sebetahat.perfect <- sqrt(diag(betahat.Sigma))
+cash.oracle <- gdash(betahat, sebetahat.perfect, w.pen = w.pen)
+cash.oracle.selected <- (1 : p)[cash.oracle$qvalue <= q]
+
+## Ash
+ash.time <- system.time(ash.fit <- ashr::ash(betahat, sebetahat, method = "fdr", mixcompdist = "normal"))[3]
+ash.selected <- (1 : p)[get_qvalue(ash.fit) <= q]
+
+## BH
+BH.time <- system.time(BH.fit <- p.adjust(pvalue, method = "BH"))[3]
+BH.selected <- (1 : p)[BH.fit <= q]
+
+## qvalue
+qvalue.time <- system.time(qvalue.fit <- qvalue::qvalue(pvalue))[3]
+qvalue.selected <- (1 : p)[qvalue.fit$qvalues <= q]
+
+fdp.mat[i, ] <- c(
+  fdp(BH.selected),
+  fdp(qvalue.selected),
+  fdp(knockoff.selected),
+  fdp(ash.selected),
+  fdp(cash.selected),
+  fdp(cash.oracle.selected)
+)
+tdn.mat[i, ] <- c(
+  tdn(BH.selected),
+  tdn(qvalue.selected),
+  tdn(knockoff.selected),
+  tdn(ash.selected),
+  tdn(cash.selected),
+  tdn(cash.oracle.selected)
+)
+time.mat[i, ] <- c(
+  ls.time + BH.time,
+  ls.time + qvalue.time,
+  knockoff.time,
+  ls.time + ash.time,
+  ls.time + cash.time,
+  ls.time
+)
+}
+fdp.list[[j]] <- fdp.mat
+tdn.list[[j]] <- tdn.mat
+time.list[[j]] <- time.mat
+}
+```
+
+### Overall FDR and Power comparison
+
+```{r sparse_cor avg, echo = FALSE, message = FALSE, warning = FALSE}
+fdp.avg <- sapply(fdp.list, colMeans)
+tdn.avg <- sapply(tdn.list, colMeans)
+
+plot(1 - k.vec / p, k.vec, type = "n", ylim = range(fdp.avg, q, 0), ylab = "FDR", xlab = "Sparsity")
+for (l in seq(nrow(fdp.avg))) {
+  lines(1 - k.vec / p, fdp.avg[l, ], col = method.col[l], type = "o", pch = l)
+}
+legend("bottomright", lty = 1, pch = seq(nrow(fdp.avg)), col = method.col, legend = method.name, bty = "n")
+abline(h = 0.1, lty = 2, lwd = 2)
+
+plot(1 - k.vec / p, k.vec, type = "n", ylim = range(tdn.avg), ylab = "Number of True Discoveries", xlab = "Sparsity")
+for (l in seq(nrow(tdn.avg))) {
+  lines(1 - k.vec / p, tdn.avg[l, ], col = method.col[l], type = "o", pch = l)
+}
+legend("topright", lty = 1, pch = seq(nrow(fdp.avg)), col = method.col, legend = method.name)
+
+plot(1 - k.vec / p, k.vec, type = "n", ylim = range(t(tdn.avg) / k.vec), ylab = "Power", xlab = "Sparsity")
+for (l in seq(nrow(tdn.avg))) {
+  lines(1 - k.vec / p, tdn.avg[l, ] / k.vec, col = method.col[l], type = "o", pch = l)
+}
+legend("topright", lty = 1, pch = seq(nrow(fdp.avg)), col = method.col, legend = method.name)
+```
+
+### FDR and Power at low sparsity: $25\%$ true signal
+
+```{r sparse_cor 250, echo = FALSE, message = FALSE, warning = FALSE}
+ggplot(data = melt(as.data.frame(fdp.list[[1]])),
+        aes(x = variable, y = value, col = variable)) +
+  geom_violin(trim = TRUE) +
+  stat_summary(fun.data = "mean_sdp", geom = "pointrange") +
+  scale_color_manual(values = method.col) +
+  geom_hline(yintercept = q, col = "maroon", linetype = "dashed", size = 1) +
+  labs(title = bquote(paste("False Discovery Proportions at ", FDR == .(q), " Cutoff")), x = "", y = "False Discovery Proportion (FDP)") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 20), axis.title.y = element_text(size = 20), axis.text.x = element_text(size = 20), axis.text.y = element_text(size = 15))
+
+ggplot(data = melt(as.data.frame(tdn.list[[1]] / k.vec[1])),
+        aes(x = variable, y = value, col = variable)) +
+  geom_violin(trim = TRUE) +
+  stat_summary(fun.data = "mean_sdp", geom = "pointrange") +
+  scale_color_manual(values = method.col) +
+  labs(title = bquote(paste("Number of True Discoveries at ", FDR == .(q), " Cutoff")), x = "", y = "Power") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 20), axis.title.y = element_text(size = 20), axis.text.x = element_text(size = 20), axis.text.y = element_text(size = 15))
+
+boxplot(log(time.list[[1]]), main = "Time Elapsed in Logarithm", ylab = "Log (Time in Seconds)", col = c(method.col[1 : 5], 1))
+```
+
+### FDR and Power at high sparsity: $5\%$ true signal
+
+```{r sparse_cor 100, echo = FALSE, message = FALSE, warning = FALSE}
+ggplot(data = melt(as.data.frame(fdp.list[[5]])),
+        aes(x = variable, y = value, col = variable)) +
+  geom_violin(trim = TRUE) +
+  stat_summary(fun.data = "mean_sdp", geom = "pointrange") +
+  scale_color_manual(values = method.col) +
+  geom_hline(yintercept = q, col = "maroon", linetype = "dashed", size = 1) +
+  labs(title = bquote(paste("False Discovery Proportions at ", FDR == .(q), " Cutoff")), x = "", y = "False Discovery Proportion (FDP)") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 20), axis.title.y = element_text(size = 20), axis.text.x = element_text(size = 20), axis.text.y = element_text(size = 15))
+
+ggplot(data = melt(as.data.frame(tdn.list[[5]] / k.vec[5])),
+        aes(x = variable, y = value, col = variable)) +
+  geom_violin(trim = TRUE) +
+  stat_summary(fun.data = "mean_sdp", geom = "pointrange") +
+  scale_color_manual(values = method.col) +
+  labs(title = bquote(paste("Number of True Discoveries at ", FDR == .(q), " Cutoff")), x = "", y = "Power") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 20), axis.title.y = element_text(size = 20), axis.text.x = element_text(size = 20), axis.text.y = element_text(size = 15))
+
+boxplot(log(time.list[[5]]), main = "Time Elapsed in Logarithm", ylab = "Log (Time in Seconds)", col = c(method.col[1 : 5], 1))
 ```
 
 ## Session information
