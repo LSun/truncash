@@ -375,10 +375,10 @@ for (l in seq(nrow(tdn.avg))) {
 legend("topright", lty = 1, pch = seq(nrow(fdp.avg)), col = method.col, legend = method.name)
 ```
 
-### FDR and Power at low sparsity: $25\%$ true signal
+### FDR and Power at low sparsity: $20\%$ true signal
 
 ```{r sparse_cor 250, echo = FALSE, message = FALSE, warning = FALSE}
-ggplot(data = melt(as.data.frame(fdp.list[[1]])),
+ggplot(data = melt(as.data.frame(fdp.list[[2]])),
         aes(x = variable, y = value, col = variable)) +
   geom_violin(trim = TRUE) +
   stat_summary(fun.data = "mean_sdp", geom = "pointrange") +
@@ -387,7 +387,7 @@ ggplot(data = melt(as.data.frame(fdp.list[[1]])),
   labs(title = bquote(paste("False Discovery Proportions at ", FDR == .(q), " Cutoff")), x = "", y = "False Discovery Proportion (FDP)") +
   theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 20), axis.title.y = element_text(size = 20), axis.text.x = element_text(size = 20), axis.text.y = element_text(size = 15))
 
-ggplot(data = melt(as.data.frame(tdn.list[[1]] / k.vec[1])),
+ggplot(data = melt(as.data.frame(tdn.list[[2]] / k.vec[2])),
         aes(x = variable, y = value, col = variable)) +
   geom_violin(trim = TRUE) +
   stat_summary(fun.data = "mean_sdp", geom = "pointrange") +
@@ -395,13 +395,13 @@ ggplot(data = melt(as.data.frame(tdn.list[[1]] / k.vec[1])),
   labs(title = bquote(paste("Number of True Discoveries at ", FDR == .(q), " Cutoff")), x = "", y = "Power") +
   theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 20), axis.title.y = element_text(size = 20), axis.text.x = element_text(size = 20), axis.text.y = element_text(size = 15))
 
-boxplot(log(time.list[[1]]), main = "Time Elapsed in Logarithm", ylab = "Log (Time in Seconds)", col = c(method.col[1 : 5], 1))
+boxplot(log(time.list[[2]]), main = "Time Elapsed in Logarithm", ylab = "Log (Time in Seconds)", col = c(method.col[1 : 5], 1))
 ```
 
-### FDR and Power at high sparsity: $5\%$ true signal
+### FDR and Power at high sparsity: $10\%$ true signal
 
 ```{r sparse_cor 100, echo = FALSE, message = FALSE, warning = FALSE}
-ggplot(data = melt(as.data.frame(fdp.list[[5]])),
+ggplot(data = melt(as.data.frame(fdp.list[[4]])),
         aes(x = variable, y = value, col = variable)) +
   geom_violin(trim = TRUE) +
   stat_summary(fun.data = "mean_sdp", geom = "pointrange") +
@@ -410,7 +410,7 @@ ggplot(data = melt(as.data.frame(fdp.list[[5]])),
   labs(title = bquote(paste("False Discovery Proportions at ", FDR == .(q), " Cutoff")), x = "", y = "False Discovery Proportion (FDP)") +
   theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 20), axis.title.y = element_text(size = 20), axis.text.x = element_text(size = 20), axis.text.y = element_text(size = 15))
 
-ggplot(data = melt(as.data.frame(tdn.list[[5]] / k.vec[5])),
+ggplot(data = melt(as.data.frame(tdn.list[[4]] / k.vec[4])),
         aes(x = variable, y = value, col = variable)) +
   geom_violin(trim = TRUE) +
   stat_summary(fun.data = "mean_sdp", geom = "pointrange") +
@@ -418,7 +418,7 @@ ggplot(data = melt(as.data.frame(tdn.list[[5]] / k.vec[5])),
   labs(title = bquote(paste("Number of True Discoveries at ", FDR == .(q), " Cutoff")), x = "", y = "Power") +
   theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 20), axis.title.y = element_text(size = 20), axis.text.x = element_text(size = 20), axis.text.y = element_text(size = 15))
 
-boxplot(log(time.list[[5]]), main = "Time Elapsed in Logarithm", ylab = "Log (Time in Seconds)", col = c(method.col[1 : 5], 1))
+boxplot(log(time.list[[4]]), main = "Time Elapsed in Logarithm", ylab = "Log (Time in Seconds)", col = c(method.col[1 : 5], 1))
 ```
 
 ## Session information
