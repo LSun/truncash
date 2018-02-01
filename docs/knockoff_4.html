@@ -11,9 +11,9 @@
 
 <meta name="author" content="Lei Sun" />
 
-<meta name="date" content="2018-01-27" />
+<meta name="date" content="2018-01-30" />
 
-<title>Comparison with Knockoff: Start from \Sigma_{\hat\beta}</title>
+<title>Comparison with Knockoff: Independent Columns in X</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -304,9 +304,9 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Comparison with <code>Knockoff</code>: Start from <span class="math inline">\(\Sigma_{\hat\beta}\)</span></h1>
+<h1 class="title toc-ignore">Comparison with <code>Knockoff</code>: Independent Columns in <span class="math inline">\(X\)</span></h1>
 <h4 class="author"><em>Lei Sun</em></h4>
-<h4 class="date"><em>2018-01-27</em></h4>
+<h4 class="date"><em>2018-01-30</em></h4>
 
 </div>
 
@@ -322,45 +322,19 @@ shared across the workflowr files. -->
 <!-- Add your analysis here -->
 <section id="introduction" class="level2">
 <h2>Introduction</h2>
-<p>Similar to <a href="knockoff.html">previous simulations</a>, only that the design matrix <span class="math inline">\(X\)</span> is <a href="design_matrix.html#start_from_(sigma_%7Bhatbeta%7D)">simulated</a> such that <span class="math inline">\(\Sigma_{\hat\beta} = \sigma_e^2(X^TX)^{-1}\)</span> has non negligible off-diagnoal correlations.</p>
+<p>Similar to <a href="knockoff.html">previous simulation</a>, only that the design matrix <span class="math inline">\(X\)</span> is <a href="design_matrix.html#(sigma_=_i)">simulated</a> such that the columns in <span class="math inline">\(X\)</span> are independent.</p>
 </section>
-<section id="d-and-sigma_hatbeta" class="level2">
-<h2><span class="math inline">\(d\)</span> and <span class="math inline">\(\Sigma_{\hat\beta}\)</span></h2>
-<p>Let <span class="math inline">\(\Sigma_{\hat\beta} / \sigma_e^2 = B_{p \times d} \cdot B_{p \times d}^T + I\)</span>, where <span class="math inline">\(B_{i, j} \stackrel{\text{iid}}{\sim} N(0, 1)\)</span>. Then rescale the matrix such that the mean of its diagnal <span class="math inline">\(= 1\)</span>. Generate <span class="math inline">\(X_{n \times p}\)</span> such that <span class="math inline">\((X^TX)^{-1} = \Sigma_{\hat\beta} / \sigma_e^2\)</span>.</p>
-<p>Recall that the random coefficient of the second order of Gaussian deviative with the empirical distribution of correlated null <span class="math inline">\(W_2\)</span> has the property <span class="math display">\[
-Var(W_2) = \bar{\rho_{ij}^2}
-\]</span> We take a look at how <span class="math inline">\(d\)</span> is related to this quantity.</p>
-<p><img src="figure/knockoff_3.rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<section id="overall-fdr-and-power-comparison" class="level2">
+<h2>Overall FDR and Power comparison</h2>
+<p><img src="figure/knockoff_4.rmd/sparse_cor%20avg-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_4.rmd/sparse_cor%20avg-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_4.rmd/sparse_cor%20avg-3.png" width="672" style="display: block; margin: auto;" /></p>
 </section>
-<section id="eta-in-0.5-0.6-0.7-0.8-0.9-sigma_beta-sigma_e-3-d-sim-unif1-2-cdots-50" class="level2">
-<h2><span class="math inline">\(\eta \in \{0.5, 0.6, 0.7, 0.8, 0.9\}\)</span>, <span class="math inline">\(\sigma_\beta / \sigma_e = 3\)</span>, <span class="math inline">\(d \sim Unif\{1, 2, \cdots, 50\}\)</span></h2>
-<section id="overall-fdr-and-power-comparison" class="level3">
-<h3>Overall FDR and Power comparison</h3>
-<p><img src="figure/knockoff_3.rmd/avg-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_3.rmd/avg-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_3.rmd/avg-3.png" width="672" style="display: block; margin: auto;" /></p>
+<section id="fdr-and-power-at-low-sparsity-20-true-signal" class="level2">
+<h2>FDR and Power at low sparsity: <span class="math inline">\(20\%\)</span> true signal</h2>
+<p><img src="figure/knockoff_4.rmd/sparse_cor%20250-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_4.rmd/sparse_cor%20250-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_4.rmd/sparse_cor%20250-3.png" width="672" style="display: block; margin: auto;" /></p>
 </section>
-<section id="fdr-and-power-at-low-sparsity-50-true-signal" class="level3">
-<h3>FDR and Power at low sparsity: <span class="math inline">\(50\%\)</span> true signal</h3>
-<p><img src="figure/knockoff_3.rmd/500-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_3.rmd/500-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_3.rmd/500-3.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="fdr-and-power-at-high-sparsity-10-true-signal" class="level3">
-<h3>FDR and Power at high sparsity: <span class="math inline">\(10\%\)</span> true signal</h3>
-<p><img src="figure/knockoff_3.rmd/100-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_3.rmd/100-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_3.rmd/100-3.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-</section>
-<section id="eta-in-0.75-0.80-0.85-0.90-0.95-sigma_beta-sigma_e-3-d-sim-unif1-2-cdots-20" class="level2">
-<h2><span class="math inline">\(\eta \in \{0.75, 0.80, 0.85, 0.90, 0.95\}\)</span>, <span class="math inline">\(\sigma_\beta / \sigma_e = 3\)</span>, <span class="math inline">\(d \sim Unif\{1, 2, \cdots, 20\}\)</span></h2>
-<section id="overall-fdr-and-power-comparison-1" class="level3">
-<h3>Overall FDR and Power comparison</h3>
-<p><img src="figure/knockoff_3.rmd/sparse_cor%20avg-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_3.rmd/sparse_cor%20avg-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_3.rmd/sparse_cor%20avg-3.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="fdr-and-power-at-low-sparsity-20-true-signal" class="level3">
-<h3>FDR and Power at low sparsity: <span class="math inline">\(20\%\)</span> true signal</h3>
-<p><img src="figure/knockoff_3.rmd/sparse_cor%20250-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_3.rmd/sparse_cor%20250-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_3.rmd/sparse_cor%20250-3.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="fdr-and-power-at-high-sparsity-10-true-signal-1" class="level3">
-<h3>FDR and Power at high sparsity: <span class="math inline">\(10\%\)</span> true signal</h3>
-<p><img src="figure/knockoff_3.rmd/sparse_cor%20100-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_3.rmd/sparse_cor%20100-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_3.rmd/sparse_cor%20100-3.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
+<section id="fdr-and-power-at-high-sparsity-10-true-signal" class="level2">
+<h2>FDR and Power at high sparsity: <span class="math inline">\(10\%\)</span> true signal</h2>
+<p><img src="figure/knockoff_4.rmd/sparse_cor%20100-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_4.rmd/sparse_cor%20100-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_4.rmd/sparse_cor%20100-3.png" width="672" style="display: block; margin: auto;" /></p>
 </section>
 <section id="session-information" class="level2">
 <h2>Session information</h2>
