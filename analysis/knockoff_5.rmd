@@ -26,28 +26,38 @@ knitr::read_chunk("chunks.R")
 
 <!-- Add your analysis here -->
 
-```{r, echo = FALSE, eval = FALSE}
+## Knockoff setting
+
+```{r, echo = FALSE, cache = TRUE}
 fdp <- function(selected) sum(beta[selected] == 0) / max(length(selected), 1)
 power <- function(selected, k = k) sum(beta[selected] != 0) / max(k, 1)
 
 library(knockoff)
-
 set.seed(777)
+```
 
+```{r, echo = FALSE, cache = TRUE}
 n <- 3000
 p <- 1000
 k <- 30
-q <- 0.1
+q <- 0.2
 sigma.beta <- 3.5
 sigma.e <- 1
+```
 
+```{r, echo = FALSE, cache = TRUE}
+m <- 100
+
+result <- list()
+
+for (i in 1 : m) {
 X <- matrix(rnorm(n * p), n , p)
 X <- t(t(X) / sqrt(colSums(X^2)))
 beta <- rep(0, p)
 nonzero <- sample(p, k)
 beta[nonzero[1 : (k/2)]] <- sigma.beta * sigma.e
 beta[nonzero[(k/2 + 1) : k]] <- -sigma.beta * sigma.e
-e <- rnorm(n)
+e <- rnorm(n, 0, sigma.e)
 y <- X %*% beta + e
 
 ## Least squares
@@ -65,17 +75,185 @@ BH.selected <- (1 : p)[BH.fit <= q]
 knockoff.time <- system.time(knockoff.fit <- knockoff::knockoff.filter(X, y, knockoffs = create.fixed, statistic = stat.glmnet_lambdasmax, fdr = q))[3]
 knockoff.selected <- knockoff.fit$selected
 
-fdp(BH.selected)
-power(BH.selected, sum(beta != 0))
-fdp(knockoff.selected)
-power(knockoff.selected, sum(beta != 0))
+result[[i]] <- c(
+  fdp.BH = fdp(BH.selected),
+  fdp.knockoff = fdp(knockoff.selected),
+  power.BH = power(BH.selected, sum(beta != 0)),
+  power.knockoff = power(knockoff.selected, sum(beta != 0))
+)
+}
+```
 
+```{r, echo = FALSE}
+result.summary <- matrix(unlist(result), 10, 4, byrow = TRUE)
+colnames(result.summary) <- c("fdp.BH", "fdp.Knockoff", "power.BH", "power.Knockoff")
+colMeans(result.summary)
+```
 
+## With small signals
 
-beta.col <- rep("grey90", p)
-beta.col[nonzero] <- "red"
-plot(sort(zscore), col = beta.col[order(zscore)], pch = 19, cex = 0.5)
+```{r, echo = FALSE, cache = TRUE}
+m <- 100
 
+k.total <- 100
+large.cutoff <- sigma.beta
+
+result <- list()
+
+for (i in 1 : m) {
+X <- matrix(rnorm(n * p), n , p)
+X <- t(t(X) / sqrt(colSums(X^2)))
+beta <- rep(0, p)
+nonzero <- sample(p, k.total)
+beta[nonzero] <- pmin(large.cutoff, pmax(-large.cutoff, rnorm(k.total, 0, -large.cutoff * sigma.e / qnorm(k / 2 / k.total))))
+e <- rnorm(n, 0, sigma.e)
+y <- X %*% beta + e
+
+## Least squares
+ls.time <- system.time(lm.fit <- lm(y ~ X - 1))[3]
+betahat <- coef(lm.fit)
+sebetahat <- summary(lm.fit)$coefficients[, 2]
+pvalue <- summary(lm.fit)$coefficients[, 4]
+zscore <- -qnorm(pvalue / 2) * sign(summary(lm.fit)$coefficients[, 3])
+
+## BH
+BH.time <- system.time(BH.fit <- p.adjust(pvalue, method = "BH"))[3]
+BH.selected <- (1 : p)[BH.fit <= q]
+
+## Knockoff
+knockoff.time <- system.time(knockoff.fit <- knockoff::knockoff.filter(X, y, knockoffs = create.fixed, statistic = stat.glmnet_lambdasmax, fdr = q))[3]
+knockoff.selected <- knockoff.fit$selected
+
+large <- seq(p)[abs(beta) >= large.cutoff * sigma.e]
+small <- seq(p)[abs(beta) > 0 & abs(beta) < large.cutoff * sigma.e]
+
+result[[i]] <- c(
+  fdp.BH = fdp(BH.selected),
+  fdp.knockoff = fdp(knockoff.selected),
+  power.BH = power(BH.selected, sum(beta != 0)),
+  power.knockoff = power(knockoff.selected, sum(beta != 0)),
+  power.large.BH <- length(intersect(BH.selected, large)) / length(large),
+  power.large.knockoff <- length(intersect(knockoff.selected, large)) / length(large),
+  power.small.BH <- length(intersect(BH.selected, small)) / length(small),
+  power.small.knockoff <- length(intersect(knockoff.selected, small)) / length(small)
+)
+}
+```
+
+```{r, echo = FALSE}
+result.summary <- matrix(unlist(result), 10, 8, byrow = TRUE)
+colnames(result.summary) <- c("fdp.BH", "fdp.Knockoff", "power.BH", "power.Knockoff", "power.large.BH", "power.large.Knockoff", "power.small.BH", "power.small.Knockoff")
+colMeans(result.summary)
+```
+
+## With non-negligible correlations
+
+```{r, echo = FALSE, cache = TRUE}
+m <- 100
+
+result <- list()
+d.max <- 50
+
+for (i in 1 : m) {
+d <- sample(d.max, 1)
+B <- matrix(rnorm(p * d, 0, 1), p, d)
+Sigma.betahat <- tcrossprod(B) + diag(p)
+Sigma.betahat <- Sigma.betahat / mean(diag(Sigma.betahat)) * 1.5
+X <- svd(matrix(rnorm(n * p), n, p))$u %*% chol(solve(Sigma.betahat))
+beta <- rep(0, p)
+nonzero <- sample(p, k)
+beta[nonzero[1 : (k/2)]] <- sigma.beta * sigma.e
+beta[nonzero[(k/2 + 1) : k]] <- -sigma.beta * sigma.e
+e <- rnorm(n, 0, sigma.e)
+y <- X %*% beta + e
+
+## Least squares
+ls.time <- system.time(lm.fit <- lm(y ~ X - 1))[3]
+betahat <- coef(lm.fit)
+sebetahat <- summary(lm.fit)$coefficients[, 2]
+pvalue <- summary(lm.fit)$coefficients[, 4]
+zscore <- -qnorm(pvalue / 2) * sign(summary(lm.fit)$coefficients[, 3])
+
+## BH
+BH.time <- system.time(BH.fit <- p.adjust(pvalue, method = "BH"))[3]
+BH.selected <- (1 : p)[BH.fit <= q]
+
+## Knockoff
+knockoff.time <- system.time(knockoff.fit <- knockoff::knockoff.filter(X, y, knockoffs = create.fixed, statistic = stat.glmnet_lambdasmax, fdr = q))[3]
+knockoff.selected <- knockoff.fit$selected
+
+result[[i]] <- c(
+  fdp.BH = fdp(BH.selected),
+  fdp.knockoff = fdp(knockoff.selected),
+  power.BH = power(BH.selected, sum(beta != 0)),
+  power.knockoff = power(knockoff.selected, sum(beta != 0))
+)
+}
+```
+
+```{r, echo = FALSE}
+result.summary <- matrix(unlist(result), 10, 4, byrow = TRUE)
+colnames(result.summary) <- c("fdp.BH", "fdp.Knockoff", "power.BH", "power.Knockoff")
+colMeans(result.summary)
+```
+
+## With small signals and non-negligible correlations
+
+```{r, echo = FALSE, cache = TRUE}
+m <- 100
+
+result <- list()
+d.max <- 50
+
+for (i in 1 : m) {
+d <- sample(d.max, 1)
+B <- matrix(rnorm(p * d, 0, 1), p, d)
+Sigma.betahat <- tcrossprod(B) + diag(p)
+Sigma.betahat <- Sigma.betahat / mean(diag(Sigma.betahat)) * 1.5
+X <- svd(matrix(rnorm(n * p), n, p))$u %*% chol(solve(Sigma.betahat))
+
+beta <- rep(0, p)
+nonzero <- sample(p, k.total)
+beta[nonzero] <- pmin(large.cutoff, pmax(-large.cutoff, rnorm(k.total, 0, -large.cutoff * sigma.e / qnorm(k / 2 / k.total))))
+
+e <- rnorm(n, 0, sigma.e)
+y <- X %*% beta + e
+
+## Least squares
+ls.time <- system.time(lm.fit <- lm(y ~ X - 1))[3]
+betahat <- coef(lm.fit)
+sebetahat <- summary(lm.fit)$coefficients[, 2]
+pvalue <- summary(lm.fit)$coefficients[, 4]
+zscore <- -qnorm(pvalue / 2) * sign(summary(lm.fit)$coefficients[, 3])
+
+## BH
+BH.time <- system.time(BH.fit <- p.adjust(pvalue, method = "BH"))[3]
+BH.selected <- (1 : p)[BH.fit <= q]
+
+## Knockoff
+knockoff.time <- system.time(knockoff.fit <- knockoff::knockoff.filter(X, y, knockoffs = create.fixed, statistic = stat.glmnet_lambdasmax, fdr = q))[3]
+knockoff.selected <- knockoff.fit$selected
+
+large <- seq(p)[abs(beta) >= large.cutoff * sigma.e]
+small <- seq(p)[abs(beta) > 0 & abs(beta) < large.cutoff * sigma.e]
+
+result[[i]] <- c(
+  fdp.BH = fdp(BH.selected),
+  fdp.knockoff = fdp(knockoff.selected),
+  power.BH = power(BH.selected, sum(beta != 0)),
+  power.knockoff = power(knockoff.selected, sum(beta != 0)),
+  power.large.BH <- length(intersect(BH.selected, large)) / length(large),
+  power.large.knockoff <- length(intersect(knockoff.selected, large)) / length(large),
+  power.small.BH <- length(intersect(BH.selected, small)) / length(small),
+  power.small.knockoff <- length(intersect(knockoff.selected, small)) / length(small)
+)
+}
+```
+
+```{r, echo = FALSE}
+result.summary <- matrix(unlist(result), 10, 8, byrow = TRUE)
+colnames(result.summary) <- c("fdp.BH", "fdp.Knockoff", "power.BH", "power.Knockoff", "power.large.BH", "power.large.Knockoff", "power.small.BH", "power.small.Knockoff")
+colMeans(result.summary)
 ```
 
 ## Session information
