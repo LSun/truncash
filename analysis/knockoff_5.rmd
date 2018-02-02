@@ -30,11 +30,13 @@ knitr::read_chunk("chunks.R")
 fdp <- function(selected) sum(beta[selected] == 0) / max(length(selected), 1)
 power <- function(selected, k = k) sum(beta[selected] != 0) / max(k, 1)
 
+library(knockoff)
+
 set.seed(777)
 
 n <- 3000
 p <- 1000
-k <- 200
+k <- 30
 q <- 0.1
 sigma.beta <- 3.5
 sigma.e <- 1
@@ -45,8 +47,6 @@ beta <- rep(0, p)
 nonzero <- sample(p, k)
 beta[nonzero[1 : (k/2)]] <- sigma.beta * sigma.e
 beta[nonzero[(k/2 + 1) : k]] <- -sigma.beta * sigma.e
-signal <- rnorm(k, 0, 2.5)
-beta[nonzero] <- signal * as.numeric(abs(signal) >= 3.5)
 e <- rnorm(n)
 y <- X %*% beta + e
 
@@ -61,18 +61,12 @@ zscore <- -qnorm(pvalue / 2) * sign(summary(lm.fit)$coefficients[, 3])
 BH.time <- system.time(BH.fit <- p.adjust(pvalue, method = "BH"))[3]
 BH.selected <- (1 : p)[BH.fit <= q]
 
-## qvalue
-qvalue.time <- system.time(qvalue.fit <- qvalue::qvalue(pvalue))[3]
-qvalue.selected <- (1 : p)[qvalue.fit$qvalues <= q]
-
 ## Knockoff
 knockoff.time <- system.time(knockoff.fit <- knockoff::knockoff.filter(X, y, knockoffs = create.fixed, statistic = stat.glmnet_lambdasmax, fdr = q))[3]
 knockoff.selected <- knockoff.fit$selected
 
 fdp(BH.selected)
 power(BH.selected, sum(beta != 0))
-fdp(qvalue.selected)
-power(qvalue.selected, sum(beta != 0))
 fdp(knockoff.selected)
 power(knockoff.selected, sum(beta != 0))
 
