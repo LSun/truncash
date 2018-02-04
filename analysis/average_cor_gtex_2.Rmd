@@ -1,0 +1,107 @@
+---
+title: "Average Correlation in GTEx: 50 vs 50"
+author: "Lei Sun"
+date: 2018-02-03
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+## Introduction
+
+```{r, echo = FALSE, message = FALSE}
+source("../code/gdash_lik.R")
+source("../code/gdfit.R")
+source("../code/count_to_summary.R")
+```
+
+```{r, echo = FALSE, cache = TRUE}
+liver <- readRDS("../data/liver.sim.rds")
+nsim <- 1000
+nsamp <- 50
+set.seed(777)
+z.mat <- matrix(0, nsim, nrow(liver))
+for (i in 1 : nsim) {
+  counts <- liver[, sample(ncol(liver), 2 * nsamp)]
+  design <- model.matrix(~c(rep(0, nsamp), rep(1, nsamp)))
+  summary <- count_to_summary(counts, design)
+  z.mat[i, ] <- summary$z
+}
+```
+
+```{r, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
+conv <- w1 <- w2 <- c()
+for (i in 1 : nsim) {
+  z <- as.numeric(z.mat[i, ])
+  gd.fit <- gdfit(z, gd.ord = 6)
+  conv[i] <- gd.fit$status
+  w1[i] <- gd.fit$w[2]
+  w2[i] <- gd.fit$w[3]
+}
+```
+
+## Severe deflation
+
+```{r, echo = FALSE, cache = TRUE}
+w2.order <- order(w2)
+for (i in w2.order[1 : 10]) {
+  z <- as.numeric(z.mat[i, ])
+  gd.fit <- gdfit(z, gd.ord = 4)
+  plot.gdfit(z, gd.fit$w, gd.fit$gd.ord)
+  w1[i] <- gd.fit$w[2]
+  w2[i] <- gd.fit$w[3]
+}
+```
+
+## Severe inflation
+
+```{r, echo = FALSE, cache = TRUE}
+w2.order <- order(w2, decreasing = TRUE)
+for (i in w2.order[1 : 10]) {
+  z <- as.numeric(z.mat[i, ])
+  gd.fit <- gdfit(z, gd.ord = 6)
+  plot.gdfit(z, gd.fit$w, gd.fit$gd.ord)
+}
+```
+
+## $W_1$
+
+```{r, echo = FALSE, fig.asp = 0.4, fig.width = 12}
+par(mfrow = c(1, 2))
+hist(w1, xlab = expression(w[1]), main = bquote(paste("mean = ", .(mean(w1)), "; sd = ", .(sd(w1)))))
+hist(abs(w1), xlab = expression(paste("|",w[1],"|")), main = bquote(paste("mean = ", .(mean(abs(w1))), "; sd = ", .(sd(abs(w1))))))
+```
+
+## $W_2$
+
+```{r, echo = FALSE, fig.asp = 0.4, fig.width = 12}
+par(mfrow = c(1, 2))
+hist(w2, xlab = expression(w[2]), main = bquote(paste("mean = ", .(mean(w2)), "; sd = ", .(sd(w2)), "; ", sqrt(bar(W[2]^2)), "= ", .(sqrt(mean(w2^2))))))
+hist(abs(w2), xlab = expression(paste("|",w[2],"|")), main = bquote(paste("mean = ", .(mean(abs(w2))), "; sd = ", .(sd(abs(w2))), "; ", sqrt(bar(W[2]^2)), "= ", .(sqrt(mean(w2^2))))))
+```
+
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```

@@ -1,0 +1,113 @@
+---
+title: "Average Correlation in GTEx: 5 vs 5"
+author: "Lei Sun"
+date: 2018-02-03
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+## Introduction
+
+```{r, echo = FALSE, message = FALSE}
+source("../code/gdash_lik.R")
+source("../code/gdfit.R")
+```
+
+```{r, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
+z.mat <- readRDS("../output/z_null_liver_777.rds")
+conv <- w1 <- w2 <- c()
+for (i in 1 : 1000) {
+  z <- as.numeric(z.mat[i, ])
+  gd.fit <- gdfit(z, gd.ord = 6)
+  conv[i] <- gd.fit$status
+  w1[i] <- gd.fit$w[2]
+  w2[i] <- gd.fit$w[3]
+}
+```
+
+## Severe deflation
+
+```{r, echo = FALSE, cache = TRUE}
+w2.order <- order(w2)
+for (i in w2.order[1 : 10]) {
+  z <- as.numeric(z.mat[i, ])
+  gd.fit <- gdfit(z, gd.ord = 4)
+  plot.gdfit(z, gd.fit$w, gd.fit$gd.ord)
+  w1[i] <- gd.fit$w[2]
+  w2[i] <- gd.fit$w[3]
+}
+```
+
+## Severe inflation
+
+```{r, echo = FALSE, cache = TRUE}
+w2.order <- order(w2, decreasing = TRUE)
+for (i in w2.order[1 : 10]) {
+  z <- as.numeric(z.mat[i, ])
+  gd.fit <- gdfit(z, gd.ord = 6)
+  plot.gdfit(z, gd.fit$w, gd.fit$gd.ord)
+}
+```
+
+## $W_1$
+
+```{r, echo = FALSE, fig.asp = 0.4, fig.width = 12}
+par(mfrow = c(1, 2))
+hist(w1, xlab = expression(w[1]), main = bquote(paste("mean = ", .(mean(w1)), "; sd = ", .(sd(w1)))))
+hist(abs(w1), xlab = expression(paste("|",w[1],"|")), main = bquote(paste("mean = ", .(mean(abs(w1))), "; sd = ", .(sd(abs(w1))))))
+```
+
+## $W_2$
+
+```{r, echo = FALSE, fig.asp = 0.4, fig.width = 12}
+par(mfrow = c(1, 2))
+hist(w2, xlab = expression(w[2]), main = bquote(paste("mean = ", .(mean(w2)), "; sd = ", .(sd(w2)), "; ", sqrt(bar(W[2]^2)), "= ", .(sqrt(mean(w2^2))))))
+hist(abs(w2), xlab = expression(paste("|",w[2],"|")), main = bquote(paste("mean = ", .(mean(abs(w2))), "; sd = ", .(sd(abs(w2))), "; ", sqrt(bar(W[2]^2)), "= ", .(sqrt(mean(w2^2))))))
+```
+
+## $\sigma(W_2)$ obtained by the factor model
+
+$\Sigma = B_{p \times d}B^T + I$
+
+```{r, echo = FALSE, cache = TRUE}
+p <- 1000
+w2.sd <- c()
+
+for (d in 1 : 1000) {
+B <- matrix(rnorm(p * d, 0, 1), p, d)
+Sigma.betahat <- B %*% t(B) + diag(p)
+Rho.betahat <- cov2cor(Sigma.betahat)
+w2.sd[d] <- sqrt((sum(Rho.betahat^2) - p) / (p * (p - 1)))
+}
+```
+
+```{r, echo = FALSE}
+par(mar = c(4.5, 5, 2.5, 0.5))
+plot(w2.sd, xlab = "d", ylab = expression(sigma(W[2]) == sqrt(bar(rho[ij]^2))), main = expression(paste("Square root of the average squared correlation among ", hat(beta)[i], " and ", hat(beta)[j])))
+```
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```
