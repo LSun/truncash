@@ -256,6 +256,64 @@ colnames(result.summary) <- c("fdp.BH", "fdp.Knockoff", "power.BH", "power.Knock
 colMeans(result.summary)
 ```
 
+
+## With non-negligible correlations 2
+
+```{r, echo = FALSE, cache = TRUE}
+m <- 200
+
+result <- list()
+d.max <- 100
+
+for (i in 1 : m) {
+d <- sample(d.max, 1)
+B <- matrix(rnorm(p * d, 0, 1), p, d)
+Sigma.betahat <- tcrossprod(B) + diag(p)
+Cor.betahat <- cov2cor(Sigma.betahat)
+
+X <- matrix(rnorm(n * p), n, p)
+X <- t(t(X) / sqrt(colSums(X^2)))
+X <- X %*% chol(solve(Cor.betahat))
+
+beta <- rep(0, p)
+nonzero <- sample(p, k)
+beta[nonzero[1 : (k/2)]] <- sigma.beta * sigma.e
+beta[nonzero[(k/2 + 1) : k]] <- -sigma.beta * sigma.e
+e <- rnorm(n, 0, sigma.e)
+y <- X %*% beta + e
+
+## Least squares
+ls.time <- system.time(lm.fit <- lm(y ~ X - 1))[3]
+betahat <- coef(lm.fit)
+sebetahat <- summary(lm.fit)$coefficients[, 2]
+pvalue <- summary(lm.fit)$coefficients[, 4]
+zscore <- -qnorm(pvalue / 2) * sign(summary(lm.fit)$coefficients[, 3])
+
+## BH
+BH.time <- system.time(BH.fit <- p.adjust(pvalue, method = "BH"))[3]
+BH.selected <- (1 : p)[BH.fit <= q]
+
+## Knockoff
+knockoff.time <- system.time(knockoff.fit <- knockoff::knockoff.filter(X, y, knockoffs = create.fixed, statistic = stat.glmnet_lambdasmax, fdr = q))[3]
+knockoff.selected <- knockoff.fit$selected
+
+result[[i]] <- c(
+  fdp.BH = fdp(BH.selected),
+  fdp.knockoff = fdp(knockoff.selected),
+  power.BH = power(BH.selected, sum(beta != 0)),
+  power.knockoff = power(knockoff.selected, sum(beta != 0))
+)
+}
+```
+
+```{r, echo = FALSE}
+result.summary <- matrix(unlist(result), 10, 4, byrow = TRUE)
+colnames(result.summary) <- c("fdp.BH", "fdp.Knockoff", "power.BH", "power.Knockoff")
+colMeans(result.summary)
+boxplot(result.summary[, 1], result.summary[, 2])
+boxplot(result.summary[, 3], result.summary[, 4])
+```
+
 ## Session information
 
 <!-- Insert the session information into the document -->
