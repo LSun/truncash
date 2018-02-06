@@ -28,12 +28,22 @@ knitr::read_chunk("chunks.R")
 
 ## Introduction
 
+For a fixed design matrix $X$, $\hat\beta \sim N(\beta, \sigma_e^2(X^TX)^{-1})$, and the empirical distribution of $\hat z_j = \hat\beta_j / \hat{\text{SE}}(\hat\beta_j)$ under the null will depend on the average correlation in $(X^TX)^{-1}$.
+
+Actually the most important quantity to determine the shape of the empirical distribution of $\hat z_j$ is the square root of the mean squared correlation among $\hat\beta_j$'s, that is, $\sqrt{\overline{\rho_{\hat\beta_i, \hat\beta_j}^2}}$.
+
+Now we are taking a look at this quantity for some commonly used design matrix in linear regression simulations.
+
+In all three settings, each row of $X_{n \times p}$ is independently drawn from a $N(0, \Sigma)$ distribution, where the diagonal elements of $\Sigma$ are all one. Then the columns of $X$ are normalized such that $\|X_j\|_2^2 = 1$.
+
 ```{r, echo = FALSE}
 n <- 3000
 p <- 1000
 ```
 
 ## Independent and normalized columns
+
+$\Sigma = I$.
 
 ```{r, echo = FALSE, cache = TRUE}
 set.seed(777)
@@ -50,13 +60,16 @@ hist(sebetahat, xlab = expression(SE(hat(beta))))
 
 ## Toeplitz column correlation
 
+$\Sigma_{ij} = \rho^{|i - j|}$
+
 ## $\text{SE}\left(\hat\beta_j\right)$
 
 ```{r, echo = FALSE, cache = TRUE}
 sqroot.avg.sq.rho.betahat <- sqroot.avg.sq.rho.X <- c()
+mean.sebetahat <- sd.sebetahat <- c()
 i <- 1
 set.seed(777)
-for (rho in seq(0.05, 0.95, by = 0.05)) {
+for (rho in seq(0.01, 0.99, by = 0.01)) {
   ## generate correlation matrix of X columns
   Sigma.X <- toeplitz(rho^(0 : (p - 1)))
   Rho.X <- cov2cor(Sigma.X)
@@ -69,27 +82,37 @@ for (rho in seq(0.05, 0.95, by = 0.05)) {
   Rho.betahat <- cov2cor(Sigma.betahat)
   sqroot.avg.sq.rho.betahat[i] <- (sum(Rho.betahat^2) - p) / (p * (p - 1))
   sebetahat <- sqrt(diag(Sigma.betahat))
-  hist(sebetahat, xlab = expression(SE(hat(beta))), main = bquote(paste(rho, "= ", .(rho))))
+  mean.sebetahat[i] <- mean(sebetahat)
+  sd.sebetahat[i] <- sd(sebetahat)
   i <- i + 1
 }
 ```
 
-## Correlation among $X_j$ and $\hat\beta_j$
-
-```{r, echo = FALSE, cache = TRUE}
+```{r, echo = FALSE}
 par(mar = c(4.5, 5, 2, 0.5))
-plot(seq(0.05, 0.95, by = 0.05), sqroot.avg.sq.rho.X, xlab = expression(rho), ylab = expression(sqrt(bar(rho[ij]^2))), type = "o", pch = 17, main = expression(Cor(X)))
-plot(seq(0.05, 0.95, by = 0.05), sqroot.avg.sq.rho.betahat, xlab = expression(rho), ylab = expression(sqrt(bar(rho[ij]^2))), type = "o", pch = 2, main = expression(Cor(hat(beta))))
+plot(seq(0.01, 0.99, by = 0.01), mean.sebetahat, xlab = expression(rho), ylab = expression(bar(SE(hat(beta[j])))))
+plot(seq(0.01, 0.99, by = 0.01), mean.sebetahat, xlab = expression(rho), ylab = expression(SD(SE(hat(beta[j])))))
+```
+
+## Average orrelation among $X_j$ and $\hat\beta_j$
+
+```{r, echo = FALSE}
+par(mar = c(4.5, 5, 2, 0.5))
+plot(seq(0.01, 0.99, by = 0.01), sqroot.avg.sq.rho.X, xlab = expression(rho), ylab = expression(sqrt(bar(rho[ij]^2))), type = "o", pch = 17, main = expression(Cor(X)), cex = 0.2)
+plot(seq(0.01, 0.99, by = 0.01), sqroot.avg.sq.rho.betahat, xlab = expression(rho), ylab = expression(sqrt(bar(rho[ij]^2))), type = "o", pch = 2, main = expression(Cor(hat(beta))), cex = 0.2)
 abline(h = sqroot.avg.sq.rho.betahat.indep, lty = 2, col = "green")
 sqroot.avg.sq.rho.betahat.toeplitz <- sqroot.avg.sq.rho.betahat
 ```
 
 ## Factor model column correlation
 
+$\Sigma = \texttt{cov2cor}(B_{p \times d}B_{d\times p}^T + I)$
+
 ## $\text{SE}\left(\hat\beta_j\right)$
 
 ```{r, echo = FALSE, cache = TRUE}
 sqroot.avg.sq.rho.betahat <- sqroot.avg.sq.rho.X <- c()
+mean.sebetahat <- sd.sebetahat <- c()
 i <- 1
 set.seed(777)
 for (d in 1 : 1000) {
@@ -105,18 +128,25 @@ for (d in 1 : 1000) {
   Rho.betahat <- cov2cor(Sigma.betahat)
   sqroot.avg.sq.rho.betahat[i] <- (sum(Rho.betahat^2) - p) / (p * (p - 1))
   sebetahat <- sqrt(diag(Sigma.betahat))
-  hist(sebetahat, xlab = expression(SE(hat(beta))), main = bquote(paste(d, "= ", .(d))))
+  mean.sebetahat <- mean(sebetahat)
+  sd.sebetahat <- sd(sebetahat)
   i <- i + 1
 }
 ```
 
-## Correlation among $X_j$ and $\hat\beta_j$.
+```{r, echo = FALSE}
+par(mar = c(4.5, 5, 2, 0.5))
+plot(seq(0.01, 0.99, by = 0.01), mean.sebetahat, xlab = expression(rho), ylab = expression(bar(SE(hat(beta[j])))))
+plot(seq(0.01, 0.99, by = 0.01), mean.sebetahat, xlab = expression(rho), ylab = expression(SD(SE(hat(beta[j])))))
+```
+
+## Average correlation among $X_j$ and $\hat\beta_j$.
 
 ```{r, echo = FALSE}
 par(mar = c(4.5, 5, 2, 0.5))
-plot(1 : 1000, sqroot.avg.sq.rho.X, xlab = expression(d), ylab = expression(sqrt(bar(rho[ij]^2))), type = "o", pch = 17, main = expression(Cor(X)), cex = 0.1)
-plot(1 : 1000, sqroot.avg.sq.rho.betahat, xlab = expression(d), ylab = expression(sqrt(bar(rho[ij]^2))), type = "o", pch = 2, main = expression(Cor(hat(beta))), cex = 0.1, ylim = range(sqroot.avg.sq.rho.betahat, sqroot.avg.sq.rho.betahat.toeplitz, sqroot.avg.sq.rho.betahat.indep))
-lines(seq(1, 1000, length = 19), sqroot.avg.sq.rho.betahat.toeplitz, lty = 2, col = "blue")
+plot(1 : 1000, sqroot.avg.sq.rho.X, xlab = expression(d), ylab = expression(sqrt(bar(rho[ij]^2))), type = "o", pch = 17, main = expression(Cor(X)), cex = 0.2)
+plot(1 : 1000, sqroot.avg.sq.rho.betahat, xlab = expression(d), ylab = expression(sqrt(bar(rho[ij]^2))), type = "o", pch = 2, main = expression(Cor(hat(beta))), cex = 0.2, ylim = range(sqroot.avg.sq.rho.betahat, sqroot.avg.sq.rho.betahat.toeplitz, sqroot.avg.sq.rho.betahat.indep))
+lines(seq(1, 1000, length = 99), sqroot.avg.sq.rho.betahat.toeplitz, lty = 2, col = "blue")
 abline(h = sqroot.avg.sq.rho.betahat.indep, lty = 2, col = "green")
 ```
 
