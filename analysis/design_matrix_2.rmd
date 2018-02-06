@@ -137,8 +137,8 @@ for (d in 1 : 1000) {
 
 ```{r, echo = FALSE}
 par(mar = c(4.5, 5, 2, 0.5))
-plot(1 : 1000, mean.sebetahat, xlab = expression(rho), ylab = expression(bar(SE(hat(beta[j])))))
-plot(1 : 1000, sd.sebetahat, xlab = expression(rho), ylab = expression(SD(SE(hat(beta[j])))))
+plot(1 : 1000, mean.sebetahat, xlab = expression(d), ylab = expression(bar(SE(hat(beta[j])))))
+plot(1 : 1000, sd.sebetahat, xlab = expression(d), ylab = expression(SD(SE(hat(beta[j])))))
 ```
 
 ### Average correlation among $X_j$ and $\hat\beta_j$.
