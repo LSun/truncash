@@ -11,9 +11,9 @@
 
 <meta name="author" content="Lei Sun" />
 
-<meta name="date" content="2018-02-01" />
+<meta name="date" content="2018-02-05" />
 
-<title>Knockoff on Correlated Design Matrix</title>
+<title>Knockoff on Small Signals</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -304,9 +304,9 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore"><code>Knockoff</code> on Correlated Design Matrix</h1>
+<h1 class="title toc-ignore"><code>Knockoff</code> on Small Signals</h1>
 <h4 class="author"><em>Lei Sun</em></h4>
-<h4 class="date"><em>2018-02-01</em></h4>
+<h4 class="date"><em>2018-02-05</em></h4>
 
 </div>
 
@@ -322,54 +322,25 @@ shared across the workflowr files. -->
 <!-- Add your analysis here -->
 <section id="introduction" class="level2">
 <h2>Introduction</h2>
-<p>In the <code>Knockoff</code> paper simulations, the columns of <span class="math inline">\(X\)</span> are either independent or simulated from a Toeplitz correlation where <span class="math inline">\(Cor(X_i, X_j) = \rho^{|i - j|}\)</span>. Here we are replicating the independent results, and investigating how well <code>Knockoff</code> deal with other correlation structures.</p>
-<p>In the following simulations, we always have <span class="math inline">\(n = 3000\)</span>, <span class="math inline">\(p = 1000\)</span>. Out of <span class="math inline">\(p = 1000\)</span> <span class="math inline">\(\beta_j\)</span>’s, <span class="math inline">\(970\)</span> of them are zeroes, and the rest <span class="math inline">\(k = 30\)</span> signals have <span class="math inline">\(15\)</span> <span class="math inline">\(\beta_j = A\)</span> and <span class="math inline">\(15\)</span> <span class="math inline">\(\beta_j = -A\)</span>. For a certain <span class="math inline">\(X\)</span>, <span class="math inline">\(Y_n \sim N(X_{n\times p}\beta_p, I_n)\)</span>. Here are three scenarios to generate the columns of <span class="math inline">\(X_{n \times p}\)</span>.</p>
+<p>In the <code>Knockoff</code> paper simulations, <span class="math inline">\(\beta\)</span>’s are either <span class="math inline">\(0\)</span> or <span class="math inline">\(A\)</span>. Here we are replicating the results, and investigating how well <code>Knockoff</code> deal with small signals.</p>
+<p>In the following simulations, we always have <span class="math inline">\(n = 3000\)</span>, <span class="math inline">\(p = 1000\)</span>, <span class="math inline">\(X_{n \times p}\)</span> has independent columns simulated from <span class="math inline">\(N(0, 1)\)</span> and then normalized to have <span class="math inline">\(\|X_j\|_2^2 \equiv 1\)</span>. For a certain <span class="math inline">\(\beta\)</span>, <span class="math inline">\(Y_n \sim N(X_{n\times p}\beta_p, I_n)\)</span>. Out of <span class="math inline">\(p = 1000\)</span> <span class="math inline">\(\beta_j\)</span>’s, here are three scenarios.</p>
 <ul>
-<li>Scenario 1: Each row of <span class="math inline">\(X\)</span> are independently drawn from <span class="math inline">\(N(0, I_p)\)</span>. All columns of <span class="math inline">\(X\)</span> are normalized such that <span class="math inline">\(\|X_j\|_2^2 = 1\)</span>. The signal magnitude <span class="math inline">\(A = 3.5\)</span>.</li>
-<li>Scenario 2: Each row of <span class="math inline">\(X\)</span> are independently drawn from <span class="math inline">\(N(0, \Sigma_X)\)</span>, where <span class="math inline">\(\Sigma_X = \texttt{cov2cor}(B_{p \times d}B_{d\times p}^T + I)\)</span>, <span class="math inline">\(d = 5\)</span>. All columns of <span class="math inline">\(X\)</span> are normalized such that <span class="math inline">\(\|X_j\|_2^2 = 1\)</span>. The signal magnitude <span class="math inline">\(A = 8\)</span>. <a href="design_matrix_2.html">In this case the columns of <span class="math inline">\(X\)</span> will have substantial average correlation, but not necessarily so for <span class="math inline">\(\hat\beta\)</span></a>.</li>
-<li>Scenario 3: Each row of <span class="math inline">\(X\)</span> are independently drawn from <span class="math inline">\(N(0, \Sigma_{\hat\beta}^{-1})\)</span>, where <span class="math inline">\(\Sigma_{\hat\beta} = \texttt{cov2cor}(B_{p \times d}B_{d\times p}^T + I)\)</span>, <span class="math inline">\(d \sim \text{Unif}\{1, 2, \ldots, 100\}\)</span>. In this case <span class="math inline">\(\hat\beta_j\)</span>’s will have substantial average correlation. The signal magnitude <span class="math inline">\(A = 3.5\)</span>.</li>
+<li>Scenario 1: <span class="math inline">\(950\)</span> are 0, <span class="math inline">\(25\)</span> are <span class="math inline">\(3.5\)</span>, <span class="math inline">\(25\)</span> are <span class="math inline">\(-3.5\)</span>. (replicating a data point on Fig 3 of the <code>Knockoff</code> paper)</li>
+<li>Scenario 2: <span class="math inline">\(900\)</span> are 0, <span class="math inline">\(100\)</span> are <span class="math inline">\((N(0, 5.19^2) \wedge 3.5) \vee (-3.5)\)</span> so that <span class="math inline">\(50\)</span> of them are expected to be larger than <span class="math inline">\(3.5\)</span> or smaller than <span class="math inline">\(-3.5\)</span>. And then we truncate these large signals to make them to be <span class="math inline">\(3.5\)</span> or <span class="math inline">\(-3.5\)</span>.</li>
+<li>Scenario 3: Similar to Scenario 2, only that <span class="math inline">\(800\)</span> are 0, <span class="math inline">\(200\)</span> are <span class="math inline">\((N(0, 3.04^2) \wedge 3.5) \vee (-3.5)\)</span> so we still have on average <span class="math inline">\(50\)</span> of them are expected to be <span class="math inline">\(3.5\)</span> or <span class="math inline">\(-3.5\)</span>.</li>
 </ul>
-<p>All simulations are using <span class="math inline">\(q = 0.2\)</span> cutoff.</p>
-<pre class="r"><code>set.seed(777)</code></pre>
 </section>
-<section id="scenario-1-independent-x-columns" class="level2">
-<h2>Scenario 1: Independent <span class="math inline">\(X\)</span> columns</h2>
-<pre class="r"><code>## Independent columns
-X &lt;- matrix(rnorm(n * p), n , p)
-## Normalization
-X &lt;- t(t(X) / sqrt(colSums(X^2)))</code></pre>
+<section id="scenario-1-50-large-signals-no-small-signals-950-zeroes." class="level2">
+<h2>Scenario 1: 50 large signals, no small signals, 950 zeroes.</h2>
+<p><img src="figure/knockoff_6.rmd/unnamed-chunk-4-1.png" width="1152" style="display: block; margin: auto;" /></p>
 </section>
-<section id="scenario-2-x-from-a-factor-model" class="level2">
-<h2>Scenario 2: <span class="math inline">\(X\)</span> from a factor model</h2>
-<pre class="r"><code>## Generate correlation matrix of X
-d &lt;- 5
-B &lt;- matrix(rnorm(p * d, 0, 1), p, d)
-Sigma.X &lt;- tcrossprod(B) + diag(p)
-Rho.X &lt;- cov2cor(Sigma.X)
-## Simulate X
-X &lt;- matrix(rnorm(n * p), n, p) %*% chol(Rho.X)
-## Normalization
-X &lt;- t(t(X) / sqrt(colSums(X^2)))
-## Average sebetahat
-sqrt(mean(diag(solve(crossprod(X)))))</code></pre>
-<pre><code>[1] 2.979758</code></pre>
-<pre class="r"><code>## Signal strength
-A &lt;- 8</code></pre>
+<section id="scenario-2-50-large-signals-50-small-signals-900-zeroes." class="level2">
+<h2>Scenario 2: 50 large signals, 50 small signals, 900 zeroes.</h2>
+<p><img src="figure/knockoff_6.rmd/unnamed-chunk-6-1.png" width="1152" style="display: block; margin: auto;" /></p>
 </section>
-<section id="scenario-3-hatbeta-from-a-factor-model" class="level2">
-<h2>Scenario 3: <span class="math inline">\(\hat\beta\)</span> from a factor model</h2>
-<pre class="r"><code>## Generate correlation matrix of betahat
-d.max &lt;- 100
-d &lt;- sample(d.max, 1)
-B &lt;- matrix(rnorm(p * d, 0, 1), p, d)
-Sigma.betahat &lt;- tcrossprod(B) + diag(p)
-Cor.betahat &lt;- cov2cor(Sigma.betahat)
-## Simulate X with independent columns
-X &lt;- matrix(rnorm(n * p), n, p)
-## Normalize X
-X &lt;- t(t(X) / sqrt(colSums(X^2)))
-## Transform independent columns to have Sigma_betahat^{-1} correlation structure
-X &lt;- X %*% chol(solve(Cor.betahat))</code></pre>
+<section id="scenario-3-50-large-signals-150-small-signals-800-zeroes." class="level2">
+<h2>Scenario 3: 50 large signals, 150 small signals, 800 zeroes.</h2>
+<p><img src="figure/knockoff_6.rmd/unnamed-chunk-8-1.png" width="1152" style="display: block; margin: auto;" /></p>
 <table>
 <thead>
 <tr class="header">
@@ -377,31 +348,49 @@ X &lt;- X %*% chol(solve(Cor.betahat))</code></pre>
 <th style="text-align: right;">FDP.Knockoff</th>
 <th style="text-align: right;">Power.BH</th>
 <th style="text-align: right;">Power.Knockoff</th>
+<th style="text-align: right;">Power.Large.BH</th>
+<th style="text-align: right;">Power.Large.Knockoff</th>
+<th style="text-align: right;">Power.Small.BH</th>
+<th style="text-align: right;">Power.Small.Knockoff</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: right;">0.2113</td>
-<td style="text-align: right;">0.1367</td>
-<td style="text-align: right;">0.4843</td>
-<td style="text-align: right;">0.5900</td>
+<td style="text-align: right;">0.0914</td>
+<td style="text-align: right;">0.0623</td>
+<td style="text-align: right;">0.4198</td>
+<td style="text-align: right;">0.4398</td>
+<td style="text-align: right;">0.4198</td>
+<td style="text-align: right;">0.4398</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">0.2015</td>
-<td style="text-align: right;">0.0303</td>
-<td style="text-align: right;">0.5127</td>
-<td style="text-align: right;">0.0020</td>
+<td style="text-align: right;">0.0880</td>
+<td style="text-align: right;">0.0458</td>
+<td style="text-align: right;">0.2970</td>
+<td style="text-align: right;">0.2623</td>
+<td style="text-align: right;">0.4748</td>
+<td style="text-align: right;">0.4132</td>
+<td style="text-align: right;">0.1210</td>
+<td style="text-align: right;">0.1126</td>
 </tr>
 <tr class="odd">
-<td style="text-align: right;">0.1647</td>
-<td style="text-align: right;">0.3538</td>
-<td style="text-align: right;">0.4730</td>
-<td style="text-align: right;">0.4187</td>
+<td style="text-align: right;">0.0754</td>
+<td style="text-align: right;">0.0342</td>
+<td style="text-align: right;">0.2216</td>
+<td style="text-align: right;">0.1641</td>
+<td style="text-align: right;">0.5206</td>
+<td style="text-align: right;">0.3929</td>
+<td style="text-align: right;">0.1236</td>
+<td style="text-align: right;">0.0886</td>
 </tr>
 </tbody>
 </table>
-<p><img src="figure/knockoff_5.rmd/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p><img src="figure/knockoff_5.rmd/unnamed-chunk-22-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/knockoff_6.rmd/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/knockoff_6.rmd/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/knockoff_6.rmd/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/knockoff_6.rmd/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
 </section>
 <section id="session-information" class="level2">
 <h2>Session information</h2>
@@ -422,7 +411,7 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] ggplot2_2.2.1  knitr_1.19     knockoff_0.3.0
+[1] ggplot2_2.2.1 knitr_1.19   
 
 loaded via a namespace (and not attached):
  [1] Rcpp_0.12.14     magrittr_1.5     munsell_0.4.3    colorspace_1.3-2
