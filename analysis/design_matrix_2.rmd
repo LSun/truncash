@@ -1,0 +1,127 @@
+---
+title: "Simulating Design Matrix $X$: Correlation patterns"
+author: "Lei Sun"
+date: 2018-02-05
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+## Introduction
+
+```{r, echo = FALSE}
+n <- 3000
+p <- 1000
+```
+
+## Independent and normalized columns
+
+```{r, echo = FALSE, cache = TRUE}
+set.seed(777)
+## independent X columns
+X <- matrix(rnorm(n * p), n, p)
+## column normalization
+X <- t(t(X) / sqrt(colSums(X^2)))
+Sigma.betahat <- solve(crossprod(X))
+Rho.betahat <- cov2cor(Sigma.betahat)
+sqroot.avg.sq.rho.betahat.indep <- (sum(Rho.betahat^2) - p) / (p * (p - 1))
+sebetahat <- sqrt(diag(Sigma.betahat))
+hist(sebetahat, xlab = expression(SE(hat(beta))))
+```
+
+## Toeplitz column correlation
+
+## $\text{SE}\left(\hat\beta_j\right)$
+
+```{r, echo = FALSE, cache = TRUE}
+sqroot.avg.sq.rho.betahat <- sqroot.avg.sq.rho.X <- c()
+i <- 1
+set.seed(777)
+for (rho in seq(0.05, 0.95, by = 0.05)) {
+  ## generate correlation matrix of X columns
+  Sigma.X <- toeplitz(rho^(0 : (p - 1)))
+  Rho.X <- cov2cor(Sigma.X)
+  sqroot.avg.sq.rho.X[i] <- (sum(Rho.X^2) - p) / (p * (p - 1))
+  ## generate correlated X columns
+  X <- matrix(rnorm(n * p), n, p) %*% chol(Rho.X)
+  ## column normalization
+  X <- t(t(X) / sqrt(colSums(X^2)))
+  Sigma.betahat <- solve(crossprod(X))
+  Rho.betahat <- cov2cor(Sigma.betahat)
+  sqroot.avg.sq.rho.betahat[i] <- (sum(Rho.betahat^2) - p) / (p * (p - 1))
+  sebetahat <- sqrt(diag(Sigma.betahat))
+  hist(sebetahat, xlab = expression(SE(hat(beta))), main = bquote(paste(rho, "= ", .(rho))))
+  i <- i + 1
+}
+```
+
+## Correlation among $X_j$ and $\hat\beta_j$
+
+```{r, echo = FALSE, cache = TRUE}
+par(mar = c(4.5, 5, 2, 0.5))
+plot(seq(0.05, 0.95, by = 0.05), sqroot.avg.sq.rho.X, xlab = expression(rho), ylab = expression(sqrt(bar(rho[ij]^2))), type = "o", pch = 17, main = expression(Cor(X)))
+plot(seq(0.05, 0.95, by = 0.05), sqroot.avg.sq.rho.betahat, xlab = expression(rho), ylab = expression(sqrt(bar(rho[ij]^2))), type = "o", pch = 2, main = expression(Cor(hat(beta))))
+abline(h = sqroot.avg.sq.rho.betahat.indep, lty = 2, col = "green")
+sqroot.avg.sq.rho.betahat.toeplitz <- sqroot.avg.sq.rho.betahat
+```
+
+## Factor model column correlation
+
+## $\text{SE}\left(\hat\beta_j\right)$
+
+```{r, echo = FALSE, cache = TRUE}
+sqroot.avg.sq.rho.betahat <- sqroot.avg.sq.rho.X <- c()
+i <- 1
+set.seed(777)
+for (d in 1 : 1000) {
+  ## generate correlation matrix of X columns
+  B <- matrix(rnorm(p * d, 0, 1), p, d)
+  Sigma.X <- tcrossprod(B) + diag(p)
+  Rho.X <- cov2cor(Sigma.X)
+  sqroot.avg.sq.rho.X[i] <- (sum(Rho.X^2) - p) / (p * (p - 1))
+  ## generate correlated X columns
+  X <- matrix(rnorm(n * p), n, p) %*% chol(Rho.X)
+  X <- t(t(X) / sqrt(colSums(X^2)))
+  Sigma.betahat <- solve(crossprod(X))
+  Rho.betahat <- cov2cor(Sigma.betahat)
+  sqroot.avg.sq.rho.betahat[i] <- (sum(Rho.betahat^2) - p) / (p * (p - 1))
+  sebetahat <- sqrt(diag(Sigma.betahat))
+  hist(sebetahat, xlab = expression(SE(hat(beta))), main = bquote(paste(d, "= ", .(d))))
+  i <- i + 1
+}
+```
+
+## Correlation among $X_j$ and $\hat\beta_j$.
+
+```{r, echo = FALSE}
+par(mar = c(4.5, 5, 2, 0.5))
+plot(1 : 1000, sqroot.avg.sq.rho.X, xlab = expression(d), ylab = expression(sqrt(bar(rho[ij]^2))), type = "o", pch = 17, main = expression(Cor(X)), cex = 0.1)
+plot(1 : 1000, sqroot.avg.sq.rho.betahat, xlab = expression(d), ylab = expression(sqrt(bar(rho[ij]^2))), type = "o", pch = 2, main = expression(Cor(hat(beta))), cex = 0.1, ylim = range(sqroot.avg.sq.rho.betahat, sqroot.avg.sq.rho.betahat.toeplitz, sqroot.avg.sq.rho.betahat.indep))
+lines(seq(1, 1000, length = 19), sqroot.avg.sq.rho.betahat.toeplitz, lty = 2, col = "blue")
+abline(h = sqroot.avg.sq.rho.betahat.indep, lty = 2, col = "green")
+```
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```
