@@ -367,7 +367,7 @@ colnames(result.summary) <- c("fdp.BH", "fdp.Knockoff", "power.BH", "power.Knock
 result.SigmaX <- result.summary
 ```
 
-```{r}
+```{r, echo = FALSE}
 set.seed(777)
 ```
 
