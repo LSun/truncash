@@ -318,7 +318,7 @@ shared across the workflowr files. -->
 <p><strong>Last updated:</strong> 2018-02-06</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> ee112bc</p>
+<p><strong>Code version:</strong> 1af62e7</p>
 <!-- Add your analysis here -->
 <section id="introduction" class="level2">
 <h2>Introduction</h2>
@@ -330,7 +330,6 @@ shared across the workflowr files. -->
 <li>Scenario 3: Each row of <span class="math inline">\(X\)</span> are independently drawn from <span class="math inline">\(N(0, \Sigma_{\hat\beta}^{-1})\)</span>, where <span class="math inline">\(\Sigma_{\hat\beta} = \texttt{cov2cor}(B_{p \times d}B_{d\times p}^T + I)\)</span>, <span class="math inline">\(d \sim \text{Unif}\{1, 2, \ldots, 100\}\)</span>. In this case <span class="math inline">\(\hat\beta_j\)</span>’s will have substantial average correlation. The signal magnitude <span class="math inline">\(A = 3.5\)</span>.</li>
 </ul>
 <p>All simulations are using <span class="math inline">\(q = 0.2\)</span> cutoff.</p>
-<pre class="r"><code>set.seed(777)</code></pre>
 </section>
 <section id="scenario-1-independent-x-columns" class="level2">
 <h2>Scenario 1: Independent <span class="math inline">\(X\)</span> columns</h2>
