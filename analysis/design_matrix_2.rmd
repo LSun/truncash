@@ -43,7 +43,7 @@ p <- 1000
 
 ## Independent and normalized columns
 
-$\Sigma = I$.
+- $\Sigma = I$.
 
 ```{r, echo = FALSE, cache = TRUE}
 set.seed(777)
@@ -60,9 +60,9 @@ hist(sebetahat, xlab = expression(SE(hat(beta))))
 
 ## Toeplitz column correlation
 
-$\Sigma_{ij} = \rho^{|i - j|}$
+- $\Sigma_{ij} = \rho^{|i - j|}$
 
-## $\text{SE}\left(\hat\beta_j\right)$
+### $\text{SE}\left(\hat\beta_j\right)$
 
 ```{r, echo = FALSE, cache = TRUE}
 sqroot.avg.sq.rho.betahat <- sqroot.avg.sq.rho.X <- c()
@@ -89,12 +89,13 @@ for (rho in seq(0.01, 0.99, by = 0.01)) {
 ```
 
 ```{r, echo = FALSE}
+sqroot.avg.sq.rho.betahat.toeplitz <- sqroot.avg.sq.rho.betahat
 par(mar = c(4.5, 5, 2, 0.5))
 plot(seq(0.01, 0.99, by = 0.01), mean.sebetahat, xlab = expression(rho), ylab = expression(bar(SE(hat(beta[j])))))
-plot(seq(0.01, 0.99, by = 0.01), mean.sebetahat, xlab = expression(rho), ylab = expression(SD(SE(hat(beta[j])))))
+plot(seq(0.01, 0.99, by = 0.01), sd.sebetahat, xlab = expression(rho), ylab = expression(SD(SE(hat(beta[j])))))
 ```
 
-## Average orrelation among $X_j$ and $\hat\beta_j$
+### Average orrelation among $X_j$ and $\hat\beta_j$
 
 ```{r, echo = FALSE}
 par(mar = c(4.5, 5, 2, 0.5))
@@ -106,9 +107,9 @@ sqroot.avg.sq.rho.betahat.toeplitz <- sqroot.avg.sq.rho.betahat
 
 ## Factor model column correlation
 
-$\Sigma = \texttt{cov2cor}(B_{p \times d}B_{d\times p}^T + I)$
+- $\Sigma = \texttt{cov2cor}(B_{p \times d}B_{d\times p}^T + I)$
 
-## $\text{SE}\left(\hat\beta_j\right)$
+### $\text{SE}\left(\hat\beta_j\right)$
 
 ```{r, echo = FALSE, cache = TRUE}
 sqroot.avg.sq.rho.betahat <- sqroot.avg.sq.rho.X <- c()
@@ -128,19 +129,19 @@ for (d in 1 : 1000) {
   Rho.betahat <- cov2cor(Sigma.betahat)
   sqroot.avg.sq.rho.betahat[i] <- (sum(Rho.betahat^2) - p) / (p * (p - 1))
   sebetahat <- sqrt(diag(Sigma.betahat))
-  mean.sebetahat <- mean(sebetahat)
-  sd.sebetahat <- sd(sebetahat)
+  mean.sebetahat[i] <- mean(sebetahat)
+  sd.sebetahat[i] <- sd(sebetahat)
   i <- i + 1
 }
 ```
 
 ```{r, echo = FALSE}
 par(mar = c(4.5, 5, 2, 0.5))
-plot(seq(0.01, 0.99, by = 0.01), mean.sebetahat, xlab = expression(rho), ylab = expression(bar(SE(hat(beta[j])))))
-plot(seq(0.01, 0.99, by = 0.01), mean.sebetahat, xlab = expression(rho), ylab = expression(SD(SE(hat(beta[j])))))
+plot(1 : 1000, mean.sebetahat, xlab = expression(rho), ylab = expression(bar(SE(hat(beta[j])))))
+plot(1 : 1000, sd.sebetahat, xlab = expression(rho), ylab = expression(SD(SE(hat(beta[j])))))
 ```
 
-## Average correlation among $X_j$ and $\hat\beta_j$.
+### Average correlation among $X_j$ and $\hat\beta_j$.
 
 ```{r, echo = FALSE}
 par(mar = c(4.5, 5, 2, 0.5))

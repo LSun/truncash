@@ -1,0 +1,343 @@
+---
+title: "`Knockoff` on Small Signals"
+author: "Lei Sun"
+date: 2018-02-05
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+## Introduction
+
+In the `Knockoff` paper simulations, $\beta$'s are either $0$ or $A$. Here we are replicating the results, and investigating how well `Knockoff` deal with small signals.
+
+In the following simulations, we always have $n = 3000$, $p = 1000$, $X_{n \times p}$ has independent columns simulated from $N(0, 1)$ and then normalized to have $\|X_j\|_2^2 \equiv 1$. For a certain $\beta$, $Y_n \sim N(X_{n\times p}\beta_p, I_n)$. Out of $p = 1000$ $\beta_j$'s, here are three scenarios.
+
+- Scenario 1: $950$ are 0, $25$ are $3.5$, $25$ are $-3.5$. (replicating a data point on Fig 3 of the `Knockoff` paper)
+- Scenario 2: $900$ are 0, $100$ are $(N(0, 5.19^2) \wedge 3.5) \vee (-3.5)$ so that $50$ of them are expected to be larger than $3.5$ or smaller than $-3.5$. And then we truncate these large signals to make them to be $3.5$ or $-3.5$.
+- Scenario 3: Similar to Scenario 2, only that $800$ are 0, $200$ are $(N(0, 3.04^2) \wedge 3.5) \vee (-3.5)$ so we still have on average $50$ of them are expected to be $3.5$ or $-3.5$.
+
+```{r, echo = FALSE, cache = TRUE}
+fdp <- function(selected) sum(beta[selected] == 0) / max(length(selected), 1)
+power <- function(selected, k = k) sum(beta[selected] != 0) / max(k, 1)
+
+library(knockoff)
+set.seed(777)
+```
+
+```{r, echo = FALSE, cache = TRUE}
+n <- 3000
+p <- 1000
+k <- 50
+q <- 0.1
+sigma.beta <- 3.5
+sigma.e <- 1
+```
+
+## Scenario 1: 50 large signals, no small signals, 950 zeroes.
+
+```{r, echo = FALSE, cache = TRUE}
+m <- 100
+
+result <- list()
+
+for (i in 1 : m) {
+X <- matrix(rnorm(n * p), n , p)
+X <- t(t(X) / sqrt(colSums(X^2)))
+beta <- rep(0, p)
+nonzero <- sample(p, k)
+beta[nonzero[1 : (k/2)]] <- sigma.beta * sigma.e
+beta[nonzero[(k/2 + 1) : k]] <- -sigma.beta * sigma.e
+e <- rnorm(n, 0, sigma.e)
+y <- X %*% beta + e
+
+## Least squares
+ls.time <- system.time(lm.fit <- lm(y ~ X - 1))[3]
+betahat <- coef(lm.fit)
+sebetahat <- summary(lm.fit)$coefficients[, 2]
+pvalue <- summary(lm.fit)$coefficients[, 4]
+zscore <- -qnorm(pvalue / 2) * sign(summary(lm.fit)$coefficients[, 3])
+
+## BH
+BH.time <- system.time(BH.fit <- p.adjust(pvalue, method = "BH"))[3]
+BH.selected <- (1 : p)[BH.fit <= q]
+
+## Knockoff
+knockoff.time <- system.time(knockoff.fit <- knockoff::knockoff.filter(X, y, knockoffs = create.fixed, statistic = stat.glmnet_lambdasmax, fdr = q))[3]
+knockoff.selected <- knockoff.fit$selected
+
+result[[i]] <- c(
+  fdp.BH = fdp(BH.selected),
+  fdp.knockoff = fdp(knockoff.selected),
+  power.BH = power(BH.selected, sum(beta != 0)),
+  power.knockoff = power(knockoff.selected, sum(beta != 0))
+)
+}
+```
+
+```{r, echo = FALSE, fig.height = 5, fig.width = 12}
+set.seed(1)
+beta <- rep(0, p)
+nonzero <- sample(p, k)
+beta[nonzero[1 : (k/2)]] <- sigma.beta * sigma.e
+beta[nonzero[(k/2 + 1) : k]] <- -sigma.beta * sigma.e
+par(mfrow = c(1, 2))
+hist(beta, xlab = expression(beta), main = expression(paste("Histogram of ", beta)))
+hist(beta[nonzero], xlab = expression(beta), main = expression(paste("Histogram of non-zero ", beta)))
+result.summary <- matrix(unlist(result), m, 4, byrow = TRUE)
+colnames(result.summary) <- c("fdp.BH", "fdp.Knockoff", "power.BH", "power.Knockoff")
+# colMeans(result.summary)
+result.nosmall <- result.summary
+```
+
+## Scenario 2: 50 large signals, 50 small signals, 900 zeroes.
+
+```{r, echo = FALSE, cache = TRUE}
+m <- 100
+
+k.total <- 100
+large.cutoff <- sigma.beta
+
+result <- list()
+
+for (i in 1 : m) {
+X <- matrix(rnorm(n * p), n , p)
+X <- t(t(X) / sqrt(colSums(X^2)))
+beta <- rep(0, p)
+nonzero <- sample(p, k.total)
+beta[nonzero] <- pmin(large.cutoff, pmax(-large.cutoff, rnorm(k.total, 0, -large.cutoff * sigma.e / qnorm(k / 2 / k.total))))
+e <- rnorm(n, 0, sigma.e)
+y <- X %*% beta + e
+
+## Least squares
+ls.time <- system.time(lm.fit <- lm(y ~ X - 1))[3]
+betahat <- coef(lm.fit)
+sebetahat <- summary(lm.fit)$coefficients[, 2]
+pvalue <- summary(lm.fit)$coefficients[, 4]
+zscore <- -qnorm(pvalue / 2) * sign(summary(lm.fit)$coefficients[, 3])
+
+## BH
+BH.time <- system.time(BH.fit <- p.adjust(pvalue, method = "BH"))[3]
+BH.selected <- (1 : p)[BH.fit <= q]
+
+## Knockoff
+knockoff.time <- system.time(knockoff.fit <- knockoff::knockoff.filter(X, y, knockoffs = create.fixed, statistic = stat.glmnet_lambdasmax, fdr = q))[3]
+knockoff.selected <- knockoff.fit$selected
+
+large <- seq(p)[abs(beta) >= large.cutoff * sigma.e]
+small <- seq(p)[abs(beta) > 0 & abs(beta) < large.cutoff * sigma.e]
+
+result[[i]] <- c(
+  fdp.BH = fdp(BH.selected),
+  fdp.knockoff = fdp(knockoff.selected),
+  power.BH = power(BH.selected, sum(beta != 0)),
+  power.knockoff = power(knockoff.selected, sum(beta != 0)),
+  power.large.BH <- length(intersect(BH.selected, large)) / length(large),
+  power.large.knockoff <- length(intersect(knockoff.selected, large)) / length(large),
+  power.small.BH <- length(intersect(BH.selected, small)) / length(small),
+  power.small.knockoff <- length(intersect(knockoff.selected, small)) / length(small)
+)
+}
+```
+
+```{r, echo = FALSE, fig.height = 5, fig.width = 12}
+set.seed(1)
+beta <- rep(0, p)
+nonzero <- sample(p, k.total)
+beta[nonzero] <- pmin(large.cutoff, pmax(-large.cutoff, rnorm(k.total, 0, -large.cutoff * sigma.e / qnorm(k / 2 / k.total))))
+par(mfrow = c(1, 2))
+hist(beta, xlab = expression(beta), main = expression(paste("Histogram of ", beta)))
+hist(beta[nonzero], xlab = expression(beta), main = expression(paste("Histogram of non-zero ", beta)))
+result.summary <- matrix(unlist(result), m, 8, byrow = TRUE)
+colnames(result.summary) <- c("fdp.BH", "fdp.Knockoff", "power.BH", "power.Knockoff", "power.large.BH", "power.large.Knockoff", "power.small.BH", "power.small.Knockoff")
+# colMeans(result.summary)
+result.fewsmall <- result.summary
+```
+
+## Scenario 3: 50 large signals, 150 small signals, 800 zeroes.
+
+```{r, echo = FALSE, cache = TRUE}
+m <- 100
+
+k.total <- 200
+large.cutoff <- sigma.beta
+
+result <- list()
+
+for (i in 1 : m) {
+X <- matrix(rnorm(n * p), n , p)
+X <- t(t(X) / sqrt(colSums(X^2)))
+beta <- rep(0, p)
+nonzero <- sample(p, k.total)
+beta[nonzero] <- pmin(large.cutoff, pmax(-large.cutoff, rnorm(k.total, 0, -large.cutoff * sigma.e / qnorm(k / 2 / k.total))))
+e <- rnorm(n, 0, sigma.e)
+y <- X %*% beta + e
+
+## Least squares
+ls.time <- system.time(lm.fit <- lm(y ~ X - 1))[3]
+betahat <- coef(lm.fit)
+sebetahat <- summary(lm.fit)$coefficients[, 2]
+pvalue <- summary(lm.fit)$coefficients[, 4]
+zscore <- -qnorm(pvalue / 2) * sign(summary(lm.fit)$coefficients[, 3])
+
+## BH
+BH.time <- system.time(BH.fit <- p.adjust(pvalue, method = "BH"))[3]
+BH.selected <- (1 : p)[BH.fit <= q]
+
+## Knockoff
+knockoff.time <- system.time(knockoff.fit <- knockoff::knockoff.filter(X, y, knockoffs = create.fixed, statistic = stat.glmnet_lambdasmax, fdr = q))[3]
+knockoff.selected <- knockoff.fit$selected
+
+large <- seq(p)[abs(beta) >= large.cutoff * sigma.e]
+small <- seq(p)[abs(beta) > 0 & abs(beta) < large.cutoff * sigma.e]
+
+result[[i]] <- c(
+  fdp.BH = fdp(BH.selected),
+  fdp.knockoff = fdp(knockoff.selected),
+  power.BH = power(BH.selected, sum(beta != 0)),
+  power.knockoff = power(knockoff.selected, sum(beta != 0)),
+  power.large.BH <- length(intersect(BH.selected, large)) / length(large),
+  power.large.knockoff <- length(intersect(knockoff.selected, large)) / length(large),
+  power.small.BH <- length(intersect(BH.selected, small)) / length(small),
+  power.small.knockoff <- length(intersect(knockoff.selected, small)) / length(small)
+)
+}
+```
+
+```{r, echo = FALSE, fig.height = 5, fig.width = 12}
+set.seed(101)
+beta <- rep(0, p)
+nonzero <- sample(p, k.total)
+beta[nonzero] <- pmin(large.cutoff, pmax(-large.cutoff, rnorm(k.total, 0, -large.cutoff * sigma.e / qnorm(k / 2 / k.total))))
+par(mfrow = c(1, 2))
+hist(beta, xlab = expression(beta), main = expression(paste("Histogram of ", beta)))
+hist(beta[nonzero], xlab = expression(beta), main = expression(paste("Histogram of non-zero ", beta)))
+result.summary <- matrix(unlist(result), m, 8, byrow = TRUE)
+colnames(result.summary) <- c("fdp.BH", "fdp.Knockoff", "power.BH", "power.Knockoff", "power.large.BH", "power.large.Knockoff", "power.small.BH", "power.small.Knockoff")
+# colMeans(result.summary)
+result.manysmall <- result.summary
+```
+
+```{r, echo = FALSE}
+summary <- rbind.data.frame(colMeans(result.nosmall), colMeans(result.fewsmall), colMeans(result.manysmall))
+colnames(summary) <- c("FDP.BH", "FDP.Knockoff", "Power.BH", "Power.Knockoff", "Power.Large.BH", "Power.Large.Knockoff", "Power.Small.BH", "Power.Small.Knockoff")
+summary[1, 5 : 6] <- summary[1, 3 : 4]
+summary[1, 7 : 8] <- NA
+library(knitr)
+kable(summary, digits = 4)
+```
+
+```{r, echo = FALSE}
+library(ggplot2)
+mean_sdp <- function(x) {
+   m <- mean(x)
+   ymax <- m + sd(x)
+   return(c(y = m, ymax = ymax, ymin = m))
+}
+method.name <- c("BH", "Knockoff")
+method.col <- c("blue", "red")
+```
+
+```{r, echo = FALSE}
+FDP.summary <- rbind.data.frame(
+   cbind.data.frame(FDP = result.nosmall[, 1], Method = rep("BH", length(result.nosmall[, 1])), Scenario = rep("No Small Signals", length(result.nosmall[, 1]))),
+   cbind.data.frame(FDP = result.nosmall[, 2], Method = rep("Knockoff", length(result.nosmall[, 2])), Scenario = rep("No Small Signals", length(result.nosmall[, 2]))),
+   cbind.data.frame(FDP = result.fewsmall[, 1], Method = rep("BH", length(result.fewsmall[, 1])), Scenario = rep("Less Small Signals", length(result.fewsmall[, 1]))),
+   cbind.data.frame(FDP = result.fewsmall[, 2], Method = rep("Knockoff", length(result.fewsmall[, 2])), Scenario = rep("Less Small Signals", length(result.fewsmall[, 2]))),
+   cbind.data.frame(FDP = result.manysmall[, 1], Method = rep("BH", length(result.manysmall[, 1])), Scenario = rep("More Small Signals", length(result.manysmall[, 1]))),
+   cbind.data.frame(FDP = result.manysmall[, 2], Method = rep("Knockoff", length(result.manysmall[, 2])), Scenario = rep("More Small Signals", length(result.manysmall[, 2])))
+ )
+
+ggplot(data = FDP.summary,
+        aes(x = Method, y = FDP, col = Method)) +
+  geom_violin(trim = TRUE) +
+  facet_wrap(~Scenario) +
+  stat_summary(fun.data = "mean_sdp", geom = "pointrange") +
+  scale_color_manual(values = method.col) +
+  geom_hline(yintercept = q, col = "maroon", linetype = "dashed", size = 1) +
+  labs(title = bquote(paste("False Discovery Proportions at ", FDR == .(q), " Cutoff")), x = "", y = "FDP") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 20), axis.title.y = element_text(size = 20), axis.text.x = element_text(size = 20), axis.text.y = element_text(size = 15))
+```
+
+```{r, echo = FALSE}
+Power.summary <- rbind.data.frame(
+   cbind.data.frame(Power = result.nosmall[, 3], Method = rep("BH", length(result.nosmall[, 3])), Scenario = rep("No Small Signals", length(result.nosmall[, 3]))),
+   cbind.data.frame(Power = result.nosmall[, 4], Method = rep("Knockoff", length(result.nosmall[, 4])), Scenario = rep("No Small Signals", length(result.nosmall[, 4]))),
+   cbind.data.frame(Power = result.fewsmall[, 3], Method = rep("BH", length(result.fewsmall[, 3])), Scenario = rep("Less Small Signals", length(result.fewsmall[, 3]))),
+   cbind.data.frame(Power = result.fewsmall[, 4], Method = rep("Knockoff", length(result.fewsmall[, 4])), Scenario = rep("Less Small Signals", length(result.fewsmall[, 4]))),
+   cbind.data.frame(Power = result.manysmall[, 3], Method = rep("BH", length(result.manysmall[, 3])), Scenario = rep("More Small Signals", length(result.manysmall[, 3]))),
+   cbind.data.frame(Power = result.manysmall[, 4], Method = rep("Knockoff", length(result.manysmall[, 4])), Scenario = rep("More Small Signals", length(result.manysmall[, 4])))
+ )
+
+ggplot(data = Power.summary,
+        aes(x = Method, y = Power, col = Method)) +
+  geom_violin(trim = TRUE) +
+  facet_wrap(~Scenario) +
+  stat_summary(fun.data = "mean_sdp", geom = "pointrange") +
+  scale_color_manual(values = method.col) +
+  labs(title = bquote(paste("Overall Power at ", FDR == .(q), " Cutoff")), x = "", y = "Power") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 20), axis.title.y = element_text(size = 20), axis.text.x = element_text(size = 20), axis.text.y = element_text(size = 15))
+```
+
+```{r, echo = FALSE}
+Power.large.summary <- rbind.data.frame(
+   cbind.data.frame(Power = result.nosmall[, 3], Method = rep("BH", length(result.nosmall[, 3])), Scenario = rep("No Small Signals", length(result.nosmall[, 3]))),
+   cbind.data.frame(Power = result.nosmall[, 4], Method = rep("Knockoff", length(result.nosmall[, 4])), Scenario = rep("No Small Signals", length(result.nosmall[, 4]))),
+   cbind.data.frame(Power = result.fewsmall[, 5], Method = rep("BH", length(result.fewsmall[, 5])), Scenario = rep("Less Small Signals", length(result.fewsmall[, 5]))),
+   cbind.data.frame(Power = result.fewsmall[, 6], Method = rep("Knockoff", length(result.fewsmall[, 6])), Scenario = rep("Less Small Signals", length(result.fewsmall[, 6]))),
+   cbind.data.frame(Power = result.manysmall[, 5], Method = rep("BH", length(result.manysmall[, 5])), Scenario = rep("More Small Signals", length(result.manysmall[, 5]))),
+   cbind.data.frame(Power = result.manysmall[, 6], Method = rep("Knockoff", length(result.manysmall[, 6])), Scenario = rep("More Small Signals", length(result.manysmall[, 6])))
+ )
+
+ggplot(data = Power.large.summary,
+        aes(x = Method, y = Power, col = Method)) +
+  geom_violin(trim = TRUE) +
+  facet_wrap(~Scenario) +
+  stat_summary(fun.data = "mean_sdp", geom = "pointrange") +
+  scale_color_manual(values = method.col) +
+  labs(title = bquote(paste("Power for Large Signals at ", FDR == .(q), " Cutoff")), x = "", y = "Power") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 20), axis.title.y = element_text(size = 20), axis.text.x = element_text(size = 20), axis.text.y = element_text(size = 15))
+```
+
+```{r, echo = FALSE}
+Power.small.summary <- rbind.data.frame(
+   cbind.data.frame(Power = result.fewsmall[, 7], Method = rep("BH", length(result.fewsmall[, 7])), Scenario = rep("Less Small Signals", length(result.fewsmall[, 7]))),
+   cbind.data.frame(Power = result.fewsmall[, 8], Method = rep("Knockoff", length(result.fewsmall[, 8])), Scenario = rep("Less Small Signals", length(result.fewsmall[, 8]))),
+   cbind.data.frame(Power = result.manysmall[, 7], Method = rep("BH", length(result.manysmall[, 7])), Scenario = rep("More Small Signals", length(result.manysmall[, 7]))),
+   cbind.data.frame(Power = result.manysmall[, 8], Method = rep("Knockoff", length(result.manysmall[, 8])), Scenario = rep("More Small Signals", length(result.manysmall[, 8])))
+ )
+
+ggplot(data = Power.small.summary,
+        aes(x = Method, y = Power, col = Method)) +
+  geom_violin(trim = TRUE) +
+  facet_wrap(~Scenario) +
+  stat_summary(fun.data = "mean_sdp", geom = "pointrange") +
+  scale_color_manual(values = method.col) +
+  labs(title = bquote(paste("Power for Small Signals at ", FDR == .(q), " Cutoff")), x = "", y = "Power") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 20), axis.title.y = element_text(size = 20), axis.text.x = element_text(size = 20), axis.text.y = element_text(size = 15))
+```
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```
