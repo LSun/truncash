@@ -475,6 +475,224 @@ ggplot(data = Power.summary,
   theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 20), axis.title.y = element_text(size = 20), axis.text.x = element_text(size = 20), axis.text.y = element_text(size = 15))
 ```
 
+## Fixed $X$ simulation
+
+```{r, echo = FALSE}
+n <- 3000
+p <- 1000
+k <- 50
+q <- 0.1
+sigma.beta <- 3.5
+sigma.e <- 1
+m <- 2
+set.seed(777)
+```
+
+```{r, echo = FALSE, cache = TRUE}
+X <- matrix(rnorm(n * p), n , p)
+X <- t(t(X) / sqrt(colSums(X^2)))
+
+beta <- rep(0, p)
+nonzero <- sample(p, k)
+beta[nonzero] <- sigma.beta * sigma.e
+
+result <- list()
+
+for (i in 1 : m) {
+e <- rnorm(n, 0, sigma.e)
+y <- X %*% beta + e
+
+## Least squares
+ls.time <- system.time(lm.fit <- lm(y ~ X - 1))[3]
+betahat <- coef(lm.fit)
+sebetahat <- summary(lm.fit)$coefficients[, 2]
+pvalue <- summary(lm.fit)$coefficients[, 4]
+zscore <- -qnorm(pvalue / 2) * sign(summary(lm.fit)$coefficients[, 3])
+
+## BH
+BH.time <- system.time(BH.fit <- p.adjust(pvalue, method = "BH"))[3]
+BH.selected <- (1 : p)[BH.fit <= q]
+
+## Knockoff
+knockoff.time <- system.time(knockoff.fit <- knockoff::knockoff.filter(X, y, knockoffs = create.fixed, statistic = stat.glmnet_lambdasmax, fdr = q))[3]
+knockoff.selected <- knockoff.fit$selected
+
+result[[i]] <- c(
+  fdp.BH = fdp(BH.selected),
+  fdp.knockoff = fdp(knockoff.selected),
+  power.BH = power(BH.selected, sum(beta != 0)),
+  power.knockoff = power(knockoff.selected, sum(beta != 0))
+)
+}
+```
+
+```{r, echo = FALSE}
+result.summary <- matrix(unlist(result), m, 4, byrow = TRUE)
+colnames(result.summary) <- c("fdp.BH", "fdp.Knockoff", "power.BH", "power.Knockoff")
+# colMeans(result.summary)
+result.indep <- result.summary
+```
+
+```{r, echo = FALSE, cache = TRUE}
+d <- 10
+B <- matrix(rnorm(p * d, 0, 1), p, d)
+Sigma.betahat <- tcrossprod(B) + diag(p)
+Cor.betahat <- cov2cor(Sigma.betahat)
+
+X <- matrix(rnorm(n * p), n, p)
+X <- t(t(X) / sqrt(colSums(X^2)))
+X <- X %*% chol(solve(Cor.betahat))
+
+beta <- rep(0, p)
+nonzero <- sample(p, k)
+beta[nonzero] <- sigma.beta * sigma.e
+
+result <- list()
+
+for (i in 1 : m) {
+e <- rnorm(n, 0, sigma.e)
+y <- X %*% beta + e
+
+## Least squares
+ls.time <- system.time(lm.fit <- lm(y ~ X - 1))[3]
+betahat <- coef(lm.fit)
+sebetahat <- summary(lm.fit)$coefficients[, 2]
+pvalue <- summary(lm.fit)$coefficients[, 4]
+zscore <- -qnorm(pvalue / 2) * sign(summary(lm.fit)$coefficients[, 3])
+
+## BH
+BH.time <- system.time(BH.fit <- p.adjust(pvalue, method = "BH"))[3]
+BH.selected <- (1 : p)[BH.fit <= q]
+
+## Knockoff
+knockoff.time <- system.time(knockoff.fit <- knockoff::knockoff.filter(X, y, knockoffs = create.fixed, statistic = stat.glmnet_lambdasmax, fdr = q))[3]
+knockoff.selected <- knockoff.fit$selected
+
+result[[i]] <- c(
+  fdp.BH = fdp(BH.selected),
+  fdp.knockoff = fdp(knockoff.selected),
+  power.BH = power(BH.selected, sum(beta != 0)),
+  power.knockoff = power(knockoff.selected, sum(beta != 0))
+)
+}
+```
+
+```{r, echo = FALSE}
+result.summary <- matrix(unlist(result), m, 4, byrow = TRUE)
+colnames(result.summary) <- c("fdp.BH", "fdp.Knockoff", "power.BH", "power.Knockoff")
+# colMeans(result.summary)
+result.Sigmabetahat <- result.summary
+```
+
+```{r, echo = FALSE, cache = TRUE}
+result <- list()
+d <- 10
+sigma.beta <- 12
+
+B <- matrix(rnorm(p * d, 0, 1), p, d)
+Sigma.X <- tcrossprod(B) + diag(p)
+Rho.X <- cov2cor(Sigma.X)
+X <- matrix(rnorm(n * p), n, p) %*% chol(Rho.X)
+X <- t(t(X) / sqrt(colSums(X^2)))
+
+beta <- rep(0, p)
+nonzero <- sample(p, k)
+beta[nonzero] <- sigma.beta * sigma.e
+
+for (i in 1 : m) {
+e <- rnorm(n, 0, sigma.e)
+y <- X %*% beta + e
+
+## Least squares
+ls.time <- system.time(lm.fit <- lm(y ~ X - 1))[3]
+betahat <- coef(lm.fit)
+sebetahat <- summary(lm.fit)$coefficients[, 2]
+pvalue <- summary(lm.fit)$coefficients[, 4]
+zscore <- -qnorm(pvalue / 2) * sign(summary(lm.fit)$coefficients[, 3])
+
+## BH
+BH.time <- system.time(BH.fit <- p.adjust(pvalue, method = "BH"))[3]
+BH.selected <- (1 : p)[BH.fit <= q]
+
+## Knockoff
+knockoff.time <- system.time(knockoff.fit <- knockoff::knockoff.filter(X, y, knockoffs = create.fixed, statistic = stat.glmnet_lambdasmax, fdr = q))[3]
+knockoff.selected <- knockoff.fit$selected
+
+result[[i]] <- c(
+  fdp.BH = fdp(BH.selected),
+  fdp.knockoff = fdp(knockoff.selected),
+  power.BH = power(BH.selected, sum(beta != 0)),
+  power.knockoff = power(knockoff.selected, sum(beta != 0))
+)
+}
+```
+
+```{r, echo = FALSE}
+result.summary <- matrix(unlist(result), m, 4, byrow = TRUE)
+colnames(result.summary) <- c("fdp.BH", "fdp.Knockoff", "power.BH", "power.Knockoff")
+# colMeans(result.summary)
+result.SigmaX <- result.summary
+```
+
+```{r, echo = FALSE}
+summary <- rbind.data.frame(colMeans(result.indep), colMeans(result.SigmaX), colMeans(result.Sigmabetahat))
+colnames(summary) <- c("FDP.BH", "FDP.Knockoff", "Power.BH", "Power.Knockoff")
+library(knitr)
+kable(summary, digits = 4)
+```
+
+```{r, echo = FALSE}
+library(ggplot2)
+mean_sdp <- function(x) {
+   m <- mean(x)
+   ymax <- m + sd(x)
+   return(c(y = m, ymax = ymax, ymin = m))
+}
+method.name <- c("BH", "Knockoff")
+method.col <- c("blue", "red")
+```
+
+```{r, echo = FALSE}
+FDP.summary <- rbind.data.frame(
+   cbind.data.frame(FDP = result.indep[, 1], Method = rep("BH", length(result.indep[, 1])), Scenario = rep("Independent Columns", length(result.indep[, 1]))),
+   cbind.data.frame(FDP = result.indep[, 2], Method = rep("Knockoff", length(result.indep[, 2])), Scenario = rep("Independent Columns", length(result.indep[, 2]))),
+   cbind.data.frame(FDP = result.SigmaX[, 1], Method = rep("BH", length(result.SigmaX[, 1])), Scenario = rep("Factor Model for X", length(result.SigmaX[, 1]))),
+   cbind.data.frame(FDP = result.SigmaX[, 2], Method = rep("Knockoff", length(result.SigmaX[, 2])), Scenario = rep("Factor Model for X", length(result.SigmaX[, 2]))),
+   cbind.data.frame(FDP = result.Sigmabetahat[, 1], Method = rep("BH", length(result.Sigmabetahat[, 1])), Scenario = rep("Factor Model for betahat", length(result.Sigmabetahat[, 1]))),
+   cbind.data.frame(FDP = result.Sigmabetahat[, 2], Method = rep("Knockoff", length(result.Sigmabetahat[, 2])), Scenario = rep("Factor Model for betahat", length(result.Sigmabetahat[, 2])))
+ )
+
+ggplot(data = FDP.summary,
+        aes(x = Method, y = FDP, col = Method)) +
+  geom_violin(trim = TRUE) +
+  facet_wrap(~Scenario) +
+  stat_summary(fun.data = "mean_sdp", geom = "pointrange") +
+  scale_color_manual(values = method.col) +
+  geom_hline(yintercept = q, col = "maroon", linetype = "dashed", size = 1) +
+  labs(title = bquote(paste("False Discovery Proportions at ", FDR == .(q), " Cutoff")), x = "", y = "FDP") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 20), axis.title.y = element_text(size = 20), axis.text.x = element_text(size = 20), axis.text.y = element_text(size = 15))
+```
+
+```{r, echo = FALSE}
+Power.summary <- rbind.data.frame(
+   cbind.data.frame(Power = result.indep[, 3], Method = rep("BH", length(result.indep[, 3])), Scenario = rep("Independent Columns", length(result.indep[, 3]))),
+   cbind.data.frame(Power = result.indep[, 4], Method = rep("Knockoff", length(result.indep[, 4])), Scenario = rep("Independent Columns", length(result.indep[, 4]))),
+   cbind.data.frame(Power = result.SigmaX[, 3], Method = rep("BH", length(result.SigmaX[, 3])), Scenario = rep("Factor Model for X", length(result.SigmaX[, 3]))),
+   cbind.data.frame(Power = result.SigmaX[, 4], Method = rep("Knockoff", length(result.SigmaX[, 4])), Scenario = rep("Factor Model for X", length(result.SigmaX[, 4]))),
+   cbind.data.frame(Power = result.Sigmabetahat[, 3], Method = rep("BH", length(result.Sigmabetahat[, 3])), Scenario = rep("Factor Model for betahat", length(result.Sigmabetahat[, 3]))),
+   cbind.data.frame(Power = result.Sigmabetahat[, 4], Method = rep("Knockoff", length(result.Sigmabetahat[, 4])), Scenario = rep("Factor Model for betahat", length(result.Sigmabetahat[, 4])))
+ )
+
+ggplot(data = Power.summary,
+        aes(x = Method, y = Power, col = Method)) +
+  geom_violin(trim = TRUE) +
+  facet_wrap(~Scenario) +
+  stat_summary(fun.data = "mean_sdp", geom = "pointrange") +
+  scale_color_manual(values = method.col) +
+  labs(title = bquote(paste("Overall Power at ", FDR == .(q), " Cutoff")), x = "", y = "Power") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 20), axis.title.y = element_text(size = 20), axis.text.x = element_text(size = 20), axis.text.y = element_text(size = 15))
+```
+
 ## Session information
 
 <!-- Insert the session information into the document -->
