@@ -377,6 +377,10 @@ set.seed(777)
 X <- matrix(rnorm(n * p), n , p)
 ## Normalization
 X <- t(t(X) / sqrt(colSums(X^2)))
+## Average sebetahat
+sqrt(mean(diag(solve(crossprod(X)))))
+## Signal strength
+A <- 3.5
 ```
 
 ## Scenario 2: $X$ from a factor model
