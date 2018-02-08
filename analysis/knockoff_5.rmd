@@ -477,18 +477,20 @@ ggplot(data = Power.summary,
 
 ## Fixed $X$ simulation
 
-```{r, echo = FALSE}
+```{r}
 n <- 3000
 p <- 1000
 k <- 50
 q <- 0.1
 sigma.beta <- 3.5
 sigma.e <- 1
-m <- 2
+m <- 100
 set.seed(777)
 ```
 
 ```{r, echo = FALSE, cache = TRUE}
+m <- 100
+
 X <- matrix(rnorm(n * p), n , p)
 X <- t(t(X) / sqrt(colSums(X^2)))
 
@@ -534,6 +536,62 @@ result.indep <- result.summary
 ```
 
 ```{r, echo = FALSE, cache = TRUE}
+m <- 100
+
+d <- 10
+sigma.beta <- 12
+
+B <- matrix(rnorm(p * d, 0, 1), p, d)
+Sigma.X <- tcrossprod(B) + diag(p)
+Rho.X <- cov2cor(Sigma.X)
+X <- matrix(rnorm(n * p), n, p) %*% chol(Rho.X)
+X <- t(t(X) / sqrt(colSums(X^2)))
+
+beta <- rep(0, p)
+nonzero <- sample(p, k)
+beta[nonzero] <- sigma.beta * sigma.e
+
+result <- list()
+
+for (i in 1 : m) {
+e <- rnorm(n, 0, sigma.e)
+y <- X %*% beta + e
+
+## Least squares
+ls.time <- system.time(lm.fit <- lm(y ~ X - 1))[3]
+betahat <- coef(lm.fit)
+sebetahat <- summary(lm.fit)$coefficients[, 2]
+pvalue <- summary(lm.fit)$coefficients[, 4]
+zscore <- -qnorm(pvalue / 2) * sign(summary(lm.fit)$coefficients[, 3])
+
+## BH
+BH.time <- system.time(BH.fit <- p.adjust(pvalue, method = "BH"))[3]
+BH.selected <- (1 : p)[BH.fit <= q]
+
+## Knockoff
+knockoff.time <- system.time(knockoff.fit <- knockoff::knockoff.filter(X, y, knockoffs = create.fixed, statistic = stat.glmnet_lambdasmax, fdr = q))[3]
+knockoff.selected <- knockoff.fit$selected
+
+result[[i]] <- c(
+  fdp.BH = fdp(BH.selected),
+  fdp.knockoff = fdp(knockoff.selected),
+  power.BH = power(BH.selected, sum(beta != 0)),
+  power.knockoff = power(knockoff.selected, sum(beta != 0))
+)
+}
+```
+
+```{r, echo = FALSE}
+result.summary <- matrix(unlist(result), m, 4, byrow = TRUE)
+colnames(result.summary) <- c("fdp.BH", "fdp.Knockoff", "power.BH", "power.Knockoff")
+# colMeans(result.summary)
+result.SigmaX <- result.summary
+```
+
+```{r, echo = FALSE, cache = TRUE}
+sigma.beta <- 3.5
+m <- 100
+
 d <- 10
 B <- matrix(rnorm(p * d, 0, 1), p, d)
 Sigma.betahat <- tcrossprod(B) + diag(p)
@@ -582,56 +640,6 @@ result.summary <- matrix(unlist(result), m, 4, byrow = TRUE)
 colnames(result.summary) <- c("fdp.BH", "fdp.Knockoff", "power.BH", "power.Knockoff")
 # colMeans(result.summary)
 result.Sigmabetahat <- result.summary
-```
-
-```{r, echo = FALSE, cache = TRUE}
-result <- list()
-d <- 10
-sigma.beta <- 12
-
-B <- matrix(rnorm(p * d, 0, 1), p, d)
-Sigma.X <- tcrossprod(B) + diag(p)
-Rho.X <- cov2cor(Sigma.X)
-X <- matrix(rnorm(n * p), n, p) %*% chol(Rho.X)
-X <- t(t(X) / sqrt(colSums(X^2)))
-
-beta <- rep(0, p)
-nonzero <- sample(p, k)
-beta[nonzero] <- sigma.beta * sigma.e
-
-for (i in 1 : m) {
-e <- rnorm(n, 0, sigma.e)
-y <- X %*% beta + e
-
-## Least squares
-ls.time <- system.time(lm.fit <- lm(y ~ X - 1))[3]
-betahat <- coef(lm.fit)
-sebetahat <- summary(lm.fit)$coefficients[, 2]
-pvalue <- summary(lm.fit)$coefficients[, 4]
-zscore <- -qnorm(pvalue / 2) * sign(summary(lm.fit)$coefficients[, 3])
-
-## BH
-BH.time <- system.time(BH.fit <- p.adjust(pvalue, method = "BH"))[3]
-BH.selected <- (1 : p)[BH.fit <= q]
-
-## Knockoff
-knockoff.time <- system.time(knockoff.fit <- knockoff::knockoff.filter(X, y, knockoffs = create.fixed, statistic = stat.glmnet_lambdasmax, fdr = q))[3]
-knockoff.selected <- knockoff.fit$selected
-
-result[[i]] <- c(
-  fdp.BH = fdp(BH.selected),
-  fdp.knockoff = fdp(knockoff.selected),
-  power.BH = power(BH.selected, sum(beta != 0)),
-  power.knockoff = power(knockoff.selected, sum(beta != 0))
-)
-}
-```
-
-```{r, echo = FALSE}
-result.summary <- matrix(unlist(result), m, 4, byrow = TRUE)
-colnames(result.summary) <- c("fdp.BH", "fdp.Knockoff", "power.BH", "power.Knockoff")
-# colMeans(result.summary)
-result.SigmaX <- result.summary
 ```
 
 ```{r, echo = FALSE}
