@@ -315,7 +315,7 @@ ggplot(data = Power.summary,
 ### Scenario 2: $X$ from a factor model
 
 ```{r factor_X_overall, echo = FALSE, cache = TRUE}
-d.vec <- c(1, 5, 10, 50, 100, 500, 1000)
+d.vec <- c(1 : 10, seq(20, 100, by = 10), seq(200, 1500, by = 100))
 set.seed(777)
 result.SigmaX <- matrix(0, length(d.vec), 6)
 colnames(result.SigmaX) <- c("fdp.BH", "fdp.Knockoff", "fdp.Knockoff.plus", "power.BH", "power.Knockoff", "power.Knockoff.plus")
@@ -339,7 +339,7 @@ A <- ceiling(3 * sqrt(mean(diag(solve(crossprod(X))))))
 beta <- rep(0, p)
 nonzero <- sample(p, k)
 beta[nonzero] <- A
-m <- 100
+m <- 1000
 result <- list()
 for (i in 1 : m) {
 y <- X %*% beta + rnorm(n)
@@ -393,7 +393,7 @@ legend("topright", col = method.col, lty = 1, pch = 1 : 3, legend = method.name)
 ### Scenario 3: $\hat\beta$ from a factor model
 
 ```{r factor_betahat_overall, echo = FALSE, cache = TRUE}
-d.vec <- c(1, 5, 10, 50, 100, 500, 1000)
+d.vec <- c(1 : 10, seq(20, 100, by = 10), seq(200, 1500, by = 100))
 set.seed(777)
 result.Sigmabetahat <- matrix(0, length(d.vec), 6)
 colnames(result.Sigmabetahat) <- c("fdp.BH", "fdp.Knockoff", "fdp.Knockoff.plus", "power.BH", "power.Knockoff", "power.Knockoff.plus")
@@ -419,7 +419,7 @@ A <- 3.5
 beta <- rep(0, p)
 nonzero <- sample(p, k)
 beta[nonzero] <- A
-m <- 100
+m <- 1000
 result <- list()
 for (i in 1 : m) {
 y <- X %*% beta + rnorm(n)
