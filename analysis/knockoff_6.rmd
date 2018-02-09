@@ -44,7 +44,7 @@ library(knockoff)
 set.seed(777)
 ```
 
-```{r, echo = FALSE}
+```{r}
 n <- 3000
 p <- 1000
 k <- 50
@@ -55,7 +55,6 @@ A <- 3.5
 ### Scenario 1: 50 large signals, no small signals, 950 zeroes.
 
 ```{r, cache = TRUE}
-set.seed(777)
 X <- matrix(rnorm(n * p), n , p)
 X <- t(t(X) / sqrt(colSums(X^2)))
 Xk <- knockoff::create.fixed(X)
@@ -71,7 +70,7 @@ beta[large] <- A
 ```{r, echo = FALSE, fig.asp = 0.4, fig.height = 5}
 par(mfrow = c(1, 2))
 hist(beta, xlab = expression(beta), main = expression(paste("Histogram of ", beta)))
-hist(beta[beta != 0], xlab = expression(beta), main = expression(paste("Histogram of non-zero ", beta)))
+hist(beta[beta != 0], xlab = expression(beta), main = expression(paste("Histogram of non-zero ", beta)), breaks = seq(0, 3.5, by = 0.5))
 ```
 
 ```{r, echo = FALSE, cache = TRUE}
@@ -134,7 +133,7 @@ beta[small] <- seq(0, A, length = k.small + 2)[-c(1, k.small + 2)]
 ```{r, echo = FALSE, fig.asp = 0.4, fig.height = 5}
 par(mfrow = c(1, 2))
 hist(beta, xlab = expression(beta), main = expression(paste("Histogram of ", beta)))
-hist(beta[beta != 0], xlab = expression(beta), main = expression(paste("Histogram of non-zero ", beta)))
+hist(beta[beta != 0], xlab = expression(beta), main = expression(paste("Histogram of non-zero ", beta)), breaks = seq(0, 3.5, by = 0.5))
 ```
 
 ```{r, echo = FALSE, cache = TRUE}
@@ -143,7 +142,7 @@ m <- 500
 result <- list()
 
 for (i in 1 : m) {
-y <- X %*% beta + e + rnorm(n)
+y <- X %*% beta + rnorm(n)
 
 ## Least squares
 lm.fit <- lm(y ~ X - 1)
@@ -203,7 +202,7 @@ beta[small] <- seq(0, A, length = k.small + 2)[-c(1, k.small + 2)]
 ```{r, echo = FALSE, fig.asp = 0.4, fig.height = 5}
 par(mfrow = c(1, 2))
 hist(beta, xlab = expression(beta), main = expression(paste("Histogram of ", beta)))
-hist(beta[beta != 0], xlab = expression(beta), main = expression(paste("Histogram of non-zero ", beta)))
+hist(beta[beta != 0], xlab = expression(beta), main = expression(paste("Histogram of non-zero ", beta)), breaks = seq(0, 3.5, by = 0.5))
 ```
 
 ```{r, echo = FALSE, cache = TRUE}
@@ -212,7 +211,7 @@ m <- 500
 result <- list()
 
 for (i in 1 : m) {
-y <- X %*% beta + e + rnorm(n)
+y <- X %*% beta + rnorm(n)
 
 ## Least squares
 lm.fit <- lm(y ~ X - 1)
