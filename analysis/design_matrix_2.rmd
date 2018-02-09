@@ -53,7 +53,7 @@ X <- matrix(rnorm(n * p), n, p)
 X <- t(t(X) / sqrt(colSums(X^2)))
 Sigma.betahat <- solve(crossprod(X))
 Rho.betahat <- cov2cor(Sigma.betahat)
-sqroot.avg.sq.rho.betahat.indep <- (sum(Rho.betahat^2) - p) / (p * (p - 1))
+sqroot.avg.sq.rho.betahat.indep <- sqrt((sum(Rho.betahat^2) - p) / (p * (p - 1)))
 sebetahat <- sqrt(diag(Sigma.betahat))
 hist(sebetahat, xlab = expression(SE(hat(beta))))
 ```
@@ -73,14 +73,14 @@ for (rho in seq(0.01, 0.99, by = 0.01)) {
   ## generate correlation matrix of X columns
   Sigma.X <- toeplitz(rho^(0 : (p - 1)))
   Rho.X <- cov2cor(Sigma.X)
-  sqroot.avg.sq.rho.X[i] <- (sum(Rho.X^2) - p) / (p * (p - 1))
+  sqroot.avg.sq.rho.X[i] <- sqrt((sum(Rho.X^2) - p) / (p * (p - 1)))
   ## generate correlated X columns
   X <- matrix(rnorm(n * p), n, p) %*% chol(Rho.X)
   ## column normalization
   X <- t(t(X) / sqrt(colSums(X^2)))
   Sigma.betahat <- solve(crossprod(X))
   Rho.betahat <- cov2cor(Sigma.betahat)
-  sqroot.avg.sq.rho.betahat[i] <- (sum(Rho.betahat^2) - p) / (p * (p - 1))
+  sqroot.avg.sq.rho.betahat[i] <- sqrt((sum(Rho.betahat^2) - p) / (p * (p - 1)))
   sebetahat <- sqrt(diag(Sigma.betahat))
   mean.sebetahat[i] <- mean(sebetahat)
   sd.sebetahat[i] <- sd(sebetahat)
@@ -102,12 +102,11 @@ par(mar = c(4.5, 5, 2, 0.5))
 plot(seq(0.01, 0.99, by = 0.01), sqroot.avg.sq.rho.X, xlab = expression(rho), ylab = expression(sqrt(bar(rho[ij]^2))), type = "o", pch = 17, main = expression(Cor(X)), cex = 0.2)
 plot(seq(0.01, 0.99, by = 0.01), sqroot.avg.sq.rho.betahat, xlab = expression(rho), ylab = expression(sqrt(bar(rho[ij]^2))), type = "o", pch = 2, main = expression(Cor(hat(beta))), cex = 0.2)
 abline(h = sqroot.avg.sq.rho.betahat.indep, lty = 2, col = "green")
-sqroot.avg.sq.rho.betahat.toeplitz <- sqroot.avg.sq.rho.betahat
 ```
 
 ## Factor model column correlation
 
-- $\Sigma = \texttt{cov2cor}(B_{p \times d}B_{d\times p}^T + I)$
+- $\Sigma_X = \texttt{cov2cor}(B_{p \times d}B_{d\times p}^T + I)$
 
 ### $\text{SE}\left(\hat\beta_j\right)$
 
@@ -121,13 +120,63 @@ for (d in 1 : 1000) {
   B <- matrix(rnorm(p * d, 0, 1), p, d)
   Sigma.X <- tcrossprod(B) + diag(p)
   Rho.X <- cov2cor(Sigma.X)
-  sqroot.avg.sq.rho.X[i] <- (sum(Rho.X^2) - p) / (p * (p - 1))
+  sqroot.avg.sq.rho.X[i] <- sqrt((sum(Rho.X^2) - p) / (p * (p - 1)))
   ## generate correlated X columns
   X <- matrix(rnorm(n * p), n, p) %*% chol(Rho.X)
   X <- t(t(X) / sqrt(colSums(X^2)))
   Sigma.betahat <- solve(crossprod(X))
   Rho.betahat <- cov2cor(Sigma.betahat)
-  sqroot.avg.sq.rho.betahat[i] <- (sum(Rho.betahat^2) - p) / (p * (p - 1))
+  sqroot.avg.sq.rho.betahat[i] <- sqrt((sum(Rho.betahat^2) - p) / (p * (p - 1)))
+  sebetahat <- sqrt(diag(Sigma.betahat))
+  mean.sebetahat[i] <- mean(sebetahat)
+  sd.sebetahat[i] <- sd(sebetahat)
+  i <- i + 1
+}
+```
+
+```{r, echo = FALSE}
+sqroot.avg.sq.rho.betahat.factorX <- sqroot.avg.sq.rho.betahat
+par(mar = c(4.5, 5, 2, 0.5))
+plot(1 : 1000, mean.sebetahat, xlab = expression(d), ylab = expression(bar(SE(hat(beta[j])))))
+plot(1 : 1000, sd.sebetahat, xlab = expression(d), ylab = expression(SD(SE(hat(beta[j])))))
+```
+
+### Average correlation among $X_j$ and $\hat\beta_j$.
+
+```{r, echo = FALSE}
+par(mar = c(4.5, 5, 2, 0.5))
+plot(1 : 1000, sqroot.avg.sq.rho.X, xlab = expression(d), ylab = expression(sqrt(bar(rho[ij]^2))), type = "o", pch = 17, main = expression(Cor(X)), cex = 0.2)
+plot(1 : 1000, sqroot.avg.sq.rho.betahat, xlab = expression(d), ylab = expression(sqrt(bar(rho[ij]^2))), type = "o", pch = 2, main = expression(Cor(hat(beta))), cex = 0.2, ylim = range(sqroot.avg.sq.rho.betahat, sqroot.avg.sq.rho.betahat.toeplitz, sqroot.avg.sq.rho.betahat.indep))
+lines(seq(1, 1000, length = 99), sqroot.avg.sq.rho.betahat.toeplitz, lty = 2, col = "blue")
+abline(h = sqroot.avg.sq.rho.betahat.indep, lty = 2, col = "green")
+```
+
+## Factor model $\hat\beta$ correlation
+
+- $Cor(\hat\beta) = \texttt{cov2cor}(B_{p \times d}B_{d\times p}^T + I)$
+
+### $\text{SE}\left(\hat\beta_j\right)$
+
+```{r, echo = FALSE, cache = TRUE}
+sqroot.avg.sq.rho.betahat <- sqroot.avg.sq.rhohat.X <- c()
+mean.sebetahat <- sd.sebetahat <- c()
+i <- 1
+set.seed(777)
+for (d in 1 : 1000) {
+  ## generate correlation matrix of betahat
+  B <- matrix(rnorm(p * d, 0, 1), p, d)
+  Sigma.betahat <- tcrossprod(B) + diag(p)
+  Rho.betahat <- cov2cor(Sigma.betahat)
+  ## generate correlated X columns
+  X <- matrix(rnorm(n * p), n, p)
+  X <- t(t(X) / sqrt(colSums(X^2)))
+  X <- X %*% chol(solve(Rho.betahat))
+  Sigmahat.X <- crossprod(X)
+  Rhohat.X <- cov2cor(Sigmahat.X)
+  sqroot.avg.sq.rhohat.X[i] <- sqrt((sum(Rhohat.X^2) - p) / (p * (p - 1)))
+  Sigma.betahat <- solve(crossprod(X))
+  Rho.betahat <- cov2cor(Sigma.betahat)
+  sqroot.avg.sq.rho.betahat[i] <- sqrt((sum(Rho.betahat^2) - p) / (p * (p - 1)))
   sebetahat <- sqrt(diag(Sigma.betahat))
   mean.sebetahat[i] <- mean(sebetahat)
   sd.sebetahat[i] <- sd(sebetahat)
@@ -145,9 +194,8 @@ plot(1 : 1000, sd.sebetahat, xlab = expression(d), ylab = expression(SD(SE(hat(b
 
 ```{r, echo = FALSE}
 par(mar = c(4.5, 5, 2, 0.5))
-plot(1 : 1000, sqroot.avg.sq.rho.X, xlab = expression(d), ylab = expression(sqrt(bar(rho[ij]^2))), type = "o", pch = 17, main = expression(Cor(X)), cex = 0.2)
+plot(1 : 1000, sqroot.avg.sq.rhohat.X, xlab = expression(d), ylab = expression(sqrt(bar(hat(rho)[ij]^2))), type = "o", pch = 17, main = expression(hat(Cor)(X)), cex = 0.2)
 plot(1 : 1000, sqroot.avg.sq.rho.betahat, xlab = expression(d), ylab = expression(sqrt(bar(rho[ij]^2))), type = "o", pch = 2, main = expression(Cor(hat(beta))), cex = 0.2, ylim = range(sqroot.avg.sq.rho.betahat, sqroot.avg.sq.rho.betahat.toeplitz, sqroot.avg.sq.rho.betahat.indep))
-lines(seq(1, 1000, length = 99), sqroot.avg.sq.rho.betahat.toeplitz, lty = 2, col = "blue")
 abline(h = sqroot.avg.sq.rho.betahat.indep, lty = 2, col = "green")
 ```
 
