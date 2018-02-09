@@ -315,96 +315,48 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2018-02-07</p>
+<p><strong>Last updated:</strong> 2018-02-08</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 7f18ee7</p>
+<p><strong>Code version:</strong> 1a2b7bf</p>
 <!-- Add your analysis here -->
 <section id="introduction" class="level2">
 <h2>Introduction</h2>
 <p>In the <code>Knockoff</code> paper simulations, <span class="math inline">\(\beta\)</span>’s are either <span class="math inline">\(0\)</span> or <span class="math inline">\(A\)</span>. Here we are replicating the results, and investigating how well <code>Knockoff</code> deal with small signals.</p>
 <p>In the following simulations, we always have <span class="math inline">\(n = 3000\)</span>, <span class="math inline">\(p = 1000\)</span>, <span class="math inline">\(X_{n \times p}\)</span> has independent columns simulated from <span class="math inline">\(N(0, 1)\)</span> and then normalized to have <span class="math inline">\(\|X_j\|_2^2 \equiv 1\)</span>. For a certain <span class="math inline">\(\beta\)</span>, <span class="math inline">\(Y_n \sim N(X_{n\times p}\beta_p, I_n)\)</span>. Out of <span class="math inline">\(p = 1000\)</span> <span class="math inline">\(\beta_j\)</span>’s, here are three scenarios.</p>
 <ul>
-<li>Scenario 1: <span class="math inline">\(950\)</span> are 0, <span class="math inline">\(25\)</span> are <span class="math inline">\(3.5\)</span>, <span class="math inline">\(25\)</span> are <span class="math inline">\(-3.5\)</span>. (replicating a data point on Fig 3 of the <code>Knockoff</code> paper)</li>
-<li>Scenario 2: <span class="math inline">\(900\)</span> are 0, <span class="math inline">\(100\)</span> are <span class="math inline">\((N(0, 5.19^2) \wedge 3.5) \vee (-3.5)\)</span> so that <span class="math inline">\(50\)</span> of them are expected to be larger than <span class="math inline">\(3.5\)</span> or smaller than <span class="math inline">\(-3.5\)</span>. And then we truncate these large signals to make them to be <span class="math inline">\(3.5\)</span> or <span class="math inline">\(-3.5\)</span>.</li>
-<li>Scenario 3: Similar to Scenario 2, only that <span class="math inline">\(800\)</span> are 0, <span class="math inline">\(200\)</span> are <span class="math inline">\((N(0, 3.04^2) \wedge 3.5) \vee (-3.5)\)</span> so we still have on average <span class="math inline">\(50\)</span> of them are expected to be <span class="math inline">\(3.5\)</span> or <span class="math inline">\(-3.5\)</span>.</li>
+<li>Scenario 1: <span class="math inline">\(950\)</span> are 0, and the rest <span class="math inline">\(50\)</span> are <span class="math inline">\(A = 3.5\)</span>. (replicating a data point on Fig 3 of the <code>Knockoff</code> paper)</li>
+<li>Scenario 2: <span class="math inline">\(850\)</span> are 0, <span class="math inline">\(50\)</span> are <span class="math inline">\(A = 3.5\)</span> as large signals, and the rest <span class="math inline">\(100\)</span> are small signals uniformly from <span class="math inline">\(0\)</span> to <span class="math inline">\(3.5\)</span>.</li>
+<li>Scenario 3: <span class="math inline">\(750\)</span> are 0, <span class="math inline">\(50\)</span> are <span class="math inline">\(A = 3.5\)</span> as large signals, and the rest <span class="math inline">\(200\)</span> are small signals uniformly from <span class="math inline">\(0\)</span> to <span class="math inline">\(3.5\)</span>.</li>
 </ul>
-</section>
-<section id="scenario-1-50-large-signals-no-small-signals-950-zeroes." class="level2">
-<h2>Scenario 1: 50 large signals, no small signals, 950 zeroes.</h2>
-<p><img src="figure/knockoff_6.rmd/unnamed-chunk-4-1.png" width="1152" style="display: block; margin: auto;" /></p>
-</section>
-<section id="scenario-2-50-large-signals-50-small-signals-900-zeroes." class="level2">
-<h2>Scenario 2: 50 large signals, 50 small signals, 900 zeroes.</h2>
-<p><img src="figure/knockoff_6.rmd/unnamed-chunk-6-1.png" width="1152" style="display: block; margin: auto;" /></p>
-</section>
-<section id="scenario-3-50-large-signals-150-small-signals-800-zeroes." class="level2">
-<h2>Scenario 3: 50 large signals, 150 small signals, 800 zeroes.</h2>
-<p><img src="figure/knockoff_6.rmd/unnamed-chunk-8-1.png" width="1152" style="display: block; margin: auto;" /></p>
-<table>
-<thead>
-<tr class="header">
-<th style="text-align: right;">FDP.BH</th>
-<th style="text-align: right;">FDP.Knockoff</th>
-<th style="text-align: right;">Power.BH</th>
-<th style="text-align: right;">Power.Knockoff</th>
-<th style="text-align: right;">Power.Large.BH</th>
-<th style="text-align: right;">Power.Large.Knockoff</th>
-<th style="text-align: right;">Power.Small.BH</th>
-<th style="text-align: right;">Power.Small.Knockoff</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: right;">0.0914</td>
-<td style="text-align: right;">0.0623</td>
-<td style="text-align: right;">0.4198</td>
-<td style="text-align: right;">0.4398</td>
-<td style="text-align: right;">0.4198</td>
-<td style="text-align: right;">0.4398</td>
-<td style="text-align: right;">NA</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="even">
-<td style="text-align: right;">0.0880</td>
-<td style="text-align: right;">0.0458</td>
-<td style="text-align: right;">0.2970</td>
-<td style="text-align: right;">0.2623</td>
-<td style="text-align: right;">0.4748</td>
-<td style="text-align: right;">0.4132</td>
-<td style="text-align: right;">0.1210</td>
-<td style="text-align: right;">0.1126</td>
-</tr>
-<tr class="odd">
-<td style="text-align: right;">0.0754</td>
-<td style="text-align: right;">0.0342</td>
-<td style="text-align: right;">0.2216</td>
-<td style="text-align: right;">0.1641</td>
-<td style="text-align: right;">0.5206</td>
-<td style="text-align: right;">0.3929</td>
-<td style="text-align: right;">0.1236</td>
-<td style="text-align: right;">0.0886</td>
-</tr>
-</tbody>
-</table>
-<p><img src="figure/knockoff_6.rmd/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p><img src="figure/knockoff_6.rmd/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p><img src="figure/knockoff_6.rmd/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p><img src="figure/knockoff_6.rmd/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="fixed-x-simulations" class="level2">
-<h2>Fixed <span class="math inline">\(X\)</span> simulations</h2>
-<section id="scenario-1-50-large-signals-no-small-signals-950-zeroes.-1" class="level3">
+<pre class="r"><code>n &lt;- 3000
+p &lt;- 1000
+k &lt;- 50
+q &lt;- 0.1
+A &lt;- 3.5</code></pre>
+<section id="scenario-1-50-large-signals-no-small-signals-950-zeroes." class="level3">
 <h3>Scenario 1: 50 large signals, no small signals, 950 zeroes.</h3>
-<p><img src="figure/knockoff_6.rmd/unnamed-chunk-18-1.png" width="0.9\linewidth" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>X &lt;- matrix(rnorm(n * p), n , p)
+X &lt;- t(t(X) / sqrt(colSums(X^2)))
+Xk &lt;- knockoff::create.fixed(X)
+Xk &lt;- Xk$Xk</code></pre>
+<p><img src="figure/knockoff_6.rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
 </section>
-<section id="scenario-2-50-large-signals-50-small-signals-900-zeroes.-1" class="level3">
-<h3>Scenario 2: 50 large signals, 50 small signals, 900 zeroes.</h3>
-<p><img src="figure/knockoff_6.rmd/unnamed-chunk-22-1.png" width="672" style="display: block; margin: auto;" /></p>
+<section id="scenario-2-50-large-signals-100-small-signals-850-zeroes." class="level3">
+<h3>Scenario 2: 50 large signals, 100 small signals, 850 zeroes.</h3>
+<pre class="r"><code>X &lt;- matrix(rnorm(n * p), n , p)
+X &lt;- t(t(X) / sqrt(colSums(X^2)))
+Xk &lt;- knockoff::create.fixed(X)
+Xk &lt;- Xk$Xk</code></pre>
+<p><img src="figure/knockoff_6.rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
 </section>
-<section id="scenario-3-50-large-signals-150-small-signals-800-zeroes.-1" class="level3">
-<h3>Scenario 3: 50 large signals, 150 small signals, 800 zeroes.</h3>
-<p><img src="figure/knockoff_6.rmd/unnamed-chunk-26-1.png" width="672" style="display: block; margin: auto;" /></p>
+<section id="scenario-3-50-large-signals-200-small-signals-750-zeroes." class="level3">
+<h3>Scenario 3: 50 large signals, 200 small signals, 750 zeroes.</h3>
+<pre class="r"><code>X &lt;- matrix(rnorm(n * p), n , p)
+X &lt;- t(t(X) / sqrt(colSums(X^2)))
+Xk &lt;- knockoff::create.fixed(X)
+Xk &lt;- Xk$Xk</code></pre>
+<p><img src="figure/knockoff_6.rmd/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;" /></p>
 <table>
 <thead>
 <tr class="header">
@@ -424,53 +376,53 @@ shared across the workflowr files. -->
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: right;">0.0783</td>
-<td style="text-align: right;">0.0645</td>
-<td style="text-align: right;">0.0399</td>
-<td style="text-align: right;">0.4290</td>
-<td style="text-align: right;">0.5292</td>
-<td style="text-align: right;">0.3730</td>
-<td style="text-align: right;">0.4290</td>
-<td style="text-align: right;">0.5292</td>
-<td style="text-align: right;">0.3730</td>
+<td style="text-align: right;">0.0936</td>
+<td style="text-align: right;">0.0677</td>
+<td style="text-align: right;">0.0431</td>
+<td style="text-align: right;">0.4277</td>
+<td style="text-align: right;">0.5400</td>
+<td style="text-align: right;">0.4076</td>
+<td style="text-align: right;">0.4277</td>
+<td style="text-align: right;">0.5400</td>
+<td style="text-align: right;">0.4076</td>
 <td style="text-align: right;">NA</td>
 <td style="text-align: right;">NA</td>
 <td style="text-align: right;">NA</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">0.0901</td>
-<td style="text-align: right;">0.0605</td>
-<td style="text-align: right;">0.0389</td>
-<td style="text-align: right;">0.2927</td>
-<td style="text-align: right;">0.3260</td>
-<td style="text-align: right;">0.2307</td>
-<td style="text-align: right;">0.4592</td>
-<td style="text-align: right;">0.5194</td>
-<td style="text-align: right;">0.3684</td>
-<td style="text-align: right;">0.1262</td>
-<td style="text-align: right;">0.1326</td>
-<td style="text-align: right;">0.0930</td>
+<td style="text-align: right;">0.0824</td>
+<td style="text-align: right;">0.0477</td>
+<td style="text-align: right;">0.0390</td>
+<td style="text-align: right;">0.3678</td>
+<td style="text-align: right;">0.3523</td>
+<td style="text-align: right;">0.3106</td>
+<td style="text-align: right;">0.5760</td>
+<td style="text-align: right;">0.5849</td>
+<td style="text-align: right;">0.5222</td>
+<td style="text-align: right;">0.1756</td>
+<td style="text-align: right;">0.1538</td>
+<td style="text-align: right;">0.1319</td>
 </tr>
 <tr class="odd">
-<td style="text-align: right;">0.0767</td>
-<td style="text-align: right;">0.0457</td>
-<td style="text-align: right;">0.0330</td>
-<td style="text-align: right;">0.2406</td>
-<td style="text-align: right;">0.2118</td>
-<td style="text-align: right;">0.1637</td>
-<td style="text-align: right;">0.5300</td>
-<td style="text-align: right;">0.4908</td>
-<td style="text-align: right;">0.3916</td>
-<td style="text-align: right;">0.1441</td>
-<td style="text-align: right;">0.1187</td>
-<td style="text-align: right;">0.0877</td>
+<td style="text-align: right;">0.0589</td>
+<td style="text-align: right;">0.0350</td>
+<td style="text-align: right;">0.0292</td>
+<td style="text-align: right;">0.3607</td>
+<td style="text-align: right;">0.2416</td>
+<td style="text-align: right;">0.2108</td>
+<td style="text-align: right;">0.6638</td>
+<td style="text-align: right;">0.5659</td>
+<td style="text-align: right;">0.5068</td>
+<td style="text-align: right;">0.2254</td>
+<td style="text-align: right;">0.1309</td>
+<td style="text-align: right;">0.1110</td>
 </tr>
 </tbody>
 </table>
-<p><img src="figure/knockoff_6.rmd/unnamed-chunk-31-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p><img src="figure/knockoff_6.rmd/unnamed-chunk-32-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p><img src="figure/knockoff_6.rmd/unnamed-chunk-33-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p><img src="figure/knockoff_6.rmd/unnamed-chunk-34-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/knockoff_6.rmd/unnamed-chunk-20-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/knockoff_6.rmd/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/knockoff_6.rmd/unnamed-chunk-22-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/knockoff_6.rmd/unnamed-chunk-23-1.png" width="672" style="display: block; margin: auto;" /></p>
 </section>
 </section>
 <section id="session-information" class="level2">
