@@ -203,17 +203,30 @@ On the deconvolution front, `CASH` generates more robust $\hat g$ than `ASH` in 
 
 First public presentation of `CASH`.
 
+* [Average correlation in GTEx data: 5 livers vs 5 livers](average_cor_gtex.html)
+* [Average correlation in GTEx data: 50 livers vs 50 livers](average_cor_gtex_2.html)
+
+A very important quantity for the shape of the empirical distribution of a large number of correlated null is **average pairwise correlation** $=\sqrt{\overline{\rho_{ij}^2}}$.
+
+Next it's a series of investigation of a number of variable selection and false discovery rate control methods in linear regression.
+
+1. Commonly used design matrix $X$ simulation schemes and its effects on **average pairwise correlation** in $X$ $=\sqrt{\overline{\rho\left(X_i, X_j\right)^2}}$ and in $\hat\beta$ $=\sqrt{\overline{\rho\left(\hat\beta_i, \hat\beta_j\right)^2}}$
+
 * [Design matrix $X$ and its effect on the empirical distribution of the correlated null](design_matrix.html)
 * [Design matrix $X$ and its effect on the correlation pattern of $X$ and $\hat\beta$](design_matrix_2.html)
+
+2. Initial comparison
+
 * [Linear regression variable selection: Independent columns in $X$](knockoff_4.html)
 * [Linear regression variable selection: $\Sigma_X$ is Toeplitz](knockoff.html)
 * [Linear regression variable selection: $X$ has high collinearity](knockoff_2.html)
 * [Linear regression variable selection: Start from $\Sigma_{\hat\beta} / \sigma_e^2 = (X^TX)^{-1}$](knockoff_3.html)
+
+3. Two scenarios that might be hostile to `knockoff`
+
 * [`Knockoff` on small signals](knockoff_6.html)
 * [`Knockoff` on design matrix correlation](knockoff_5.html)
 
-* [Average correlation in GTEx data: 5 livers vs 5 livers](average_cor_gtex.html)
-* [Average correlation in GTEx data: 50 livers vs 50 livers](average_cor_gtex_2.html)
 
 [`ashr`]: https://github.com/stephens999/ashr
 

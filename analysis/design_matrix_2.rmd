@@ -54,6 +54,7 @@ X <- t(t(X) / sqrt(colSums(X^2)))
 Sigma.betahat <- solve(crossprod(X))
 Rho.betahat <- cov2cor(Sigma.betahat)
 sqroot.avg.sq.rho.betahat.indep <- sqrt((sum(Rho.betahat^2) - p) / (p * (p - 1)))
+sqroot.avg.sq.rho.betahat.indep
 sebetahat <- sqrt(diag(Sigma.betahat))
 hist(sebetahat, xlab = expression(SE(hat(beta))))
 ```
