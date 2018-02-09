@@ -315,10 +315,10 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2018-02-06</p>
+<p><strong>Last updated:</strong> 2018-02-08</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> a31a150</p>
+<p><strong>Code version:</strong> bbf283a</p>
 <!-- Add your analysis here -->
 <section id="introduction" class="level2">
 <h2>Introduction</h2>
@@ -351,7 +351,7 @@ shared across the workflowr files. -->
 <section id="factor-model-column-correlation" class="level2">
 <h2>Factor model column correlation</h2>
 <ul>
-<li><span class="math inline">\(\Sigma = \texttt{cov2cor}(B_{p \times d}B_{d\times p}^T + I)\)</span></li>
+<li><span class="math inline">\(\Sigma_X = \texttt{cov2cor}(B_{p \times d}B_{d\times p}^T + I)\)</span></li>
 </ul>
 <section id="textselefthatbeta_jright-1" class="level3">
 <h3><span class="math inline">\(\text{SE}\left(\hat\beta_j\right)\)</span></h3>
@@ -360,6 +360,20 @@ shared across the workflowr files. -->
 <section id="average-correlation-among-x_j-and-hatbeta_j." class="level3">
 <h3>Average correlation among <span class="math inline">\(X_j\)</span> and <span class="math inline">\(\hat\beta_j\)</span>.</h3>
 <p><img src="figure/design_matrix_2.rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/design_matrix_2.rmd/unnamed-chunk-8-2.png" width="672" style="display: block; margin: auto;" /></p>
+</section>
+</section>
+<section id="factor-model-hatbeta-correlation" class="level2">
+<h2>Factor model <span class="math inline">\(\hat\beta\)</span> correlation</h2>
+<ul>
+<li><span class="math inline">\(Cor(\hat\beta) = \texttt{cov2cor}(B_{p \times d}B_{d\times p}^T + I)\)</span></li>
+</ul>
+<section id="textselefthatbeta_jright-2" class="level3">
+<h3><span class="math inline">\(\text{SE}\left(\hat\beta_j\right)\)</span></h3>
+<p><img src="figure/design_matrix_2.rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/design_matrix_2.rmd/unnamed-chunk-10-2.png" width="672" style="display: block; margin: auto;" /></p>
+</section>
+<section id="average-correlation-among-x_j-and-hatbeta_j.-1" class="level3">
+<h3>Average correlation among <span class="math inline">\(X_j\)</span> and <span class="math inline">\(\hat\beta_j\)</span>.</h3>
+<p><img src="figure/design_matrix_2.rmd/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/design_matrix_2.rmd/unnamed-chunk-11-2.png" width="672" style="display: block; margin: auto;" /></p>
 </section>
 </section>
 <section id="session-information" class="level2">
