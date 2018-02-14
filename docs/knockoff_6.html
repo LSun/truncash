@@ -315,10 +315,10 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2018-02-08</p>
+<p><strong>Last updated:</strong> 2018-02-14</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 1a2b7bf</p>
+<p><strong>Code version:</strong> c9c60cc</p>
 <!-- Add your analysis here -->
 <section id="introduction" class="level2">
 <h2>Introduction</h2>
@@ -337,7 +337,7 @@ A &lt;- 3.5</code></pre>
 <section id="scenario-1-50-large-signals-no-small-signals-950-zeroes." class="level3">
 <h3>Scenario 1: 50 large signals, no small signals, 950 zeroes.</h3>
 <pre class="r"><code>X &lt;- matrix(rnorm(n * p), n , p)
-X &lt;- t(t(X) / sqrt(colSums(X^2)))
+X &lt;- svd(X)$u
 Xk &lt;- knockoff::create.fixed(X)
 Xk &lt;- Xk$Xk</code></pre>
 <p><img src="figure/knockoff_6.rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
@@ -345,7 +345,7 @@ Xk &lt;- Xk$Xk</code></pre>
 <section id="scenario-2-50-large-signals-100-small-signals-850-zeroes." class="level3">
 <h3>Scenario 2: 50 large signals, 100 small signals, 850 zeroes.</h3>
 <pre class="r"><code>X &lt;- matrix(rnorm(n * p), n , p)
-X &lt;- t(t(X) / sqrt(colSums(X^2)))
+X &lt;- svd(X)$u
 Xk &lt;- knockoff::create.fixed(X)
 Xk &lt;- Xk$Xk</code></pre>
 <p><img src="figure/knockoff_6.rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
@@ -353,7 +353,7 @@ Xk &lt;- Xk$Xk</code></pre>
 <section id="scenario-3-50-large-signals-200-small-signals-750-zeroes." class="level3">
 <h3>Scenario 3: 50 large signals, 200 small signals, 750 zeroes.</h3>
 <pre class="r"><code>X &lt;- matrix(rnorm(n * p), n , p)
-X &lt;- t(t(X) / sqrt(colSums(X^2)))
+X &lt;- svd(X)$u
 Xk &lt;- knockoff::create.fixed(X)
 Xk &lt;- Xk$Xk</code></pre>
 <p><img src="figure/knockoff_6.rmd/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;" /></p>
@@ -376,46 +376,46 @@ Xk &lt;- Xk$Xk</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: right;">0.0936</td>
-<td style="text-align: right;">0.0677</td>
-<td style="text-align: right;">0.0431</td>
-<td style="text-align: right;">0.4277</td>
-<td style="text-align: right;">0.5400</td>
-<td style="text-align: right;">0.4076</td>
-<td style="text-align: right;">0.4277</td>
-<td style="text-align: right;">0.5400</td>
-<td style="text-align: right;">0.4076</td>
+<td style="text-align: right;">0.0979</td>
+<td style="text-align: right;">0.1082</td>
+<td style="text-align: right;">0.0863</td>
+<td style="text-align: right;">0.7339</td>
+<td style="text-align: right;">0.7329</td>
+<td style="text-align: right;">0.6939</td>
+<td style="text-align: right;">0.7339</td>
+<td style="text-align: right;">0.7329</td>
+<td style="text-align: right;">0.6939</td>
 <td style="text-align: right;">NA</td>
 <td style="text-align: right;">NA</td>
 <td style="text-align: right;">NA</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">0.0824</td>
-<td style="text-align: right;">0.0477</td>
-<td style="text-align: right;">0.0390</td>
-<td style="text-align: right;">0.3678</td>
-<td style="text-align: right;">0.3523</td>
-<td style="text-align: right;">0.3106</td>
-<td style="text-align: right;">0.5760</td>
-<td style="text-align: right;">0.5849</td>
-<td style="text-align: right;">0.5222</td>
-<td style="text-align: right;">0.1756</td>
-<td style="text-align: right;">0.1538</td>
-<td style="text-align: right;">0.1319</td>
+<td style="text-align: right;">0.0847</td>
+<td style="text-align: right;">0.0921</td>
+<td style="text-align: right;">0.0795</td>
+<td style="text-align: right;">0.3836</td>
+<td style="text-align: right;">0.3867</td>
+<td style="text-align: right;">0.3691</td>
+<td style="text-align: right;">0.7791</td>
+<td style="text-align: right;">0.7799</td>
+<td style="text-align: right;">0.7555</td>
+<td style="text-align: right;">0.1858</td>
+<td style="text-align: right;">0.1901</td>
+<td style="text-align: right;">0.176</td>
 </tr>
 <tr class="odd">
-<td style="text-align: right;">0.0589</td>
-<td style="text-align: right;">0.0350</td>
-<td style="text-align: right;">0.0292</td>
-<td style="text-align: right;">0.3607</td>
-<td style="text-align: right;">0.2416</td>
-<td style="text-align: right;">0.2108</td>
-<td style="text-align: right;">0.6638</td>
-<td style="text-align: right;">0.5659</td>
-<td style="text-align: right;">0.5068</td>
-<td style="text-align: right;">0.2254</td>
-<td style="text-align: right;">0.1309</td>
-<td style="text-align: right;">0.1110</td>
+<td style="text-align: right;">0.0756</td>
+<td style="text-align: right;">0.0817</td>
+<td style="text-align: right;">0.0727</td>
+<td style="text-align: right;">0.3294</td>
+<td style="text-align: right;">0.3340</td>
+<td style="text-align: right;">0.3195</td>
+<td style="text-align: right;">0.8116</td>
+<td style="text-align: right;">0.8122</td>
+<td style="text-align: right;">0.7932</td>
+<td style="text-align: right;">0.2088</td>
+<td style="text-align: right;">0.2145</td>
+<td style="text-align: right;">0.201</td>
 </tr>
 </tbody>
 </table>
@@ -431,7 +431,7 @@ Xk &lt;- Xk$Xk</code></pre>
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS High Sierra 10.13.2
+Running under: macOS High Sierra 10.13.3
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
