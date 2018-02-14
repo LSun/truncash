@@ -57,7 +57,7 @@ ngene <- 1000
 r <- r[sample(nrow(r), ngene), ]
 nsamp <- 5
 nsim <- 500
-sigma.beta <- 3
+sigma.beta <- 2.5
 ```
 
 ```{r method, echo = FALSE}
@@ -73,6 +73,7 @@ qvalue.pi0.list <- qvalue.list <- list()
 z.pi0.list <- z.list <- list()
 
 set.seed(777)
+
 for (j in seq(length(pi0.vec))) {
   pi0 <- pi0.vec[j]
 for (i in 1 : nsim) {
@@ -94,7 +95,7 @@ for (i in 1 : nsim) {
 
   ## different methods
   fit.ash = ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
-  fit.gdash = gdash(betahat, sebetahat, gd.ord = 2)
+  fit.gdash = gdash(betahat, sebetahat, gd.ord = 4)
   fit.qvalue = qvalue::qvalue(p)
   fit.BH = p.adjust(p, method = "BH")
 
