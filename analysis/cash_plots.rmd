@@ -65,8 +65,6 @@ method.name <- c("BH", "qvalue", "ASH", "CASH")
 method.col <- c("blue", "green", "orange", "red")
 ```
 
-## Use $6$ Gaussian derivatives
-
 ```{r fitting, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
 pi0.vec <- seq(0.75, 0.95, by = 0.05)
 qvalue.pi0.list <- qvalue.list <- list()
@@ -331,6 +329,101 @@ for (j in seq(length(pi0.vec))) {
   labs(title = bquote(paste("Power at ", pi[0] == .(pi0.vec[j]), ", Nominal ", FDR == .(q))), x = "", y = "Power") +
   theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 12.5), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 7.5), axis.text.y = element_text(size = 15))
   )
+}
+```
+
+```{r fitting, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
+for (sigma.beta in c(1.5, 2, 1.5, 3)) {
+for (L in c(2, 4, 6)) {
+cat("sigma.beta =", sigma.beta, "; GD =", L)
+pi0.vec <- seq(0.75, 0.95, by = 0.05)
+qvalue.pi0.list <- qvalue.list <- list()
+z.pi0.list <- z.list <- list()
+
+set.seed(777)
+
+for (j in seq(length(pi0.vec))) {
+  pi0 <- pi0.vec[j]
+for (i in 1 : nsim) {
+  ## generate data
+  counts <- r[, sample(ncol(r), 2 * nsamp)]
+  design <- model.matrix(~c(rep(0, nsamp), rep(1, nsamp)))
+  summary <- count_to_summary(counts, design)
+  z <- summary$z
+  sebetahat <- summary$sebetahat
+  sebetahat <- sebetahat * 1 / sqrt(mean(sebetahat^2))
+  beta <- sample(
+    c(
+      rep(0, round(pi0 * ngene)),
+      rnorm(round((1 - pi0) * ngene), 0, sigma.beta)
+    )
+  )
+  betahat <- beta + z * sebetahat
+  p = (1 - pnorm(abs(betahat / sebetahat))) * 2
+
+  ## different methods
+  fit.ash = ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+  fit.gdash = gdash(betahat, sebetahat, gd.ord = L)
+  fit.qvalue = qvalue::qvalue(p)
+  fit.BH = p.adjust(p, method = "BH")
+
+  ## FDR
+  qvalue.list[[i]] <- cbind(
+    beta <- beta,
+    BH <- fit.BH,
+    qvalue <- fit.qvalue$qvalues,
+    ASH <- ashr::get_qvalue(fit.ash),
+    CASH <- fit.gdash$qvalue
+  )
+  z.list[[i]] <- z
+}
+qvalue.pi0.list[[j]] <- qvalue.list
+z.pi0.list[[j]] <- z.list
+}
+z.over <- 1.075
+z.under <- 0.925
+for (j in seq(length(pi0.vec))) {
+  sd.z <- sapply(z.pi0.list[[j]], sd)
+  Noise <- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c("Underdispersion", "In-between", "Overdispersion"))
+  print(
+  ggplot(data = melt(cbind(Noise, as.data.frame(FDP.array[, which(q.vec == q), , j])), id.vars = "Noise"),
+         aes(x = variable, y = value, col = variable)) +
+  geom_boxplot() +
+  stat_summary(fun.y = mean, geom = "point") +
+  scale_color_manual(values = method.col) +
+  facet_wrap(~Noise) +
+  geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
+  scale_x_discrete(labels = method.name) +
+  labs(title = bquote(paste("False Discovery Proportions at ", pi[0] == .(pi0.vec[j]), ", Nominal ", FDR == .(q))), x = "", y = "FDP") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 12.5), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 7.5), axis.text.y = element_text(size = 15))
+  )
+  
+  print(
+  ggplot(data = melt(cbind(Noise, as.data.frame(pFDP.array[, which(q.vec == q), , j])), id.vars = "Noise"),
+        aes(x = variable, y = value, col = variable)) +
+  geom_boxplot(na.rm = TRUE) +
+  stat_summary(fun.y = mean, geom = "point") +
+  scale_color_manual(values = method.col) +
+  facet_wrap(~Noise) +
+  geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
+  scale_x_discrete(labels = method.name) +
+  labs(title = bquote(paste("Positive False Discovery Proportions at ", pi[0] == .(pi0.vec[j]), ", Nominal ", FDR == .(q))), x = "", y = "pFDP") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 12.5), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 7.5), axis.text.y = element_text(size = 15))
+  )
+  
+  print(
+  ggplot(data = melt(cbind(Noise, as.data.frame(power.array[, which(q.vec == q), , j])), id.vars = "Noise"),
+        aes(x = variable, y = value, col = variable)) +
+  geom_boxplot() +
+  stat_summary(fun.y = mean, geom = "point") +
+  scale_color_manual(values = method.col) +
+  facet_wrap(~Noise) +
+  scale_x_discrete(labels = method.name) +
+  labs(title = bquote(paste("Power at ", pi[0] == .(pi0.vec[j]), ", Nominal ", FDR == .(q))), x = "", y = "Power") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 12.5), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 7.5), axis.text.y = element_text(size = 15))
+  )
+}
+}
 }
 ```
 
