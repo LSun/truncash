@@ -56,7 +56,7 @@ A <- 3.5
 
 ```{r, cache = TRUE}
 X <- matrix(rnorm(n * p), n , p)
-X <- t(t(X) / sqrt(colSums(X^2)))
+X <- svd(X)$u
 Xk <- knockoff::create.fixed(X)
 Xk <- Xk$Xk
 ```
@@ -74,10 +74,8 @@ hist(beta[beta != 0], xlab = expression(beta), main = expression(paste("Histogra
 ```
 
 ```{r, echo = FALSE, cache = TRUE}
-m <- 500
-
+m <- 1000
 result <- list()
-
 for (i in 1 : m) {
 y <- X %*% beta + rnorm(n)
 
@@ -117,17 +115,18 @@ result.nosmall <- result.summary
 
 ```{r, cache = TRUE}
 X <- matrix(rnorm(n * p), n , p)
-X <- t(t(X) / sqrt(colSums(X^2)))
+X <- svd(X)$u
 Xk <- knockoff::create.fixed(X)
 Xk <- Xk$Xk
 ```
 
 ```{r, echo = FALSE}
 k.small <- 100
+beta <- rep(0, p)
 large <- sample(p, k)
 small <- sample(setdiff(seq(p), large), k.small)
 beta[large] <- A
-beta[small] <- seq(0, A, length = k.small + 2)[-c(1, k.small + 2)]
+beta[small] <- seq(0, 3, length = k.small + 1)[-1]
 ```
 
 ```{r, echo = FALSE, fig.asp = 0.4, fig.height = 5}
@@ -137,10 +136,8 @@ hist(beta[beta != 0], xlab = expression(beta), main = expression(paste("Histogra
 ```
 
 ```{r, echo = FALSE, cache = TRUE}
-m <- 500
-
+m <- 1000
 result <- list()
-
 for (i in 1 : m) {
 y <- X %*% beta + rnorm(n)
 
@@ -186,17 +183,18 @@ result.fewsmall <- result.summary
 
 ```{r, cache = TRUE}
 X <- matrix(rnorm(n * p), n , p)
-X <- t(t(X) / sqrt(colSums(X^2)))
+X <- svd(X)$u
 Xk <- knockoff::create.fixed(X)
 Xk <- Xk$Xk
 ```
 
 ```{r, echo = FALSE}
 k.small <- 200
+beta <- rep(0, p)
 large <- sample(p, k)
 small <- sample(setdiff(seq(p), large), k.small)
 beta[large] <- A
-beta[small] <- seq(0, A, length = k.small + 2)[-c(1, k.small + 2)]
+beta[small] <- seq(0, 3, length = k.small + 1)[-1]
 ```
 
 ```{r, echo = FALSE, fig.asp = 0.4, fig.height = 5}
@@ -206,10 +204,8 @@ hist(beta[beta != 0], xlab = expression(beta), main = expression(paste("Histogra
 ```
 
 ```{r, echo = FALSE, cache = TRUE}
-m <- 500
-
+m <- 1000
 result <- list()
-
 for (i in 1 : m) {
 y <- X %*% beta + rnorm(n)
 
