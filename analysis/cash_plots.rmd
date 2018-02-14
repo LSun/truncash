@@ -1,0 +1,340 @@
+---
+title: "`CASH` Simulations"
+author: "Lei Sun"
+date: 2018-02-10
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+```{r packages, message = FALSE, warning = FALSE, echo = FALSE}
+source("../code/gdash_lik.R")
+source("../code/count_to_summary.R")
+library(ashr)
+library(reshape2)
+library(ggplot2)
+```
+
+```{r functions, echo = FALSE}
+mean_sdp <- function(x) {
+   m <- mean(x)
+   ymax <- m + sd(x)
+   return(c(y = m, ymax = ymax, ymin = m))
+}
+FDP <- function (FDR, qvalue, beta) {
+  return(sum(qvalue <= FDR & beta == 0) / max(sum(qvalue <= FDR), 1))
+}
+pFDP <- function (FDR, qvalue, beta) {
+  return(sum(qvalue <= FDR & beta == 0) / sum(qvalue <= FDR))
+}
+power <- function (FDR, qvalue, beta) {
+  return(sum(qvalue <= FDR & beta != 0) / sum(beta != 0))
+}
+```
+
+```{r read gtex data, echo = FALSE}
+r <- readRDS("../data/liver.sim.rds")
+ngene <- 1000
+r <- r[sample(nrow(r), ngene), ]
+nsamp <- 5
+nsim <- 500
+sigma.beta <- 3
+```
+
+```{r method, echo = FALSE}
+method.name <- c("BH", "qvalue", "ASH", "CASH")
+method.col <- c("blue", "green", "orange", "red")
+```
+
+## Use $6$ Gaussian derivatives
+
+```{r fitting, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
+pi0.vec <- seq(0.75, 0.95, by = 0.05)
+qvalue.pi0.list <- qvalue.list <- list()
+z.pi0.list <- z.list <- list()
+
+set.seed(777)
+for (j in seq(length(pi0.vec))) {
+  pi0 <- pi0.vec[j]
+for (i in 1 : nsim) {
+  ## generate data
+  counts <- r[, sample(ncol(r), 2 * nsamp)]
+  design <- model.matrix(~c(rep(0, nsamp), rep(1, nsamp)))
+  summary <- count_to_summary(counts, design)
+  z <- summary$z
+  sebetahat <- summary$sebetahat
+  sebetahat <- sebetahat * 1 / sqrt(mean(sebetahat^2))
+  beta <- sample(
+    c(
+      rep(0, round(pi0 * ngene)),
+      rnorm(round((1 - pi0) * ngene), 0, sigma.beta)
+    )
+  )
+  betahat <- beta + z * sebetahat
+  p = (1 - pnorm(abs(betahat / sebetahat))) * 2
+
+  ## different methods
+  fit.ash = ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+  fit.gdash = gdash(betahat, sebetahat, gd.ord = 2)
+  fit.qvalue = qvalue::qvalue(p)
+  fit.BH = p.adjust(p, method = "BH")
+
+  ## FDR
+  qvalue.list[[i]] <- cbind(
+    beta <- beta,
+    BH <- fit.BH,
+    qvalue <- fit.qvalue$qvalues,
+    ASH <- ashr::get_qvalue(fit.ash),
+    CASH <- fit.gdash$qvalue
+  )
+  z.list[[i]] <- z
+}
+qvalue.pi0.list[[j]] <- qvalue.list
+z.pi0.list[[j]] <- z.list
+}
+```
+
+```{r, echo = FALSE}
+q.vec <- seq(0.005, 0.20, by = 0.005)
+FDP.array <- pFDP.array <- power.array <- array(0, dim = c(nsim, length(q.vec), length(method.name), length(pi0.vec)))
+FDP.summary <- pFDP.summary <- power.summary <- array(0, dim = c(5, length(q.vec), length(method.name), length(pi0.vec)))
+for (j in seq(length(pi0.vec))) {
+  for (k in seq(length(method.name))) {
+    for (i in seq(nsim)) {
+      FDP.array[i, , k, j] <- sapply(q.vec, FDP, qvalue = qvalue.pi0.list[[j]][[i]][, k + 1], beta = qvalue.pi0.list[[j]][[i]][, 1])
+      pFDP.array[i, , k, j] <- sapply(q.vec, pFDP, qvalue = qvalue.pi0.list[[j]][[i]][, k + 1], beta = qvalue.pi0.list[[j]][[i]][, 1])
+      power.array[i, , k, j] <- sapply(q.vec, power, qvalue = qvalue.pi0.list[[j]][[i]][, k + 1], beta = qvalue.pi0.list[[j]][[i]][, 1])
+    }
+    FDP.summary[, , k, j] <- rbind(
+      avg <- colMeans(FDP.array[, , k, j]),
+      sd <- apply(FDP.array[, , k, j], 2, sd),
+      n <- colSums(!is.na(FDP.array[, , k, j])),
+      q975 <- apply(FDP.array[, , k, j], 2, quantile, probs = 0.975),
+      q025 <- apply(FDP.array[, , k, j], 2, quantile, probs = 0.025)
+    )
+    pFDP.summary[, , k, j] <- rbind(
+      avg <- colMeans(pFDP.array[, , k, j], na.rm = TRUE),
+      sd <- apply(pFDP.array[, , k, j], 2, sd, na.rm = TRUE),
+      n <- colSums(!is.na(pFDP.array[, , k, j])),
+      q975 <- apply(pFDP.array[, , k, j], 2, quantile, probs = 0.975, na.rm = TRUE),
+      q025 <- apply(pFDP.array[, , k, j], 2, quantile, probs = 0.025, na.rm = TRUE)
+    )
+    power.summary[, , k, j] <- rbind(
+      avg <- colMeans(power.array[, , k, j]),
+      sd <- apply(power.array[, , k, j], 2, sd),
+      n <- colSums(!is.na(power.array[, , k, j])),
+      q975 <- apply(power.array[, , k, j], 2, quantile, probs = 0.975),
+      q025 <- apply(power.array[, , k, j], 2, quantile, probs = 0.025)
+    )
+  }
+}
+```
+
+### FDR, pFDR Calibration at each sparsity level
+
+```{r, echo = FALSE}
+for (j in seq(length(pi0.vec))) {
+  plot(q.vec, q.vec, xlab = "Nominal FDR", ylab = "Average FDP", main = bquote(paste("FDR Calibration at ", pi[0] == .(pi0.vec[j]))), type = "n")
+  for (k in seq(length(method.name))) {
+    lines(q.vec, FDP.summary[1, , k, j], col = method.col[k], lwd = 2)
+    polygon.color.rgb = as.vector(grDevices::col2rgb(method.col[k]))
+    polygon(x = c(q.vec, rev(q.vec)),
+            y = c(FDP.summary[1, , k, j] + 2 * FDP.summary[2, , k, j] / sqrt(FDP.summary[3, , k, j]),
+                  rev(FDP.summary[1, , k, j] - 2 * FDP.summary[2, , k, j] / sqrt(FDP.summary[3, , k, j]))),
+            col = grDevices::rgb(polygon.color.rgb[1], polygon.color.rgb[2], polygon.color.rgb[3], alpha = 100, max = 255),
+            border = method.col[k],
+            lty = 2)
+  }
+  lines(q.vec, q.vec, lty = 2, lwd = 2)
+  legend("topleft", legend = method.name, pch = 15, lty = 1, col = method.col, ncol = 2)
+
+  plot(q.vec, q.vec, xlab = "Nominal FDR", ylab = "Average FDP", main = bquote(paste("FDR Calibration at ", pi[0] == .(pi0.vec[j]))), type = "n")
+  for (k in seq(length(method.name))) {
+    # plot.x <- q.vec + (k - length(method.name) / 2 - 1 / 2) / 250
+    plot.x <- q.vec
+    lines(plot.x, FDP.summary[1, , k, j], col = method.col[k], lwd = 2)
+    arrows(plot.x, FDP.summary[1, , k, j] - 2 * FDP.summary[2, , k, j] / sqrt(FDP.summary[3, , k, j]), plot.x, FDP.summary[1, , k, j] + 2 * FDP.summary[2, , k, j] / sqrt(FDP.summary[3, , k, j]), length = 0.05, angle = 90, code = 3, col = method.col[k])
+  }
+  lines(q.vec, q.vec, lty = 2, lwd = 2)
+  legend("topleft", legend = method.name, lty = 1, col = method.col, ncol = 2)
+}
+
+
+for (j in seq(length(pi0.vec))) {
+  plot(q.vec, q.vec, xlab = "Nominal FDR", ylab = "Average pFDP", main = bquote(paste("Positive FDR Calibration at ", pi[0] == .(pi0.vec[j]))), type = "n")
+  for (k in seq(length(method.name))) {
+    lines(q.vec, pFDP.summary[1, , k, j], col = method.col[k], lwd = 2)
+    polygon.color.rgb = as.vector(grDevices::col2rgb(method.col[k]))
+    polygon(x = c(q.vec, rev(q.vec)),
+            y = c(pFDP.summary[1, , k, j] + 2 * pFDP.summary[2, , k, j] / sqrt(pFDP.summary[3, , k, j]),
+                  rev(pFDP.summary[1, , k, j] - 2 * pFDP.summary[2, , k, j] / sqrt(pFDP.summary[3, , k, j]))),
+            col = grDevices::rgb(polygon.color.rgb[1], polygon.color.rgb[2], polygon.color.rgb[3], alpha = 100, max = 255),
+            border = method.col[k],
+            lty = 2)
+  }
+  lines(q.vec, q.vec, lty = 2, lwd = 2)
+  legend("topleft", legend = method.name, pch = 15, lty = 1, col = method.col, ncol = 2)
+
+  plot(q.vec, q.vec, xlab = "Nominal FDR", ylab = "Average pFDP", main = bquote(paste("Positive FDR Calibration at ", pi[0] == .(pi0.vec[j]))), type = "n")
+  for (k in seq(length(method.name))) {
+    # plot.x <- q.vec + (k - length(method.name) / 2 - 1 / 2) / 250
+    plot.x <- q.vec
+    lines(plot.x, pFDP.summary[1, , k, j], col = method.col[k], lwd = 2)
+    arrows(plot.x, pFDP.summary[1, , k, j] - 2 * pFDP.summary[2, , k, j] / sqrt(pFDP.summary[3, , k, j]), plot.x, pFDP.summary[1, , k, j] + 2 * pFDP.summary[2, , k, j] / sqrt(pFDP.summary[3, , k, j]), length = 0.05, angle = 90, code = 3, col = method.col[k])
+  }
+  lines(q.vec, q.vec, lty = 2, lwd = 2)
+  legend("topleft", legend = method.name, lty = 1, col = method.col, ncol = 2)
+}
+```
+
+### FDR, pFDR, Power at Nominal FDR = 0.1
+
+```{r, echo = FALSE}
+# FDR, pFDR, power at q = 0.1
+q <- 0.1
+
+par(mar = c(4.5, 4.5, 3.5, 0.8), xpd = TRUE)
+plot(pi0.vec, pi0.vec, type = "n", ylim = c(0, 2 * q), xlab = expression(pi[0]), ylab = "FDR", xlim = c(0.745, 0.955))
+legend("top", inset = c(0, -0.2), legend = method.name, pch = seq(length(method.name)), lty = 1, col = method.col, horiz = TRUE)
+for (k in seq(length(method.name))) {
+  plot.x <- pi0.vec + (k - length(method.name) / 2 - 1 / 2) / 250
+  lines(plot.x, FDP.summary[1, which(q.vec == q), k, ], type = "o", pch = k, col = method.col[k])
+  arrows(plot.x, FDP.summary[1, which(q.vec == q), k, ] - 2 * FDP.summary[2, which(q.vec == q), k, ] / sqrt(FDP.summary[3, which(q.vec == q), k, ]), plot.x, FDP.summary[1, which(q.vec == q), k, ] + 2 * FDP.summary[2, which(q.vec == q), k, ] / sqrt(FDP.summary[3, which(q.vec == q), k, ]), length = 0.05, angle = 90, code = 3, col = method.col[k])
+}
+par(xpd = FALSE)
+abline(h = q, lty = 2)
+
+par(mar = c(4.5, 4.5, 3.5, 0.8), xpd = TRUE)
+plot(pi0.vec, pi0.vec, type = "n", ylim = c(0, 2 * q), xlab = expression(pi[0]), ylab = "Positive FDR", xlim = c(0.745, 0.955))
+legend("top", inset = c(0, -0.2), legend = method.name, pch = seq(length(method.name)), lty = 1, col = method.col, horiz = TRUE)
+for (k in seq(length(method.name))) {
+  plot.x <- pi0.vec + (k - length(method.name) / 2 - 1 / 2) / 250
+  lines(plot.x, pFDP.summary[1, which(q.vec == q), k, ], type = "o", pch = k, col = method.col[k])
+  arrows(plot.x, pFDP.summary[1, which(q.vec == q), k, ] - 2 * pFDP.summary[2, which(q.vec == q), k, ] / sqrt(pFDP.summary[3, which(q.vec == q), k, ]), plot.x, pFDP.summary[1, which(q.vec == q), k, ] + 2 * pFDP.summary[2, which(q.vec == q), k, ] / sqrt(pFDP.summary[3, which(q.vec == q), k, ]), length = 0.05, angle = 90, code = 3, col = method.col[k])
+}
+par(xpd = FALSE)
+abline(h = q, lty = 2)
+
+par(mar = c(4.5, 4.5, 3.5, 0.8), xpd = TRUE)
+plot(pi0.vec, pi0.vec, type = "n", ylim = c(0, 1), xlab = expression(pi[0]), ylab = "Power", xlim = c(0.745, 0.955))
+legend("top", inset = c(0, -0.2), legend = method.name, pch = seq(length(method.name)), lty = 1, col = method.col, horiz = TRUE)
+for (k in seq(length(method.name))) {
+  plot.x <- pi0.vec + (k - length(method.name) / 2 - 1 / 2) / 250
+  lines(plot.x, power.summary[1, which(q.vec == q), k, ], type = "o", pch = k, col = method.col[k])
+  arrows(plot.x, power.summary[1, which(q.vec == q), k, ] - 2 * power.summary[2, which(q.vec == q), k, ] / sqrt(power.summary[3, which(q.vec == q), k, ]), plot.x, power.summary[1, which(q.vec == q), k, ] + 2 * power.summary[2, which(q.vec == q), k, ] / sqrt(power.summary[3, which(q.vec == q), k, ]), length = 0.05, angle = 90, code = 3, col = method.col[k])
+}
+```
+
+### FDR, Power at each sparsity level at Nominal FDR = 0.1
+
+```{r, echo = FALSE, message = FALSE}
+for (j in seq(length(pi0.vec))) {
+  print(
+  ggplot(data = melt(as.data.frame(FDP.array[, which(q.vec == q), , j])),
+         aes(x = variable, y = value, col = variable)) +
+  geom_violin(trim = TRUE) +
+  stat_summary(fun.data = "mean_sdp", geom = "pointrange") +
+  scale_color_manual(values = method.col) +
+  geom_hline(yintercept = q, col = "maroon", linetype = "dashed", size = 1) +
+  scale_x_discrete(labels = method.name) +
+  labs(title = bquote(paste("False Discovery Proportions at ", pi[0] == .(pi0.vec[j]), ", Nominal ", FDR == .(q))), x = "", y = "FDP") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 12.5), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 15), axis.text.y = element_text(size = 15))
+  )
+  
+  print(
+  ggplot(data = melt(as.data.frame(FDP.array[, which(q.vec == q), , j])),
+        aes(x = variable, y = value, col = variable)) +
+  geom_violin(trim = TRUE, na.rm = TRUE) +
+  stat_summary(fun.data = "mean_sdp", geom = "pointrange") +
+  scale_color_manual(values = method.col) +
+  geom_hline(yintercept = q, col = "maroon", linetype = "dashed", size = 1) +
+  scale_x_discrete(labels = method.name) +
+  labs(title = bquote(paste("Positive False Discovery Proportions at ", pi[0] == .(pi0.vec[j]), ", Nominal ", FDR == .(q))), x = "", y = "pFDP") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 12.5), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 15), axis.text.y = element_text(size = 15))
+  )
+  
+  print(
+  ggplot(data = melt(as.data.frame(power.array[, which(q.vec == q), , j])),
+        aes(x = variable, y = value, col = variable)) +
+  geom_violin(trim = TRUE) +
+  stat_summary(fun.data = "mean_sdp", geom = "pointrange") +
+  scale_color_manual(values = method.col) +
+  scale_x_discrete(labels = method.name) +
+  labs(title = bquote(paste("Power at ", pi[0] == .(pi0.vec[j]), ", Nominal ", FDR == .(q))), x = "", y = "Power") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 12.5), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 15), axis.text.y = element_text(size = 15))
+  )
+}
+```
+
+### FDR, Power at each sparsity level at Nominal FDR = 0.1, separated by dispersion
+
+```{r, echo = FALSE, message = FALSE}
+z.over <- 1.075
+z.under <- 0.925
+for (j in seq(length(pi0.vec))) {
+  sd.z <- sapply(z.pi0.list[[j]], sd)
+  Noise <- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c("Underdispersion", "In-between", "Overdispersion"))
+  print(
+  ggplot(data = melt(cbind(Noise, as.data.frame(FDP.array[, which(q.vec == q), , j])), id.vars = "Noise"),
+         aes(x = variable, y = value, col = variable)) +
+  geom_boxplot() +
+  stat_summary(fun.y = mean, geom = "point") +
+  scale_color_manual(values = method.col) +
+  facet_wrap(~Noise) +
+  geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
+  scale_x_discrete(labels = method.name) +
+  labs(title = bquote(paste("False Discovery Proportions at ", pi[0] == .(pi0.vec[j]), ", Nominal ", FDR == .(q))), x = "", y = "FDP") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 12.5), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 7.5), axis.text.y = element_text(size = 15))
+  )
+  
+  print(
+  ggplot(data = melt(cbind(Noise, as.data.frame(pFDP.array[, which(q.vec == q), , j])), id.vars = "Noise"),
+        aes(x = variable, y = value, col = variable)) +
+  geom_boxplot(na.rm = TRUE) +
+  stat_summary(fun.y = mean, geom = "point") +
+  scale_color_manual(values = method.col) +
+  facet_wrap(~Noise) +
+  geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
+  scale_x_discrete(labels = method.name) +
+  labs(title = bquote(paste("Positive False Discovery Proportions at ", pi[0] == .(pi0.vec[j]), ", Nominal ", FDR == .(q))), x = "", y = "pFDP") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 12.5), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 7.5), axis.text.y = element_text(size = 15))
+  )
+  
+  print(
+  ggplot(data = melt(cbind(Noise, as.data.frame(power.array[, which(q.vec == q), , j])), id.vars = "Noise"),
+        aes(x = variable, y = value, col = variable)) +
+  geom_boxplot() +
+  stat_summary(fun.y = mean, geom = "point") +
+  scale_color_manual(values = method.col) +
+  facet_wrap(~Noise) +
+  scale_x_discrete(labels = method.name) +
+  labs(title = bquote(paste("Power at ", pi[0] == .(pi0.vec[j]), ", Nominal ", FDR == .(q))), x = "", y = "Power") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 12.5), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 7.5), axis.text.y = element_text(size = 15))
+  )
+}
+```
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```
