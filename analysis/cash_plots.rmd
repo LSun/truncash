@@ -332,7 +332,7 @@ for (j in seq(length(pi0.vec))) {
 }
 ```
 
-```{r fitting, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
+```{r many_fitting, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
 for (sigma.beta in c(1.5, 2, 1.5, 3)) {
 for (L in c(2, 4, 6)) {
 cat("sigma.beta =", sigma.beta, "; GD =", L)
