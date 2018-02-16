@@ -336,16 +336,34 @@ for (j in seq(length(pi0.vec))) {
 
 ## Many different $\sigma_\beta$ and Gaussian deviatives
 
-```{r many_fitting, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
-for (sigma.beta in seq(0.5, 4, by = 0.5)) {
-for (L in c(2, 4, 6, 8, 10)) {
-for (w.lambda in c(0, 10)) {
-cat("sigma.beta =", sigma.beta, "; GD =", L)
+```{r read gtex data, echo = FALSE}
+set.seed(777)
+
+r <- readRDS("../data/liver.sim.rds")
+ngene <- 1000
+r <- r[sample(nrow(r), ngene), ]
+nsamp <- 10
+nsim <- 500
+
 pi0.vec <- seq(0.75, 0.95, by = 0.05)
+q.vec <- seq(0.005, 0.20, by = 0.005)
+q <- 0.1
+z.over <- 1.075
+z.under <- 0.925
+```
+
+```{r method, echo = FALSE}
+method.name <- c("BH", "qvalue", "ASH", "CASH")
+method.col <- c("blue", "green", "orange", "red")
+```
+
+```{r many_fitting, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
+for (sigma.beta in seq(0.5, 0.5, by = 0.5)) {
+for (L in seq(2, 2, by = 2)) {
+for (w.lambda in c(0, 10)) {
+cat("sigma.beta =", sigma.beta, "; GD =", L, "; Constraints on w:", w.lambda != 0)
 qvalue.pi0.list <- qvalue.list <- list()
 z.pi0.list <- z.list <- list()
-
-set.seed(777)
 
 for (j in seq(length(pi0.vec))) {
   pi0 <- pi0.vec[j]
@@ -368,7 +386,7 @@ for (i in 1 : nsim) {
 
   ## different methods
   fit.ash = ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
-  fit.gdash = gdash(betahat, sebetahat, gd.ord = L)
+  fit.gdash = gdash(betahat, sebetahat, gd.ord = L, w.lambda = w.lambda)
   fit.qvalue = qvalue::qvalue(p)
   fit.BH = p.adjust(p, method = "BH")
 
@@ -385,11 +403,44 @@ for (i in 1 : nsim) {
 qvalue.pi0.list[[j]] <- qvalue.list
 z.pi0.list[[j]] <- z.list
 }
-z.over <- 1.075
-z.under <- 0.925
+
+FDP.array <- pFDP.array <- power.array <- array(0, dim = c(nsim, length(q.vec), length(method.name), length(pi0.vec)))
+FDP.summary <- pFDP.summary <- power.summary <- array(0, dim = c(5, length(q.vec), length(method.name), length(pi0.vec)))
+for (j in seq(length(pi0.vec))) {
+  for (k in seq(length(method.name))) {
+    for (i in seq(nsim)) {
+      FDP.array[i, , k, j] <- sapply(q.vec, FDP, qvalue = qvalue.pi0.list[[j]][[i]][, k + 1], beta = qvalue.pi0.list[[j]][[i]][, 1])
+      pFDP.array[i, , k, j] <- sapply(q.vec, pFDP, qvalue = qvalue.pi0.list[[j]][[i]][, k + 1], beta = qvalue.pi0.list[[j]][[i]][, 1])
+      power.array[i, , k, j] <- sapply(q.vec, power, qvalue = qvalue.pi0.list[[j]][[i]][, k + 1], beta = qvalue.pi0.list[[j]][[i]][, 1])
+    }
+    FDP.summary[, , k, j] <- rbind(
+      avg <- colMeans(FDP.array[, , k, j]),
+      sd <- apply(FDP.array[, , k, j], 2, sd),
+      n <- colSums(!is.na(FDP.array[, , k, j])),
+      q975 <- apply(FDP.array[, , k, j], 2, quantile, probs = 0.975),
+      q025 <- apply(FDP.array[, , k, j], 2, quantile, probs = 0.025)
+    )
+    pFDP.summary[, , k, j] <- rbind(
+      avg <- colMeans(pFDP.array[, , k, j], na.rm = TRUE),
+      sd <- apply(pFDP.array[, , k, j], 2, sd, na.rm = TRUE),
+      n <- colSums(!is.na(pFDP.array[, , k, j])),
+      q975 <- apply(pFDP.array[, , k, j], 2, quantile, probs = 0.975, na.rm = TRUE),
+      q025 <- apply(pFDP.array[, , k, j], 2, quantile, probs = 0.025, na.rm = TRUE)
+    )
+    power.summary[, , k, j] <- rbind(
+      avg <- colMeans(power.array[, , k, j]),
+      sd <- apply(power.array[, , k, j], 2, sd),
+      n <- colSums(!is.na(power.array[, , k, j])),
+      q975 <- apply(power.array[, , k, j], 2, quantile, probs = 0.975),
+      q025 <- apply(power.array[, , k, j], 2, quantile, probs = 0.025)
+    )
+  }
+}
+
 for (j in seq(length(pi0.vec))) {
   sd.z <- sapply(z.pi0.list[[j]], sd)
   Noise <- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c("Underdispersion", "In-between", "Overdispersion"))
+
   print(
   ggplot(data = melt(cbind(Noise, as.data.frame(FDP.array[, which(q.vec == q), , j])), id.vars = "Noise"),
          aes(x = variable, y = value, col = variable)) +
