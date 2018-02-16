@@ -51,6 +51,8 @@ power <- function (FDR, qvalue, beta) {
 }
 ```
 
+## $\sigma_\beta = 2.5$, 4 Gaussian derivatives
+
 ```{r read gtex data, echo = FALSE}
 r <- readRDS("../data/liver.sim.rds")
 ngene <- 1000
@@ -332,9 +334,12 @@ for (j in seq(length(pi0.vec))) {
 }
 ```
 
+## Many different $\sigma_\beta$ and Gaussian deviatives
+
 ```{r many_fitting, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
-for (sigma.beta in seq(0.5, 3, by = 0.5)) {
+for (sigma.beta in seq(0.5, 4, by = 0.5)) {
 for (L in c(2, 4, 6, 8, 10)) {
+for (w.lambda in c(0, 10)) {
 cat("sigma.beta =", sigma.beta, "; GD =", L)
 pi0.vec <- seq(0.75, 0.95, by = 0.05)
 qvalue.pi0.list <- qvalue.list <- list()
@@ -422,6 +427,7 @@ for (j in seq(length(pi0.vec))) {
   labs(title = bquote(paste("Power at ", pi[0] == .(pi0.vec[j]), ", Nominal ", FDR == .(q))), x = "", y = "Power") +
   theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 12.5), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 7.5), axis.text.y = element_text(size = 15))
   )
+}
 }
 }
 }
