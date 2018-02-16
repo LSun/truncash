@@ -36,7 +36,7 @@ In the following simulations, we always have $n = 3000$, $p = 1000$, For a certa
 - Scenario 2: $850$ are 0, $50$ are $A = 3.5$ as large signals, and the rest $100$ are small signals uniformly from $0$ to $3.5$.
 - Scenario 3: $750$ are 0, $50$ are $A = 3.5$ as large signals, and the rest $200$ are small signals uniformly from $0$ to $3.5$.
 
-```{r, echo = FALSE, cache = TRUE}
+```{r, echo = FALSE}
 library(knockoff)
 library(ggplot2)
 fdp <- function(selected) sum(beta[selected] == 0) / max(length(selected), 1)
@@ -361,14 +361,6 @@ ggplot(data = Power.small.summary,
 
 $X_{n \times p}$ has independent columns simulated from $N(0, 1)$ and then normalized to have $\|X_j\|_2^2 \equiv 1$. 
 
-```{r}
-n <- 3000
-p <- 1000
-k <- 50
-q <- 0.1
-A <- 3.5
-```
-
 ```{r, cache = TRUE}
 X <- matrix(rnorm(n * p), n , p)
 X <- t(t(X) / sqrt(colSums(X^2)))
@@ -643,19 +635,11 @@ ggplot(data = Power.small.summary,
 
 $X_{n \times p}$ has correlation $\Sigma_{ij} = \rho^{|i - j|}$. Each row is independently $N(0, \Sigma)$ and then normalized to have $\|X_j\|_2^2 \equiv 1$.
 
-```{r}
-n <- 3000
-p <- 1000
-k <- 50
-q <- 0.1
-A <- 3.5
-```
-
 ```{r, cache = TRUE}
-X <- matrix(rnorm(n * p), n , p)
-X <- t(t(X) / sqrt(colSums(X^2)))
 rho <- 0.25
 Sigma <- toeplitz(rho^(0 : (p - 1)))
+X <- matrix(rnorm(n * p), n , p)
+X <- t(t(X) / sqrt(colSums(X^2)))
 X <- X %*% chol(Sigma)
 Xk <- knockoff::create.fixed(X)
 Xk <- Xk$Xk
@@ -708,8 +692,6 @@ result.nosmall <- result.summary
 ```{r, cache = TRUE}
 X <- matrix(rnorm(n * p), n , p)
 X <- t(t(X) / sqrt(colSums(X^2)))
-rho <- 0.25
-Sigma <- toeplitz(rho^(0 : (p - 1)))
 X <- X %*% chol(Sigma)
 Xk <- knockoff::create.fixed(X)
 Xk <- Xk$Xk
@@ -771,8 +753,6 @@ result.fewsmall <- result.summary
 ```{r, cache = TRUE}
 X <- matrix(rnorm(n * p), n , p)
 X <- t(t(X) / sqrt(colSums(X^2)))
-rho <- 0.25
-Sigma <- toeplitz(rho^(0 : (p - 1)))
 X <- X %*% chol(Sigma)
 Xk <- knockoff::create.fixed(X)
 Xk <- Xk$Xk
