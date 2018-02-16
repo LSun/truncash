@@ -315,15 +315,15 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2018-02-14</p>
+<p><strong>Last updated:</strong> 2018-02-15</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> c9c60cc</p>
+<p><strong>Code version:</strong> c586cb3</p>
 <!-- Add your analysis here -->
 <section id="introduction" class="level2">
 <h2>Introduction</h2>
 <p>In the <code>Knockoff</code> paper simulations, <span class="math inline">\(\beta\)</span>’s are either <span class="math inline">\(0\)</span> or <span class="math inline">\(A\)</span>. Here we are replicating the results, and investigating how well <code>Knockoff</code> deal with small signals.</p>
-<p>In the following simulations, we always have <span class="math inline">\(n = 3000\)</span>, <span class="math inline">\(p = 1000\)</span>, <span class="math inline">\(X_{n \times p}\)</span> has independent columns simulated from <span class="math inline">\(N(0, 1)\)</span> and then normalized to have <span class="math inline">\(\|X_j\|_2^2 \equiv 1\)</span>. For a certain <span class="math inline">\(\beta\)</span>, <span class="math inline">\(Y_n \sim N(X_{n\times p}\beta_p, I_n)\)</span>. Out of <span class="math inline">\(p = 1000\)</span> <span class="math inline">\(\beta_j\)</span>’s, here are three scenarios.</p>
+<p>In the following simulations, we always have <span class="math inline">\(n = 3000\)</span>, <span class="math inline">\(p = 1000\)</span>, For a certain <span class="math inline">\(\beta\)</span>, <span class="math inline">\(Y_n \sim N(X_{n\times p}\beta_p, I_n)\)</span>. Out of <span class="math inline">\(p = 1000\)</span> <span class="math inline">\(\beta_j\)</span>’s, here are three scenarios.</p>
 <ul>
 <li>Scenario 1: <span class="math inline">\(950\)</span> are 0, and the rest <span class="math inline">\(50\)</span> are <span class="math inline">\(A = 3.5\)</span>. (replicating a data point on Fig 3 of the <code>Knockoff</code> paper)</li>
 <li>Scenario 2: <span class="math inline">\(850\)</span> are 0, <span class="math inline">\(50\)</span> are <span class="math inline">\(A = 3.5\)</span> as large signals, and the rest <span class="math inline">\(100\)</span> are small signals uniformly from <span class="math inline">\(0\)</span> to <span class="math inline">\(3.5\)</span>.</li>
@@ -357,6 +357,11 @@ X &lt;- svd(X)$u
 Xk &lt;- knockoff::create.fixed(X)
 Xk &lt;- Xk$Xk</code></pre>
 <p><img src="figure/knockoff_6.rmd/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;" /></p>
+</section>
+</section>
+<section id="orthogonal-design" class="level2">
+<h2>Orthogonal design</h2>
+<p><span class="math inline">\(X\)</span> has random orthonormal columns</p>
 <table>
 <thead>
 <tr class="header">
@@ -419,11 +424,179 @@ Xk &lt;- Xk$Xk</code></pre>
 </tr>
 </tbody>
 </table>
+<p><img src="figure/knockoff_6.rmd/unnamed-chunk-19-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p><img src="figure/knockoff_6.rmd/unnamed-chunk-20-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p><img src="figure/knockoff_6.rmd/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p><img src="figure/knockoff_6.rmd/unnamed-chunk-22-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p><img src="figure/knockoff_6.rmd/unnamed-chunk-23-1.png" width="672" style="display: block; margin: auto;" /></p>
 </section>
+<section id="independent-design" class="level2">
+<h2>Independent design</h2>
+<p><span class="math inline">\(X_{n \times p}\)</span> has independent columns simulated from <span class="math inline">\(N(0, 1)\)</span> and then normalized to have <span class="math inline">\(\|X_j\|_2^2 \equiv 1\)</span>.</p>
+<pre class="r"><code>X &lt;- matrix(rnorm(n * p), n , p)
+X &lt;- t(t(X) / sqrt(colSums(X^2)))
+Xk &lt;- knockoff::create.fixed(X)
+Xk &lt;- Xk$Xk</code></pre>
+<pre class="r"><code>X &lt;- matrix(rnorm(n * p), n , p)
+X &lt;- t(t(X) / sqrt(colSums(X^2)))
+Xk &lt;- knockoff::create.fixed(X)
+Xk &lt;- Xk$Xk</code></pre>
+<pre class="r"><code>X &lt;- matrix(rnorm(n * p), n , p)
+X &lt;- t(t(X) / sqrt(colSums(X^2)))
+Xk &lt;- knockoff::create.fixed(X)
+Xk &lt;- Xk$Xk</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: right;">FDP.BH</th>
+<th style="text-align: right;">FDP.Knockoff</th>
+<th style="text-align: right;">FDP.Knockoff.Plus</th>
+<th style="text-align: right;">Power.BH</th>
+<th style="text-align: right;">Power.Knockoff</th>
+<th style="text-align: right;">Power.Knockoff.Plus</th>
+<th style="text-align: right;">Power.Large.BH</th>
+<th style="text-align: right;">Power.Large.Knockoff</th>
+<th style="text-align: right;">Power.Large.Knockoff.Plus</th>
+<th style="text-align: right;">Power.Small.BH</th>
+<th style="text-align: right;">Power.Small.Knockoff</th>
+<th style="text-align: right;">Power.Small.Knockoff.Plus</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">0.0950</td>
+<td style="text-align: right;">0.0713</td>
+<td style="text-align: right;">0.0483</td>
+<td style="text-align: right;">0.4344</td>
+<td style="text-align: right;">0.5399</td>
+<td style="text-align: right;">0.4135</td>
+<td style="text-align: right;">0.4344</td>
+<td style="text-align: right;">0.5399</td>
+<td style="text-align: right;">0.4135</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0.0828</td>
+<td style="text-align: right;">0.0587</td>
+<td style="text-align: right;">0.0397</td>
+<td style="text-align: right;">0.2180</td>
+<td style="text-align: right;">0.2106</td>
+<td style="text-align: right;">0.1584</td>
+<td style="text-align: right;">0.4789</td>
+<td style="text-align: right;">0.4820</td>
+<td style="text-align: right;">0.3699</td>
+<td style="text-align: right;">0.0876</td>
+<td style="text-align: right;">0.0749</td>
+<td style="text-align: right;">0.0527</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">0.0747</td>
+<td style="text-align: right;">0.0456</td>
+<td style="text-align: right;">0.0325</td>
+<td style="text-align: right;">0.1838</td>
+<td style="text-align: right;">0.1613</td>
+<td style="text-align: right;">0.1243</td>
+<td style="text-align: right;">0.5135</td>
+<td style="text-align: right;">0.4372</td>
+<td style="text-align: right;">0.3432</td>
+<td style="text-align: right;">0.1013</td>
+<td style="text-align: right;">0.0923</td>
+<td style="text-align: right;">0.0696</td>
+</tr>
+</tbody>
+</table>
+<p><img src="figure/knockoff_6.rmd/unnamed-chunk-36-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/knockoff_6.rmd/unnamed-chunk-37-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/knockoff_6.rmd/unnamed-chunk-38-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/knockoff_6.rmd/unnamed-chunk-39-1.png" width="672" style="display: block; margin: auto;" /></p>
+</section>
+<section id="local-correlation-design" class="level2">
+<h2>Local correlation design</h2>
+<p><span class="math inline">\(X_{n \times p}\)</span> has correlation <span class="math inline">\(\Sigma_{ij} = \rho^{|i - j|}\)</span>. Each row is independently <span class="math inline">\(N(0, \Sigma)\)</span> and then normalized to have <span class="math inline">\(\|X_j\|_2^2 \equiv 1\)</span>.</p>
+<pre class="r"><code>rho &lt;- 0.25
+Sigma &lt;- toeplitz(rho^(0 : (p - 1)))
+X &lt;- matrix(rnorm(n * p), n , p)
+X &lt;- t(t(X) / sqrt(colSums(X^2)))
+X &lt;- X %*% chol(Sigma)
+Xk &lt;- knockoff::create.fixed(X)
+Xk &lt;- Xk$Xk</code></pre>
+<pre class="r"><code>X &lt;- matrix(rnorm(n * p), n , p)
+X &lt;- t(t(X) / sqrt(colSums(X^2)))
+X &lt;- X %*% chol(Sigma)
+Xk &lt;- knockoff::create.fixed(X)
+Xk &lt;- Xk$Xk</code></pre>
+<pre class="r"><code>X &lt;- matrix(rnorm(n * p), n , p)
+X &lt;- t(t(X) / sqrt(colSums(X^2)))
+X &lt;- X %*% chol(Sigma)
+Xk &lt;- knockoff::create.fixed(X)
+Xk &lt;- Xk$Xk</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: right;">FDP.BH</th>
+<th style="text-align: right;">FDP.Knockoff</th>
+<th style="text-align: right;">FDP.Knockoff.Plus</th>
+<th style="text-align: right;">Power.BH</th>
+<th style="text-align: right;">Power.Knockoff</th>
+<th style="text-align: right;">Power.Knockoff.Plus</th>
+<th style="text-align: right;">Power.Large.BH</th>
+<th style="text-align: right;">Power.Large.Knockoff</th>
+<th style="text-align: right;">Power.Large.Knockoff.Plus</th>
+<th style="text-align: right;">Power.Small.BH</th>
+<th style="text-align: right;">Power.Small.Knockoff</th>
+<th style="text-align: right;">Power.Small.Knockoff.Plus</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">0.0957</td>
+<td style="text-align: right;">0.0563</td>
+<td style="text-align: right;">0.0344</td>
+<td style="text-align: right;">0.3367</td>
+<td style="text-align: right;">0.4985</td>
+<td style="text-align: right;">0.3484</td>
+<td style="text-align: right;">0.3367</td>
+<td style="text-align: right;">0.4985</td>
+<td style="text-align: right;">0.3484</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">0.0824</td>
+<td style="text-align: right;">0.0407</td>
+<td style="text-align: right;">0.0249</td>
+<td style="text-align: right;">0.1710</td>
+<td style="text-align: right;">0.1656</td>
+<td style="text-align: right;">0.1070</td>
+<td style="text-align: right;">0.3820</td>
+<td style="text-align: right;">0.3620</td>
+<td style="text-align: right;">0.2348</td>
+<td style="text-align: right;">0.0655</td>
+<td style="text-align: right;">0.0673</td>
+<td style="text-align: right;">0.0431</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">0.0738</td>
+<td style="text-align: right;">0.0258</td>
+<td style="text-align: right;">0.0170</td>
+<td style="text-align: right;">0.1441</td>
+<td style="text-align: right;">0.1393</td>
+<td style="text-align: right;">0.0988</td>
+<td style="text-align: right;">0.4137</td>
+<td style="text-align: right;">0.4040</td>
+<td style="text-align: right;">0.2893</td>
+<td style="text-align: right;">0.0767</td>
+<td style="text-align: right;">0.0731</td>
+<td style="text-align: right;">0.0511</td>
+</tr>
+</tbody>
+</table>
+<p><img src="figure/knockoff_6.rmd/unnamed-chunk-53-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/knockoff_6.rmd/unnamed-chunk-54-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/knockoff_6.rmd/unnamed-chunk-55-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/knockoff_6.rmd/unnamed-chunk-56-1.png" width="672" style="display: block; margin: auto;" /></p>
 </section>
 <section id="session-information" class="level2">
 <h2>Session information</h2>
@@ -444,11 +617,11 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] ggplot2_2.2.1 knitr_1.19   
+[1] knitr_1.19     ggplot2_2.2.1  knockoff_0.3.0
 
 loaded via a namespace (and not attached):
  [1] Rcpp_0.12.14     magrittr_1.5     munsell_0.4.3    colorspace_1.3-2
- [5] rlang_0.1.6      stringr_1.2.0    highr_0.6        plyr_1.8.4      
+ [5] rlang_0.1.6      highr_0.6        stringr_1.2.0    plyr_1.8.4      
  [9] tools_3.4.3      grid_3.4.3       gtable_0.2.0     git2r_0.21.0    
 [13] htmltools_0.3.6  yaml_2.1.16      lazyeval_0.2.1   rprojroot_1.3-2 
 [17] digest_0.6.14    tibble_1.4.1     evaluate_0.10.1  rmarkdown_1.8   
