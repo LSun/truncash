@@ -266,12 +266,13 @@ summary[1, 10 : 12] <- NA
 library(knitr)
 kable(summary, digits = 4)
 
-plot(seq(method.name), seq(method.name), ylim = c(0, 1), xaxt = "n", type = "n", xlab = "", ylab = "FDR")
+plot(seq(method.name), seq(method.name), ylim = c(0, 2 * q), xaxt = "n", type = "n", xlab = "", ylab = "FDR")
 axis(1, labels = c("No Small", "Less Small", "More Small"), at = 1 : 3)
 for (i in seq(method.name)) {
   lines(seq(method.name), c(mean(result.nosmall[, i]), mean(result.fewsmall[, i]), mean(result.manysmall[, i])), type = "o", pch = i, col = method.col[i])
   arrows(x0 = seq(method.name), x1 = seq(method.name), y0 = c(mean(result.nosmall[, i]), mean(result.fewsmall[, i]), mean(result.manysmall[, i])) - 2 * c(sd(result.nosmall[, i]), sd(result.fewsmall[, i]), sd(result.manysmall[, i])) / sqrt(m), y1 = c(mean(result.nosmall[, i]), mean(result.fewsmall[, i]), mean(result.manysmall[, i])) + 2 * c(sd(result.nosmall[, i]), sd(result.fewsmall[, i]), sd(result.manysmall[, i])) / sqrt(m), length = 0.05, angle = 90, code = 3, col = method.col[i])
 }
+abline(h = q, lty = 2, lwd = 2)
 ```
 
 ```{r, echo = FALSE}
