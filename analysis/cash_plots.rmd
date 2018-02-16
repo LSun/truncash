@@ -333,8 +333,8 @@ for (j in seq(length(pi0.vec))) {
 ```
 
 ```{r many_fitting, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
-for (sigma.beta in c(1.5, 2, 1.5, 3)) {
-for (L in c(2, 4, 6)) {
+for (sigma.beta in seq(0.5, 3, by = 0.5)) {
+for (L in c(2, 4, 6, 8, 10)) {
 cat("sigma.beta =", sigma.beta, "; GD =", L)
 pi0.vec <- seq(0.75, 0.95, by = 0.05)
 qvalue.pi0.list <- qvalue.list <- list()
