@@ -317,7 +317,8 @@ ggplot(data = Power.summary,
 ```{r factor_X_overall, echo = FALSE, cache = TRUE}
 d.vec <- c(1 : 10, seq(20, 100, by = 10), seq(200, 1500, by = 100))
 set.seed(777)
-result.SigmaX <- matrix(0, length(d.vec), 6)
+result.SigmaX.list <- list()
+result.SigmaX <- result.SigmaX.sd <- matrix(0, length(d.vec), 6)
 colnames(result.SigmaX) <- c("fdp.BH", "fdp.Knockoff", "fdp.Knockoff.plus", "power.BH", "power.Knockoff", "power.Knockoff.plus")
 rownames(result.SigmaX) <- paste("d =", d.vec)
 for (j in seq(length(d.vec))) {
@@ -339,7 +340,7 @@ A <- ceiling(3 * sqrt(mean(diag(solve(crossprod(X))))))
 beta <- rep(0, p)
 nonzero <- sample(p, k)
 beta[nonzero] <- A
-m <- 1000
+m <- 500
 result <- list()
 for (i in 1 : m) {
 y <- X %*% beta + rnorm(n)
@@ -369,7 +370,9 @@ result[[i]] <- c(
 )
 }
 result.summary <- matrix(unlist(result), m, 6, byrow = TRUE)
+result.SigmaX.list[[j]] <- result.summary
 result.SigmaX[j, ] <- colMeans(result.summary)
+result.SigmaX.sd[j, ] <- apply(result.summary, 2, sd)
 }
 ```
 
@@ -395,7 +398,8 @@ legend("topright", col = method.col, lty = 1, pch = 1 : 3, legend = method.name)
 ```{r factor_betahat_overall, echo = FALSE, cache = TRUE}
 d.vec <- c(1 : 10, seq(20, 100, by = 10), seq(200, 1500, by = 100))
 set.seed(777)
-result.Sigmabetahat <- matrix(0, length(d.vec), 6)
+result.Sigmabetahat.list <- list()
+result.Sigmabetahat <- result.Sigmabetahat.sd <- matrix(0, length(d.vec), 6)
 colnames(result.Sigmabetahat) <- c("fdp.BH", "fdp.Knockoff", "fdp.Knockoff.plus", "power.BH", "power.Knockoff", "power.Knockoff.plus")
 rownames(result.Sigmabetahat) <- paste("d =", d.vec)
 for (j in seq(length(d.vec))) {
@@ -419,7 +423,7 @@ A <- 3.5
 beta <- rep(0, p)
 nonzero <- sample(p, k)
 beta[nonzero] <- A
-m <- 1000
+m <- 500
 result <- list()
 for (i in 1 : m) {
 y <- X %*% beta + rnorm(n)
@@ -449,7 +453,9 @@ result[[i]] <- c(
 )
 }
 result.summary <- matrix(unlist(result), m, 6, byrow = TRUE)
+result.Sigmabetahat.list[[j]] <- result.summary
 result.Sigmabetahat[j, ] <- colMeans(result.summary)
+result.Sigmabetahat.sd[j, ] <- apply(result.summary, 2, sd)
 }
 ```
 
