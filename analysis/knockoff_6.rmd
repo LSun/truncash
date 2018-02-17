@@ -295,7 +295,7 @@ plot(seq(2), seq(2), ylim = c(0, 1), xaxt = "n", type = "n", xlab = "", ylab = "
 axis(1, labels = c("Less Small", "More Small"), at = seq(2))
 for (i in seq(method.name)) {
   lines(seq(2), c(mean(result.fewsmall[, i + 9]), mean(result.manysmall[, i + 9])), type = "o", pch = i, col = method.col[i])
-  arrows(x0 = seq(2), x1 = seq(2), y0 = c(mean(result.fewsmall[, i + 6]), mean(result.manysmall[, i + 6])) - 2 * c(sd(result.fewsmall[, i + 6]), sd(result.manysmall[, i + 6])) / sqrt(m), y1 = c(mean(result.fewsmall[, i + 6]), mean(result.manysmall[, i + 6])) + 2 * c(sd(result.fewsmall[, i + 6]), sd(result.manysmall[, i + 6])) / sqrt(m), length = 0.05, angle = 90, code = 3, col = method.col[i])
+  arrows(x0 = seq(2), x1 = seq(2), y0 = c(mean(result.fewsmall[, i + 9]), mean(result.manysmall[, i + 9])) - 2 * c(sd(result.fewsmall[, i + 9]), sd(result.manysmall[, i + 9])) / sqrt(m), y1 = c(mean(result.fewsmall[, i + 9]), mean(result.manysmall[, i + 9])) + 2 * c(sd(result.fewsmall[, i + 9]), sd(result.manysmall[, i + 9])) / sqrt(m), length = 0.05, angle = 90, code = 3, col = method.col[i])
 }
 legend("top", horiz = TRUE, method.name, col = method.col, pch = seq(method.name), lty = 1)
 ```
@@ -602,7 +602,7 @@ plot(seq(2), seq(2), ylim = c(0, 1), xaxt = "n", type = "n", xlab = "", ylab = "
 axis(1, labels = c("Less Small", "More Small"), at = seq(2))
 for (i in seq(method.name)) {
   lines(seq(2), c(mean(result.fewsmall[, i + 9]), mean(result.manysmall[, i + 9])), type = "o", pch = i, col = method.col[i])
-  arrows(x0 = seq(2), x1 = seq(2), y0 = c(mean(result.fewsmall[, i + 6]), mean(result.manysmall[, i + 6])) - 2 * c(sd(result.fewsmall[, i + 6]), sd(result.manysmall[, i + 6])) / sqrt(m), y1 = c(mean(result.fewsmall[, i + 6]), mean(result.manysmall[, i + 6])) + 2 * c(sd(result.fewsmall[, i + 6]), sd(result.manysmall[, i + 6])) / sqrt(m), length = 0.05, angle = 90, code = 3, col = method.col[i])
+  arrows(x0 = seq(2), x1 = seq(2), y0 = c(mean(result.fewsmall[, i + 9]), mean(result.manysmall[, i + 9])) - 2 * c(sd(result.fewsmall[, i + 9]), sd(result.manysmall[, i + 9])) / sqrt(m), y1 = c(mean(result.fewsmall[, i + 9]), mean(result.manysmall[, i + 9])) + 2 * c(sd(result.fewsmall[, i + 9]), sd(result.manysmall[, i + 9])) / sqrt(m), length = 0.05, angle = 90, code = 3, col = method.col[i])
 }
 legend("top", horiz = TRUE, method.name, col = method.col, pch = seq(method.name), lty = 1)
 ```
@@ -914,7 +914,7 @@ plot(seq(2), seq(2), ylim = c(0, 1), xaxt = "n", type = "n", xlab = "", ylab = "
 axis(1, labels = c("Less Small", "More Small"), at = seq(2))
 for (i in seq(method.name)) {
   lines(seq(2), c(mean(result.fewsmall[, i + 9]), mean(result.manysmall[, i + 9])), type = "o", pch = i, col = method.col[i])
-  arrows(x0 = seq(2), x1 = seq(2), y0 = c(mean(result.fewsmall[, i + 6]), mean(result.manysmall[, i + 6])) - 2 * c(sd(result.fewsmall[, i + 6]), sd(result.manysmall[, i + 6])) / sqrt(m), y1 = c(mean(result.fewsmall[, i + 6]), mean(result.manysmall[, i + 6])) + 2 * c(sd(result.fewsmall[, i + 6]), sd(result.manysmall[, i + 6])) / sqrt(m), length = 0.05, angle = 90, code = 3, col = method.col[i])
+  arrows(x0 = seq(2), x1 = seq(2), y0 = c(mean(result.fewsmall[, i + 9]), mean(result.manysmall[, i + 9])) - 2 * c(sd(result.fewsmall[, i + 9]), sd(result.manysmall[, i + 9])) / sqrt(m), y1 = c(mean(result.fewsmall[, i + 9]), mean(result.manysmall[, i + 9])) + 2 * c(sd(result.fewsmall[, i + 9]), sd(result.manysmall[, i + 9])) / sqrt(m), length = 0.05, angle = 90, code = 3, col = method.col[i])
 }
 legend("top", horiz = TRUE, method.name, col = method.col, pch = seq(method.name), lty = 1)
 ```
