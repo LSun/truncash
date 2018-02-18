@@ -315,7 +315,7 @@ ggplot(data = Power.summary,
 ### Scenario 2: $X$ from a factor model
 
 ```{r factor_X_overall, echo = FALSE, cache = TRUE}
-d.vec <- c(1 : 10, seq(20, 100, by = 10), seq(200, 1500, by = 100))
+d.vec <- c(1 : 10, seq(20, 100, by = 10), seq(200, 1900, by = 100), seq(2000, 10000, by = 1000))
 set.seed(777)
 result.SigmaX.list <- list()
 result.SigmaX <- result.SigmaX.sd <- matrix(0, length(d.vec), 6)
@@ -329,13 +329,15 @@ Sigma.X <- tcrossprod(B) + diag(p)
 Rho.X <- cov2cor(Sigma.X)
 ## Simulate X
 X <- matrix(rnorm(n * p), n, p) %*% chol(Rho.X)
+## Centering
+X <- t(t(X) - colMeans(X))
 ## Normalization
 X <- t(t(X) / sqrt(colSums(X^2)))
 ## Generate knockoffs
 Xk <- knockoff::create.fixed(X)
 Xk <- Xk$Xk
 ## Signal strength
-A <- ceiling(3 * sqrt(mean(diag(solve(crossprod(X))))))
+A <- round(3 * sqrt(mean(diag(solve(crossprod(X))))))
 ## Set beta
 beta <- rep(0, p)
 nonzero <- sample(p, k)
@@ -406,7 +408,7 @@ legend("top", col = method.col, lty = 1, pch = 1 : 3, legend = method.name, hori
 ### Scenario 3: $\hat\beta$ from a factor model
 
 ```{r factor_betahat_overall, echo = FALSE, cache = TRUE}
-d.vec <- c(1 : 10, seq(20, 100, by = 10), seq(200, 1500, by = 100))
+d.vec <- c(1 : 10, seq(20, 100, by = 10), seq(200, 1900, by = 100), seq(2000, 10000, by = 1000))
 set.seed(777)
 result.Sigmabetahat.list <- list()
 result.Sigmabetahat <- result.Sigmabetahat.sd <- matrix(0, length(d.vec), 6)
@@ -420,15 +422,17 @@ Sigma.betahat <- tcrossprod(B) + diag(p)
 Cor.betahat <- cov2cor(Sigma.betahat)
 ## Simulate X with independent columns
 X <- matrix(rnorm(n * p), n, p)
-## Normalize X
-X <- t(t(X) / sqrt(colSums(X^2)))
 ## Transform independent columns to have Sigma_betahat^{-1} correlation structure
 X <- X %*% chol(solve(Cor.betahat))
+## Centering X
+X <- t(t(X) - colMeans(X))
+## Normalize X
+X <- t(t(X) / sqrt(colSums(X^2)))
 ## Generate knockoffs
 Xk <- knockoff::create.fixed(X)
 Xk <- Xk$Xk
 ## Signal strength
-A <- 3.5
+A <- round(3 * sqrt(mean(diag(solve(crossprod(X))))))
 ## Set beta
 beta <- rep(0, p)
 nonzero <- sample(p, k)
