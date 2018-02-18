@@ -376,7 +376,7 @@ result.SigmaX.sd[j, ] <- apply(result.summary, 2, sd)
 }
 ```
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, warning = FALSE}
 plot(log(d.vec), d.vec, type = "n", ylim = range(0, result.SigmaX[, 1 : 3] + 2 * result.SigmaX.sd[, 1 : 3] / sqrt(m)), xlab = expression(d), ylab = "FDR", main = expression(paste("FDR: Factor Model for ", X)), xaxt = "n")
 axis(1, at = log(d.vec), labels = d.vec)
 for (i in 1 : 3) {
@@ -469,7 +469,7 @@ result.Sigmabetahat.sd[j, ] <- apply(result.summary, 2, sd)
 }
 ```
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, warning = FALSE}
 plot(log(d.vec), d.vec, type = "n", ylim = range(0, result.Sigmabetahat[, 1 : 3] + 2 * result.Sigmabetahat.sd[, 1 : 3] / sqrt(m)), xlab = expression(d), ylab = "FDR", main = expression(paste("FDR: Factor Model for ", Sigma[hat(beta)])), xaxt = "n")
 axis(1, at = log(d.vec), labels = d.vec)
 for (i in 1 : 3) {
