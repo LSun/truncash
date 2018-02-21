@@ -1,0 +1,146 @@
+---
+title: "A closer look at `Knockoff` on heavy correlation design"
+author: "Lei Sun"
+date: 2018-02-20
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+```{r, echo = FALSE}
+library(knockoff)
+fdp <- function(selected) sum(beta[selected] == 0) / max(length(selected), 1)
+power <- function(selected, k = k) sum(beta[selected] != 0) / max(k, 1)
+```
+
+```{r}
+n <- 3e3
+p <- 1e3
+k <- 50
+d <- 7
+q <- 0.1
+```
+
+```{r, echo = FALSE, cache = TRUE}
+set.seed(777)
+## Correlation matrix of betahat
+B <- matrix(rnorm(p * d, 0, 1), p, d)
+Sigma.betahat <- tcrossprod(B) + diag(p)
+Cor.betahat <- cov2cor(Sigma.betahat)
+## Simulate X with Cor.betahat^{-1} correlation structure
+X <- matrix(rnorm(n * p), n, p) %*% chol(cov2cor(solve(Cor.betahat)))
+## Centering X
+X <- t(t(X) - colMeans(X))
+## Normalize X
+X <- t(t(X) / sqrt(colSums(X^2)))
+## Generate knockoffs
+Xk <- knockoff::create.fixed(X, method = "equi")
+Xk_e <- Xk$Xk
+Xk <- knockoff::create.fixed(X, method = "sdp")
+Xk_s <- Xk$Xk
+## Signal strength
+A <- round(3 * sqrt(mean(diag(solve(crossprod(X))))))
+## Set beta
+beta <- rep(0, p)
+nonzero <- sample(p, k)
+beta[nonzero] <- A
+```
+
+```{r, echo = FALSE, cache = TRUE}
+m <- 1000
+W <- result <- list()
+for (i in 1 : m) {
+y <- X %*% beta + rnorm(n)
+
+## Least squares
+lm.fit <- lm(y ~ X - 1)
+pvalue <- summary(lm.fit)$coefficients[, 4]
+
+## BH
+BH.fit <- p.adjust(pvalue, method = "BH")
+BH.selected <- (1 : p)[BH.fit <= q]
+
+## Knockoff
+W[[i]] <- cbind(
+  equi_lasso <- knockoff::stat.glmnet_lambdasmax(X, Xk_e, y),
+  equi_marginal <- abs(t(X) %*% y) - abs(t(Xk_e) %*% y),
+  sdp_lasso <- knockoff::stat.glmnet_lambdasmax(X, Xk_s, y),
+  sdp_marginal <- abs(t(X) %*% y) - abs(t(Xk_s) %*% y)
+)
+
+Knockoff.threshold <- apply(W[[i]], 2, knockoff.threshold, fdr = q, offset = 0)
+Knockoff.threshold.plus <- apply(W[[i]], 2, knockoff.threshold, fdr = q, offset = 1)
+
+fdp.Knockoff <- fdp.Knockoff.plus <- power.Knockoff <- power.Knockoff.plus <- c()
+for (j in 1 : ncol(W[[i]])) {
+  fdp.Knockoff[j] <- fdp(which(W[[i]][, j] >= Knockoff.threshold[j]))
+  fdp.Knockoff.plus[j] <- fdp(which(W[[i]][, j] >= Knockoff.threshold.plus[j]))
+  power.Knockoff[j] <- sum(beta[which(W[[i]][, j] >= Knockoff.threshold[j])] != 0) / max(k, 1)
+  power.Knockoff.plus[j] <- sum(beta[which(W[[i]][, j] >= Knockoff.threshold.plus[j])] != 0) / max(k, 1)
+}
+
+result[[i]] <- c(
+  fdp(BH.selected), fdp.Knockoff, fdp.Knockoff.plus,
+  power(BH.selected, k), power.Knockoff, power.Knockoff.plus
+  )
+}
+```
+
+```{r, echo = FALSE}
+result.matrix <- matrix(unlist(result), m, byrow = TRUE)
+boxplot(result.matrix[, 1 : 9], ylab = "FDP", las = 2, names = c(
+  "BH",
+  "KO.Equi.LASSO",
+  "KO.Equi.Marginal",
+  "KO.SDP.LASSO",
+  "KO.SDP.Marginal",
+  "KO+.Equi.LASSO",
+  "KO+.Equi.Marginal",
+  "KO+.SDP.LASSO",
+  "KO+.SDP.Marginal"
+  ), cex.axis = 0.55
+)
+points(colMeans(result.matrix[, 1 : 9]), col = "blue", pch = 3)
+abline(h = q, lty = 2, col = "red")
+```
+
+```{r, echo = FALSE}
+boxplot(result.matrix[, 10 : 18], ylab = "TDP", las = 2, names = c(
+  "BH",
+  "KO.Equi.LASSO",
+  "KO.Equi.Marginal",
+  "KO.SDP.LASSO",
+  "KO.SDP.Marginal",
+  "KO+.Equi.LASSO",
+  "KO+.Equi.Marginal",
+  "KO+.SDP.LASSO",
+  "KO+.SDP.Marginal"
+  ), cex.axis = 0.55
+)
+points(colMeans(result.matrix[, 10 : 18]), col = "blue", pch = 3)
+```
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```
