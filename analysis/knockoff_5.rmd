@@ -421,7 +421,7 @@ B <- matrix(rnorm(p * d, 0, 1), p, d)
 Sigma.betahat <- tcrossprod(B) + diag(p)
 Cor.betahat <- cov2cor(Sigma.betahat)
 ## Simulate X with Cor.betahat^{-1} correlation structure
-X <- matrix(rnorm(n * p), n, p) %*% chol(solve(Cor.betahat))
+X <- matrix(rnorm(n * p), n, p) %*% chol(cov2cor(solve(Cor.betahat)))
 ## Centering X
 X <- t(t(X) - colMeans(X))
 ## Normalize X
