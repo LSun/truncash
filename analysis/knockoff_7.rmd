@@ -40,6 +40,8 @@ d <- 7
 q <- 0.1
 ```
 
+## Fixed $X$ Knockoffs
+
 ```{r, echo = FALSE, cache = TRUE}
 set.seed(777)
 ## Correlation matrix of betahat
@@ -84,6 +86,106 @@ W[[i]] <- cbind(
   equi_lasso <- knockoff::stat.glmnet_lambdasmax(X, Xk_e, y),
   equi_marginal <- abs(t(X) %*% y) - abs(t(Xk_e) %*% y),
   sdp_lasso <- knockoff::stat.glmnet_lambdasmax(X, Xk_s, y),
+  sdp_marginal <- abs(t(X) %*% y) - abs(t(Xk_s) %*% y)
+)
+
+Knockoff.threshold <- apply(W[[i]], 2, knockoff.threshold, fdr = q, offset = 0)
+Knockoff.threshold.plus <- apply(W[[i]], 2, knockoff.threshold, fdr = q, offset = 1)
+
+fdp.Knockoff <- fdp.Knockoff.plus <- power.Knockoff <- power.Knockoff.plus <- c()
+for (j in 1 : ncol(W[[i]])) {
+  fdp.Knockoff[j] <- fdp(which(W[[i]][, j] >= Knockoff.threshold[j]))
+  fdp.Knockoff.plus[j] <- fdp(which(W[[i]][, j] >= Knockoff.threshold.plus[j]))
+  power.Knockoff[j] <- sum(beta[which(W[[i]][, j] >= Knockoff.threshold[j])] != 0) / max(k, 1)
+  power.Knockoff.plus[j] <- sum(beta[which(W[[i]][, j] >= Knockoff.threshold.plus[j])] != 0) / max(k, 1)
+}
+
+result[[i]] <- c(
+  fdp(BH.selected), fdp.Knockoff, fdp.Knockoff.plus,
+  power(BH.selected, k), power.Knockoff, power.Knockoff.plus
+  )
+}
+```
+
+```{r, echo = FALSE}
+result.matrix <- matrix(unlist(result), m, byrow = TRUE)
+boxplot(result.matrix[, 1 : 9], ylab = "FDP", las = 2, names = c(
+  "BH",
+  "KO.Equi.LASSO",
+  "KO.Equi.Marginal",
+  "KO.SDP.LASSO",
+  "KO.SDP.Marginal",
+  "KO+.Equi.LASSO",
+  "KO+.Equi.Marginal",
+  "KO+.SDP.LASSO",
+  "KO+.SDP.Marginal"
+  ), cex.axis = 0.55
+)
+points(colMeans(result.matrix[, 1 : 9]), col = "blue", pch = 3)
+abline(h = q, lty = 2, col = "red")
+```
+
+```{r, echo = FALSE}
+boxplot(result.matrix[, 10 : 18], ylab = "TDP", las = 2, names = c(
+  "BH",
+  "KO.Equi.LASSO",
+  "KO.Equi.Marginal",
+  "KO.SDP.LASSO",
+  "KO.SDP.Marginal",
+  "KO+.Equi.LASSO",
+  "KO+.Equi.Marginal",
+  "KO+.SDP.LASSO",
+  "KO+.SDP.Marginal"
+  ), cex.axis = 0.55
+)
+points(colMeans(result.matrix[, 10 : 18]), col = "blue", pch = 3)
+```
+
+## Model $X$ Knockoffs
+
+```{r, echo = FALSE, cache = TRUE}
+set.seed(777)
+
+## Covariance matrix of betahat
+B <- matrix(rnorm(p * d, 0, 1), p, d)
+Sigma.betahat <- tcrossprod(B) + diag(p)
+## Covariance matrix of X = cov2cor(Sigma.betahat^{-1})
+Sigma.X <- cov2cor(solve(Sigma.betahat))
+## Set beta
+A <- 10
+beta <- rep(0, p)
+nonzero <- sample(p, k)
+beta[nonzero] <- A / sqrt(n)
+```
+
+```{r, echo = FALSE, cache = TRUE}
+m <- 100
+
+W <- result <- list()
+
+for (i in 1 : m) {
+## Generate the variables from a multivariate normal distribution
+X <- matrix(rnorm(n * p), n, p) %*% chol(Sigma.X)
+## Generate knockoffs
+Xk_e <- knockoff::create.second_order(X, method = "equi")
+Xk_s <- knockoff::create.second_order(X, method = "sdp")
+
+## Generate data
+y <- X %*% beta + rnorm(n)
+
+## Least squares
+lm.fit <- lm(y ~ X - 1)
+pvalue <- summary(lm.fit)$coefficients[, 4]
+
+## BH
+BH.fit <- p.adjust(pvalue, method = "BH")
+BH.selected <- (1 : p)[BH.fit <= q]
+
+## Knockoff
+W[[i]] <- cbind(
+  equi_lasso <- knockoff::stat.glmnet_coefdiff(X, Xk_e, y),
+  equi_marginal <- abs(t(X) %*% y) - abs(t(Xk_e) %*% y),
+  sdp_lasso <- knockoff::stat.glmnet_coefdiff(X, Xk_s, y),
   sdp_marginal <- abs(t(X) %*% y) - abs(t(Xk_s) %*% y)
 )
 
