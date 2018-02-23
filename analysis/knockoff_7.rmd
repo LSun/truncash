@@ -26,8 +26,24 @@ knitr::read_chunk("chunks.R")
 
 <!-- Add your analysis here -->
 
+## Introduction
+
+`Knockoff` has 3 steps.
+
+1. Generate knockoff variables, which keep the same correlation structure as original variables but has no effect on the response.
+
+2. Generate test statistics such that these statistics tend to be large positive number for non-null variables but iid positive or negative for null variables.
+
+3. Find a cutoff threshold for those test statistics to control the estimated FDR under $q$.
+
+The default `knockoff::knockoff.filter` function uses `SDP` construction in step 1 and `LASSO`-related statistics in step 2. However, [we've found](knockoff_5.html#scenario_3:_(hatbeta)_from_a_factor_model7) that `Knockoff` coded in this way failed to control FDR in simulations when variables are generated such that $\hat\beta$ has heavy average absolute pairwise correlation, which seems to contradict Thoerem 2 in the `Knockoff` paper. Now we take a closer look to see what went wrong.
+
+In step 1, we use two construction methods: `equi` and `sdp`. `sdp` is believed to be more powerful. In step 2, we use two statistics: `marginal` and `lasso`-related. `lasso`-related is believed to be more powerful.
+
 ```{r, echo = FALSE}
 library(knockoff)
+library(reshape2)
+library(ggplot2)
 fdp <- function(selected) sum(beta[selected] == 0) / max(length(selected), 1)
 power <- function(selected, k = k) sum(beta[selected] != 0) / max(k, 1)
 ```
@@ -40,7 +56,7 @@ d <- 7
 q <- 0.1
 ```
 
-## Fixed $X$ Knockoffs
+## Fixed $X$ Knockoffs: 1000 simulation trials
 
 ```{r, echo = FALSE, cache = TRUE}
 set.seed(777)
@@ -125,7 +141,7 @@ points(colMeans(result.matrix[, 1 : 9]), col = "blue", pch = 3)
 abline(h = q, lty = 2, col = "red")
 ```
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, message = FALSE}
 boxplot(result.matrix[, 10 : 18], ylab = "TDP", las = 2, names = c(
   "BH",
   "KO.Equi.LASSO",
@@ -139,9 +155,24 @@ boxplot(result.matrix[, 10 : 18], ylab = "TDP", las = 2, names = c(
   ), cex.axis = 0.55
 )
 points(colMeans(result.matrix[, 10 : 18]), col = "blue", pch = 3)
+
+null <- setdiff(seq(p), nonzero)
+W.sign <- lapply(W, apply, 2, function(x)(sum(x[null] > 0) / sum(x[null] != 0)))
+W.sign <- matrix(unlist(W.sign), m, 4, byrow = TRUE)
+colnames(W.sign) <- c(
+  "equi + stat.glmnet_coefdiff",
+  "equi + marginaldiff",
+  "sdp + stat.glmnet_coefdiff",
+  "sdp + marginaldiff"
+)
+ggplot2::ggplot(data = reshape2::melt(as.data.frame(W.sign)), mapping = aes(x = value)) +
+  geom_histogram(breaks = seq(0, 1, by = 0.05)) +
+  facet_wrap(~ variable) +
+  labs(x = "Proportion of Null Test Statistics Being Positive") +
+  geom_vline(xintercept = 0.5, col = "red", linetype = "dashed")
 ```
 
-## Model $X$ Knockoffs
+## Model $X$ Knockoffs: 100 simulation trials
 
 ```{r, echo = FALSE, cache = TRUE}
 set.seed(777)
@@ -239,6 +270,23 @@ boxplot(result.matrix[, 10 : 18], ylab = "TDP", las = 2, names = c(
   ), cex.axis = 0.55
 )
 points(colMeans(result.matrix[, 10 : 18]), col = "blue", pch = 3)
+```
+
+```{r, echo = FALSE, message = FALSE}
+null <- setdiff(seq(p), nonzero)
+W.sign <- lapply(W, apply, 2, function(x)(sum(x[null] > 0) / sum(x[null] != 0)))
+W.sign <- matrix(unlist(W.sign), m, 4, byrow = TRUE)
+colnames(W.sign) <- c(
+  "equi + stat.glmnet_coefdiff",
+  "equi + marginaldiff",
+  "sdp + stat.glmnet_coefdiff",
+  "sdp + marginaldiff"
+)
+ggplot2::ggplot(data = reshape2::melt(as.data.frame(W.sign)), mapping = aes(x = value)) +
+  geom_histogram(breaks = seq(0, 1, by = 0.05)) +
+  facet_wrap(~ variable) +
+  labs(x = "Proportion of Null Test Statistics Being Positive") +
+  geom_vline(xintercept = 0.5, col = "red", linetype = "dashed")
 ```
 
 ## Session information
