@@ -358,14 +358,15 @@ method.col <- c("blue", "green", "orange", "red")
 ```
 
 ```{r many_fitting, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
-for (sigma.beta in seq(3, 4, by = 0.5)) {
-for (L in seq(2, 10, by = 2)) {
-for (w.lambda in c(0, 10)) {
+pi0.vec <- c(0.8, 0.9)
+for (sigma.beta in seq(1, 1, by = 0.5)) {
+for (L in seq(6, 6, by = 2)) {
+for (w.lambda in c(10)) {
 cat("sigma.beta =", sigma.beta, "; GD =", L, "; Constraints on w:", w.lambda != 0)
 qvalue.pi0.list <- qvalue.list <- list()
 z.pi0.list <- z.list <- list()
 
-for (j in seq(length(pi0.vec))) {
+for (j in seq(pi0.vec)) {
   pi0 <- pi0.vec[j]
 for (i in 1 : nsim) {
   ## generate data
@@ -492,8 +493,8 @@ p <- 1e3
 B <- matrix(rnorm(p * d), p, d)
 Sigma <- B %*% t(B) + diag(p)
 Rho <- cov2cor(Sigma)
-pi0.vec <- 0.9
-nsim <- 1000
+pi0.vec <- c(0.8, 0.9)
+nsim <- 500
 ```
 
 ```{r sim_z, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
@@ -604,6 +605,10 @@ for (j in seq(length(pi0.vec))) {
   theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 12.5), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 7.5), axis.text.y = element_text(size = 15))
 
   grid.arrange(FDR.plot, pFDR.plot, power.plot, top = textGrob(bquote(paste(pi[0] == .(pi0.vec[j]), "; ", sigma[beta] == .(sigma.beta), "; ", .(L), "GDs; ", .(ifelse(w.lambda == 0, "No Constraints", "With Constraints")), "; ", q == .(q)))))
+  
+  pdf(paste("../output/fig/sim_cash", sigma.beta, L, w.lambda, pi0.vec[j], "plot.pdf", sep = "_"), onefile = TRUE)
+  grid.arrange(FDR.plot, pFDR.plot, power.plot, top = textGrob(bquote(paste(pi[0] == .(pi0.vec[j]), "; ", sigma[beta] == .(sigma.beta), "; ", .(L), "GDs; ", .(ifelse(w.lambda == 0, "No Constraints", "With Constraints")), "; ", q == .(q)))))
+  dev.off()
 }
 }
 }
