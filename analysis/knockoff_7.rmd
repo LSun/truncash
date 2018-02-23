@@ -40,10 +40,11 @@ The default `knockoff::knockoff.filter` function uses `SDP` construction in step
 
 In step 1, we use two construction methods: `equi` and `sdp`. `sdp` is believed to be more powerful. In step 2, we use two statistics: `marginal` and `lasso`-related. `lasso`-related is believed to be more powerful.
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, message = FALSE}
 library(knockoff)
 library(reshape2)
 library(ggplot2)
+library(doMC)
 fdp <- function(selected) sum(beta[selected] == 0) / max(length(selected), 1)
 power <- function(selected, k = k) sum(beta[selected] != 0) / max(k, 1)
 ```
@@ -160,9 +161,9 @@ null <- setdiff(seq(p), nonzero)
 W.sign <- lapply(W, apply, 2, function(x)(sum(x[null] > 0) / sum(x[null] != 0)))
 W.sign <- matrix(unlist(W.sign), m, 4, byrow = TRUE)
 colnames(W.sign) <- c(
-  "equi + stat.glmnet_coefdiff",
+  "equi + stat.glmnet_lambdasmax",
   "equi + marginaldiff",
-  "sdp + stat.glmnet_coefdiff",
+  "sdp + stat.glmnet_lambdasmax",
   "sdp + marginaldiff"
 )
 ggplot2::ggplot(data = reshape2::melt(as.data.frame(W.sign)), mapping = aes(x = value)) +
