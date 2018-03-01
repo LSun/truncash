@@ -315,10 +315,10 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2018-02-28</p>
+<p><strong>Last updated:</strong> 2018-03-01</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 4eaee81</p>
+<p><strong>Code version:</strong> ed7a1a0</p>
 <!-- Add your analysis here -->
 <section id="introduction" class="level2">
 <h2>Introduction</h2>
@@ -355,6 +355,12 @@ cor(X^k_i, X^k_j) = cor(X_i, X_j)\\
 cor(X_i, X^k_j) = cor(X_i, X_j)
 \end{array}
 \]</span> while <span class="math inline">\(cor(X_i, X^k_i)\)</span> should be as small as possible. It turns out it’s just not that easy to generate these well-behaving <code>Knockoff</code> variables when columns in <span class="math inline">\(X\)</span> are correlated in a certain way. Especially when using <code>SDP</code> optimization, it could generate a lot of knockoffs that are exactly the same as the originals.</p>
+<p><img src="figure/knockoff_7.rmd/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>If an original variable and its knockoff are too similar, it essentially makes little difference which one is included in the model, from a goodness of fit point of view.</p>
+<p>The problem becomes more severe when we fit models like LASSO using methods like coordinate descent. The result depends in large part on the sequence of variables getting into the model. So if we feed LASSO with <code>cbind(X, Xk)</code>, for every iteration, it’s always <code>X[j]</code> being optimized before <code>Xk[j]</code>. That’s a major reason we see asymmetric test statistics as above, and why <code>Knockoff</code> loses FDR control in these circumstances.</p>
+<p>One way to fix that is to randomize the order of variables in <code>cbind(X, Xk)</code> before feeding them to LASSO. The following is a simulation.</p>
+<p><img src="figure/knockoff_7.rmd/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_7.rmd/unnamed-chunk-14-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_7.rmd/unnamed-chunk-14-3.png" width="672" style="display: block; margin: auto;" /></p>
+<p>After column randomization, the test statistcs for null variables are back to normal and <code>Knockoff</code> controls FDR again. The low power is another issue.</p>
 </section>
 <section id="session-information" class="level2">
 <h2>Session information</h2>
