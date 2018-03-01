@@ -45,6 +45,7 @@ library(knockoff)
 library(reshape2)
 library(ggplot2)
 library(doMC)
+library(lattice)
 fdp <- function(selected) sum(beta[selected] == 0) / max(length(selected), 1)
 power <- function(selected, k = k) sum(beta[selected] != 0) / max(k, 1)
 ```
@@ -173,7 +174,7 @@ ggplot2::ggplot(data = reshape2::melt(as.data.frame(W.sign)), mapping = aes(x = 
   geom_vline(xintercept = 0.5, col = "red", linetype = "dashed")
 ```
 
-## Model $X$ Knockoffs: 100 simulation trials
+## Model $X$ Knockoffs: 1000 simulation trials
 
 ```{r, echo = FALSE, cache = TRUE}
 set.seed(777)
@@ -190,11 +191,9 @@ nonzero <- sample(p, k)
 beta[nonzero] <- A / sqrt(n)
 ```
 
-```{r, echo = FALSE, cache = TRUE}
-m <- 100
-
+```{r, echo = FALSE, cache = TRUE, message = FALSE, warning = FALSE}
+m <- 1000
 W <- result <- list()
-
 for (i in 1 : m) {
 ## Generate the variables from a multivariate normal distribution
 X <- matrix(rnorm(n * p), n, p) %*% chol(Sigma.X)
@@ -288,6 +287,41 @@ ggplot2::ggplot(data = reshape2::melt(as.data.frame(W.sign)), mapping = aes(x = 
   facet_wrap(~ variable) +
   labs(x = "Proportion of Null Test Statistics Being Positive") +
   geom_vline(xintercept = 0.5, col = "red", linetype = "dashed")
+```
+
+## Observation
+
+A set of well-bahaving `Knockoff` variables $X^k$ should have the property that
+$$
+\begin{array}{c}
+cor(X^k_i, X^k_j) = cor(X_i, X_j)\\
+cor(X_i, X^k_j) = cor(X_i, X_j)
+\end{array}
+$$
+while $cor(X_i, X^k_i)$ should be as small as possible. It turns out it's just not that easy to generate these well-behaving `Knockoff` variables when columns in $X$ are correlated in a certain way. Especially when using `SDP` optimization, it could generate a lot of knockoffs that are exactly the same as the originals.
+
+```{r, echo = FALSE}
+set.seed(777)
+## Correlation matrix of betahat
+B <- matrix(rnorm(p * d, 0, 1), p, d)
+Sigma.betahat <- tcrossprod(B) + diag(p)
+Cor.betahat <- cov2cor(Sigma.betahat)
+## Simulate X with Cor.betahat^{-1} correlation structure
+X <- matrix(rnorm(n * p), n, p) %*% chol(cov2cor(solve(Cor.betahat)))
+## Centering X
+X <- t(t(X) - colMeans(X))
+## Normalize X
+X <- t(t(X) / sqrt(colSums(X^2)))
+## Generate knockoffs
+Xk <- knockoff::create.fixed(X, method = "equi")
+Xk_e <- Xk$Xk
+Xk <- knockoff::create.fixed(X, method = "sdp")
+Xk_s <- Xk$Xk
+corxxke <- corxxks <- c()
+for (i in 1 : p) {
+  corxxke[i] <- cor(X[, i], Xk_e[, i])
+  corxxks[i] <- cor(X[, i], Xk_s[, i])
+}
 ```
 
 ## Session information
