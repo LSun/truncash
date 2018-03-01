@@ -409,7 +409,7 @@ for (i in 1 : m) {
 }
 ```
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, message = FALSE}
 par(mar = c(9, 4.5, 0.5, 0.5))
 result.matrix <- matrix(unlist(result), m, byrow = TRUE)
 boxplot(result.matrix[, 1 : 13], ylab = "FDP", las = 2, names = c(
