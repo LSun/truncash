@@ -67,6 +67,12 @@ After centering $X_j$'s, the constraints on the Fix-$X$ design can be seen as th
 ```{r, echo = FALSE, message = FALSE}
 library(knockoff)
 library(Matrix)
+library(reshape2)
+library(ggplot2)
+library(doMC)
+library(lattice)
+fdp <- function(selected) sum(beta[selected] == 0) / max(length(selected), 1)
+power <- function(selected, k = k) sum(beta[selected] != 0) / max(k, 1)
 ```
 
 ```{r}
