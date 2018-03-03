@@ -72,6 +72,9 @@ library(Matrix)
 ```{r}
 n <- 3000
 p <- 1000
+k <- 50
+m <- 100
+q <- 0.1
 ```
 
 ## Scenario 1: Independent Gaussian Columns
@@ -88,6 +91,7 @@ Cor.X <- cov2cor(Cov.X)
 Sigma.X <- crossprod(X)
 R.X <- cov2cor(Sigma.X)
 Rho.X <- cor(X)
+Cor.betahat <- cov2cor(solve(Sigma.X))
 Xk_f_e <- knockoff::create.fixed(X, method = "equi")
 Xk_f_e <- Xk_f_e$Xk
 Xk_f_s <- knockoff::create.fixed(X, method = "sdp")
@@ -117,9 +121,130 @@ for (i in 1 : p) {
 hist(Cor.X[lower.tri(Cor.X)], main = "Histogram of population pairwise correlation of columns in X", xlab = expression(paste("Population ", cor(X[i], X[j]))), breaks = seq(-0.45, 0.45, by = 0.1))
 hist(R.X[lower.tri(R.X)], main = "Histogram of sample normalized pairwise inner product of columns in X", xlab = expression(paste("Normalized ", X[i]^T~X[j])))
 hist(Rho.X[lower.tri(Rho.X)], main = "Histogram of sample pairwise correlation of columns in X", xlab = expression(paste("Sample ", cor(X[i], X[j]))))
+hist(Cor.betahat[lower.tri(Cor.betahat)], main = expression(paste("Histogram of population pairwise correlation of ", hat(beta))), xlab = expression(paste("Population ", cor(hat(beta)[i], hat(beta)[j]))))
 par(mfrow = c(1, 1))
 par(mar = c(9, 2.5, 2.5, 1.5))
 boxplot(corxxk, las = 2, main = "Similarity between originals and their knockoffs")
+```
+
+### Fixed Design
+
+```{r indep fixed, echo = FALSE, cache = TRUE, message = FALSE, warning = FALSE}
+A <- 4
+beta <- rep(0, p)
+nonzero <- sample(p, k)
+beta[nonzero] <- A
+
+W <- result <- list()
+for (i in 1 : m) {
+  y <- X %*% beta + rnorm(n)
+
+  ## Least squares
+  lm.fit <- lm(y ~ X - 1)
+  pvalue <- summary(lm.fit)$coefficients[, 4]
+
+  ## BH
+  BH.fit <- p.adjust(pvalue, method = "BH")
+  BH.selected <- (1 : p)[BH.fit <= q]
+
+  orig <- 1 : p
+  random.order.variable <- sample(2 * p)
+  Z <- knockoff:::lasso_max_lambda(cbind(X, Xk_f_e)[, random.order.variable], y, method = "glmnet", family = "gaussian")
+  Z <- Z[order(random.order.variable)]
+  W_f_e <- pmax(Z[orig], Z[orig + p]) * sign(Z[orig] - Z[orig + p])
+
+  random.order.variable <- sample(2 * p)
+  Z <- knockoff:::lasso_max_lambda(cbind(X, Xk_f_s)[, random.order.variable], y, method = "glmnet", family = "gaussian")
+  Z <- Z[order(random.order.variable)]
+  W_f_s <- pmax(Z[orig], Z[orig + p]) * sign(Z[orig] - Z[orig + p])
+
+  ## Knockoff
+  W[[i]] <- cbind(
+    equi_marginal <- abs(t(X) %*% y) - abs(t(Xk_f_e) %*% y),
+    sdp_marginal <- abs(t(X) %*% y) - abs(t(Xk_f_s) %*% y),
+    equi_lasso <- knockoff::stat.glmnet_lambdasmax(X, Xk_f_e, y),
+    equi_lasso_random <- W_f_e,
+    sdp_lasso <- knockoff::stat.glmnet_lambdasmax(X, Xk_f_s, y),
+    sdp_lasso_random <- W_f_s
+  )
+
+  Knockoff.threshold <- apply(W[[i]], 2, knockoff.threshold, fdr = q, offset = 0)
+  Knockoff.threshold.plus <- apply(W[[i]], 2, knockoff.threshold, fdr = q, offset = 1)
+
+  fdp.Knockoff <- fdp.Knockoff.plus <- power.Knockoff <- power.Knockoff.plus <- c()
+  for (j in 1 : ncol(W[[i]])) {
+    fdp.Knockoff[j] <- fdp(which(W[[i]][, j] >= Knockoff.threshold[j]))
+    fdp.Knockoff.plus[j] <- fdp(which(W[[i]][, j] >= Knockoff.threshold.plus[j]))
+    power.Knockoff[j] <- sum(beta[which(W[[i]][, j] >= Knockoff.threshold[j])] != 0) / max(k, 1)
+    power.Knockoff.plus[j] <- sum(beta[which(W[[i]][, j] >= Knockoff.threshold.plus[j])] != 0) / max(k, 1)
+  }
+
+  result[[i]] <- c(
+    fdp(BH.selected), fdp.Knockoff, fdp.Knockoff.plus,
+    power(BH.selected, k), power.Knockoff, power.Knockoff.plus
+  )
+}
+```
+
+```{r, echo = FALSE, message = FALSE}
+par(mar = c(9, 4.5, 0.5, 0.5))
+result.matrix <- matrix(unlist(result), m, byrow = TRUE)
+boxplot(result.matrix[, 1 : 13], ylab = "FDP", las = 2, names = c(
+  "BH",
+  "KO.Equi.Marginal",
+  "KO.SDP.Marginal",
+  "KO.Equi.LASSO",
+  "KO.Equi.LASSO.Random",
+  "KO.SDP.LASSO",
+  "KO.SDP.LASSO.Random",
+  "KO+.Equi.Marginal",
+  "KO+.SDP.Marginal",
+  "KO+.Equi.LASSO",
+  "KO+.Equi.LASSO.Random",
+  "KO+.SDP.LASSO",
+  "KO+.SDP.LASSO.Random"
+), cex.axis = 0.75, border = c("green", rep(c(rep("black", 4), rep("red", 2)), 2))
+)
+points(colMeans(result.matrix[, 1 : 13]), col = "blue", pch = 3)
+abline(h = q, lty = 2, col = "red")
+abline(v = c(1.5, 7.5), col = "maroon")
+
+boxplot(result.matrix[, 14 : 26], ylab = "TDP", las = 2, names = c(
+  "BH",
+  "KO.Equi.Marginal",
+  "KO.SDP.Marginal",
+  "KO.Equi.LASSO",
+  "KO.Equi.LASSO.Random",
+  "KO.SDP.LASSO",
+  "KO.SDP.LASSO.Random",
+  "KO+.Equi.Marginal",
+  "KO+.SDP.Marginal",
+  "KO+.Equi.LASSO",
+  "KO+.Equi.LASSO.Random",
+  "KO+.SDP.LASSO",
+  "KO+.SDP.LASSO.Random"
+), cex.axis = 0.75, border = c("green", rep(c(rep("black", 4), rep("red", 2)), 2))
+)
+points(colMeans(result.matrix[, 14 : 26]), col = "blue", pch = 3)
+abline(v = c(1.5, 7.5), col = "maroon")
+
+null <- setdiff(seq(p), nonzero)
+W.sign <- lapply(W, apply, 2, function(x)(sum(x[null] > 0) / sum(x[null] != 0)))
+W.sign <- matrix(unlist(W.sign), m, byrow = TRUE)
+colnames(W.sign) <- c(
+  "equi + marginaldiff",
+  "sdp + marginaldiff",
+  "equi + stat.glmnet_lambdasmax",
+  "equi + stat.glmnet_lambdasmax + random",
+  "sdp + stat.glmnet_lambdasmax",
+  "sdp + stat.glmnet_lambdasmax + random"
+)
+
+ggplot2::ggplot(data = reshape2::melt(as.data.frame(W.sign)), mapping = aes(x = value)) +
+  geom_histogram(breaks = seq(0, 1, by = 0.05)) +
+  facet_wrap(~ variable, ncol = 2) +
+  labs(x = "Proportion of Null Test Statistics Being Positive") +
+  geom_vline(xintercept = 0.5, col = "red", linetype = "dashed")
 ```
 
 ## Scenario 2: Equal-correlation
@@ -127,9 +252,11 @@ boxplot(corxxk, las = 2, main = "Similarity between originals and their knockoff
 $$
 \begin{array}{c}
 X_{ij} \sim N\left(0, \left(\frac{1}{\sqrt n}\right)^2\right) \\
-cor(X_{ij}, X_{ij'}) \equiv \rho = 0.5
+cor(X_{ij}, X_{ij'}) \equiv \rho
 \end{array}
 $$
+
+### $\rho = 0.5$
 
 ```{r equal-cor, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
 set.seed(777)
@@ -141,6 +268,7 @@ Cor.X <- cov2cor(Cov.X)
 Sigma.X <- crossprod(X)
 R.X <- cov2cor(Sigma.X)
 Rho.X <- cor(X)
+Cor.betahat <- cov2cor(solve(Sigma.X))
 Xk_f_e <- knockoff::create.fixed(X, method = "equi")
 Xk_f_e <- Xk_f_e$Xk
 Xk_f_s <- knockoff::create.fixed(X, method = "sdp")
@@ -148,10 +276,11 @@ Xk_f_s <- Xk_f_s$Xk
 Xk_m_g_e <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "equi")
 Xk_m_g_s <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "sdp")
 Xk_m_g_a <- data.frame(matrix(0, n, p))
-tryCatch({Xk_m_g_a <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "asdp")}, error = function(w){})
+tryCatch({Xk_m_g_a <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "asdp")}, error = function(w){Xk_m_g_a <- data.frame(matrix(0, n, p))})
 Xk_m_2_e <- knockoff::create.second_order(X, method = "equi")
 Xk_m_2_s <- knockoff::create.second_order(X, method = "sdp")
-Xk_m_2_a <- knockoff::create.second_order(X, method = "asdp")
+Xk_m_2_a <- data.frame(matrix(0, n, p))
+tryCatch({Xk_m_2_a <- knockoff::create.second_order(X, method = "asdp")}, error = function(w){Xk_m_2_a <- data.frame(matrix(0, n, p))})
 
 corxxk <- matrix(0, p, 8)
 colnames(corxxk) <- c("Fixed_Equi", "Fixed_SDP", "Model_Gaus_Equi", "Model_Gaus_SDP", "Model_Gaus_aSDP", "Model_2nd_Equi", "Model_2nd_SDP", "Model_2nd_aSDP")
@@ -171,10 +300,303 @@ for (i in 1 : p) {
 hist(Cor.X[lower.tri(Cor.X)], main = "Histogram of population pairwise correlation of columns in X", xlab = expression(paste("Population ", cor(X[i], X[j]))), breaks = seq(0.05, 0.95, by = 0.1))
 hist(R.X[lower.tri(R.X)], main = "Histogram of sample normalized pairwise inner product of columns in X", xlab = expression(paste("Normalized ", X[i]^T~X[j])))
 hist(Rho.X[lower.tri(Rho.X)], main = "Histogram of sample pairwise correlation of columns in X", xlab = expression(paste("Sample ", cor(X[i], X[j]))))
+hist(Cor.betahat[lower.tri(Cor.betahat)], main = expression(paste("Histogram of population pairwise correlation of ", hat(beta))), xlab = expression(paste("Population ", cor(hat(beta)[i], hat(beta)[j]))))
 par(mfrow = c(1, 1))
 par(mar = c(9, 2.5, 2.5, 1.5))
 boxplot(corxxk, las = 2, main = "Similarity between originals and their knockoffs")
 ```
+
+#### Fixed Design
+
+```{r equal-cor fixed, echo = FALSE, cache = TRUE, message = FALSE, warning = FALSE}
+A <- 5
+beta <- rep(0, p)
+nonzero <- sample(p, k)
+beta[nonzero] <- A
+
+W <- result <- list()
+for (i in 1 : m) {
+  y <- X %*% beta + rnorm(n)
+
+  ## Least squares
+  lm.fit <- lm(y ~ X - 1)
+  pvalue <- summary(lm.fit)$coefficients[, 4]
+
+  ## BH
+  BH.fit <- p.adjust(pvalue, method = "BH")
+  BH.selected <- (1 : p)[BH.fit <= q]
+
+  orig <- 1 : p
+  random.order.variable <- sample(2 * p)
+  Z <- knockoff:::lasso_max_lambda(cbind(X, Xk_f_e)[, random.order.variable], y, method = "glmnet", family = "gaussian")
+  Z <- Z[order(random.order.variable)]
+  W_f_e <- pmax(Z[orig], Z[orig + p]) * sign(Z[orig] - Z[orig + p])
+
+  random.order.variable <- sample(2 * p)
+  Z <- knockoff:::lasso_max_lambda(cbind(X, Xk_f_s)[, random.order.variable], y, method = "glmnet", family = "gaussian")
+  Z <- Z[order(random.order.variable)]
+  W_f_s <- pmax(Z[orig], Z[orig + p]) * sign(Z[orig] - Z[orig + p])
+
+  ## Knockoff
+  W[[i]] <- cbind(
+    equi_marginal <- abs(t(X) %*% y) - abs(t(Xk_f_e) %*% y),
+    sdp_marginal <- abs(t(X) %*% y) - abs(t(Xk_f_s) %*% y),
+    equi_lasso <- knockoff::stat.glmnet_lambdasmax(X, Xk_f_e, y),
+    equi_lasso_random <- W_f_e,
+    sdp_lasso <- knockoff::stat.glmnet_lambdasmax(X, Xk_f_s, y),
+    sdp_lasso_random <- W_f_s
+  )
+
+  Knockoff.threshold <- apply(W[[i]], 2, knockoff.threshold, fdr = q, offset = 0)
+  Knockoff.threshold.plus <- apply(W[[i]], 2, knockoff.threshold, fdr = q, offset = 1)
+
+  fdp.Knockoff <- fdp.Knockoff.plus <- power.Knockoff <- power.Knockoff.plus <- c()
+  for (j in 1 : ncol(W[[i]])) {
+    fdp.Knockoff[j] <- fdp(which(W[[i]][, j] >= Knockoff.threshold[j]))
+    fdp.Knockoff.plus[j] <- fdp(which(W[[i]][, j] >= Knockoff.threshold.plus[j]))
+    power.Knockoff[j] <- sum(beta[which(W[[i]][, j] >= Knockoff.threshold[j])] != 0) / max(k, 1)
+    power.Knockoff.plus[j] <- sum(beta[which(W[[i]][, j] >= Knockoff.threshold.plus[j])] != 0) / max(k, 1)
+  }
+
+  result[[i]] <- c(
+    fdp(BH.selected), fdp.Knockoff, fdp.Knockoff.plus,
+    power(BH.selected, k), power.Knockoff, power.Knockoff.plus
+  )
+}
+```
+
+```{r, echo = FALSE, message = FALSE}
+par(mar = c(9, 4.5, 0.5, 0.5))
+result.matrix <- matrix(unlist(result), m, byrow = TRUE)
+boxplot(result.matrix[, 1 : 13], ylab = "FDP", las = 2, names = c(
+  "BH",
+  "KO.Equi.Marginal",
+  "KO.SDP.Marginal",
+  "KO.Equi.LASSO",
+  "KO.Equi.LASSO.Random",
+  "KO.SDP.LASSO",
+  "KO.SDP.LASSO.Random",
+  "KO+.Equi.Marginal",
+  "KO+.SDP.Marginal",
+  "KO+.Equi.LASSO",
+  "KO+.Equi.LASSO.Random",
+  "KO+.SDP.LASSO",
+  "KO+.SDP.LASSO.Random"
+), cex.axis = 0.75, border = c("green", rep(c(rep("black", 4), rep("red", 2)), 2))
+)
+points(colMeans(result.matrix[, 1 : 13]), col = "blue", pch = 3)
+abline(h = q, lty = 2, col = "red")
+abline(v = c(1.5, 7.5), col = "maroon")
+
+boxplot(result.matrix[, 14 : 26], ylab = "TDP", las = 2, names = c(
+  "BH",
+  "KO.Equi.Marginal",
+  "KO.SDP.Marginal",
+  "KO.Equi.LASSO",
+  "KO.Equi.LASSO.Random",
+  "KO.SDP.LASSO",
+  "KO.SDP.LASSO.Random",
+  "KO+.Equi.Marginal",
+  "KO+.SDP.Marginal",
+  "KO+.Equi.LASSO",
+  "KO+.Equi.LASSO.Random",
+  "KO+.SDP.LASSO",
+  "KO+.SDP.LASSO.Random"
+), cex.axis = 0.75, border = c("green", rep(c(rep("black", 4), rep("red", 2)), 2))
+)
+points(colMeans(result.matrix[, 14 : 26]), col = "blue", pch = 3)
+abline(v = c(1.5, 7.5), col = "maroon")
+
+null <- setdiff(seq(p), nonzero)
+W.sign <- lapply(W, apply, 2, function(x)(sum(x[null] > 0) / sum(x[null] != 0)))
+W.sign <- matrix(unlist(W.sign), m, byrow = TRUE)
+colnames(W.sign) <- c(
+  "equi + marginaldiff",
+  "sdp + marginaldiff",
+  "equi + stat.glmnet_lambdasmax",
+  "equi + stat.glmnet_lambdasmax + random",
+  "sdp + stat.glmnet_lambdasmax",
+  "sdp + stat.glmnet_lambdasmax + random"
+)
+
+ggplot2::ggplot(data = reshape2::melt(as.data.frame(W.sign)), mapping = aes(x = value)) +
+  geom_histogram(breaks = seq(0, 1, by = 0.05)) +
+  facet_wrap(~ variable, ncol = 2) +
+  labs(x = "Proportion of Null Test Statistics Being Positive") +
+  geom_vline(xintercept = 0.5, col = "red", linetype = "dashed")
+```
+
+
+### $\rho = 0.99$
+
+```{r equal-cor-2, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
+set.seed(777)
+rho <- 0.99
+Z <- rnorm(n, 0, sqrt(1 / n))
+X <- sqrt(rho) * Z + sqrt(1 - rho) * matrix(rnorm(n * p, 0, sqrt(1 / n)), n, p)
+Cov.X <- (1 - rho) * diag(1 / n, p) + rho * matrix(1 / n, p, p)
+Cor.X <- cov2cor(Cov.X)
+Sigma.X <- crossprod(X)
+R.X <- cov2cor(Sigma.X)
+Rho.X <- cor(X)
+Cor.betahat <- cov2cor(solve(Sigma.X))
+Xk_f_e <- knockoff::create.fixed(X, method = "equi")
+Xk_f_e <- Xk_f_e$Xk
+Xk_f_s <- knockoff::create.fixed(X, method = "sdp")
+Xk_f_s <- Xk_f_s$Xk
+Xk_m_g_e <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "equi")
+Xk_m_g_s <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "sdp")
+Xk_m_g_a <- data.frame(matrix(0, n, p))
+tryCatch({Xk_m_g_a <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "asdp")}, error = function(w){Xk_m_g_a <- data.frame(matrix(0, n, p))})
+Xk_m_2_e <- knockoff::create.second_order(X, method = "equi")
+Xk_m_2_s <- knockoff::create.second_order(X, method = "sdp")
+Xk_m_2_a <- data.frame(matrix(0, n, p))
+tryCatch({Xk_m_2_a <- knockoff::create.second_order(X, method = "asdp")}, error = function(w){Xk_m_2_a <- data.frame(matrix(0, n, p))})
+
+corxxk <- matrix(0, p, 8)
+colnames(corxxk) <- c("Fixed_Equi", "Fixed_SDP", "Model_Gaus_Equi", "Model_Gaus_SDP", "Model_Gaus_aSDP", "Model_2nd_Equi", "Model_2nd_SDP", "Model_2nd_aSDP")
+for (i in 1 : p) {
+  corxxk[i, 1] <- sum(X[, i] * Xk_f_e[, i]) / sqrt(sum(X[, i]^2) * sum(Xk_f_e[, i]^2))
+  corxxk[i, 2] <- sum(X[, i] * Xk_f_s[, i]) / sqrt(sum(X[, i]^2) * sum(Xk_f_s[, i]^2))
+  corxxk[i, 3] <- cor(X[, i], Xk_m_g_e[, i])
+  corxxk[i, 4] <- cor(X[, i], Xk_m_g_s[, i])
+  corxxk[i, 5] <- cor(X[, i], Xk_m_g_a[, i])
+  corxxk[i, 6] <- cor(X[, i], Xk_m_2_e[, i])
+  corxxk[i, 7] <- cor(X[, i], Xk_m_2_s[, i])
+  corxxk[i, 8] <- cor(X[, i], Xk_m_2_a[, i])
+}
+```
+
+```{r, echo = FALSE}
+hist(Cor.X[lower.tri(Cor.X)], main = "Histogram of population pairwise correlation of columns in X", xlab = expression(paste("Population ", cor(X[i], X[j]))), breaks = seq(0.9805, 0.9995, by = 0.001))
+hist(R.X[lower.tri(R.X)], main = "Histogram of sample normalized pairwise inner product of columns in X", xlab = expression(paste("Normalized ", X[i]^T~X[j])))
+hist(Rho.X[lower.tri(Rho.X)], main = "Histogram of sample pairwise correlation of columns in X", xlab = expression(paste("Sample ", cor(X[i], X[j]))))
+hist(Cor.betahat[lower.tri(Cor.betahat)], main = expression(paste("Histogram of population pairwise correlation of ", hat(beta))), xlab = expression(paste("Population ", cor(hat(beta)[i], hat(beta)[j]))))
+par(mfrow = c(1, 1))
+par(mar = c(9, 2.5, 2.5, 1.5))
+boxplot(corxxk, las = 2, main = "Similarity between originals and their knockoffs")
+```
+
+#### Fixed Design
+
+```{r equal-cor-2 fixed, echo = FALSE, cache = TRUE, message = FALSE, warning = FALSE}
+A <- 40
+beta <- rep(0, p)
+nonzero <- sample(p, k)
+beta[nonzero] <- A
+
+W <- result <- list()
+for (i in 1 : m) {
+  y <- X %*% beta + rnorm(n)
+
+  ## Least squares
+  lm.fit <- lm(y ~ X - 1)
+  pvalue <- summary(lm.fit)$coefficients[, 4]
+
+  ## BH
+  BH.fit <- p.adjust(pvalue, method = "BH")
+  BH.selected <- (1 : p)[BH.fit <= q]
+
+  orig <- 1 : p
+  random.order.variable <- sample(2 * p)
+  Z <- knockoff:::lasso_max_lambda(cbind(X, Xk_f_e)[, random.order.variable], y, method = "glmnet", family = "gaussian")
+  Z <- Z[order(random.order.variable)]
+  W_f_e <- pmax(Z[orig], Z[orig + p]) * sign(Z[orig] - Z[orig + p])
+
+  random.order.variable <- sample(2 * p)
+  Z <- knockoff:::lasso_max_lambda(cbind(X, Xk_f_s)[, random.order.variable], y, method = "glmnet", family = "gaussian")
+  Z <- Z[order(random.order.variable)]
+  W_f_s <- pmax(Z[orig], Z[orig + p]) * sign(Z[orig] - Z[orig + p])
+
+  ## Knockoff
+  W[[i]] <- cbind(
+    equi_marginal <- abs(t(X) %*% y) - abs(t(Xk_f_e) %*% y),
+    sdp_marginal <- abs(t(X) %*% y) - abs(t(Xk_f_s) %*% y),
+    equi_lasso <- knockoff::stat.glmnet_lambdasmax(X, Xk_f_e, y),
+    equi_lasso_random <- W_f_e,
+    sdp_lasso <- knockoff::stat.glmnet_lambdasmax(X, Xk_f_s, y),
+    sdp_lasso_random <- W_f_s
+  )
+
+  Knockoff.threshold <- apply(W[[i]], 2, knockoff.threshold, fdr = q, offset = 0)
+  Knockoff.threshold.plus <- apply(W[[i]], 2, knockoff.threshold, fdr = q, offset = 1)
+
+  fdp.Knockoff <- fdp.Knockoff.plus <- power.Knockoff <- power.Knockoff.plus <- c()
+  for (j in 1 : ncol(W[[i]])) {
+    fdp.Knockoff[j] <- fdp(which(W[[i]][, j] >= Knockoff.threshold[j]))
+    fdp.Knockoff.plus[j] <- fdp(which(W[[i]][, j] >= Knockoff.threshold.plus[j]))
+    power.Knockoff[j] <- sum(beta[which(W[[i]][, j] >= Knockoff.threshold[j])] != 0) / max(k, 1)
+    power.Knockoff.plus[j] <- sum(beta[which(W[[i]][, j] >= Knockoff.threshold.plus[j])] != 0) / max(k, 1)
+  }
+
+  result[[i]] <- c(
+    fdp(BH.selected), fdp.Knockoff, fdp.Knockoff.plus,
+    power(BH.selected, k), power.Knockoff, power.Knockoff.plus
+  )
+}
+```
+
+```{r, echo = FALSE, message = FALSE}
+par(mar = c(9, 4.5, 0.5, 0.5))
+result.matrix <- matrix(unlist(result), m, byrow = TRUE)
+boxplot(result.matrix[, 1 : 13], ylab = "FDP", las = 2, names = c(
+  "BH",
+  "KO.Equi.Marginal",
+  "KO.SDP.Marginal",
+  "KO.Equi.LASSO",
+  "KO.Equi.LASSO.Random",
+  "KO.SDP.LASSO",
+  "KO.SDP.LASSO.Random",
+  "KO+.Equi.Marginal",
+  "KO+.SDP.Marginal",
+  "KO+.Equi.LASSO",
+  "KO+.Equi.LASSO.Random",
+  "KO+.SDP.LASSO",
+  "KO+.SDP.LASSO.Random"
+), cex.axis = 0.75, border = c("green", rep(c(rep("black", 4), rep("red", 2)), 2))
+)
+points(colMeans(result.matrix[, 1 : 13]), col = "blue", pch = 3)
+abline(h = q, lty = 2, col = "red")
+abline(v = c(1.5, 7.5), col = "maroon")
+
+boxplot(result.matrix[, 14 : 26], ylab = "TDP", las = 2, names = c(
+  "BH",
+  "KO.Equi.Marginal",
+  "KO.SDP.Marginal",
+  "KO.Equi.LASSO",
+  "KO.Equi.LASSO.Random",
+  "KO.SDP.LASSO",
+  "KO.SDP.LASSO.Random",
+  "KO+.Equi.Marginal",
+  "KO+.SDP.Marginal",
+  "KO+.Equi.LASSO",
+  "KO+.Equi.LASSO.Random",
+  "KO+.SDP.LASSO",
+  "KO+.SDP.LASSO.Random"
+), cex.axis = 0.75, border = c("green", rep(c(rep("black", 4), rep("red", 2)), 2))
+)
+points(colMeans(result.matrix[, 14 : 26]), col = "blue", pch = 3)
+abline(v = c(1.5, 7.5), col = "maroon")
+
+null <- setdiff(seq(p), nonzero)
+W.sign <- lapply(W, apply, 2, function(x)(sum(x[null] > 0) / sum(x[null] != 0)))
+W.sign <- matrix(unlist(W.sign), m, byrow = TRUE)
+colnames(W.sign) <- c(
+  "equi + marginaldiff",
+  "sdp + marginaldiff",
+  "equi + stat.glmnet_lambdasmax",
+  "equi + stat.glmnet_lambdasmax + random",
+  "sdp + stat.glmnet_lambdasmax",
+  "sdp + stat.glmnet_lambdasmax + random"
+)
+
+ggplot2::ggplot(data = reshape2::melt(as.data.frame(W.sign)), mapping = aes(x = value)) +
+  geom_histogram(breaks = seq(0, 1, by = 0.05)) +
+  facet_wrap(~ variable, ncol = 2) +
+  labs(x = "Proportion of Null Test Statistics Being Positive") +
+  geom_vline(xintercept = 0.5, col = "red", linetype = "dashed")
+```
+
 
 ## Scenario 3: Extreme local correlation
 
@@ -201,6 +623,7 @@ Cov.X <- Cor.X * 1 / n
 Sigma.X <- crossprod(X)
 R.X <- cov2cor(Sigma.X)
 Rho.X <- cor(X)
+Cor.betahat <- cov2cor(solve(Sigma.X))
 Xk_f_e <- knockoff::create.fixed(X, method = "equi")
 Xk_f_e <- Xk_f_e$Xk
 Xk_f_s <- knockoff::create.fixed(X, method = "sdp")
@@ -208,11 +631,11 @@ Xk_f_s <- Xk_f_s$Xk
 Xk_m_g_e <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "equi")
 Xk_m_g_s <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "sdp")
 Xk_m_g_a <- data.frame(matrix(0, n, p))
-tryCatch({Xk_m_g_a <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "asdp")}, error = function(e){})
+tryCatch({Xk_m_g_a <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "asdp")}, error = function(e){Xk_m_g_a <- data.frame(matrix(0, n, p))})
 Xk_m_2_e <- knockoff::create.second_order(X, method = "equi")
 Xk_m_2_s <- knockoff::create.second_order(X, method = "sdp")
 Xk_m_2_a <- data.frame(matrix(0, n, p))
-tryCatch({Xk_m_2_a <- knockoff::create.second_order(X, method = "asdp")}, error = function(e){})
+tryCatch({Xk_m_2_a <- knockoff::create.second_order(X, method = "asdp")}, error = function(e){Xk_m_2_a <- data.frame(matrix(0, n, p))})
 
 corxxk <- matrix(0, p, 8)
 colnames(corxxk) <- c("Fixed_Equi", "Fixed_SDP", "Model_Gaus_Equi", "Model_Gaus_SDP", "Model_Gaus_aSDP", "Model_2nd_Equi", "Model_2nd_SDP", "Model_2nd_aSDP")
@@ -232,9 +655,130 @@ for (i in 1 : p) {
 hist(Cor.X[lower.tri(Cor.X)], main = "Histogram of population pairwise correlation of columns in X", xlab = expression(paste("Population ", cor(X[i], X[j]))))
 hist(R.X[lower.tri(R.X)], main = "Histogram of sample normalized pairwise inner product of columns in X", xlab = expression(paste("Normalized ", X[i]^T~X[j])))
 hist(Rho.X[lower.tri(Rho.X)], main = "Histogram of sample pairwise correlation of columns in X", xlab = expression(paste("Sample ", cor(X[i], X[j]))))
+hist(Cor.betahat[lower.tri(Cor.betahat)], main = expression(paste("Histogram of population pairwise correlation of ", hat(beta))), xlab = expression(paste("Population ", cor(hat(beta)[i], hat(beta)[j]))))
 par(mfrow = c(1, 1))
 par(mar = c(9, 3.5, 2.5, 1.5))
 boxplot(corxxk, las = 2, main = "Similarity between originals and their knockoffs")
+```
+
+### Fixed Design
+
+```{r extr-local-cor fixed, echo = FALSE, cache = TRUE, message = FALSE, warning = FALSE}
+A <- 30
+beta <- rep(0, p)
+nonzero <- sample(seq(1, p, by = 2), k)
+beta[nonzero] <- A
+
+W <- result <- list()
+for (i in 1 : m) {
+  y <- X %*% beta + rnorm(n)
+
+  ## Least squares
+  lm.fit <- lm(y ~ X - 1)
+  pvalue <- summary(lm.fit)$coefficients[, 4]
+
+  ## BH
+  BH.fit <- p.adjust(pvalue, method = "BH")
+  BH.selected <- (1 : p)[BH.fit <= q]
+
+  orig <- 1 : p
+  random.order.variable <- sample(2 * p)
+  Z <- knockoff:::lasso_max_lambda(cbind(X, Xk_f_e)[, random.order.variable], y, method = "glmnet", family = "gaussian")
+  Z <- Z[order(random.order.variable)]
+  W_f_e <- pmax(Z[orig], Z[orig + p]) * sign(Z[orig] - Z[orig + p])
+
+  random.order.variable <- sample(2 * p)
+  Z <- knockoff:::lasso_max_lambda(cbind(X, Xk_f_s)[, random.order.variable], y, method = "glmnet", family = "gaussian")
+  Z <- Z[order(random.order.variable)]
+  W_f_s <- pmax(Z[orig], Z[orig + p]) * sign(Z[orig] - Z[orig + p])
+
+  ## Knockoff
+  W[[i]] <- cbind(
+    equi_marginal <- abs(t(X) %*% y) - abs(t(Xk_f_e) %*% y),
+    sdp_marginal <- abs(t(X) %*% y) - abs(t(Xk_f_s) %*% y),
+    equi_lasso <- knockoff::stat.glmnet_lambdasmax(X, Xk_f_e, y),
+    equi_lasso_random <- W_f_e,
+    sdp_lasso <- knockoff::stat.glmnet_lambdasmax(X, Xk_f_s, y),
+    sdp_lasso_random <- W_f_s
+  )
+
+  Knockoff.threshold <- apply(W[[i]], 2, knockoff.threshold, fdr = q, offset = 0)
+  Knockoff.threshold.plus <- apply(W[[i]], 2, knockoff.threshold, fdr = q, offset = 1)
+
+  fdp.Knockoff <- fdp.Knockoff.plus <- power.Knockoff <- power.Knockoff.plus <- c()
+  for (j in 1 : ncol(W[[i]])) {
+    fdp.Knockoff[j] <- fdp(which(W[[i]][, j] >= Knockoff.threshold[j]))
+    fdp.Knockoff.plus[j] <- fdp(which(W[[i]][, j] >= Knockoff.threshold.plus[j]))
+    power.Knockoff[j] <- sum(beta[which(W[[i]][, j] >= Knockoff.threshold[j])] != 0) / max(k, 1)
+    power.Knockoff.plus[j] <- sum(beta[which(W[[i]][, j] >= Knockoff.threshold.plus[j])] != 0) / max(k, 1)
+  }
+
+  result[[i]] <- c(
+    fdp(BH.selected), fdp.Knockoff, fdp.Knockoff.plus,
+    power(BH.selected, k), power.Knockoff, power.Knockoff.plus
+  )
+}
+```
+
+```{r, echo = FALSE, message = FALSE}
+par(mar = c(9, 4.5, 0.5, 0.5))
+result.matrix <- matrix(unlist(result), m, byrow = TRUE)
+boxplot(result.matrix[, 1 : 13], ylab = "FDP", las = 2, names = c(
+  "BH",
+  "KO.Equi.Marginal",
+  "KO.SDP.Marginal",
+  "KO.Equi.LASSO",
+  "KO.Equi.LASSO.Random",
+  "KO.SDP.LASSO",
+  "KO.SDP.LASSO.Random",
+  "KO+.Equi.Marginal",
+  "KO+.SDP.Marginal",
+  "KO+.Equi.LASSO",
+  "KO+.Equi.LASSO.Random",
+  "KO+.SDP.LASSO",
+  "KO+.SDP.LASSO.Random"
+), cex.axis = 0.75, border = c("green", rep(c(rep("black", 4), rep("red", 2)), 2))
+)
+points(colMeans(result.matrix[, 1 : 13]), col = "blue", pch = 3)
+abline(h = q, lty = 2, col = "red")
+abline(v = c(1.5, 7.5), col = "maroon")
+
+boxplot(result.matrix[, 14 : 26], ylab = "TDP", las = 2, names = c(
+  "BH",
+  "KO.Equi.Marginal",
+  "KO.SDP.Marginal",
+  "KO.Equi.LASSO",
+  "KO.Equi.LASSO.Random",
+  "KO.SDP.LASSO",
+  "KO.SDP.LASSO.Random",
+  "KO+.Equi.Marginal",
+  "KO+.SDP.Marginal",
+  "KO+.Equi.LASSO",
+  "KO+.Equi.LASSO.Random",
+  "KO+.SDP.LASSO",
+  "KO+.SDP.LASSO.Random"
+), cex.axis = 0.75, border = c("green", rep(c(rep("black", 4), rep("red", 2)), 2))
+)
+points(colMeans(result.matrix[, 14 : 26]), col = "blue", pch = 3)
+abline(v = c(1.5, 7.5), col = "maroon")
+
+null <- setdiff(seq(p), nonzero)
+W.sign <- lapply(W, apply, 2, function(x)(sum(x[null] > 0) / sum(x[null] != 0)))
+W.sign <- matrix(unlist(W.sign), m, byrow = TRUE)
+colnames(W.sign) <- c(
+  "equi + marginaldiff",
+  "sdp + marginaldiff",
+  "equi + stat.glmnet_lambdasmax",
+  "equi + stat.glmnet_lambdasmax + random",
+  "sdp + stat.glmnet_lambdasmax",
+  "sdp + stat.glmnet_lambdasmax + random"
+)
+
+ggplot2::ggplot(data = reshape2::melt(as.data.frame(W.sign)), mapping = aes(x = value)) +
+  geom_histogram(breaks = seq(0, 1, by = 0.05)) +
+  facet_wrap(~ variable, ncol = 2) +
+  labs(x = "Proportion of Null Test Statistics Being Positive") +
+  geom_vline(xintercept = 0.5, col = "red", linetype = "dashed")
 ```
 
 ## Scenario 4: Factor Model for $X$
@@ -257,6 +801,7 @@ X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n) %*% chol(Cor.X)
 Sigma.X <- crossprod(X)
 R.X <- cov2cor(Sigma.X)
 Rho.X <- cor(X)
+Cor.betahat <- cov2cor(solve(Sigma.X))
 Xk_f_e <- knockoff::create.fixed(X, method = "equi")
 Xk_f_e <- Xk_f_e$Xk
 Xk_f_s <- knockoff::create.fixed(X, method = "sdp")
@@ -264,11 +809,11 @@ Xk_f_s <- Xk_f_s$Xk
 Xk_m_g_e <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "equi")
 Xk_m_g_s <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "sdp")
 Xk_m_g_a <- data.frame(matrix(0, n, p))
-tryCatch({Xk_m_g_a <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "asdp")}, error = function(e){})
+tryCatch({Xk_m_g_a <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "asdp")}, error = function(e){Xk_m_g_a <- data.frame(matrix(0, n, p))})
 Xk_m_2_e <- knockoff::create.second_order(X, method = "equi")
 Xk_m_2_s <- knockoff::create.second_order(X, method = "sdp")
 Xk_m_2_a <- data.frame(matrix(0, n, p))
-tryCatch({Xk_m_2_a <- knockoff::create.second_order(X, method = "asdp")}, error = function(e){})
+tryCatch({Xk_m_2_a <- knockoff::create.second_order(X, method = "asdp")}, error = function(e){Xk_m_g_a <- data.frame(matrix(0, n, p))})
 
 corxxk <- matrix(0, p, 8)
 colnames(corxxk) <- c("Fixed_Equi", "Fixed_SDP", "Model_Gaus_Equi", "Model_Gaus_SDP", "Model_Gaus_aSDP", "Model_2nd_Equi", "Model_2nd_SDP", "Model_2nd_aSDP")
@@ -288,9 +833,130 @@ for (i in 1 : p) {
 hist(Cor.X[lower.tri(Cor.X)], main = "Histogram of population pairwise correlation of columns in X", xlab = expression(paste("Population ", cor(X[i], X[j]))))
 hist(R.X[lower.tri(R.X)], main = "Histogram of sample normalized pairwise inner product of columns in X", xlab = expression(paste("Normalized ", X[i]^T~X[j])))
 hist(Rho.X[lower.tri(Rho.X)], main = "Histogram of sample pairwise correlation of columns in X", xlab = expression(paste("Sample ", cor(X[i], X[j]))))
+hist(Cor.betahat[lower.tri(Cor.betahat)], main = expression(paste("Histogram of population pairwise correlation of ", hat(beta))), xlab = expression(paste("Population ", cor(hat(beta)[i], hat(beta)[j]))))
 par(mfrow = c(1, 1))
 par(mar = c(9, 3.5, 2.5, 1.5))
 boxplot(corxxk, las = 2, main = "Similarity between originals and their knockoffs")
+```
+
+### Fixed Design
+
+```{r factor-x fixed, echo = FALSE, cache = TRUE, message = FALSE, warning = FALSE}
+A <- 10
+beta <- rep(0, p)
+nonzero <- sample(p, k)
+beta[nonzero] <- A
+
+W <- result <- list()
+for (i in 1 : m) {
+  y <- X %*% beta + rnorm(n)
+
+  ## Least squares
+  lm.fit <- lm(y ~ X - 1)
+  pvalue <- summary(lm.fit)$coefficients[, 4]
+
+  ## BH
+  BH.fit <- p.adjust(pvalue, method = "BH")
+  BH.selected <- (1 : p)[BH.fit <= q]
+
+  orig <- 1 : p
+  random.order.variable <- sample(2 * p)
+  Z <- knockoff:::lasso_max_lambda(cbind(X, Xk_f_e)[, random.order.variable], y, method = "glmnet", family = "gaussian")
+  Z <- Z[order(random.order.variable)]
+  W_f_e <- pmax(Z[orig], Z[orig + p]) * sign(Z[orig] - Z[orig + p])
+
+  random.order.variable <- sample(2 * p)
+  Z <- knockoff:::lasso_max_lambda(cbind(X, Xk_f_s)[, random.order.variable], y, method = "glmnet", family = "gaussian")
+  Z <- Z[order(random.order.variable)]
+  W_f_s <- pmax(Z[orig], Z[orig + p]) * sign(Z[orig] - Z[orig + p])
+
+  ## Knockoff
+  W[[i]] <- cbind(
+    equi_marginal <- abs(t(X) %*% y) - abs(t(Xk_f_e) %*% y),
+    sdp_marginal <- abs(t(X) %*% y) - abs(t(Xk_f_s) %*% y),
+    equi_lasso <- knockoff::stat.glmnet_lambdasmax(X, Xk_f_e, y),
+    equi_lasso_random <- W_f_e,
+    sdp_lasso <- knockoff::stat.glmnet_lambdasmax(X, Xk_f_s, y),
+    sdp_lasso_random <- W_f_s
+  )
+
+  Knockoff.threshold <- apply(W[[i]], 2, knockoff.threshold, fdr = q, offset = 0)
+  Knockoff.threshold.plus <- apply(W[[i]], 2, knockoff.threshold, fdr = q, offset = 1)
+
+  fdp.Knockoff <- fdp.Knockoff.plus <- power.Knockoff <- power.Knockoff.plus <- c()
+  for (j in 1 : ncol(W[[i]])) {
+    fdp.Knockoff[j] <- fdp(which(W[[i]][, j] >= Knockoff.threshold[j]))
+    fdp.Knockoff.plus[j] <- fdp(which(W[[i]][, j] >= Knockoff.threshold.plus[j]))
+    power.Knockoff[j] <- sum(beta[which(W[[i]][, j] >= Knockoff.threshold[j])] != 0) / max(k, 1)
+    power.Knockoff.plus[j] <- sum(beta[which(W[[i]][, j] >= Knockoff.threshold.plus[j])] != 0) / max(k, 1)
+  }
+
+  result[[i]] <- c(
+    fdp(BH.selected), fdp.Knockoff, fdp.Knockoff.plus,
+    power(BH.selected, k), power.Knockoff, power.Knockoff.plus
+  )
+}
+```
+
+```{r, echo = FALSE, message = FALSE}
+par(mar = c(9, 4.5, 0.5, 0.5))
+result.matrix <- matrix(unlist(result), m, byrow = TRUE)
+boxplot(result.matrix[, 1 : 13], ylab = "FDP", las = 2, names = c(
+  "BH",
+  "KO.Equi.Marginal",
+  "KO.SDP.Marginal",
+  "KO.Equi.LASSO",
+  "KO.Equi.LASSO.Random",
+  "KO.SDP.LASSO",
+  "KO.SDP.LASSO.Random",
+  "KO+.Equi.Marginal",
+  "KO+.SDP.Marginal",
+  "KO+.Equi.LASSO",
+  "KO+.Equi.LASSO.Random",
+  "KO+.SDP.LASSO",
+  "KO+.SDP.LASSO.Random"
+), cex.axis = 0.75, border = c("green", rep(c(rep("black", 4), rep("red", 2)), 2))
+)
+points(colMeans(result.matrix[, 1 : 13]), col = "blue", pch = 3)
+abline(h = q, lty = 2, col = "red")
+abline(v = c(1.5, 7.5), col = "maroon")
+
+boxplot(result.matrix[, 14 : 26], ylab = "TDP", las = 2, names = c(
+  "BH",
+  "KO.Equi.Marginal",
+  "KO.SDP.Marginal",
+  "KO.Equi.LASSO",
+  "KO.Equi.LASSO.Random",
+  "KO.SDP.LASSO",
+  "KO.SDP.LASSO.Random",
+  "KO+.Equi.Marginal",
+  "KO+.SDP.Marginal",
+  "KO+.Equi.LASSO",
+  "KO+.Equi.LASSO.Random",
+  "KO+.SDP.LASSO",
+  "KO+.SDP.LASSO.Random"
+), cex.axis = 0.75, border = c("green", rep(c(rep("black", 4), rep("red", 2)), 2))
+)
+points(colMeans(result.matrix[, 14 : 26]), col = "blue", pch = 3)
+abline(v = c(1.5, 7.5), col = "maroon")
+
+null <- setdiff(seq(p), nonzero)
+W.sign <- lapply(W, apply, 2, function(x)(sum(x[null] > 0) / sum(x[null] != 0)))
+W.sign <- matrix(unlist(W.sign), m, byrow = TRUE)
+colnames(W.sign) <- c(
+  "equi + marginaldiff",
+  "sdp + marginaldiff",
+  "equi + stat.glmnet_lambdasmax",
+  "equi + stat.glmnet_lambdasmax + random",
+  "sdp + stat.glmnet_lambdasmax",
+  "sdp + stat.glmnet_lambdasmax + random"
+)
+
+ggplot2::ggplot(data = reshape2::melt(as.data.frame(W.sign)), mapping = aes(x = value)) +
+  geom_histogram(breaks = seq(0, 1, by = 0.05)) +
+  facet_wrap(~ variable, ncol = 2) +
+  labs(x = "Proportion of Null Test Statistics Being Positive") +
+  geom_vline(xintercept = 0.5, col = "red", linetype = "dashed")
 ```
 
 ## Scenario 5: Factor Model for $\hat\beta$
@@ -307,12 +973,13 @@ $$
 set.seed(777)
 d <- 5
 B <- matrix(rnorm(p * d), p, d)
-Cor.X <- cov2cor(round(solve(tcrossprod(B) + diag(p)), 10))
+Cor.X <- cov2cor(round(solve(tcrossprod(B) + diag(p)), 4))
 Cov.X <- Cor.X / n
 X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n) %*% chol(Cor.X)
 Sigma.X <- crossprod(X)
 R.X <- cov2cor(Sigma.X)
 Rho.X <- cor(X)
+Cor.betahat <- cov2cor(solve(Sigma.X))
 Xk_f_e <- knockoff::create.fixed(X, method = "equi")
 Xk_f_e <- Xk_f_e$Xk
 Xk_f_s <- knockoff::create.fixed(X, method = "sdp")
@@ -320,11 +987,11 @@ Xk_f_s <- Xk_f_s$Xk
 Xk_m_g_e <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "equi")
 Xk_m_g_s <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "sdp")
 Xk_m_g_a <- data.frame(matrix(0, n, p))
-tryCatch({Xk_m_g_a <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "asdp")}, error = function(e){})
+tryCatch({Xk_m_g_a <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "asdp")}, error = function(e){Xk_m_g_a <- data.frame(matrix(0, n, p))})
 Xk_m_2_e <- knockoff::create.second_order(X, method = "equi")
 Xk_m_2_s <- knockoff::create.second_order(X, method = "sdp")
 Xk_m_2_a <- data.frame(matrix(0, n, p))
-tryCatch({Xk_m_2_a <- knockoff::create.second_order(X, method = "asdp")}, error = function(e){})
+tryCatch({Xk_m_2_a <- knockoff::create.second_order(X, method = "asdp")}, error = function(e){Xk_m_2_a <- data.frame(matrix(0, n, p))})
 
 corxxk <- matrix(0, p, 8)
 colnames(corxxk) <- c("Fixed_Equi", "Fixed_SDP", "Model_Gaus_Equi", "Model_Gaus_SDP", "Model_Gaus_aSDP", "Model_2nd_Equi", "Model_2nd_SDP", "Model_2nd_aSDP")
@@ -344,9 +1011,130 @@ for (i in 1 : p) {
 hist(Cor.X[lower.tri(Cor.X)], main = "Histogram of population pairwise correlation of columns in X", xlab = expression(paste("Population ", cor(X[i], X[j]))))
 hist(R.X[lower.tri(R.X)], main = "Histogram of sample normalized pairwise inner product of columns in X", xlab = expression(paste("Normalized ", X[i]^T~X[j])))
 hist(Rho.X[lower.tri(Rho.X)], main = "Histogram of sample pairwise correlation of columns in X", xlab = expression(paste("Sample ", cor(X[i], X[j]))))
+hist(Cor.betahat[lower.tri(Cor.betahat)], main = expression(paste("Histogram of population pairwise correlation of ", hat(beta))), xlab = expression(paste("Population ", cor(hat(beta)[i], hat(beta)[j]))))
 par(mfrow = c(1, 1))
 par(mar = c(9, 3.5, 2.5, 1.5))
 boxplot(corxxk, las = 2, main = "Similarity between originals and their knockoffs")
+```
+
+### Fixed Design
+
+```{r factor-betahat fixed, echo = FALSE, cache = TRUE, message = FALSE, warning = FALSE}
+A <- 10
+beta <- rep(0, p)
+nonzero <- sample(p, k)
+beta[nonzero] <- A
+
+W <- result <- list()
+for (i in 1 : m) {
+  y <- X %*% beta + rnorm(n)
+
+  ## Least squares
+  lm.fit <- lm(y ~ X - 1)
+  pvalue <- summary(lm.fit)$coefficients[, 4]
+
+  ## BH
+  BH.fit <- p.adjust(pvalue, method = "BH")
+  BH.selected <- (1 : p)[BH.fit <= q]
+
+  orig <- 1 : p
+  random.order.variable <- sample(2 * p)
+  Z <- knockoff:::lasso_max_lambda(cbind(X, Xk_f_e)[, random.order.variable], y, method = "glmnet", family = "gaussian")
+  Z <- Z[order(random.order.variable)]
+  W_f_e <- pmax(Z[orig], Z[orig + p]) * sign(Z[orig] - Z[orig + p])
+
+  random.order.variable <- sample(2 * p)
+  Z <- knockoff:::lasso_max_lambda(cbind(X, Xk_f_s)[, random.order.variable], y, method = "glmnet", family = "gaussian")
+  Z <- Z[order(random.order.variable)]
+  W_f_s <- pmax(Z[orig], Z[orig + p]) * sign(Z[orig] - Z[orig + p])
+
+  ## Knockoff
+  W[[i]] <- cbind(
+    equi_marginal <- abs(t(X) %*% y) - abs(t(Xk_f_e) %*% y),
+    sdp_marginal <- abs(t(X) %*% y) - abs(t(Xk_f_s) %*% y),
+    equi_lasso <- knockoff::stat.glmnet_lambdasmax(X, Xk_f_e, y),
+    equi_lasso_random <- W_f_e,
+    sdp_lasso <- knockoff::stat.glmnet_lambdasmax(X, Xk_f_s, y),
+    sdp_lasso_random <- W_f_s
+  )
+
+  Knockoff.threshold <- apply(W[[i]], 2, knockoff.threshold, fdr = q, offset = 0)
+  Knockoff.threshold.plus <- apply(W[[i]], 2, knockoff.threshold, fdr = q, offset = 1)
+
+  fdp.Knockoff <- fdp.Knockoff.plus <- power.Knockoff <- power.Knockoff.plus <- c()
+  for (j in 1 : ncol(W[[i]])) {
+    fdp.Knockoff[j] <- fdp(which(W[[i]][, j] >= Knockoff.threshold[j]))
+    fdp.Knockoff.plus[j] <- fdp(which(W[[i]][, j] >= Knockoff.threshold.plus[j]))
+    power.Knockoff[j] <- sum(beta[which(W[[i]][, j] >= Knockoff.threshold[j])] != 0) / max(k, 1)
+    power.Knockoff.plus[j] <- sum(beta[which(W[[i]][, j] >= Knockoff.threshold.plus[j])] != 0) / max(k, 1)
+  }
+
+  result[[i]] <- c(
+    fdp(BH.selected), fdp.Knockoff, fdp.Knockoff.plus,
+    power(BH.selected, k), power.Knockoff, power.Knockoff.plus
+  )
+}
+```
+
+```{r, echo = FALSE, message = FALSE}
+par(mar = c(9, 4.5, 0.5, 0.5))
+result.matrix <- matrix(unlist(result), m, byrow = TRUE)
+boxplot(result.matrix[, 1 : 13], ylab = "FDP", las = 2, names = c(
+  "BH",
+  "KO.Equi.Marginal",
+  "KO.SDP.Marginal",
+  "KO.Equi.LASSO",
+  "KO.Equi.LASSO.Random",
+  "KO.SDP.LASSO",
+  "KO.SDP.LASSO.Random",
+  "KO+.Equi.Marginal",
+  "KO+.SDP.Marginal",
+  "KO+.Equi.LASSO",
+  "KO+.Equi.LASSO.Random",
+  "KO+.SDP.LASSO",
+  "KO+.SDP.LASSO.Random"
+), cex.axis = 0.75, border = c("green", rep(c(rep("black", 4), rep("red", 2)), 2))
+)
+points(colMeans(result.matrix[, 1 : 13]), col = "blue", pch = 3)
+abline(h = q, lty = 2, col = "red")
+abline(v = c(1.5, 7.5), col = "maroon")
+
+boxplot(result.matrix[, 14 : 26], ylab = "TDP", las = 2, names = c(
+  "BH",
+  "KO.Equi.Marginal",
+  "KO.SDP.Marginal",
+  "KO.Equi.LASSO",
+  "KO.Equi.LASSO.Random",
+  "KO.SDP.LASSO",
+  "KO.SDP.LASSO.Random",
+  "KO+.Equi.Marginal",
+  "KO+.SDP.Marginal",
+  "KO+.Equi.LASSO",
+  "KO+.Equi.LASSO.Random",
+  "KO+.SDP.LASSO",
+  "KO+.SDP.LASSO.Random"
+), cex.axis = 0.75, border = c("green", rep(c(rep("black", 4), rep("red", 2)), 2))
+)
+points(colMeans(result.matrix[, 14 : 26]), col = "blue", pch = 3)
+abline(v = c(1.5, 7.5), col = "maroon")
+
+null <- setdiff(seq(p), nonzero)
+W.sign <- lapply(W, apply, 2, function(x)(sum(x[null] > 0) / sum(x[null] != 0)))
+W.sign <- matrix(unlist(W.sign), m, byrow = TRUE)
+colnames(W.sign) <- c(
+  "equi + marginaldiff",
+  "sdp + marginaldiff",
+  "equi + stat.glmnet_lambdasmax",
+  "equi + stat.glmnet_lambdasmax + random",
+  "sdp + stat.glmnet_lambdasmax",
+  "sdp + stat.glmnet_lambdasmax + random"
+)
+
+ggplot2::ggplot(data = reshape2::melt(as.data.frame(W.sign)), mapping = aes(x = value)) +
+  geom_histogram(breaks = seq(0, 1, by = 0.05)) +
+  facet_wrap(~ variable, ncol = 2) +
+  labs(x = "Proportion of Null Test Statistics Being Positive") +
+  geom_vline(xintercept = 0.5, col = "red", linetype = "dashed")
 ```
 
 ## Session information
