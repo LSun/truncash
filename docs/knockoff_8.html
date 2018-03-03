@@ -315,31 +315,102 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2018-03-01</p>
+<p><strong>Last updated:</strong> 2018-03-02</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> f4c819a</p>
+<p><strong>Code version:</strong> 5e91918</p>
 <!-- Add your analysis here -->
 <section id="introduction" class="level2">
 <h2>Introduction</h2>
 <p>The idea in <code>Knockoff</code> is to generate knockoff variables <span class="math inline">\(\tilde X\)</span> which 1) keep the relationship of original variables <span class="math inline">\(X\)</span> 2) are unlike the original variables 3) are null.</p>
-<ul>
-<li><p>For Fixed Knockoff <span class="math display">\[
+<section id="for-fixed-x-knockoff" class="level3">
+<h3>For Fixed-<span class="math inline">\(X\)</span> Knockoff</h3>
+<p><span class="math display">\[
 \begin{array}{c}
 \tilde X_i^T\tilde X_i = X_i^TX_i \\
 \tilde X_i^T\tilde X_j = X_i^T \tilde X_j = \tilde X_i^T X_j = X_i^TX_j \\
-\tilde X_i^T X_i: \text{as small as possible}
+\left|\tilde X_i^T X_i\right|: \text{as small as possible}
 \end{array}
-\]</span></p></li>
-<li><p>For Model-X Knockoff <span class="math display">\[
+\]</span></p>
+<p>The first two constraints are to control the Type I error, whereas the third is to increase power. Furthermore, there are two methods to make <span class="math inline">\(\left|\tilde X_i^T X_i\right|\)</span> as small as possible.</p>
+<ul>
+<li>Equi: <span class="math inline">\(\tilde X_1^T X_1 = \tilde X_2^T X_2 = \cdots = \tilde X_p^T X_p \geq 0\)</span> as close to zero as possible.</li>
+<li>SDP: <span class="math inline">\(\tilde X_1^T X_1 + \tilde X_2^T X_2 + \cdots + \tilde X_p^T X_p\)</span> as close to zero as possible with <span class="math inline">\(\tilde X_i^T X_i \geq 0\)</span>.</li>
+</ul>
+</section>
+<section id="for-model-x-knockoff" class="level3">
+<h3>For Model-X Knockoff</h3>
+<p><span class="math display">\[
 \begin{array}{c}
 Var(X_i) = Var(\tilde X_i) \\
 cor(\tilde X_i, \tilde X_j) = cor(X_i, \tilde X_j)
 = cor(\tilde X_i, X_j) = cor(X_i, X_j) \\
-cor(\tilde X_i, X_i): \text{as small as possible}
+\left|cor(\tilde X_i, X_i)\right|: \text{as small as possible}
 \end{array}
-\]</span></p></li>
+\]</span></p>
+<p>Similarly, the first two constraints are to control the Type I error, whereas the third is to increase power. Furthermore, there are three methods to make <span class="math inline">\(\left|cor(\tilde X_i, X_i)\right|\)</span> as small as possible.</p>
+<ul>
+<li>Equi: <span class="math inline">\(cor(\tilde X_1, X_1) = cor(\tilde X_2, X_2) = \cdots = cor(\tilde X_p, X_p) \geq 0\)</span> as close to zero as possible.</li>
+<li>SDP: <span class="math inline">\(\left|cor(\tilde X_1, X_1)\right| + \left|cor(\tilde X_2, X_2)\right| + \cdots + \left|cor(\tilde X_p, X_p)\right|\)</span> as small as possible.</li>
+<li>aSDP: An approximation to SDP to speed it up and also retain the power to some extend.</li>
 </ul>
+<p>After centering <span class="math inline">\(X_j\)</span>’s, the constraints on the Fix-<span class="math inline">\(X\)</span> design can be seen as the constraints on the <strong>sample correlation</strong> structure, whereas those on the Model-<span class="math inline">\(X\)</span> design as on the <strong>population correlation</strong> structure. It’s no wonder the Model-<span class="math inline">\(X\)</span> design is believed to be more relaxed, and hence, more powerful.</p>
+<pre class="r"><code>n &lt;- 3000
+p &lt;- 1000</code></pre>
+</section>
+</section>
+<section id="scenario-1-independent-gaussian-columns" class="level2">
+<h2>Scenario 1: Independent Gaussian Columns</h2>
+<p><span class="math display">\[
+X_{ij} \overset{iid}{\sim} N\left(0, \left(\frac{1}{\sqrt n}\right)^2\right)
+\]</span></p>
+<p><img src="figure/knockoff_8.rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_8.rmd/unnamed-chunk-3-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_8.rmd/unnamed-chunk-3-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_8.rmd/unnamed-chunk-3-4.png" width="672" style="display: block; margin: auto;" /></p>
+</section>
+<section id="scenario-2-equal-correlation" class="level2">
+<h2>Scenario 2: Equal-correlation</h2>
+<p><span class="math display">\[
+\begin{array}{c}
+X_{ij} \sim N\left(0, \left(\frac{1}{\sqrt n}\right)^2\right) \\
+cor(X_{ij}, X_{ij&#39;}) \equiv \rho = 0.5
+\end{array}
+\]</span></p>
+<pre><code>NULL</code></pre>
+<p><img src="figure/knockoff_8.rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_8.rmd/unnamed-chunk-4-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_8.rmd/unnamed-chunk-4-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_8.rmd/unnamed-chunk-4-4.png" width="672" style="display: block; margin: auto;" /></p>
+</section>
+<section id="scenario-3-extreme-local-correlation" class="level2">
+<h2>Scenario 3: Extreme local correlation</h2>
+<p><span class="math display">\[
+\begin{array}{c}
+X_{ij} \sim N\left(0, \left(\frac{1}{\sqrt n}\right)^2\right) \\
+cor(X_{i1}, X_{i2})  = cor(X_{i3}, X_{i4}) = \cdots = cor(X_{i(p-1)}, X_{ip}) = \rho = 0.99
+\end{array}
+\]</span></p>
+<pre><code>NULL</code></pre>
+<pre><code>NULL</code></pre>
+<p><img src="figure/knockoff_8.rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_8.rmd/unnamed-chunk-5-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_8.rmd/unnamed-chunk-5-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_8.rmd/unnamed-chunk-5-4.png" width="672" style="display: block; margin: auto;" /></p>
+</section>
+<section id="scenario-4-factor-model-for-x" class="level2">
+<h2>Scenario 4: Factor Model for <span class="math inline">\(X\)</span></h2>
+<p><span class="math display">\[
+\begin{array}{c}
+\text{each row }X_{i}^T \sim N\left(0, \frac{1}n\Sigma_{p}\right) \\
+\Sigma_p = \texttt{cov2cor}(B_{p \times d}B_{d\times p}^T + I)\\
+B_{ij} \overset{iid}{\sim} N(0, 1)
+\end{array}
+\]</span></p>
+<pre><code>NULL</code></pre>
+<p><img src="figure/knockoff_8.rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_8.rmd/unnamed-chunk-6-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_8.rmd/unnamed-chunk-6-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_8.rmd/unnamed-chunk-6-4.png" width="672" style="display: block; margin: auto;" /></p>
+</section>
+<section id="scenario-5-factor-model-for-hatbeta" class="level2">
+<h2>Scenario 5: Factor Model for <span class="math inline">\(\hat\beta\)</span></h2>
+<p><span class="math display">\[
+\begin{array}{c}
+\text{each row }X_{i}^T \sim N\left(0, \frac{1}n\Sigma_{p}\right) \\
+\Sigma_p = \texttt{cov2cor}(\left(B_{p \times d}B_{d\times p}^T + I\right)^{-1})\\
+B_{ij} \overset{iid}{\sim} N(0, 1)
+\end{array}
+\]</span></p>
+<p><img src="figure/knockoff_8.rmd/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_8.rmd/unnamed-chunk-7-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_8.rmd/unnamed-chunk-7-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_8.rmd/unnamed-chunk-7-4.png" width="672" style="display: block; margin: auto;" /></p>
 </section>
 <section id="session-information" class="level2">
 <h2>Session information</h2>
@@ -359,11 +430,15 @@ locale:
 attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
+other attached packages:
+[1] Matrix_1.2-12  knockoff_0.3.0
+
 loaded via a namespace (and not attached):
- [1] compiler_3.4.3  backports_1.1.2 magrittr_1.5    rprojroot_1.3-2
- [5] tools_3.4.3     htmltools_0.3.6 yaml_2.1.16     Rcpp_0.12.15   
- [9] stringi_1.1.6   rmarkdown_1.8   knitr_1.19      git2r_0.21.0   
-[13] stringr_1.2.0   digest_0.6.15   evaluate_0.10.1</code></pre>
+ [1] Rcpp_0.12.14    lattice_0.20-35 digest_0.6.14   rprojroot_1.3-2
+ [5] grid_3.4.3      backports_1.1.2 git2r_0.21.0    magrittr_1.5   
+ [9] evaluate_0.10.1 stringi_1.1.6   rmarkdown_1.8   tools_3.4.3    
+[13] stringr_1.2.0   yaml_2.1.16     compiler_3.4.3  htmltools_0.3.6
+[17] knitr_1.19     </code></pre>
 </section>
 
 <hr>
