@@ -30,26 +30,324 @@ knitr::read_chunk("chunks.R")
 
 The idea in `Knockoff` is to generate knockoff variables $\tilde X$ which 1) keep the relationship of original variables $X$ 2) are unlike the original variables 3) are null.
 
-- For Fixed-$X$ Knockoff
+### For Fixed-$X$ Knockoff
+
 $$
 \begin{array}{c}
 \tilde X_i^T\tilde X_i = X_i^TX_i \\
 \tilde X_i^T\tilde X_j = X_i^T \tilde X_j = \tilde X_i^T X_j = X_i^TX_j \\
-\tilde X_i^T X_i: \text{as small as possible}
+\left|\tilde X_i^T X_i\right|: \text{as small as possible}
 \end{array}
 $$
 
-- For Model-X Knockoff
+The first two constraints are to control the Type I error, whereas the third is to increase power. Furthermore, there are two methods to make $\left|\tilde X_i^T X_i\right|$ as small as possible.
+
+- Equi: $\tilde X_1^T X_1 = \tilde X_2^T X_2 = \cdots = \tilde X_p^T X_p \geq 0$ as close to zero as possible.
+- SDP: $\tilde X_1^T X_1 + \tilde X_2^T X_2 + \cdots + \tilde X_p^T X_p$ as close to zero as possible with $\tilde X_i^T X_i \geq 0$.
+
+### For Model-X Knockoff
+
 $$
 \begin{array}{c}
 Var(X_i) = Var(\tilde X_i) \\
 cor(\tilde X_i, \tilde X_j) = cor(X_i, \tilde X_j)
 = cor(\tilde X_i, X_j) = cor(X_i, X_j) \\
-cor(\tilde X_i, X_i): \text{as small as possible}
+\left|cor(\tilde X_i, X_i)\right|: \text{as small as possible}
 \end{array}
 $$
 
+Similarly, the first two constraints are to control the Type I error, whereas the third is to increase power. Furthermore, there are three methods to make $\left|cor(\tilde X_i, X_i)\right|$ as small as possible.
+
+- Equi: $cor(\tilde X_1, X_1) = cor(\tilde X_2, X_2) = \cdots = cor(\tilde X_p, X_p) \geq 0$ as close to zero as possible.
+- SDP: $\left|cor(\tilde X_1, X_1)\right| + \left|cor(\tilde X_2, X_2)\right| + \cdots + \left|cor(\tilde X_p, X_p)\right|$ as small as possible.
+- aSDP: An approximation to SDP to speed it up and also retain the power to some extend.
+
 After centering $X_j$'s, the constraints on the Fix-$X$ design can be seen as the constraints on the **sample correlation** structure, whereas those on the Model-$X$ design as on the **population correlation** structure. It's no wonder the Model-$X$ design is believed to be more relaxed, and hence, more powerful.
+
+```{r, echo = FALSE, message = FALSE}
+library(knockoff)
+library(Matrix)
+```
+
+```{r}
+n <- 3000
+p <- 1000
+```
+
+## Scenario 1: Independent Gaussian Columns
+
+$$
+X_{ij} \overset{iid}{\sim} N\left(0, \left(\frac{1}{\sqrt n}\right)^2\right)
+$$
+
+```{r indep, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
+set.seed(777)
+X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n, p)
+Cov.X <- diag(1 / n, p)
+Cor.X <- cov2cor(Cov.X)
+Sigma.X <- crossprod(X)
+R.X <- cov2cor(Sigma.X)
+Rho.X <- cor(X)
+Xk_f_e <- knockoff::create.fixed(X, method = "equi")
+Xk_f_e <- Xk_f_e$Xk
+Xk_f_s <- knockoff::create.fixed(X, method = "sdp")
+Xk_f_s <- Xk_f_s$Xk
+Xk_m_g_e <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "equi")
+Xk_m_g_s <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "sdp")
+Xk_m_g_a <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "asdp")
+Xk_m_2_e <- knockoff::create.second_order(X, method = "equi")
+Xk_m_2_s <- knockoff::create.second_order(X, method = "sdp")
+Xk_m_2_a <- knockoff::create.second_order(X, method = "asdp")
+
+corxxk <- matrix(0, p, 8)
+colnames(corxxk) <- c("Fixed_Equi", "Fixed_SDP", "Model_Gaus_Equi", "Model_Gaus_SDP", "Model_Gaus_aSDP", "Model_2nd_Equi", "Model_2nd_SDP", "Model_2nd_aSDP")
+for (i in 1 : p) {
+  corxxk[i, 1] <- sum(X[, i] * Xk_f_e[, i]) / sqrt(sum(X[, i]^2) * sum(Xk_f_e[, i]^2))
+  corxxk[i, 2] <- sum(X[, i] * Xk_f_s[, i]) / sqrt(sum(X[, i]^2) * sum(Xk_f_s[, i]^2))
+  corxxk[i, 3] <- cor(X[, i], Xk_m_g_e[, i])
+  corxxk[i, 4] <- cor(X[, i], Xk_m_g_s[, i])
+  corxxk[i, 5] <- cor(X[, i], Xk_m_g_a[, i])
+  corxxk[i, 6] <- cor(X[, i], Xk_m_2_e[, i])
+  corxxk[i, 7] <- cor(X[, i], Xk_m_2_s[, i])
+  corxxk[i, 8] <- cor(X[, i], Xk_m_2_a[, i])
+}
+```
+
+```{r, echo = FALSE}
+hist(Cor.X[lower.tri(Cor.X)], main = "Histogram of population pairwise correlation of columns in X", xlab = expression(paste("Population ", cor(X[i], X[j]))), breaks = seq(-0.45, 0.45, by = 0.1))
+hist(R.X[lower.tri(R.X)], main = "Histogram of sample normalized pairwise inner product of columns in X", xlab = expression(paste("Normalized ", X[i]^T~X[j])))
+hist(Rho.X[lower.tri(Rho.X)], main = "Histogram of sample pairwise correlation of columns in X", xlab = expression(paste("Sample ", cor(X[i], X[j]))))
+par(mfrow = c(1, 1))
+par(mar = c(9, 2.5, 2.5, 1.5))
+boxplot(corxxk, las = 2, main = "Similarity between originals and their knockoffs")
+```
+
+## Scenario 2: Equal-correlation
+
+$$
+\begin{array}{c}
+X_{ij} \sim N\left(0, \left(\frac{1}{\sqrt n}\right)^2\right) \\
+cor(X_{ij}, X_{ij'}) \equiv \rho = 0.5
+\end{array}
+$$
+
+```{r equal-cor, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
+set.seed(777)
+rho <- 0.5
+Z <- rnorm(n, 0, sqrt(1 / n))
+X <- sqrt(rho) * Z + sqrt(1 - rho) * matrix(rnorm(n * p, 0, sqrt(1 / n)), n, p)
+Cov.X <- (1 - rho) * diag(1 / n, p) + rho * matrix(1 / n, p, p)
+Cor.X <- cov2cor(Cov.X)
+Sigma.X <- crossprod(X)
+R.X <- cov2cor(Sigma.X)
+Rho.X <- cor(X)
+Xk_f_e <- knockoff::create.fixed(X, method = "equi")
+Xk_f_e <- Xk_f_e$Xk
+Xk_f_s <- knockoff::create.fixed(X, method = "sdp")
+Xk_f_s <- Xk_f_s$Xk
+Xk_m_g_e <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "equi")
+Xk_m_g_s <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "sdp")
+Xk_m_g_a <- data.frame(matrix(0, n, p))
+tryCatch({Xk_m_g_a <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "asdp")}, error = function(w){})
+Xk_m_2_e <- knockoff::create.second_order(X, method = "equi")
+Xk_m_2_s <- knockoff::create.second_order(X, method = "sdp")
+Xk_m_2_a <- knockoff::create.second_order(X, method = "asdp")
+
+corxxk <- matrix(0, p, 8)
+colnames(corxxk) <- c("Fixed_Equi", "Fixed_SDP", "Model_Gaus_Equi", "Model_Gaus_SDP", "Model_Gaus_aSDP", "Model_2nd_Equi", "Model_2nd_SDP", "Model_2nd_aSDP")
+for (i in 1 : p) {
+  corxxk[i, 1] <- sum(X[, i] * Xk_f_e[, i]) / sqrt(sum(X[, i]^2) * sum(Xk_f_e[, i]^2))
+  corxxk[i, 2] <- sum(X[, i] * Xk_f_s[, i]) / sqrt(sum(X[, i]^2) * sum(Xk_f_s[, i]^2))
+  corxxk[i, 3] <- cor(X[, i], Xk_m_g_e[, i])
+  corxxk[i, 4] <- cor(X[, i], Xk_m_g_s[, i])
+  corxxk[i, 5] <- cor(X[, i], Xk_m_g_a[, i])
+  corxxk[i, 6] <- cor(X[, i], Xk_m_2_e[, i])
+  corxxk[i, 7] <- cor(X[, i], Xk_m_2_s[, i])
+  corxxk[i, 8] <- cor(X[, i], Xk_m_2_a[, i])
+}
+```
+
+```{r, echo = FALSE}
+hist(Cor.X[lower.tri(Cor.X)], main = "Histogram of population pairwise correlation of columns in X", xlab = expression(paste("Population ", cor(X[i], X[j]))), breaks = seq(0.05, 0.95, by = 0.1))
+hist(R.X[lower.tri(R.X)], main = "Histogram of sample normalized pairwise inner product of columns in X", xlab = expression(paste("Normalized ", X[i]^T~X[j])))
+hist(Rho.X[lower.tri(Rho.X)], main = "Histogram of sample pairwise correlation of columns in X", xlab = expression(paste("Sample ", cor(X[i], X[j]))))
+par(mfrow = c(1, 1))
+par(mar = c(9, 2.5, 2.5, 1.5))
+boxplot(corxxk, las = 2, main = "Similarity between originals and their knockoffs")
+```
+
+## Scenario 3: Extreme local correlation
+
+$$
+\begin{array}{c}
+X_{ij} \sim N\left(0, \left(\frac{1}{\sqrt n}\right)^2\right) \\
+cor(X_{i1}, X_{i2})  = cor(X_{i3}, X_{i4}) = \cdots = cor(X_{i(p-1)}, X_{ip}) = \rho = 0.99
+\end{array}
+$$
+
+```{r extr-local-cor, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
+set.seed(777)
+rho <- 0.99
+Z1 <- matrix(rnorm(n * p / 2, 0, sqrt(1 / n)), n)
+Z2 <- rho * Z1 + sqrt(1 - rho^2) * matrix(rnorm(n * p / 2, 0, sqrt(1 / n)), n)
+X <- matrix(0, n, p)
+X[, seq(1, p, by = 2)] = Z1
+X[, seq(2, p, by = 2)] = Z2
+cor.x <- matrix(c(1, rho, rho, 1), 2, 2)
+cor.x.list <- list()
+for (i in 1 : (p / 2)) {cor.x.list[[i]] <- cor.x}
+Cor.X <- as.matrix(Matrix::bdiag(cor.x.list))
+Cov.X <- Cor.X * 1 / n
+Sigma.X <- crossprod(X)
+R.X <- cov2cor(Sigma.X)
+Rho.X <- cor(X)
+Xk_f_e <- knockoff::create.fixed(X, method = "equi")
+Xk_f_e <- Xk_f_e$Xk
+Xk_f_s <- knockoff::create.fixed(X, method = "sdp")
+Xk_f_s <- Xk_f_s$Xk
+Xk_m_g_e <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "equi")
+Xk_m_g_s <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "sdp")
+Xk_m_g_a <- data.frame(matrix(0, n, p))
+tryCatch({Xk_m_g_a <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "asdp")}, error = function(e){})
+Xk_m_2_e <- knockoff::create.second_order(X, method = "equi")
+Xk_m_2_s <- knockoff::create.second_order(X, method = "sdp")
+Xk_m_2_a <- data.frame(matrix(0, n, p))
+tryCatch({Xk_m_2_a <- knockoff::create.second_order(X, method = "asdp")}, error = function(e){})
+
+corxxk <- matrix(0, p, 8)
+colnames(corxxk) <- c("Fixed_Equi", "Fixed_SDP", "Model_Gaus_Equi", "Model_Gaus_SDP", "Model_Gaus_aSDP", "Model_2nd_Equi", "Model_2nd_SDP", "Model_2nd_aSDP")
+for (i in 1 : p) {
+  corxxk[i, 1] <- sum(X[, i] * Xk_f_e[, i]) / sqrt(sum(X[, i]^2) * sum(Xk_f_e[, i]^2))
+  corxxk[i, 2] <- sum(X[, i] * Xk_f_s[, i]) / sqrt(sum(X[, i]^2) * sum(Xk_f_s[, i]^2))
+  corxxk[i, 3] <- cor(X[, i], Xk_m_g_e[, i])
+  corxxk[i, 4] <- cor(X[, i], Xk_m_g_s[, i])
+  corxxk[i, 5] <- cor(X[, i], Xk_m_g_a[, i])
+  corxxk[i, 6] <- cor(X[, i], Xk_m_2_e[, i])
+  corxxk[i, 7] <- cor(X[, i], Xk_m_2_s[, i])
+  corxxk[i, 8] <- cor(X[, i], Xk_m_2_a[, i])
+}
+```
+
+```{r, echo = FALSE}
+hist(Cor.X[lower.tri(Cor.X)], main = "Histogram of population pairwise correlation of columns in X", xlab = expression(paste("Population ", cor(X[i], X[j]))))
+hist(R.X[lower.tri(R.X)], main = "Histogram of sample normalized pairwise inner product of columns in X", xlab = expression(paste("Normalized ", X[i]^T~X[j])))
+hist(Rho.X[lower.tri(Rho.X)], main = "Histogram of sample pairwise correlation of columns in X", xlab = expression(paste("Sample ", cor(X[i], X[j]))))
+par(mfrow = c(1, 1))
+par(mar = c(9, 3.5, 2.5, 1.5))
+boxplot(corxxk, las = 2, main = "Similarity between originals and their knockoffs")
+```
+
+## Scenario 4: Factor Model for $X$
+
+$$
+\begin{array}{c}
+\text{each row }X_{i}^T \sim N\left(0, \frac{1}n\Sigma_{p}\right) \\
+\Sigma_p = \texttt{cov2cor}(B_{p \times d}B_{d\times p}^T + I)\\
+B_{ij} \overset{iid}{\sim} N(0, 1)
+\end{array}
+$$
+
+```{r factor-x, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
+set.seed(777)
+d <- 5
+B <- matrix(rnorm(p * d), p, d)
+Cor.X <- cov2cor(tcrossprod(B) + diag(p))
+Cov.X <- Cor.X / n
+X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n) %*% chol(Cor.X)
+Sigma.X <- crossprod(X)
+R.X <- cov2cor(Sigma.X)
+Rho.X <- cor(X)
+Xk_f_e <- knockoff::create.fixed(X, method = "equi")
+Xk_f_e <- Xk_f_e$Xk
+Xk_f_s <- knockoff::create.fixed(X, method = "sdp")
+Xk_f_s <- Xk_f_s$Xk
+Xk_m_g_e <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "equi")
+Xk_m_g_s <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "sdp")
+Xk_m_g_a <- data.frame(matrix(0, n, p))
+tryCatch({Xk_m_g_a <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "asdp")}, error = function(e){})
+Xk_m_2_e <- knockoff::create.second_order(X, method = "equi")
+Xk_m_2_s <- knockoff::create.second_order(X, method = "sdp")
+Xk_m_2_a <- data.frame(matrix(0, n, p))
+tryCatch({Xk_m_2_a <- knockoff::create.second_order(X, method = "asdp")}, error = function(e){})
+
+corxxk <- matrix(0, p, 8)
+colnames(corxxk) <- c("Fixed_Equi", "Fixed_SDP", "Model_Gaus_Equi", "Model_Gaus_SDP", "Model_Gaus_aSDP", "Model_2nd_Equi", "Model_2nd_SDP", "Model_2nd_aSDP")
+for (i in 1 : p) {
+  corxxk[i, 1] <- sum(X[, i] * Xk_f_e[, i]) / sqrt(sum(X[, i]^2) * sum(Xk_f_e[, i]^2))
+  corxxk[i, 2] <- sum(X[, i] * Xk_f_s[, i]) / sqrt(sum(X[, i]^2) * sum(Xk_f_s[, i]^2))
+  corxxk[i, 3] <- cor(X[, i], Xk_m_g_e[, i])
+  corxxk[i, 4] <- cor(X[, i], Xk_m_g_s[, i])
+  corxxk[i, 5] <- cor(X[, i], Xk_m_g_a[, i])
+  corxxk[i, 6] <- cor(X[, i], Xk_m_2_e[, i])
+  corxxk[i, 7] <- cor(X[, i], Xk_m_2_s[, i])
+  corxxk[i, 8] <- cor(X[, i], Xk_m_2_a[, i])
+}
+```
+
+```{r, echo = FALSE}
+hist(Cor.X[lower.tri(Cor.X)], main = "Histogram of population pairwise correlation of columns in X", xlab = expression(paste("Population ", cor(X[i], X[j]))))
+hist(R.X[lower.tri(R.X)], main = "Histogram of sample normalized pairwise inner product of columns in X", xlab = expression(paste("Normalized ", X[i]^T~X[j])))
+hist(Rho.X[lower.tri(Rho.X)], main = "Histogram of sample pairwise correlation of columns in X", xlab = expression(paste("Sample ", cor(X[i], X[j]))))
+par(mfrow = c(1, 1))
+par(mar = c(9, 3.5, 2.5, 1.5))
+boxplot(corxxk, las = 2, main = "Similarity between originals and their knockoffs")
+```
+
+## Scenario 5: Factor Model for $\hat\beta$
+
+$$
+\begin{array}{c}
+\text{each row }X_{i}^T \sim N\left(0, \frac{1}n\Sigma_{p}\right) \\
+\Sigma_p = \texttt{cov2cor}(\left(B_{p \times d}B_{d\times p}^T + I\right)^{-1})\\
+B_{ij} \overset{iid}{\sim} N(0, 1)
+\end{array}
+$$
+
+```{r factor-betahat, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
+set.seed(777)
+d <- 5
+B <- matrix(rnorm(p * d), p, d)
+Cor.X <- cov2cor(round(solve(tcrossprod(B) + diag(p)), 10))
+Cov.X <- Cor.X / n
+X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n) %*% chol(Cor.X)
+Sigma.X <- crossprod(X)
+R.X <- cov2cor(Sigma.X)
+Rho.X <- cor(X)
+Xk_f_e <- knockoff::create.fixed(X, method = "equi")
+Xk_f_e <- Xk_f_e$Xk
+Xk_f_s <- knockoff::create.fixed(X, method = "sdp")
+Xk_f_s <- Xk_f_s$Xk
+Xk_m_g_e <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "equi")
+Xk_m_g_s <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "sdp")
+Xk_m_g_a <- data.frame(matrix(0, n, p))
+tryCatch({Xk_m_g_a <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "asdp")}, error = function(e){})
+Xk_m_2_e <- knockoff::create.second_order(X, method = "equi")
+Xk_m_2_s <- knockoff::create.second_order(X, method = "sdp")
+Xk_m_2_a <- data.frame(matrix(0, n, p))
+tryCatch({Xk_m_2_a <- knockoff::create.second_order(X, method = "asdp")}, error = function(e){})
+
+corxxk <- matrix(0, p, 8)
+colnames(corxxk) <- c("Fixed_Equi", "Fixed_SDP", "Model_Gaus_Equi", "Model_Gaus_SDP", "Model_Gaus_aSDP", "Model_2nd_Equi", "Model_2nd_SDP", "Model_2nd_aSDP")
+for (i in 1 : p) {
+  corxxk[i, 1] <- sum(X[, i] * Xk_f_e[, i]) / sqrt(sum(X[, i]^2) * sum(Xk_f_e[, i]^2))
+  corxxk[i, 2] <- sum(X[, i] * Xk_f_s[, i]) / sqrt(sum(X[, i]^2) * sum(Xk_f_s[, i]^2))
+  corxxk[i, 3] <- cor(X[, i], Xk_m_g_e[, i])
+  corxxk[i, 4] <- cor(X[, i], Xk_m_g_s[, i])
+  corxxk[i, 5] <- cor(X[, i], Xk_m_g_a[, i])
+  corxxk[i, 6] <- cor(X[, i], Xk_m_2_e[, i])
+  corxxk[i, 7] <- cor(X[, i], Xk_m_2_s[, i])
+  corxxk[i, 8] <- cor(X[, i], Xk_m_2_a[, i])
+}
+```
+
+```{r, echo = FALSE}
+hist(Cor.X[lower.tri(Cor.X)], main = "Histogram of population pairwise correlation of columns in X", xlab = expression(paste("Population ", cor(X[i], X[j]))))
+hist(R.X[lower.tri(R.X)], main = "Histogram of sample normalized pairwise inner product of columns in X", xlab = expression(paste("Normalized ", X[i]^T~X[j])))
+hist(Rho.X[lower.tri(Rho.X)], main = "Histogram of sample pairwise correlation of columns in X", xlab = expression(paste("Sample ", cor(X[i], X[j]))))
+par(mfrow = c(1, 1))
+par(mar = c(9, 3.5, 2.5, 1.5))
+boxplot(corxxk, las = 2, main = "Similarity between originals and their knockoffs")
+```
 
 ## Session information
 
