@@ -258,7 +258,6 @@ ggplot2::ggplot(data = reshape2::melt(as.data.frame(W.sign)), mapping = aes(x = 
 ### Model-$X$ Design
 
 ```{r indep model, echo = FALSE, cache = TRUE, message = FALSE, warning = FALSE}
-beta <- rep(0, p)
 A <- 4
 
 W <- result <- list()
@@ -271,6 +270,7 @@ for (i in 1 : m) {
   Xk_m_2_e <- knockoff::create.second_order(X, method = "equi")
   Xk_m_2_s <- knockoff::create.second_order(X, method = "sdp")
   
+  beta <- rep(0, p)
   nonzero <- sample(p, k)
   beta[nonzero] <- A
   
@@ -588,7 +588,6 @@ ggplot2::ggplot(data = reshape2::melt(as.data.frame(W.sign)), mapping = aes(x = 
 #### Model-$X$ Design
 
 ```{r equal-cor model, echo = FALSE, cache = TRUE, message = FALSE, warning = FALSE}
-beta <- rep(0, p)
 A <- 5
 
 W <- result <- list()
@@ -602,6 +601,7 @@ for (i in 1 : m) {
   Xk_m_2_e <- knockoff::create.second_order(X, method = "equi")
   Xk_m_2_s <- knockoff::create.second_order(X, method = "sdp")
   
+  beta <- rep(0, p)
   nonzero <- sample(p, k)
   beta[nonzero] <- A
   
@@ -910,7 +910,6 @@ ggplot2::ggplot(data = reshape2::melt(as.data.frame(W.sign)), mapping = aes(x = 
 #### Model-$X$ Design
 
 ```{r equal-cor-2 model, echo = FALSE, cache = TRUE, message = FALSE, warning = FALSE}
-beta <- rep(0, p)
 A <- 40
 
 W <- result <- list()
@@ -924,6 +923,7 @@ for (i in 1 : m) {
   Xk_m_2_e <- knockoff::create.second_order(X, method = "equi")
   Xk_m_2_s <- knockoff::create.second_order(X, method = "sdp")
   
+  beta <- rep(0, p)
   nonzero <- sample(p, k)
   beta[nonzero] <- A
   
@@ -1245,7 +1245,6 @@ ggplot2::ggplot(data = reshape2::melt(as.data.frame(W.sign)), mapping = aes(x = 
 ### Model-$X$ Design
 
 ```{r extr-local-cor model, echo = FALSE, cache = TRUE, message = FALSE, warning = FALSE}
-beta <- rep(0, p)
 A <- 30
 
 W <- result <- list()
@@ -1262,6 +1261,7 @@ for (i in 1 : m) {
   Xk_m_2_e <- knockoff::create.second_order(X, method = "equi")
   Xk_m_2_s <- knockoff::create.second_order(X, method = "sdp")
   
+  beta <- rep(0, p)
   nonzero <- sample(seq(1, p, by = 2), k)
   beta[nonzero] <- A
 
@@ -1578,7 +1578,6 @@ ggplot2::ggplot(data = reshape2::melt(as.data.frame(W.sign)), mapping = aes(x = 
 ### Model-$X$ Design
 
 ```{r factor-x model, echo = FALSE, cache = TRUE, message = FALSE, warning = FALSE}
-beta <- rep(0, p)
 A <- 10
 
 W <- result <- list()
@@ -1591,6 +1590,7 @@ for (i in 1 : m) {
   Xk_m_2_e <- knockoff::create.second_order(X, method = "equi")
   Xk_m_2_s <- knockoff::create.second_order(X, method = "sdp")
   
+  beta <- rep(0, p)
   nonzero <- sample(p, k)
   beta[nonzero] <- A
   
@@ -1907,7 +1907,6 @@ ggplot2::ggplot(data = reshape2::melt(as.data.frame(W.sign)), mapping = aes(x = 
 ### Model-$X$ Design
 
 ```{r factor-betahat model, echo = FALSE, cache = TRUE, message = FALSE, warning = FALSE}
-beta <- rep(0, p)
 A <- 10
 
 W <- result <- list()
@@ -1920,6 +1919,7 @@ for (i in 1 : m) {
   Xk_m_2_e <- knockoff::create.second_order(X, method = "equi")
   Xk_m_2_s <- knockoff::create.second_order(X, method = "sdp")
   
+  beta <- rep(0, p)
   nonzero <- sample(p, k)
   beta[nonzero] <- A
   
