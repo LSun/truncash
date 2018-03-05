@@ -592,7 +592,7 @@ ggplot2::ggplot(data = reshape2::melt(as.data.frame(W.sign)), mapping = aes(x = 
 ```{r equal-cor model, echo = FALSE, cache = TRUE, message = FALSE, warning = FALSE}
 A <- 5
 
-W <- result <- list()
+nonzero.list <- W <- W.sign <- result <- list()
 
 for (i in 1 : m) {
   Z <- rnorm(n, 0, sqrt(1 / n))
@@ -605,6 +605,8 @@ for (i in 1 : m) {
   
   beta <- rep(0, p)
   nonzero <- sample(p, k)
+  nonzero.list[[i]] <- nonzero
+  null <- setdiff(seq(p), nonzero)
   beta[nonzero] <- A
   
   y <- X %*% beta + rnorm(n)
@@ -649,6 +651,8 @@ for (i in 1 : m) {
     est_sdp <- knockoff::stat.glmnet_coefdiff(X, Xk_m_2_s, y, cores = ncores),
     est_sdp_random <- W_m_2_s
   )
+  
+  W.sign[[i]] <- apply(W[[i]], 2, function (x) {sum(x[null] > 0) / sum(x[null] != 0)})
 
   Knockoff.threshold <- apply(W[[i]], 2, knockoff.threshold, fdr = q, offset = 0)
   Knockoff.threshold.plus <- apply(W[[i]], 2, knockoff.threshold, fdr = q, offset = 1)
@@ -718,10 +722,9 @@ boxplot(result.matrix[, 18 : 34], ylab = "TDP", las = 2, names = c(
 points(colMeans(result.matrix[, 18 : 34]), col = "blue", pch = 3)
 abline(v = c(1.5, 9.5), col = "maroon")
 
-null <- setdiff(seq(p), nonzero)
-W.sign <- lapply(W, apply, 2, function(x)(sum(x[null] > 0) / sum(x[null] != 0)))
-W.sign <- matrix(unlist(W.sign), m, byrow = TRUE)
-colnames(W.sign) <- c(
+
+W.sign.matrix <- matrix(unlist(W.sign), m, byrow = TRUE)
+colnames(W.sign.matrix) <- c(
   "Gauss + Equi",
   "Gauss + Equi + Random",
   "Gauss + SDP",
@@ -732,7 +735,7 @@ colnames(W.sign) <- c(
   "2nd + SDP + Random"
 )
 
-ggplot2::ggplot(data = reshape2::melt(as.data.frame(W.sign)), mapping = aes(x = value)) +
+ggplot2::ggplot(data = reshape2::melt(as.data.frame(W.sign.matrix)), mapping = aes(x = value)) +
   geom_histogram(breaks = seq(0, 1, by = 0.05)) +
   facet_wrap(~ variable, ncol = 2) +
   labs(x = "Proportion of Null Test Statistics Being Positive") +
@@ -914,7 +917,7 @@ ggplot2::ggplot(data = reshape2::melt(as.data.frame(W.sign)), mapping = aes(x = 
 ```{r equal-cor-2 model, echo = FALSE, cache = TRUE, message = FALSE, warning = FALSE}
 A <- 40
 
-W <- result <- list()
+nonzero.list <- W.sign <- W <- result <- list()
 
 for (i in 1 : m) {
   Z <- rnorm(n, 0, sqrt(1 / n))
@@ -927,6 +930,8 @@ for (i in 1 : m) {
   
   beta <- rep(0, p)
   nonzero <- sample(p, k)
+  nonzero.list[[i]] <- nonzero
+  null <- setdiff(seq(p), nonzero)
   beta[nonzero] <- A
   
   y <- X %*% beta + rnorm(n)
@@ -971,6 +976,8 @@ for (i in 1 : m) {
     est_sdp <- knockoff::stat.glmnet_coefdiff(X, Xk_m_2_s, y, cores = ncores),
     est_sdp_random <- W_m_2_s
   )
+  
+  W.sign[[i]] <- apply(W[[i]], 2, function (x) {sum(x[null] > 0) / sum(x[null] != 0)})
 
   Knockoff.threshold <- apply(W[[i]], 2, knockoff.threshold, fdr = q, offset = 0)
   Knockoff.threshold.plus <- apply(W[[i]], 2, knockoff.threshold, fdr = q, offset = 1)
@@ -1040,10 +1047,8 @@ boxplot(result.matrix[, 18 : 34], ylab = "TDP", las = 2, names = c(
 points(colMeans(result.matrix[, 18 : 34]), col = "blue", pch = 3)
 abline(v = c(1.5, 9.5), col = "maroon")
 
-null <- setdiff(seq(p), nonzero)
-W.sign <- lapply(W, apply, 2, function(x)(sum(x[null] > 0) / sum(x[null] != 0)))
-W.sign <- matrix(unlist(W.sign), m, byrow = TRUE)
-colnames(W.sign) <- c(
+W.sign.matrix <- matrix(unlist(W.sign), m, byrow = TRUE)
+colnames(W.sign.matrix) <- c(
   "Gauss + Equi",
   "Gauss + Equi + Random",
   "Gauss + SDP",
@@ -1054,7 +1059,7 @@ colnames(W.sign) <- c(
   "2nd + SDP + Random"
 )
 
-ggplot2::ggplot(data = reshape2::melt(as.data.frame(W.sign)), mapping = aes(x = value)) +
+ggplot2::ggplot(data = reshape2::melt(as.data.frame(W.sign.matrix)), mapping = aes(x = value)) +
   geom_histogram(breaks = seq(0, 1, by = 0.05)) +
   facet_wrap(~ variable, ncol = 2) +
   labs(x = "Proportion of Null Test Statistics Being Positive") +
@@ -1249,7 +1254,7 @@ ggplot2::ggplot(data = reshape2::melt(as.data.frame(W.sign)), mapping = aes(x = 
 ```{r extr-local-cor model, echo = FALSE, cache = TRUE, message = FALSE, warning = FALSE}
 A <- 30
 
-W <- result <- list()
+nonzero.list <- W.sign <- W <- result <- list()
 
 for (i in 1 : m) {
   Z1 <- matrix(rnorm(n * p / 2, 0, sqrt(1 / n)), n)
@@ -1265,6 +1270,8 @@ for (i in 1 : m) {
   
   beta <- rep(0, p)
   nonzero <- sample(seq(1, p, by = 2), k)
+  nonzero.list[[i]] <- nonzero
+  null <- setdiff(seq(p), nonzero)
   beta[nonzero] <- A
 
   y <- X %*% beta + rnorm(n)
@@ -1310,6 +1317,8 @@ for (i in 1 : m) {
     est_sdp_random <- W_m_2_s
   )
 
+  W.sign[[i]] <- apply(W[[i]], 2, function (x) {sum(x[null] > 0) / sum(x[null] != 0)})
+  
   Knockoff.threshold <- apply(W[[i]], 2, knockoff.threshold, fdr = q, offset = 0)
   Knockoff.threshold.plus <- apply(W[[i]], 2, knockoff.threshold, fdr = q, offset = 1)
 
@@ -1378,10 +1387,8 @@ boxplot(result.matrix[, 18 : 34], ylab = "TDP", las = 2, names = c(
 points(colMeans(result.matrix[, 18 : 34]), col = "blue", pch = 3)
 abline(v = c(1.5, 9.5), col = "maroon")
 
-null <- setdiff(seq(p), nonzero)
-W.sign <- lapply(W, apply, 2, function(x)(sum(x[null] > 0) / sum(x[null] != 0)))
-W.sign <- matrix(unlist(W.sign), m, byrow = TRUE)
-colnames(W.sign) <- c(
+W.sign.matrix <- matrix(unlist(W.sign), m, byrow = TRUE)
+colnames(W.sign.matrix) <- c(
   "Gauss + Equi",
   "Gauss + Equi + Random",
   "Gauss + SDP",
@@ -1392,7 +1399,7 @@ colnames(W.sign) <- c(
   "2nd + SDP + Random"
 )
 
-ggplot2::ggplot(data = reshape2::melt(as.data.frame(W.sign)), mapping = aes(x = value)) +
+ggplot2::ggplot(data = reshape2::melt(as.data.frame(W.sign.matrix)), mapping = aes(x = value)) +
   geom_histogram(breaks = seq(0, 1, by = 0.05)) +
   facet_wrap(~ variable, ncol = 2) +
   labs(x = "Proportion of Null Test Statistics Being Positive") +
@@ -1582,7 +1589,7 @@ ggplot2::ggplot(data = reshape2::melt(as.data.frame(W.sign)), mapping = aes(x = 
 ```{r factor-x model, echo = FALSE, cache = TRUE, message = FALSE, warning = FALSE}
 A <- 10
 
-W <- result <- list()
+nonzero.list <- W.sign <- W <- result <- list()
 
 for (i in 1 : m) {
   X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n) %*% chol(Cor.X)
@@ -1594,6 +1601,8 @@ for (i in 1 : m) {
   
   beta <- rep(0, p)
   nonzero <- sample(p, k)
+  nonzero.list[[i]] <- nonzero
+  null <- setdiff(seq(p), nonzero)
   beta[nonzero] <- A
   
   y <- X %*% beta + rnorm(n)
@@ -1638,6 +1647,8 @@ for (i in 1 : m) {
     est_sdp <- knockoff::stat.glmnet_coefdiff(X, Xk_m_2_s, y, cores = ncores),
     est_sdp_random <- W_m_2_s
   )
+  
+  W.sign[[i]] <- apply(W[[i]], 2, function (x) {sum(x[null] > 0) / sum(x[null] != 0)})
 
   Knockoff.threshold <- apply(W[[i]], 2, knockoff.threshold, fdr = q, offset = 0)
   Knockoff.threshold.plus <- apply(W[[i]], 2, knockoff.threshold, fdr = q, offset = 1)
@@ -1707,10 +1718,8 @@ boxplot(result.matrix[, 18 : 34], ylab = "TDP", las = 2, names = c(
 points(colMeans(result.matrix[, 18 : 34]), col = "blue", pch = 3)
 abline(v = c(1.5, 9.5), col = "maroon")
 
-null <- setdiff(seq(p), nonzero)
-W.sign <- lapply(W, apply, 2, function(x)(sum(x[null] > 0) / sum(x[null] != 0)))
-W.sign <- matrix(unlist(W.sign), m, byrow = TRUE)
-colnames(W.sign) <- c(
+W.sign.matrix <- matrix(unlist(W.sign), m, byrow = TRUE)
+colnames(W.sign.matrix) <- c(
   "Gauss + Equi",
   "Gauss + Equi + Random",
   "Gauss + SDP",
@@ -1721,7 +1730,7 @@ colnames(W.sign) <- c(
   "2nd + SDP + Random"
 )
 
-ggplot2::ggplot(data = reshape2::melt(as.data.frame(W.sign)), mapping = aes(x = value)) +
+ggplot2::ggplot(data = reshape2::melt(as.data.frame(W.sign.matrix)), mapping = aes(x = value)) +
   geom_histogram(breaks = seq(0, 1, by = 0.05)) +
   facet_wrap(~ variable, ncol = 2) +
   labs(x = "Proportion of Null Test Statistics Being Positive") +
@@ -1911,7 +1920,7 @@ ggplot2::ggplot(data = reshape2::melt(as.data.frame(W.sign)), mapping = aes(x = 
 ```{r factor-betahat model, echo = FALSE, cache = TRUE, message = FALSE, warning = FALSE}
 A <- 10
 
-W <- result <- list()
+nonzero.list <- W.sign <- W <- result <- list()
 
 for (i in 1 : m) {
   X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n) %*% chol(Cor.X)
@@ -1923,6 +1932,8 @@ for (i in 1 : m) {
   
   beta <- rep(0, p)
   nonzero <- sample(p, k)
+  nonzero.list[[i]] <- nonzero
+  null <- setdiff(seq(p), nonzero)
   beta[nonzero] <- A
   
   y <- X %*% beta + rnorm(n)
@@ -1967,6 +1978,8 @@ for (i in 1 : m) {
     est_sdp <- knockoff::stat.glmnet_coefdiff(X, Xk_m_2_s, y, cores = ncores),
     est_sdp_random <- W_m_2_s
   )
+  
+  W.sign[[i]] <- apply(W[[i]], 2, function (x) {sum(x[null] > 0) / sum(x[null] != 0)})
 
   Knockoff.threshold <- apply(W[[i]], 2, knockoff.threshold, fdr = q, offset = 0)
   Knockoff.threshold.plus <- apply(W[[i]], 2, knockoff.threshold, fdr = q, offset = 1)
@@ -2036,10 +2049,8 @@ boxplot(result.matrix[, 18 : 34], ylab = "TDP", las = 2, names = c(
 points(colMeans(result.matrix[, 18 : 34]), col = "blue", pch = 3)
 abline(v = c(1.5, 9.5), col = "maroon")
 
-null <- setdiff(seq(p), nonzero)
-W.sign <- lapply(W, apply, 2, function(x)(sum(x[null] > 0) / sum(x[null] != 0)))
-W.sign <- matrix(unlist(W.sign), m, byrow = TRUE)
-colnames(W.sign) <- c(
+W.sign.matrix <- matrix(unlist(W.sign), m, byrow = TRUE)
+colnames(W.sign.matrix) <- c(
   "Gauss + Equi",
   "Gauss + Equi + Random",
   "Gauss + SDP",
@@ -2050,7 +2061,7 @@ colnames(W.sign) <- c(
   "2nd + SDP + Random"
 )
 
-ggplot2::ggplot(data = reshape2::melt(as.data.frame(W.sign)), mapping = aes(x = value)) +
+ggplot2::ggplot(data = reshape2::melt(as.data.frame(W.sign.matrix)), mapping = aes(x = value)) +
   geom_histogram(breaks = seq(0, 1, by = 0.05)) +
   facet_wrap(~ variable, ncol = 2) +
   labs(x = "Proportion of Null Test Statistics Being Positive") +
