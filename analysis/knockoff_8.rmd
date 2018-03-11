@@ -156,24 +156,37 @@ for (i in 1 : m) {
   BH.selected <- (1 : p)[BH.fit <= q]
 
   orig <- 1 : p
+  
   random.order.variable <- sample(2 * p)
   Z <- knockoff:::lasso_max_lambda(cbind(X, Xk_f_e)[, random.order.variable], y, method = "glmnet", family = "gaussian")
   Z <- Z[order(random.order.variable)]
-  W_f_e <- pmax(Z[orig], Z[orig + p]) * sign(Z[orig] - Z[orig + p])
+  W_f_e_max <- pmax(Z[orig], Z[orig + p]) * sign(Z[orig] - Z[orig + p])
 
   random.order.variable <- sample(2 * p)
   Z <- knockoff:::lasso_max_lambda(cbind(X, Xk_f_s)[, random.order.variable], y, method = "glmnet", family = "gaussian")
   Z <- Z[order(random.order.variable)]
-  W_f_s <- pmax(Z[orig], Z[orig + p]) * sign(Z[orig] - Z[orig + p])
+  W_f_s_max <- pmax(Z[orig], Z[orig + p]) * sign(Z[orig] - Z[orig + p])
+  
+  random.order.variable <- sample(2 * p)
+  Z <- knockoff:::cv_coeffs_glmnet(cbind(X, Xk_f_e)[, random.order.variable], y, family = "gaussian", parallel = TRUE)
+  Z <- Z[order(random.order.variable)]
+  Xk_f_e_diff <- abs(Z[orig]) - abs(Z[orig + p])
+
+  random.order.variable <- sample(2 * p)
+  Z <- knockoff:::cv_coeffs_glmnet(cbind(X, Xk_f_s)[, random.order.variable], y, family = "gaussian", parallel = TRUE)
+  Z <- Z[order(random.order.variable)]
+  Xk_f_s_diff <- abs(Z[orig]) - abs(Z[orig + p])
 
   ## Knockoff
   W[[i]] <- cbind(
-    equi_marginal <- abs(t(X) %*% y) - abs(t(Xk_f_e) %*% y),
-    sdp_marginal <- abs(t(X) %*% y) - abs(t(Xk_f_s) %*% y),
-    equi_lasso <- knockoff::stat.glmnet_lambdasmax(X, Xk_f_e, y),
-    equi_lasso_random <- W_f_e,
-    sdp_lasso <- knockoff::stat.glmnet_lambdasmax(X, Xk_f_s, y),
-    sdp_lasso_random <- W_f_s
+    equi_max <- knockoff::stat.glmnet_lambdasmax(X, Xk_f_e, y),
+    equi_max_random <- W_f_e_max,
+    sdp_max <- knockoff::stat.glmnet_lambdasmax(X, Xk_f_s, y),
+    sdp_max_random <- W_f_s_max,
+    equi_diff <- knockoff::stat.glmnet_coefdiff(X, Xk_f_e, y, cores = ncores),
+    equi_diff_random <- Xk_f_e_diff,
+    sdp_diff <- knockoff::stat.glmnet_coefdiff(X, Xk_f_s, y, cores = ncores),
+    sdp_diff_random <- Xk_f_s_diff
   )
 
   Knockoff.threshold <- apply(W[[i]], 2, knockoff.threshold, fdr = q, offset = 0)
@@ -197,55 +210,65 @@ for (i in 1 : m) {
 ```{r, echo = FALSE, message = FALSE}
 par(mar = c(9, 4.5, 0.5, 0.5))
 result.matrix <- matrix(unlist(result), m, byrow = TRUE)
-boxplot(result.matrix[, 1 : 13], ylab = "FDP", las = 2, names = c(
+boxplot(result.matrix[, 1 : 17], ylab = "FDP", las = 2, names = c(
   "BH",
-  "KO.Equi.Marginal",
-  "KO.SDP.Marginal",
-  "KO.Equi.LASSO",
-  "KO.Equi.LASSO.Random",
-  "KO.SDP.LASSO",
-  "KO.SDP.LASSO.Random",
-  "KO+.Equi.Marginal",
-  "KO+.SDP.Marginal",
-  "KO+.Equi.LASSO",
-  "KO+.Equi.LASSO.Random",
-  "KO+.SDP.LASSO",
-  "KO+.SDP.LASSO.Random"
-), cex.axis = 0.75, border = c("green", rep(c(rep("black", 4), rep("red", 2)), 2))
+  "KO.Equi.lambdasmax",
+  "KO.Equi.lambdasmax.Rand",
+  "KO.SDP.lambdasmax",
+  "KO.SDP.lambdasmax.Rand",
+  "KO.Equi.coefdiff",
+  "KO.Equi.coefdiff.Rand",
+  "KO.SDP.coefdiff",
+  "KO.SDP.coefdiff.Rand",
+  "KO+.Equi.lambdasmax",
+  "KO+.Equi.lambdasmax.Rand",
+  "KO+.SDP.lambdasmax",
+  "KO+.SDP.lambdasmax.Rand",
+  "KO+.Equi.coefdiff",
+  "KO+.Equi.coefdiff.Rand",
+  "KO+.SDP.coefdiff",
+  "KO+.SDP.coefdiff.Rand"
+), cex.axis = 0.75, border = c("green", rep(c("black", "red"), 8))
 )
-points(colMeans(result.matrix[, 1 : 13]), col = "blue", pch = 3)
+points(colMeans(result.matrix[, 1 : 17]), col = "blue", pch = 3)
 abline(h = q, lty = 2, col = "red")
-abline(v = c(1.5, 7.5), col = "maroon")
+abline(v = c(1.5, 9.5), col = "maroon")
 
-boxplot(result.matrix[, 14 : 26], ylab = "TDP", las = 2, names = c(
+boxplot(result.matrix[, 18 : 34], ylab = "TDP", las = 2, names = c(
   "BH",
-  "KO.Equi.Marginal",
-  "KO.SDP.Marginal",
-  "KO.Equi.LASSO",
-  "KO.Equi.LASSO.Random",
-  "KO.SDP.LASSO",
-  "KO.SDP.LASSO.Random",
-  "KO+.Equi.Marginal",
-  "KO+.SDP.Marginal",
-  "KO+.Equi.LASSO",
-  "KO+.Equi.LASSO.Random",
-  "KO+.SDP.LASSO",
-  "KO+.SDP.LASSO.Random"
-), cex.axis = 0.75, border = c("green", rep(c(rep("black", 4), rep("red", 2)), 2))
+  "KO.Equi.lambdasmax",
+  "KO.Equi.lambdasmax.Rand",
+  "KO.SDP.lambdasmax",
+  "KO.SDP.lambdasmax.Rand",
+  "KO.Equi.coefdiff",
+  "KO.Equi.coefdiff.Rand",
+  "KO.SDP.coefdiff",
+  "KO.SDP.coefdiff.Rand",
+  "KO+.Equi.lambdasmax",
+  "KO+.Equi.lambdasmax.Rand",
+  "KO+.SDP.lambdasmax",
+  "KO+.SDP.lambdasmax.Rand",
+  "KO+.Equi.coefdiff",
+  "KO+.Equi.coefdiff.Rand",
+  "KO+.SDP.coefdiff",
+  "KO+.SDP.coefdiff.Rand"
+), cex.axis = 0.75, border = c("green", rep(c("black", "red"), 8))
 )
-points(colMeans(result.matrix[, 14 : 26]), col = "blue", pch = 3)
-abline(v = c(1.5, 7.5), col = "maroon")
+points(colMeans(result.matrix[, 18 : 34]), col = "blue", pch = 3)
+abline(v = c(1.5, 9.5), col = "maroon")
 
 null <- setdiff(seq(p), nonzero)
 W.sign <- lapply(W, apply, 2, function(x)(sum(x[null] > 0) / sum(x[null] != 0)))
 W.sign <- matrix(unlist(W.sign), m, byrow = TRUE)
 colnames(W.sign) <- c(
-  "equi + marginaldiff",
-  "sdp + marginaldiff",
-  "equi + stat.glmnet_lambdasmax",
-  "equi + stat.glmnet_lambdasmax + random",
-  "sdp + stat.glmnet_lambdasmax",
-  "sdp + stat.glmnet_lambdasmax + random"
+  "Equi + lambdasmax",
+  "Equi + lambdasmax + Random",
+  "SDP + lambdasmax",
+  "SDP + lambdasmax + Random",
+  "Equi + coefdiff",
+  "Equi + coefdiff + Random",
+  "SDP + coefdiff",
+  "SDP + coefdiff + Random"
 )
 
 ggplot2::ggplot(data = reshape2::melt(as.data.frame(W.sign)), mapping = aes(x = value)) +
@@ -488,26 +511,39 @@ for (i in 1 : m) {
   BH.selected <- (1 : p)[BH.fit <= q]
 
   orig <- 1 : p
+  
   random.order.variable <- sample(2 * p)
   Z <- knockoff:::lasso_max_lambda(cbind(X, Xk_f_e)[, random.order.variable], y, method = "glmnet", family = "gaussian")
   Z <- Z[order(random.order.variable)]
-  W_f_e <- pmax(Z[orig], Z[orig + p]) * sign(Z[orig] - Z[orig + p])
+  W_f_e_max <- pmax(Z[orig], Z[orig + p]) * sign(Z[orig] - Z[orig + p])
 
   random.order.variable <- sample(2 * p)
   Z <- knockoff:::lasso_max_lambda(cbind(X, Xk_f_s)[, random.order.variable], y, method = "glmnet", family = "gaussian")
   Z <- Z[order(random.order.variable)]
-  W_f_s <- pmax(Z[orig], Z[orig + p]) * sign(Z[orig] - Z[orig + p])
+  W_f_s_max <- pmax(Z[orig], Z[orig + p]) * sign(Z[orig] - Z[orig + p])
+  
+  random.order.variable <- sample(2 * p)
+  Z <- knockoff:::cv_coeffs_glmnet(cbind(X, Xk_f_e)[, random.order.variable], y, family = "gaussian", parallel = TRUE)
+  Z <- Z[order(random.order.variable)]
+  Xk_f_e_diff <- abs(Z[orig]) - abs(Z[orig + p])
+
+  random.order.variable <- sample(2 * p)
+  Z <- knockoff:::cv_coeffs_glmnet(cbind(X, Xk_f_s)[, random.order.variable], y, family = "gaussian", parallel = TRUE)
+  Z <- Z[order(random.order.variable)]
+  Xk_f_s_diff <- abs(Z[orig]) - abs(Z[orig + p])
 
   ## Knockoff
   W[[i]] <- cbind(
-    equi_marginal <- abs(t(X) %*% y) - abs(t(Xk_f_e) %*% y),
-    sdp_marginal <- abs(t(X) %*% y) - abs(t(Xk_f_s) %*% y),
-    equi_lasso <- knockoff::stat.glmnet_lambdasmax(X, Xk_f_e, y),
-    equi_lasso_random <- W_f_e,
-    sdp_lasso <- knockoff::stat.glmnet_lambdasmax(X, Xk_f_s, y),
-    sdp_lasso_random <- W_f_s
+    equi_max <- knockoff::stat.glmnet_lambdasmax(X, Xk_f_e, y),
+    equi_max_random <- W_f_e_max,
+    sdp_max <- knockoff::stat.glmnet_lambdasmax(X, Xk_f_s, y),
+    sdp_max_random <- W_f_s_max,
+    equi_diff <- knockoff::stat.glmnet_coefdiff(X, Xk_f_e, y, cores = ncores),
+    equi_diff_random <- Xk_f_e_diff,
+    sdp_diff <- knockoff::stat.glmnet_coefdiff(X, Xk_f_s, y, cores = ncores),
+    sdp_diff_random <- Xk_f_s_diff
   )
-
+  
   Knockoff.threshold <- apply(W[[i]], 2, knockoff.threshold, fdr = q, offset = 0)
   Knockoff.threshold.plus <- apply(W[[i]], 2, knockoff.threshold, fdr = q, offset = 1)
 
@@ -529,58 +565,66 @@ for (i in 1 : m) {
 ```{r, echo = FALSE, message = FALSE}
 par(mar = c(9, 4.5, 0.5, 0.5))
 result.matrix <- matrix(unlist(result), m, byrow = TRUE)
-boxplot(result.matrix[, 1 : 13], ylab = "FDP", las = 2, names = c(
+boxplot(result.matrix[, 1 : 17], ylab = "FDP", las = 2, names = c(
   "BH",
-  "KO.Equi.Marginal",
-  "KO.SDP.Marginal",
-  "KO.Equi.LASSO",
-  "KO.Equi.LASSO.Random",
-  "KO.SDP.LASSO",
-  "KO.SDP.LASSO.Random",
-  "KO+.Equi.Marginal",
-  "KO+.SDP.Marginal",
-  "KO+.Equi.LASSO",
-  "KO+.Equi.LASSO.Random",
-  "KO+.SDP.LASSO",
-  "KO+.SDP.LASSO.Random"
-), cex.axis = 0.75, border = c("green", rep(c(rep("black", 4), rep("red", 2)), 2))
+  "KO.Gauss.Equi",
+  "KO.Gauss.Equi.Rand",
+  "KO.Gauss.SDP",
+  "KO.Gauss.SDP.Rand",
+  "KO.2nd.Equi",
+  "KO.2nd.Equi.Rand",
+  "KO.2nd.SDP",
+  "KO.2nd.SDP.Rand",
+  "KO+.Gauss.Equi",
+  "KO+.Gauss.Equi.Rand",
+  "KO+.Gauss.SDP",
+  "KO+.Gauss.SDP.Rand",
+  "KO+.2nd.Equi",
+  "KO+.2nd.Equi.Rand",
+  "KO+.2nd.SDP",
+  "KO+.2nd.SDP.Rand"
+), cex.axis = 0.75, border = c("green", rep(c("black", "red"), 8))
 )
-points(colMeans(result.matrix[, 1 : 13]), col = "blue", pch = 3)
+points(colMeans(result.matrix[, 1 : 17]), col = "blue", pch = 3)
 abline(h = q, lty = 2, col = "red")
-abline(v = c(1.5, 7.5), col = "maroon")
+abline(v = c(1.5, 9.5), col = "maroon")
 
-boxplot(result.matrix[, 14 : 26], ylab = "TDP", las = 2, names = c(
+boxplot(result.matrix[, 18 : 34], ylab = "TDP", las = 2, names = c(
   "BH",
-  "KO.Equi.Marginal",
-  "KO.SDP.Marginal",
-  "KO.Equi.LASSO",
-  "KO.Equi.LASSO.Random",
-  "KO.SDP.LASSO",
-  "KO.SDP.LASSO.Random",
-  "KO+.Equi.Marginal",
-  "KO+.SDP.Marginal",
-  "KO+.Equi.LASSO",
-  "KO+.Equi.LASSO.Random",
-  "KO+.SDP.LASSO",
-  "KO+.SDP.LASSO.Random"
-), cex.axis = 0.75, border = c("green", rep(c(rep("black", 4), rep("red", 2)), 2))
+  "KO.Gauss.Equi",
+  "KO.Gauss.Equi.Rand",
+  "KO.Gauss.SDP",
+  "KO.Gauss.SDP.Rand",
+  "KO.2nd.Equi",
+  "KO.2nd.Equi.Rand",
+  "KO.2nd.SDP",
+  "KO.2nd.SDP.Rand",
+  "KO+.Gauss.Equi",
+  "KO+.Gauss.Equi.Rand",
+  "KO+.Gauss.SDP",
+  "KO+.Gauss.SDP.Rand",
+  "KO+.2nd.Equi",
+  "KO+.2nd.Equi.Rand",
+  "KO+.2nd.SDP",
+  "KO+.2nd.SDP.Rand"
+), cex.axis = 0.75, border = c("green", rep(c("black", "red"), 8))
 )
-points(colMeans(result.matrix[, 14 : 26]), col = "blue", pch = 3)
-abline(v = c(1.5, 7.5), col = "maroon")
+points(colMeans(result.matrix[, 18 : 34]), col = "blue", pch = 3)
+abline(v = c(1.5, 9.5), col = "maroon")
 
-null <- setdiff(seq(p), nonzero)
-W.sign <- lapply(W, apply, 2, function(x)(sum(x[null] > 0) / sum(x[null] != 0)))
-W.sign <- matrix(unlist(W.sign), m, byrow = TRUE)
-colnames(W.sign) <- c(
-  "equi + marginaldiff",
-  "sdp + marginaldiff",
-  "equi + stat.glmnet_lambdasmax",
-  "equi + stat.glmnet_lambdasmax + random",
-  "sdp + stat.glmnet_lambdasmax",
-  "sdp + stat.glmnet_lambdasmax + random"
+W.sign.matrix <- matrix(unlist(W.sign), m, byrow = TRUE)
+colnames(W.sign.matrix) <- c(
+  "Gauss + Equi",
+  "Gauss + Equi + Random",
+  "Gauss + SDP",
+  "Gauss + SDP + Random",
+  "2nd + Equi",
+  "2nd + Equi + Random",
+  "2nd + SDP",
+  "2nd + SDP + Random"
 )
 
-ggplot2::ggplot(data = reshape2::melt(as.data.frame(W.sign)), mapping = aes(x = value)) +
+ggplot2::ggplot(data = reshape2::melt(as.data.frame(W.sign.matrix)), mapping = aes(x = value)) +
   geom_histogram(breaks = seq(0, 1, by = 0.05)) +
   facet_wrap(~ variable, ncol = 2) +
   labs(x = "Proportion of Null Test Statistics Being Positive") +
@@ -813,24 +857,37 @@ for (i in 1 : m) {
   BH.selected <- (1 : p)[BH.fit <= q]
 
   orig <- 1 : p
+  
   random.order.variable <- sample(2 * p)
   Z <- knockoff:::lasso_max_lambda(cbind(X, Xk_f_e)[, random.order.variable], y, method = "glmnet", family = "gaussian")
   Z <- Z[order(random.order.variable)]
-  W_f_e <- pmax(Z[orig], Z[orig + p]) * sign(Z[orig] - Z[orig + p])
+  W_f_e_max <- pmax(Z[orig], Z[orig + p]) * sign(Z[orig] - Z[orig + p])
 
   random.order.variable <- sample(2 * p)
   Z <- knockoff:::lasso_max_lambda(cbind(X, Xk_f_s)[, random.order.variable], y, method = "glmnet", family = "gaussian")
   Z <- Z[order(random.order.variable)]
-  W_f_s <- pmax(Z[orig], Z[orig + p]) * sign(Z[orig] - Z[orig + p])
+  W_f_s_max <- pmax(Z[orig], Z[orig + p]) * sign(Z[orig] - Z[orig + p])
+  
+  random.order.variable <- sample(2 * p)
+  Z <- knockoff:::cv_coeffs_glmnet(cbind(X, Xk_f_e)[, random.order.variable], y, family = "gaussian", parallel = TRUE)
+  Z <- Z[order(random.order.variable)]
+  Xk_f_e_diff <- abs(Z[orig]) - abs(Z[orig + p])
+
+  random.order.variable <- sample(2 * p)
+  Z <- knockoff:::cv_coeffs_glmnet(cbind(X, Xk_f_s)[, random.order.variable], y, family = "gaussian", parallel = TRUE)
+  Z <- Z[order(random.order.variable)]
+  Xk_f_s_diff <- abs(Z[orig]) - abs(Z[orig + p])
 
   ## Knockoff
   W[[i]] <- cbind(
-    equi_marginal <- abs(t(X) %*% y) - abs(t(Xk_f_e) %*% y),
-    sdp_marginal <- abs(t(X) %*% y) - abs(t(Xk_f_s) %*% y),
-    equi_lasso <- knockoff::stat.glmnet_lambdasmax(X, Xk_f_e, y),
-    equi_lasso_random <- W_f_e,
-    sdp_lasso <- knockoff::stat.glmnet_lambdasmax(X, Xk_f_s, y),
-    sdp_lasso_random <- W_f_s
+    equi_max <- knockoff::stat.glmnet_lambdasmax(X, Xk_f_e, y),
+    equi_max_random <- W_f_e_max,
+    sdp_max <- knockoff::stat.glmnet_lambdasmax(X, Xk_f_s, y),
+    sdp_max_random <- W_f_s_max,
+    equi_diff <- knockoff::stat.glmnet_coefdiff(X, Xk_f_e, y, cores = ncores),
+    equi_diff_random <- Xk_f_e_diff,
+    sdp_diff <- knockoff::stat.glmnet_coefdiff(X, Xk_f_s, y, cores = ncores),
+    sdp_diff_random <- Xk_f_s_diff
   )
 
   Knockoff.threshold <- apply(W[[i]], 2, knockoff.threshold, fdr = q, offset = 0)
@@ -854,55 +911,65 @@ for (i in 1 : m) {
 ```{r, echo = FALSE, message = FALSE}
 par(mar = c(9, 4.5, 0.5, 0.5))
 result.matrix <- matrix(unlist(result), m, byrow = TRUE)
-boxplot(result.matrix[, 1 : 13], ylab = "FDP", las = 2, names = c(
+boxplot(result.matrix[, 1 : 17], ylab = "FDP", las = 2, names = c(
   "BH",
-  "KO.Equi.Marginal",
-  "KO.SDP.Marginal",
-  "KO.Equi.LASSO",
-  "KO.Equi.LASSO.Random",
-  "KO.SDP.LASSO",
-  "KO.SDP.LASSO.Random",
-  "KO+.Equi.Marginal",
-  "KO+.SDP.Marginal",
-  "KO+.Equi.LASSO",
-  "KO+.Equi.LASSO.Random",
-  "KO+.SDP.LASSO",
-  "KO+.SDP.LASSO.Random"
-), cex.axis = 0.75, border = c("green", rep(c(rep("black", 4), rep("red", 2)), 2))
+  "KO.Equi.lambdasmax",
+  "KO.Equi.lambdasmax.Rand",
+  "KO.SDP.lambdasmax",
+  "KO.SDP.lambdasmax.Rand",
+  "KO.Equi.coefdiff",
+  "KO.Equi.coefdiff.Rand",
+  "KO.SDP.coefdiff",
+  "KO.SDP.coefdiff.Rand",
+  "KO+.Equi.lambdasmax",
+  "KO+.Equi.lambdasmax.Rand",
+  "KO+.SDP.lambdasmax",
+  "KO+.SDP.lambdasmax.Rand",
+  "KO+.Equi.coefdiff",
+  "KO+.Equi.coefdiff.Rand",
+  "KO+.SDP.coefdiff",
+  "KO+.SDP.coefdiff.Rand"
+), cex.axis = 0.75, border = c("green", rep(c("black", "red"), 8))
 )
-points(colMeans(result.matrix[, 1 : 13]), col = "blue", pch = 3)
+points(colMeans(result.matrix[, 1 : 17]), col = "blue", pch = 3)
 abline(h = q, lty = 2, col = "red")
-abline(v = c(1.5, 7.5), col = "maroon")
+abline(v = c(1.5, 9.5), col = "maroon")
 
-boxplot(result.matrix[, 14 : 26], ylab = "TDP", las = 2, names = c(
+boxplot(result.matrix[, 18 : 34], ylab = "TDP", las = 2, names = c(
   "BH",
-  "KO.Equi.Marginal",
-  "KO.SDP.Marginal",
-  "KO.Equi.LASSO",
-  "KO.Equi.LASSO.Random",
-  "KO.SDP.LASSO",
-  "KO.SDP.LASSO.Random",
-  "KO+.Equi.Marginal",
-  "KO+.SDP.Marginal",
-  "KO+.Equi.LASSO",
-  "KO+.Equi.LASSO.Random",
-  "KO+.SDP.LASSO",
-  "KO+.SDP.LASSO.Random"
-), cex.axis = 0.75, border = c("green", rep(c(rep("black", 4), rep("red", 2)), 2))
+  "KO.Equi.lambdasmax",
+  "KO.Equi.lambdasmax.Rand",
+  "KO.SDP.lambdasmax",
+  "KO.SDP.lambdasmax.Rand",
+  "KO.Equi.coefdiff",
+  "KO.Equi.coefdiff.Rand",
+  "KO.SDP.coefdiff",
+  "KO.SDP.coefdiff.Rand",
+  "KO+.Equi.lambdasmax",
+  "KO+.Equi.lambdasmax.Rand",
+  "KO+.SDP.lambdasmax",
+  "KO+.SDP.lambdasmax.Rand",
+  "KO+.Equi.coefdiff",
+  "KO+.Equi.coefdiff.Rand",
+  "KO+.SDP.coefdiff",
+  "KO+.SDP.coefdiff.Rand"
+), cex.axis = 0.75, border = c("green", rep(c("black", "red"), 8))
 )
-points(colMeans(result.matrix[, 14 : 26]), col = "blue", pch = 3)
-abline(v = c(1.5, 7.5), col = "maroon")
+points(colMeans(result.matrix[, 18 : 34]), col = "blue", pch = 3)
+abline(v = c(1.5, 9.5), col = "maroon")
 
 null <- setdiff(seq(p), nonzero)
 W.sign <- lapply(W, apply, 2, function(x)(sum(x[null] > 0) / sum(x[null] != 0)))
 W.sign <- matrix(unlist(W.sign), m, byrow = TRUE)
 colnames(W.sign) <- c(
-  "equi + marginaldiff",
-  "sdp + marginaldiff",
-  "equi + stat.glmnet_lambdasmax",
-  "equi + stat.glmnet_lambdasmax + random",
-  "sdp + stat.glmnet_lambdasmax",
-  "sdp + stat.glmnet_lambdasmax + random"
+  "Equi + lambdasmax",
+  "Equi + lambdasmax + Random",
+  "SDP + lambdasmax",
+  "SDP + lambdasmax + Random",
+  "Equi + coefdiff",
+  "Equi + coefdiff + Random",
+  "SDP + coefdiff",
+  "SDP + coefdiff + Random"
 )
 
 ggplot2::ggplot(data = reshape2::melt(as.data.frame(W.sign)), mapping = aes(x = value)) +
@@ -1150,24 +1217,37 @@ for (i in 1 : m) {
   BH.selected <- (1 : p)[BH.fit <= q]
 
   orig <- 1 : p
+  
   random.order.variable <- sample(2 * p)
   Z <- knockoff:::lasso_max_lambda(cbind(X, Xk_f_e)[, random.order.variable], y, method = "glmnet", family = "gaussian")
   Z <- Z[order(random.order.variable)]
-  W_f_e <- pmax(Z[orig], Z[orig + p]) * sign(Z[orig] - Z[orig + p])
+  W_f_e_max <- pmax(Z[orig], Z[orig + p]) * sign(Z[orig] - Z[orig + p])
 
   random.order.variable <- sample(2 * p)
   Z <- knockoff:::lasso_max_lambda(cbind(X, Xk_f_s)[, random.order.variable], y, method = "glmnet", family = "gaussian")
   Z <- Z[order(random.order.variable)]
-  W_f_s <- pmax(Z[orig], Z[orig + p]) * sign(Z[orig] - Z[orig + p])
+  W_f_s_max <- pmax(Z[orig], Z[orig + p]) * sign(Z[orig] - Z[orig + p])
+  
+  random.order.variable <- sample(2 * p)
+  Z <- knockoff:::cv_coeffs_glmnet(cbind(X, Xk_f_e)[, random.order.variable], y, family = "gaussian", parallel = TRUE)
+  Z <- Z[order(random.order.variable)]
+  Xk_f_e_diff <- abs(Z[orig]) - abs(Z[orig + p])
+
+  random.order.variable <- sample(2 * p)
+  Z <- knockoff:::cv_coeffs_glmnet(cbind(X, Xk_f_s)[, random.order.variable], y, family = "gaussian", parallel = TRUE)
+  Z <- Z[order(random.order.variable)]
+  Xk_f_s_diff <- abs(Z[orig]) - abs(Z[orig + p])
 
   ## Knockoff
   W[[i]] <- cbind(
-    equi_marginal <- abs(t(X) %*% y) - abs(t(Xk_f_e) %*% y),
-    sdp_marginal <- abs(t(X) %*% y) - abs(t(Xk_f_s) %*% y),
-    equi_lasso <- knockoff::stat.glmnet_lambdasmax(X, Xk_f_e, y),
-    equi_lasso_random <- W_f_e,
-    sdp_lasso <- knockoff::stat.glmnet_lambdasmax(X, Xk_f_s, y),
-    sdp_lasso_random <- W_f_s
+    equi_max <- knockoff::stat.glmnet_lambdasmax(X, Xk_f_e, y),
+    equi_max_random <- W_f_e_max,
+    sdp_max <- knockoff::stat.glmnet_lambdasmax(X, Xk_f_s, y),
+    sdp_max_random <- W_f_s_max,
+    equi_diff <- knockoff::stat.glmnet_coefdiff(X, Xk_f_e, y, cores = ncores),
+    equi_diff_random <- Xk_f_e_diff,
+    sdp_diff <- knockoff::stat.glmnet_coefdiff(X, Xk_f_s, y, cores = ncores),
+    sdp_diff_random <- Xk_f_s_diff
   )
 
   Knockoff.threshold <- apply(W[[i]], 2, knockoff.threshold, fdr = q, offset = 0)
@@ -1191,55 +1271,65 @@ for (i in 1 : m) {
 ```{r, echo = FALSE, message = FALSE}
 par(mar = c(9, 4.5, 0.5, 0.5))
 result.matrix <- matrix(unlist(result), m, byrow = TRUE)
-boxplot(result.matrix[, 1 : 13], ylab = "FDP", las = 2, names = c(
+boxplot(result.matrix[, 1 : 17], ylab = "FDP", las = 2, names = c(
   "BH",
-  "KO.Equi.Marginal",
-  "KO.SDP.Marginal",
-  "KO.Equi.LASSO",
-  "KO.Equi.LASSO.Random",
-  "KO.SDP.LASSO",
-  "KO.SDP.LASSO.Random",
-  "KO+.Equi.Marginal",
-  "KO+.SDP.Marginal",
-  "KO+.Equi.LASSO",
-  "KO+.Equi.LASSO.Random",
-  "KO+.SDP.LASSO",
-  "KO+.SDP.LASSO.Random"
-), cex.axis = 0.75, border = c("green", rep(c(rep("black", 4), rep("red", 2)), 2))
+  "KO.Equi.lambdasmax",
+  "KO.Equi.lambdasmax.Rand",
+  "KO.SDP.lambdasmax",
+  "KO.SDP.lambdasmax.Rand",
+  "KO.Equi.coefdiff",
+  "KO.Equi.coefdiff.Rand",
+  "KO.SDP.coefdiff",
+  "KO.SDP.coefdiff.Rand",
+  "KO+.Equi.lambdasmax",
+  "KO+.Equi.lambdasmax.Rand",
+  "KO+.SDP.lambdasmax",
+  "KO+.SDP.lambdasmax.Rand",
+  "KO+.Equi.coefdiff",
+  "KO+.Equi.coefdiff.Rand",
+  "KO+.SDP.coefdiff",
+  "KO+.SDP.coefdiff.Rand"
+), cex.axis = 0.75, border = c("green", rep(c("black", "red"), 8))
 )
-points(colMeans(result.matrix[, 1 : 13]), col = "blue", pch = 3)
+points(colMeans(result.matrix[, 1 : 17]), col = "blue", pch = 3)
 abline(h = q, lty = 2, col = "red")
-abline(v = c(1.5, 7.5), col = "maroon")
+abline(v = c(1.5, 9.5), col = "maroon")
 
-boxplot(result.matrix[, 14 : 26], ylab = "TDP", las = 2, names = c(
+boxplot(result.matrix[, 18 : 34], ylab = "TDP", las = 2, names = c(
   "BH",
-  "KO.Equi.Marginal",
-  "KO.SDP.Marginal",
-  "KO.Equi.LASSO",
-  "KO.Equi.LASSO.Random",
-  "KO.SDP.LASSO",
-  "KO.SDP.LASSO.Random",
-  "KO+.Equi.Marginal",
-  "KO+.SDP.Marginal",
-  "KO+.Equi.LASSO",
-  "KO+.Equi.LASSO.Random",
-  "KO+.SDP.LASSO",
-  "KO+.SDP.LASSO.Random"
-), cex.axis = 0.75, border = c("green", rep(c(rep("black", 4), rep("red", 2)), 2))
+  "KO.Equi.lambdasmax",
+  "KO.Equi.lambdasmax.Rand",
+  "KO.SDP.lambdasmax",
+  "KO.SDP.lambdasmax.Rand",
+  "KO.Equi.coefdiff",
+  "KO.Equi.coefdiff.Rand",
+  "KO.SDP.coefdiff",
+  "KO.SDP.coefdiff.Rand",
+  "KO+.Equi.lambdasmax",
+  "KO+.Equi.lambdasmax.Rand",
+  "KO+.SDP.lambdasmax",
+  "KO+.SDP.lambdasmax.Rand",
+  "KO+.Equi.coefdiff",
+  "KO+.Equi.coefdiff.Rand",
+  "KO+.SDP.coefdiff",
+  "KO+.SDP.coefdiff.Rand"
+), cex.axis = 0.75, border = c("green", rep(c("black", "red"), 8))
 )
-points(colMeans(result.matrix[, 14 : 26]), col = "blue", pch = 3)
-abline(v = c(1.5, 7.5), col = "maroon")
+points(colMeans(result.matrix[, 18 : 34]), col = "blue", pch = 3)
+abline(v = c(1.5, 9.5), col = "maroon")
 
 null <- setdiff(seq(p), nonzero)
 W.sign <- lapply(W, apply, 2, function(x)(sum(x[null] > 0) / sum(x[null] != 0)))
 W.sign <- matrix(unlist(W.sign), m, byrow = TRUE)
 colnames(W.sign) <- c(
-  "equi + marginaldiff",
-  "sdp + marginaldiff",
-  "equi + stat.glmnet_lambdasmax",
-  "equi + stat.glmnet_lambdasmax + random",
-  "sdp + stat.glmnet_lambdasmax",
-  "sdp + stat.glmnet_lambdasmax + random"
+  "Equi + lambdasmax",
+  "Equi + lambdasmax + Random",
+  "SDP + lambdasmax",
+  "SDP + lambdasmax + Random",
+  "Equi + coefdiff",
+  "Equi + coefdiff + Random",
+  "SDP + coefdiff",
+  "SDP + coefdiff + Random"
 )
 
 ggplot2::ggplot(data = reshape2::melt(as.data.frame(W.sign)), mapping = aes(x = value)) +
@@ -1485,24 +1575,37 @@ for (i in 1 : m) {
   BH.selected <- (1 : p)[BH.fit <= q]
 
   orig <- 1 : p
+  
   random.order.variable <- sample(2 * p)
   Z <- knockoff:::lasso_max_lambda(cbind(X, Xk_f_e)[, random.order.variable], y, method = "glmnet", family = "gaussian")
   Z <- Z[order(random.order.variable)]
-  W_f_e <- pmax(Z[orig], Z[orig + p]) * sign(Z[orig] - Z[orig + p])
+  W_f_e_max <- pmax(Z[orig], Z[orig + p]) * sign(Z[orig] - Z[orig + p])
 
   random.order.variable <- sample(2 * p)
   Z <- knockoff:::lasso_max_lambda(cbind(X, Xk_f_s)[, random.order.variable], y, method = "glmnet", family = "gaussian")
   Z <- Z[order(random.order.variable)]
-  W_f_s <- pmax(Z[orig], Z[orig + p]) * sign(Z[orig] - Z[orig + p])
+  W_f_s_max <- pmax(Z[orig], Z[orig + p]) * sign(Z[orig] - Z[orig + p])
+  
+  random.order.variable <- sample(2 * p)
+  Z <- knockoff:::cv_coeffs_glmnet(cbind(X, Xk_f_e)[, random.order.variable], y, family = "gaussian", parallel = TRUE)
+  Z <- Z[order(random.order.variable)]
+  Xk_f_e_diff <- abs(Z[orig]) - abs(Z[orig + p])
+
+  random.order.variable <- sample(2 * p)
+  Z <- knockoff:::cv_coeffs_glmnet(cbind(X, Xk_f_s)[, random.order.variable], y, family = "gaussian", parallel = TRUE)
+  Z <- Z[order(random.order.variable)]
+  Xk_f_s_diff <- abs(Z[orig]) - abs(Z[orig + p])
 
   ## Knockoff
   W[[i]] <- cbind(
-    equi_marginal <- abs(t(X) %*% y) - abs(t(Xk_f_e) %*% y),
-    sdp_marginal <- abs(t(X) %*% y) - abs(t(Xk_f_s) %*% y),
-    equi_lasso <- knockoff::stat.glmnet_lambdasmax(X, Xk_f_e, y),
-    equi_lasso_random <- W_f_e,
-    sdp_lasso <- knockoff::stat.glmnet_lambdasmax(X, Xk_f_s, y),
-    sdp_lasso_random <- W_f_s
+    equi_max <- knockoff::stat.glmnet_lambdasmax(X, Xk_f_e, y),
+    equi_max_random <- W_f_e_max,
+    sdp_max <- knockoff::stat.glmnet_lambdasmax(X, Xk_f_s, y),
+    sdp_max_random <- W_f_s_max,
+    equi_diff <- knockoff::stat.glmnet_coefdiff(X, Xk_f_e, y, cores = ncores),
+    equi_diff_random <- Xk_f_e_diff,
+    sdp_diff <- knockoff::stat.glmnet_coefdiff(X, Xk_f_s, y, cores = ncores),
+    sdp_diff_random <- Xk_f_s_diff
   )
 
   Knockoff.threshold <- apply(W[[i]], 2, knockoff.threshold, fdr = q, offset = 0)
@@ -1526,55 +1629,65 @@ for (i in 1 : m) {
 ```{r, echo = FALSE, message = FALSE}
 par(mar = c(9, 4.5, 0.5, 0.5))
 result.matrix <- matrix(unlist(result), m, byrow = TRUE)
-boxplot(result.matrix[, 1 : 13], ylab = "FDP", las = 2, names = c(
+boxplot(result.matrix[, 1 : 17], ylab = "FDP", las = 2, names = c(
   "BH",
-  "KO.Equi.Marginal",
-  "KO.SDP.Marginal",
-  "KO.Equi.LASSO",
-  "KO.Equi.LASSO.Random",
-  "KO.SDP.LASSO",
-  "KO.SDP.LASSO.Random",
-  "KO+.Equi.Marginal",
-  "KO+.SDP.Marginal",
-  "KO+.Equi.LASSO",
-  "KO+.Equi.LASSO.Random",
-  "KO+.SDP.LASSO",
-  "KO+.SDP.LASSO.Random"
-), cex.axis = 0.75, border = c("green", rep(c(rep("black", 4), rep("red", 2)), 2))
+  "KO.Equi.lambdasmax",
+  "KO.Equi.lambdasmax.Rand",
+  "KO.SDP.lambdasmax",
+  "KO.SDP.lambdasmax.Rand",
+  "KO.Equi.coefdiff",
+  "KO.Equi.coefdiff.Rand",
+  "KO.SDP.coefdiff",
+  "KO.SDP.coefdiff.Rand",
+  "KO+.Equi.lambdasmax",
+  "KO+.Equi.lambdasmax.Rand",
+  "KO+.SDP.lambdasmax",
+  "KO+.SDP.lambdasmax.Rand",
+  "KO+.Equi.coefdiff",
+  "KO+.Equi.coefdiff.Rand",
+  "KO+.SDP.coefdiff",
+  "KO+.SDP.coefdiff.Rand"
+), cex.axis = 0.75, border = c("green", rep(c("black", "red"), 8))
 )
-points(colMeans(result.matrix[, 1 : 13]), col = "blue", pch = 3)
+points(colMeans(result.matrix[, 1 : 17]), col = "blue", pch = 3)
 abline(h = q, lty = 2, col = "red")
-abline(v = c(1.5, 7.5), col = "maroon")
+abline(v = c(1.5, 9.5), col = "maroon")
 
-boxplot(result.matrix[, 14 : 26], ylab = "TDP", las = 2, names = c(
+boxplot(result.matrix[, 18 : 34], ylab = "TDP", las = 2, names = c(
   "BH",
-  "KO.Equi.Marginal",
-  "KO.SDP.Marginal",
-  "KO.Equi.LASSO",
-  "KO.Equi.LASSO.Random",
-  "KO.SDP.LASSO",
-  "KO.SDP.LASSO.Random",
-  "KO+.Equi.Marginal",
-  "KO+.SDP.Marginal",
-  "KO+.Equi.LASSO",
-  "KO+.Equi.LASSO.Random",
-  "KO+.SDP.LASSO",
-  "KO+.SDP.LASSO.Random"
-), cex.axis = 0.75, border = c("green", rep(c(rep("black", 4), rep("red", 2)), 2))
+  "KO.Equi.lambdasmax",
+  "KO.Equi.lambdasmax.Rand",
+  "KO.SDP.lambdasmax",
+  "KO.SDP.lambdasmax.Rand",
+  "KO.Equi.coefdiff",
+  "KO.Equi.coefdiff.Rand",
+  "KO.SDP.coefdiff",
+  "KO.SDP.coefdiff.Rand",
+  "KO+.Equi.lambdasmax",
+  "KO+.Equi.lambdasmax.Rand",
+  "KO+.SDP.lambdasmax",
+  "KO+.SDP.lambdasmax.Rand",
+  "KO+.Equi.coefdiff",
+  "KO+.Equi.coefdiff.Rand",
+  "KO+.SDP.coefdiff",
+  "KO+.SDP.coefdiff.Rand"
+), cex.axis = 0.75, border = c("green", rep(c("black", "red"), 8))
 )
-points(colMeans(result.matrix[, 14 : 26]), col = "blue", pch = 3)
-abline(v = c(1.5, 7.5), col = "maroon")
+points(colMeans(result.matrix[, 18 : 34]), col = "blue", pch = 3)
+abline(v = c(1.5, 9.5), col = "maroon")
 
 null <- setdiff(seq(p), nonzero)
 W.sign <- lapply(W, apply, 2, function(x)(sum(x[null] > 0) / sum(x[null] != 0)))
 W.sign <- matrix(unlist(W.sign), m, byrow = TRUE)
 colnames(W.sign) <- c(
-  "equi + marginaldiff",
-  "sdp + marginaldiff",
-  "equi + stat.glmnet_lambdasmax",
-  "equi + stat.glmnet_lambdasmax + random",
-  "sdp + stat.glmnet_lambdasmax",
-  "sdp + stat.glmnet_lambdasmax + random"
+  "Equi + lambdasmax",
+  "Equi + lambdasmax + Random",
+  "SDP + lambdasmax",
+  "SDP + lambdasmax + Random",
+  "Equi + coefdiff",
+  "Equi + coefdiff + Random",
+  "SDP + coefdiff",
+  "SDP + coefdiff + Random"
 )
 
 ggplot2::ggplot(data = reshape2::melt(as.data.frame(W.sign)), mapping = aes(x = value)) +
@@ -1816,24 +1929,37 @@ for (i in 1 : m) {
   BH.selected <- (1 : p)[BH.fit <= q]
 
   orig <- 1 : p
+  
   random.order.variable <- sample(2 * p)
   Z <- knockoff:::lasso_max_lambda(cbind(X, Xk_f_e)[, random.order.variable], y, method = "glmnet", family = "gaussian")
   Z <- Z[order(random.order.variable)]
-  W_f_e <- pmax(Z[orig], Z[orig + p]) * sign(Z[orig] - Z[orig + p])
+  W_f_e_max <- pmax(Z[orig], Z[orig + p]) * sign(Z[orig] - Z[orig + p])
 
   random.order.variable <- sample(2 * p)
   Z <- knockoff:::lasso_max_lambda(cbind(X, Xk_f_s)[, random.order.variable], y, method = "glmnet", family = "gaussian")
   Z <- Z[order(random.order.variable)]
-  W_f_s <- pmax(Z[orig], Z[orig + p]) * sign(Z[orig] - Z[orig + p])
+  W_f_s_max <- pmax(Z[orig], Z[orig + p]) * sign(Z[orig] - Z[orig + p])
+  
+  random.order.variable <- sample(2 * p)
+  Z <- knockoff:::cv_coeffs_glmnet(cbind(X, Xk_f_e)[, random.order.variable], y, family = "gaussian", parallel = TRUE)
+  Z <- Z[order(random.order.variable)]
+  Xk_f_e_diff <- abs(Z[orig]) - abs(Z[orig + p])
+
+  random.order.variable <- sample(2 * p)
+  Z <- knockoff:::cv_coeffs_glmnet(cbind(X, Xk_f_s)[, random.order.variable], y, family = "gaussian", parallel = TRUE)
+  Z <- Z[order(random.order.variable)]
+  Xk_f_s_diff <- abs(Z[orig]) - abs(Z[orig + p])
 
   ## Knockoff
   W[[i]] <- cbind(
-    equi_marginal <- abs(t(X) %*% y) - abs(t(Xk_f_e) %*% y),
-    sdp_marginal <- abs(t(X) %*% y) - abs(t(Xk_f_s) %*% y),
-    equi_lasso <- knockoff::stat.glmnet_lambdasmax(X, Xk_f_e, y),
-    equi_lasso_random <- W_f_e,
-    sdp_lasso <- knockoff::stat.glmnet_lambdasmax(X, Xk_f_s, y),
-    sdp_lasso_random <- W_f_s
+    equi_max <- knockoff::stat.glmnet_lambdasmax(X, Xk_f_e, y),
+    equi_max_random <- W_f_e_max,
+    sdp_max <- knockoff::stat.glmnet_lambdasmax(X, Xk_f_s, y),
+    sdp_max_random <- W_f_s_max,
+    equi_diff <- knockoff::stat.glmnet_coefdiff(X, Xk_f_e, y, cores = ncores),
+    equi_diff_random <- Xk_f_e_diff,
+    sdp_diff <- knockoff::stat.glmnet_coefdiff(X, Xk_f_s, y, cores = ncores),
+    sdp_diff_random <- Xk_f_s_diff
   )
 
   Knockoff.threshold <- apply(W[[i]], 2, knockoff.threshold, fdr = q, offset = 0)
@@ -1857,55 +1983,65 @@ for (i in 1 : m) {
 ```{r, echo = FALSE, message = FALSE}
 par(mar = c(9, 4.5, 0.5, 0.5))
 result.matrix <- matrix(unlist(result), m, byrow = TRUE)
-boxplot(result.matrix[, 1 : 13], ylab = "FDP", las = 2, names = c(
+boxplot(result.matrix[, 1 : 17], ylab = "FDP", las = 2, names = c(
   "BH",
-  "KO.Equi.Marginal",
-  "KO.SDP.Marginal",
-  "KO.Equi.LASSO",
-  "KO.Equi.LASSO.Random",
-  "KO.SDP.LASSO",
-  "KO.SDP.LASSO.Random",
-  "KO+.Equi.Marginal",
-  "KO+.SDP.Marginal",
-  "KO+.Equi.LASSO",
-  "KO+.Equi.LASSO.Random",
-  "KO+.SDP.LASSO",
-  "KO+.SDP.LASSO.Random"
-), cex.axis = 0.75, border = c("green", rep(c(rep("black", 4), rep("red", 2)), 2))
+  "KO.Equi.lambdasmax",
+  "KO.Equi.lambdasmax.Rand",
+  "KO.SDP.lambdasmax",
+  "KO.SDP.lambdasmax.Rand",
+  "KO.Equi.coefdiff",
+  "KO.Equi.coefdiff.Rand",
+  "KO.SDP.coefdiff",
+  "KO.SDP.coefdiff.Rand",
+  "KO+.Equi.lambdasmax",
+  "KO+.Equi.lambdasmax.Rand",
+  "KO+.SDP.lambdasmax",
+  "KO+.SDP.lambdasmax.Rand",
+  "KO+.Equi.coefdiff",
+  "KO+.Equi.coefdiff.Rand",
+  "KO+.SDP.coefdiff",
+  "KO+.SDP.coefdiff.Rand"
+), cex.axis = 0.75, border = c("green", rep(c("black", "red"), 8))
 )
-points(colMeans(result.matrix[, 1 : 13]), col = "blue", pch = 3)
+points(colMeans(result.matrix[, 1 : 17]), col = "blue", pch = 3)
 abline(h = q, lty = 2, col = "red")
-abline(v = c(1.5, 7.5), col = "maroon")
+abline(v = c(1.5, 9.5), col = "maroon")
 
-boxplot(result.matrix[, 14 : 26], ylab = "TDP", las = 2, names = c(
+boxplot(result.matrix[, 18 : 34], ylab = "TDP", las = 2, names = c(
   "BH",
-  "KO.Equi.Marginal",
-  "KO.SDP.Marginal",
-  "KO.Equi.LASSO",
-  "KO.Equi.LASSO.Random",
-  "KO.SDP.LASSO",
-  "KO.SDP.LASSO.Random",
-  "KO+.Equi.Marginal",
-  "KO+.SDP.Marginal",
-  "KO+.Equi.LASSO",
-  "KO+.Equi.LASSO.Random",
-  "KO+.SDP.LASSO",
-  "KO+.SDP.LASSO.Random"
-), cex.axis = 0.75, border = c("green", rep(c(rep("black", 4), rep("red", 2)), 2))
+  "KO.Equi.lambdasmax",
+  "KO.Equi.lambdasmax.Rand",
+  "KO.SDP.lambdasmax",
+  "KO.SDP.lambdasmax.Rand",
+  "KO.Equi.coefdiff",
+  "KO.Equi.coefdiff.Rand",
+  "KO.SDP.coefdiff",
+  "KO.SDP.coefdiff.Rand",
+  "KO+.Equi.lambdasmax",
+  "KO+.Equi.lambdasmax.Rand",
+  "KO+.SDP.lambdasmax",
+  "KO+.SDP.lambdasmax.Rand",
+  "KO+.Equi.coefdiff",
+  "KO+.Equi.coefdiff.Rand",
+  "KO+.SDP.coefdiff",
+  "KO+.SDP.coefdiff.Rand"
+), cex.axis = 0.75, border = c("green", rep(c("black", "red"), 8))
 )
-points(colMeans(result.matrix[, 14 : 26]), col = "blue", pch = 3)
-abline(v = c(1.5, 7.5), col = "maroon")
+points(colMeans(result.matrix[, 18 : 34]), col = "blue", pch = 3)
+abline(v = c(1.5, 9.5), col = "maroon")
 
 null <- setdiff(seq(p), nonzero)
 W.sign <- lapply(W, apply, 2, function(x)(sum(x[null] > 0) / sum(x[null] != 0)))
 W.sign <- matrix(unlist(W.sign), m, byrow = TRUE)
 colnames(W.sign) <- c(
-  "equi + marginaldiff",
-  "sdp + marginaldiff",
-  "equi + stat.glmnet_lambdasmax",
-  "equi + stat.glmnet_lambdasmax + random",
-  "sdp + stat.glmnet_lambdasmax",
-  "sdp + stat.glmnet_lambdasmax + random"
+  "Equi + lambdasmax",
+  "Equi + lambdasmax + Random",
+  "SDP + lambdasmax",
+  "SDP + lambdasmax + Random",
+  "Equi + coefdiff",
+  "Equi + coefdiff + Random",
+  "SDP + coefdiff",
+  "SDP + coefdiff + Random"
 )
 
 ggplot2::ggplot(data = reshape2::melt(as.data.frame(W.sign)), mapping = aes(x = value)) +
