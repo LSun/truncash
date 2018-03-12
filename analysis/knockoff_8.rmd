@@ -2204,6 +2204,16 @@ ggplot2::ggplot(data = reshape2::melt(as.data.frame(W.sign.matrix)), mapping = a
   geom_vline(xintercept = 0.5, col = "red", linetype = "dashed")
 ```
 
+## Observation
+
+Model-$X$ knockoff indeed increases power substantially.
+
+- Reason 1: it builds better knockoffs as they are less similar to originals, since Model-$X$ is about population correlation not sample correlation.
+
+- Reason 2: Model-$X$ unleashes a large swarm of complicated test statistics which are not applicable for Fixed-$X$.
+
+However, for that particular case when we have $$\Sigma_\hat\beta$$ as a factor model, Model-$X$ knockoffs are still not good.
+
 ## Session information
 
 <!-- Insert the session information into the document -->

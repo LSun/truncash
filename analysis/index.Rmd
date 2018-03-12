@@ -231,6 +231,7 @@ Next it's a series of investigation of a number of variable selection and false 
 * [`Knockoff` on small signals](knockoff_6.html)
 * [`Knockoff` on design matrix correlation](knockoff_5.html)
 * [A closer look at `Knockoff` on design matrix correlation](knockoff_7.html)
+* [Quality of Knockoffs and Power](knockoff_8.html)
 
 [`ashr`]: https://github.com/stephens999/ashr
 
