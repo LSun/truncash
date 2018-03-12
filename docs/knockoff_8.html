@@ -315,10 +315,10 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2018-03-10</p>
+<p><strong>Last updated:</strong> 2018-03-11</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> b1215be</p>
+<p><strong>Code version:</strong> 2c9cf26</p>
 <!-- Add your analysis here -->
 <section id="introduction" class="level2">
 <h2>Introduction</h2>
@@ -465,6 +465,15 @@ B_{ij} \overset{iid}{\sim} N(0, 1)
 <h3>Model-<span class="math inline">\(X\)</span> Design</h3>
 <p><img src="figure/knockoff_8.rmd/unnamed-chunk-20-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_8.rmd/unnamed-chunk-20-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_8.rmd/unnamed-chunk-20-3.png" width="672" style="display: block; margin: auto;" /></p>
 </section>
+</section>
+<section id="observation" class="level2">
+<h2>Observation</h2>
+<p>Model-<span class="math inline">\(X\)</span> knockoff indeed increases power substantially.</p>
+<ul>
+<li><p>Reason 1: it builds better knockoffs as they are less similar to originals, since Model-<span class="math inline">\(X\)</span> is about population correlation not sample correlation.</p></li>
+<li><p>Reason 2: Model-<span class="math inline">\(X\)</span> unleashes a large swarm of complicated test statistics which are not applicable for Fixed-<span class="math inline">\(X\)</span>.</p></li>
+</ul>
+<p>However, for that particular case when we have <span class="math display">\[\Sigma_\hat\beta\]</span> as a factor model, Model-<span class="math inline">\(X\)</span> knockoffs are still not good.</p>
 </section>
 <section id="session-information" class="level2">
 <h2>Session information</h2>
