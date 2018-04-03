@@ -1,0 +1,54 @@
+---
+title: "Variability of `Knockoff`'s FDR Control"
+author: "Lei Sun"
+date: 2018-04-03
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+```{r, eval = FALSE}
+library(knockoff)
+n <- 1e4
+p <- 4
+Sigma <- matrix(c(1, 0.99, 0, 0, 0.99, 1, 0, 0, 0, 0, 1, 0.01, 0, 0, 0.01, 1), byrow = TRUE, 4, 4)
+beta <- c(5, 0, 5, 0) / sqrt(n)
+
+W <- list()
+
+for (i in 1 : 1000) {
+  X1 <- rnorm(n)
+  X2 <- 0.99 * X1 + sqrt(1 - 0.99^2) * rnorm(n)
+  X3 <- rnorm(n)
+  X4 <- 0.01 * X3 + sqrt(1 - 0.01^2) * rnorm(n)
+  X <- cbind(X1, X2, X3, X4)
+  Xk <- knockoff::create.gaussian(X, mu = rep(0, 4), Sigma = Sigma, method = "sdp")
+  y <- X %*% beta + rnorm(n)
+  W[[i]] <- knockoff::stat.glmnet_coefdiff(X, Xk, y)
+}
+```
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```

@@ -38,7 +38,14 @@ In the following simulations, we always have $n = 3000$, $p = 1000$, For a certa
 
 ```{r, echo = FALSE}
 library(knockoff)
+library(Matrix)
+library(reshape2)
 library(ggplot2)
+library(doMC)
+library(lattice)
+ncores <- parallel::detectCores(all.tests = TRUE, logical = TRUE)
+doMC::registerDoMC(cores = ncores)
+
 fdp <- function(selected) sum(beta[selected] == 0) / max(length(selected), 1)
 power <- function(selected, k = k) sum(beta[selected] != 0) / max(k, 1)
 mean_sdp <- function(x) {
@@ -254,7 +261,9 @@ colnames(result.summary) <- c("fdp.BH", "fdp.Knockoff", "fdp.Knockoff.plus", "po
 result.manysmall <- result.summary
 ```
 
-## Orthogonal design
+## Fix-$X$ Knockoffs
+
+### Orthogonal design
 
 $X$ has random orthonormal columns
 
@@ -390,7 +399,7 @@ ggplot(data = Power.small.summary,
   theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 10), axis.title.y = element_text(size = 10), axis.text.x = element_text(size = 10), axis.text.y = element_text(size = 10))
 ```
 
-## Independent design
+### Independent design
 
 $X_{n \times p}$ has independent columns simulated from $N(0, 1)$ and then normalized to have $\|X_j\|_2^2 \equiv 1$. 
 
@@ -697,7 +706,7 @@ ggplot(data = Power.small.summary,
   theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 10), axis.title.y = element_text(size = 10), axis.text.x = element_text(size = 10), axis.text.y = element_text(size = 10))
 ```
 
-## Local correlation design
+### Local correlation design
 
 $X_{n \times p}$ has correlation $\Sigma_{ij} = \rho^{|i - j|}$. Each row is independently $N(0, \Sigma)$ and then normalized to have $\|X_j\|_2^2 \equiv 1$.
 
@@ -1009,8 +1018,604 @@ ggplot(data = Power.small.summary,
   theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 10), axis.title.y = element_text(size = 10), axis.text.x = element_text(size = 10), axis.text.y = element_text(size = 10))
 ```
 
+## Model-$X$ Knockoffs
+
+### Independent design
+
+$X_{n \times p}$ has independent columns simulated from $N(0, (1/\sqrt n)^2)$ so they are roughly normalized.
+
+```{r, echo = FALSE, cache = TRUE}
+Cov.X <- diag(1 / n, p)
+m <- 100
+```
+
+```{r, echo = FALSE, cache = TRUE}
+result <- list()
+for (i in 1 : m) {
+beta <- rep(0, p)
+large <- sample(p, k)
+beta[large] <- A
+
+X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n, p)
+y <- X %*% beta + rnorm(n)
+
+## Least squares
+lm.fit <- lm(y ~ X - 1)
+pvalue <- summary(lm.fit)$coefficients[, 4]
+
+## BH
+BH.fit <- p.adjust(pvalue, method = "BH")
+BH.selected <- (1 : p)[BH.fit <= q]
+
+## Knockoff
+Xk_m_g_s <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "sdp")
+gauss_sdp <- knockoff::stat.glmnet_coefdiff(X, Xk_m_g_s, y, cores = ncores)
+thres.knockoff = knockoff::knockoff.threshold(gauss_sdp, fdr = q, offset = 0) # less conservative
+thres.knockoff.plus = knockoff::knockoff.threshold(gauss_sdp, fdr = q, offset = 1) # more conservative
+knockoff.selected <- which(gauss_sdp >= thres.knockoff)
+knockoff.plus.selected <- which(gauss_sdp >= thres.knockoff.plus)
+
+result[[i]] <- c(
+  fdp.BH = fdp(BH.selected),
+  fdp.knockoff = fdp(knockoff.selected),
+  fdp.knockoff.plus = fdp(knockoff.plus.selected),
+  power.BH = power(BH.selected, sum(beta != 0)),
+  power.knockoff = power(knockoff.selected, sum(beta != 0)),
+  power.knockoff.plus = power(knockoff.plus.selected, sum(beta != 0))
+)
+}
+```
+
+```{r, echo = FALSE}
+result.summary <- matrix(unlist(result), m, 6, byrow = TRUE)
+colnames(result.summary) <- c("fdp.BH", "fdp.Knockoff", "fdp.Knockoff.plus", "power.BH", "power.Knockoff", "power.Knockoff.plus")
+result.nosmall <- result.summary
+```
+
+```{r, echo = FALSE}
+k.small <- 100
+```
+
+```{r, echo = FALSE, cache = TRUE}
+result <- list()
+for (i in 1 : m) {
+beta <- rep(0, p)
+large <- sample(p, k)
+small <- sample(setdiff(seq(p), large), k.small)
+beta[large] <- A
+beta[small] <- seq(0, 3, length = k.small + 1)[-1]
+  
+X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n, p)
+y <- X %*% beta + rnorm(n)
+
+## Least squares
+lm.fit <- lm(y ~ X - 1)
+pvalue <- summary(lm.fit)$coefficients[, 4]
+
+## BH
+BH.fit <- p.adjust(pvalue, method = "BH")
+BH.selected <- (1 : p)[BH.fit <= q]
+
+## Knockoff
+Xk_m_g_s <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "sdp")
+gauss_sdp <- knockoff::stat.glmnet_coefdiff(X, Xk_m_g_s, y, cores = ncores)
+thres.knockoff = knockoff::knockoff.threshold(gauss_sdp, fdr = q, offset = 0) # less conservative
+thres.knockoff.plus = knockoff::knockoff.threshold(gauss_sdp, fdr = q, offset = 1) # more conservative
+knockoff.selected <- which(gauss_sdp >= thres.knockoff)
+knockoff.plus.selected <- which(gauss_sdp >= thres.knockoff.plus)
+
+result[[i]] <- c(
+  fdp.BH = fdp(BH.selected),
+  fdp.knockoff = fdp(knockoff.selected),
+  fdp.knockoff.plus = fdp(knockoff.plus.selected),
+  power.BH = power(BH.selected, sum(beta != 0)),
+  power.knockoff = power(knockoff.selected, sum(beta != 0)),
+  power.knockoff.plus = power(knockoff.plus.selected, sum(beta != 0)),
+  power.large.BH <- length(intersect(BH.selected, large)) / length(large),
+  power.large.knockoff <- length(intersect(knockoff.selected, large)) / length(large),
+  power.large.knockoff.plus <- length(intersect(knockoff.plus.selected, large)) / length(large),
+  power.small.BH <- length(intersect(BH.selected, small)) / length(small),
+  power.small.knockoff <- length(intersect(knockoff.selected, small)) / length(small),
+  power.small.knockoff.plus <- length(intersect(knockoff.plus.selected, small)) / length(small)
+)
+}
+```
+
+```{r, echo = FALSE}
+result.summary <- matrix(unlist(result), m, 12, byrow = TRUE)
+colnames(result.summary) <- c("fdp.BH", "fdp.Knockoff", "fdp.Knockoff.plus", "power.BH", "power.Knockoff", "power.Knockoff.plus", "power.large.BH", "power.large.Knockoff", "power.large.Knockoff.plus", "power.small.BH", "power.small.Knockoff", "power.small.Knockoff.plus")
+result.fewsmall <- result.summary
+```
+
+```{r, echo = FALSE}
+k.small <- 200
+```
+
+```{r, echo = FALSE, cache = TRUE}
+result <- list()
+for (i in 1 : m) {
+beta <- rep(0, p)
+large <- sample(p, k)
+small <- sample(setdiff(seq(p), large), k.small)
+beta[large] <- A
+beta[small] <- seq(0, 3, length = k.small + 1)[-1]
+
+X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n, p)
+y <- X %*% beta + rnorm(n)
+
+## Least squares
+lm.fit <- lm(y ~ X - 1)
+pvalue <- summary(lm.fit)$coefficients[, 4]
+
+## BH
+BH.fit <- p.adjust(pvalue, method = "BH")
+BH.selected <- (1 : p)[BH.fit <= q]
+
+## Knockoff
+Xk_m_g_s <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "sdp")
+gauss_sdp <- knockoff::stat.glmnet_coefdiff(X, Xk_m_g_s, y, cores = ncores)
+thres.knockoff = knockoff::knockoff.threshold(gauss_sdp, fdr = q, offset = 0) # less conservative
+thres.knockoff.plus = knockoff::knockoff.threshold(gauss_sdp, fdr = q, offset = 1) # more conservative
+knockoff.selected <- which(gauss_sdp >= thres.knockoff)
+knockoff.plus.selected <- which(gauss_sdp >= thres.knockoff.plus)
+
+result[[i]] <- c(
+  fdp.BH = fdp(BH.selected),
+  fdp.knockoff = fdp(knockoff.selected),
+  fdp.knockoff.plus = fdp(knockoff.plus.selected),
+  power.BH = power(BH.selected, sum(beta != 0)),
+  power.knockoff = power(knockoff.selected, sum(beta != 0)),
+  power.knockoff.plus = power(knockoff.plus.selected, sum(beta != 0)),
+  power.large.BH <- length(intersect(BH.selected, large)) / length(large),
+  power.large.knockoff <- length(intersect(knockoff.selected, large)) / length(large),
+  power.large.knockoff.plus <- length(intersect(knockoff.plus.selected, large)) / length(large),
+  power.small.BH <- length(intersect(BH.selected, small)) / length(small),
+  power.small.knockoff <- length(intersect(knockoff.selected, small)) / length(small),
+  power.small.knockoff.plus <- length(intersect(knockoff.plus.selected, small)) / length(small)
+)
+}
+```
+
+```{r, echo = FALSE}
+result.summary <- matrix(unlist(result), m, 12, byrow = TRUE)
+colnames(result.summary) <- c("fdp.BH", "fdp.Knockoff", "fdp.Knockoff.plus", "power.BH", "power.Knockoff", "power.Knockoff.plus", "power.large.BH", "power.large.Knockoff", "power.large.Knockoff.plus", "power.small.BH", "power.small.Knockoff", "power.small.Knockoff.plus")
+result.manysmall <- result.summary
+```
+
+```{r, echo = FALSE}
+summary <- rbind.data.frame(colMeans(result.nosmall), colMeans(result.fewsmall), colMeans(result.manysmall))
+colnames(summary) <- c("FDP.BH", "FDP.Knockoff", "FDP.Knockoff.Plus", "Power.BH", "Power.Knockoff", "Power.Knockoff.Plus", "Power.Large.BH", "Power.Large.Knockoff", "Power.Large.Knockoff.Plus", "Power.Small.BH", "Power.Small.Knockoff", "Power.Small.Knockoff.Plus")
+summary[1, 7 : 9] <- summary[1, 4 : 6]
+summary[1, 10 : 12] <- NA
+library(knitr)
+kable(summary, digits = 4)
+
+plot(seq(3), seq(3), ylim = c(0, 2 * q), xaxt = "n", type = "n", xlab = "", ylab = "FDR")
+axis(1, labels = c("No Small", "Less Small", "More Small"), at = seq(3))
+for (i in seq(method.name)) {
+  lines(seq(3), c(mean(result.nosmall[, i]), mean(result.fewsmall[, i]), mean(result.manysmall[, i])), type = "o", pch = i, col = method.col[i])
+  arrows(x0 = seq(3), x1 = seq(3), y0 = c(mean(result.nosmall[, i]), mean(result.fewsmall[, i]), mean(result.manysmall[, i])) - 2 * c(sd(result.nosmall[, i]), sd(result.fewsmall[, i]), sd(result.manysmall[, i])) / sqrt(m), y1 = c(mean(result.nosmall[, i]), mean(result.fewsmall[, i]), mean(result.manysmall[, i])) + 2 * c(sd(result.nosmall[, i]), sd(result.fewsmall[, i]), sd(result.manysmall[, i])) / sqrt(m), length = 0.05, angle = 90, code = 3, col = method.col[i])
+}
+abline(h = q, lty = 2, lwd = 2)
+legend("top", horiz = TRUE, method.name, col = method.col, pch = seq(method.name), lty = 1)
+
+plot(seq(3), seq(3), ylim = c(0, 1), xaxt = "n", type = "n", xlab = "", ylab = "FDR", main = "Overall Power")
+axis(1, labels = c("No Small", "Less Small", "More Small"), at = seq(3))
+for (i in seq(method.name)) {
+  lines(seq(3), c(mean(result.nosmall[, i + 3]), mean(result.fewsmall[, i + 3]), mean(result.manysmall[, i + 3])), type = "o", pch = i, col = method.col[i])
+  arrows(x0 = seq(3), x1 = seq(3), y0 = c(mean(result.nosmall[, i + 3]), mean(result.fewsmall[, i + 3]), mean(result.manysmall[, i + 3])) - 2 * c(sd(result.nosmall[, i + 3]), sd(result.fewsmall[, i + 3]), sd(result.manysmall[, i + 3])) / sqrt(m), y1 = c(mean(result.nosmall[, i + 3]), mean(result.fewsmall[, i + 3]), mean(result.manysmall[, i + 3])) + 2 * c(sd(result.nosmall[, i + 3]), sd(result.fewsmall[, i + 3]), sd(result.manysmall[, i + 3])) / sqrt(m), length = 0.05, angle = 90, code = 3, col = method.col[i])
+}
+legend("top", horiz = TRUE, method.name, col = method.col, pch = seq(method.name), lty = 1)
+
+plot(seq(3), seq(3), ylim = c(0, 1), xaxt = "n", type = "n", xlab = "", ylab = "FDR", main = "Power for Large Signals")
+axis(1, labels = c("No Small", "Less Small", "More Small"), at = seq(3))
+for (i in seq(method.name)) {
+  lines(seq(3), c(mean(result.nosmall[, i + 3]), mean(result.fewsmall[, i + 6]), mean(result.manysmall[, i + 6])), type = "o", pch = i, col = method.col[i])
+  arrows(x0 = seq(3), x1 = seq(3), y0 = c(mean(result.nosmall[, i + 3]), mean(result.fewsmall[, i + 6]), mean(result.manysmall[, i + 6])) - 2 * c(sd(result.nosmall[, i + 3]), sd(result.fewsmall[, i + 6]), sd(result.manysmall[, i + 6])) / sqrt(m), y1 = c(mean(result.nosmall[, i + 3]), mean(result.fewsmall[, i + 6]), mean(result.manysmall[, i + 6])) + 2 * c(sd(result.nosmall[, i + 3]), sd(result.fewsmall[, i + 6]), sd(result.manysmall[, i + 6])) / sqrt(m), length = 0.05, angle = 90, code = 3, col = method.col[i])
+}
+legend("top", horiz = TRUE, method.name, col = method.col, pch = seq(method.name), lty = 1)
+
+plot(seq(2), seq(2), ylim = c(0, 1), xaxt = "n", type = "n", xlab = "", ylab = "FDR", main = "Power for Small Signals")
+axis(1, labels = c("Less Small", "More Small"), at = seq(2))
+for (i in seq(method.name)) {
+  lines(seq(2), c(mean(result.fewsmall[, i + 9]), mean(result.manysmall[, i + 9])), type = "o", pch = i, col = method.col[i])
+  arrows(x0 = seq(2), x1 = seq(2), y0 = c(mean(result.fewsmall[, i + 9]), mean(result.manysmall[, i + 9])) - 2 * c(sd(result.fewsmall[, i + 9]), sd(result.manysmall[, i + 9])) / sqrt(m), y1 = c(mean(result.fewsmall[, i + 9]), mean(result.manysmall[, i + 9])) + 2 * c(sd(result.fewsmall[, i + 9]), sd(result.manysmall[, i + 9])) / sqrt(m), length = 0.05, angle = 90, code = 3, col = method.col[i])
+}
+legend("top", horiz = TRUE, method.name, col = method.col, pch = seq(method.name), lty = 1)
+```
+
+```{r, echo = FALSE}
+FDP.summary <- rbind.data.frame(
+   cbind.data.frame(FDP = result.nosmall[, 1], Method = rep("BH", length(result.nosmall[, 1])), Scenario = rep("No Small Signals", length(result.nosmall[, 1]))),
+   cbind.data.frame(FDP = result.nosmall[, 2], Method = rep("Knockoff", length(result.nosmall[, 2])), Scenario = rep("No Small Signals", length(result.nosmall[, 2]))),
+   cbind.data.frame(FDP = result.nosmall[, 3], Method = rep("Knockoff+", length(result.nosmall[, 3])), Scenario = rep("No Small Signals", length(result.nosmall[, 3]))),
+   cbind.data.frame(FDP = result.fewsmall[, 1], Method = rep("BH", length(result.fewsmall[, 1])), Scenario = rep("Less Small Signals", length(result.fewsmall[, 1]))),
+   cbind.data.frame(FDP = result.fewsmall[, 2], Method = rep("Knockoff", length(result.fewsmall[, 2])), Scenario = rep("Less Small Signals", length(result.fewsmall[, 2]))),
+   cbind.data.frame(FDP = result.fewsmall[, 3], Method = rep("Knockoff+", length(result.fewsmall[, 3])), Scenario = rep("Less Small Signals", length(result.fewsmall[, 3]))),
+   cbind.data.frame(FDP = result.manysmall[, 1], Method = rep("BH", length(result.manysmall[, 1])), Scenario = rep("More Small Signals", length(result.manysmall[, 1]))),
+   cbind.data.frame(FDP = result.manysmall[, 2], Method = rep("Knockoff", length(result.manysmall[, 2])), Scenario = rep("More Small Signals", length(result.manysmall[, 2]))),
+   cbind.data.frame(FDP = result.manysmall[, 3], Method = rep("Knockoff+", length(result.manysmall[, 3])), Scenario = rep("More Small Signals", length(result.manysmall[, 3])))
+ )
+
+ggplot(data = FDP.summary,
+        aes(x = Method, y = FDP, col = Method)) +
+  geom_violin(trim = TRUE) +
+  facet_wrap(~Scenario) +
+  stat_summary(fun.data = "mean_sdp", geom = "pointrange") +
+  scale_color_manual(values = method.col) +
+  geom_hline(yintercept = q, col = "maroon", linetype = "dashed", size = 1) +
+  labs(title = bquote(paste("False Discovery Proportions at ", FDR == .(q), " Cutoff")), x = "", y = "FDP") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 10), axis.title.y = element_text(size = 10), axis.text.x = element_text(size = 10), axis.text.y = element_text(size = 10))
+```
+
+```{r, echo = FALSE}
+Power.summary <- rbind.data.frame(
+   cbind.data.frame(Power = result.nosmall[, 4], Method = rep("BH", length(result.nosmall[, 4])), Scenario = rep("No Small Signals", length(result.nosmall[, 4]))),
+   cbind.data.frame(Power = result.nosmall[, 5], Method = rep("Knockoff", length(result.nosmall[, 5])), Scenario = rep("No Small Signals", length(result.nosmall[, 5]))),
+   cbind.data.frame(Power = result.nosmall[, 6], Method = rep("Knockoff+", length(result.nosmall[, 6])), Scenario = rep("No Small Signals", length(result.nosmall[, 6]))),
+   cbind.data.frame(Power = result.fewsmall[, 4], Method = rep("BH", length(result.fewsmall[, 4])), Scenario = rep("Less Small Signals", length(result.fewsmall[, 4]))),
+   cbind.data.frame(Power = result.fewsmall[, 5], Method = rep("Knockoff", length(result.fewsmall[, 5])), Scenario = rep("Less Small Signals", length(result.fewsmall[, 5]))),
+   cbind.data.frame(Power = result.fewsmall[, 6], Method = rep("Knockoff+", length(result.fewsmall[, 6])), Scenario = rep("Less Small Signals", length(result.fewsmall[, 6]))),
+   cbind.data.frame(Power = result.manysmall[, 4], Method = rep("BH", length(result.manysmall[, 4])), Scenario = rep("More Small Signals", length(result.manysmall[, 4]))),
+   cbind.data.frame(Power = result.manysmall[, 5], Method = rep("Knockoff", length(result.manysmall[, 5])), Scenario = rep("More Small Signals", length(result.manysmall[, 5]))),
+   cbind.data.frame(Power = result.manysmall[, 6], Method = rep("Knockoff+", length(result.manysmall[, 6])), Scenario = rep("More Small Signals", length(result.manysmall[, 6])))
+ )
+
+ggplot(data = Power.summary,
+        aes(x = Method, y = Power, col = Method)) +
+  geom_violin(trim = TRUE) +
+  facet_wrap(~Scenario) +
+  stat_summary(fun.data = "mean_sdp", geom = "pointrange") +
+  scale_color_manual(values = method.col) +
+  labs(title = bquote(paste("Overall Power at ", FDR == .(q), " Cutoff")), x = "", y = "Power") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 10), axis.title.y = element_text(size = 10), axis.text.x = element_text(size = 10), axis.text.y = element_text(size = 10))
+```
+
+```{r, echo = FALSE}
+Power.large.summary <- rbind.data.frame(
+   cbind.data.frame(Power = result.nosmall[, 4], Method = rep("BH", length(result.nosmall[, 4])), Scenario = rep("No Small Signals", length(result.nosmall[, 4]))),
+   cbind.data.frame(Power = result.nosmall[, 5], Method = rep("Knockoff", length(result.nosmall[, 5])), Scenario = rep("No Small Signals", length(result.nosmall[, 5]))),
+   cbind.data.frame(Power = result.nosmall[, 6], Method = rep("Knockoff+", length(result.nosmall[, 6])), Scenario = rep("No Small Signals", length(result.nosmall[, 6]))),
+   cbind.data.frame(Power = result.fewsmall[, 7], Method = rep("BH", length(result.fewsmall[, 7])), Scenario = rep("Less Small Signals", length(result.fewsmall[, 7]))),
+   cbind.data.frame(Power = result.fewsmall[, 8], Method = rep("Knockoff", length(result.fewsmall[, 8])), Scenario = rep("Less Small Signals", length(result.fewsmall[, 8]))),
+   cbind.data.frame(Power = result.fewsmall[, 9], Method = rep("Knockoff+", length(result.fewsmall[, 9])), Scenario = rep("Less Small Signals", length(result.fewsmall[, 9]))),
+   cbind.data.frame(Power = result.manysmall[, 7], Method = rep("BH", length(result.manysmall[, 7])), Scenario = rep("More Small Signals", length(result.manysmall[, 7]))),
+   cbind.data.frame(Power = result.manysmall[, 8], Method = rep("Knockoff", length(result.manysmall[, 8])), Scenario = rep("More Small Signals", length(result.manysmall[, 8]))),
+   cbind.data.frame(Power = result.manysmall[, 9], Method = rep("Knockoff+", length(result.manysmall[, 9])), Scenario = rep("More Small Signals", length(result.manysmall[, 9])))
+ )
+
+ggplot(data = Power.large.summary,
+        aes(x = Method, y = Power, col = Method)) +
+  geom_violin(trim = TRUE) +
+  facet_wrap(~Scenario) +
+  stat_summary(fun.data = "mean_sdp", geom = "pointrange") +
+  scale_color_manual(values = method.col) +
+  labs(title = bquote(paste("Power for Large Signals at ", FDR == .(q), " Cutoff")), x = "", y = "Power") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 10), axis.title.y = element_text(size = 10), axis.text.x = element_text(size = 10), axis.text.y = element_text(size = 10))
+```
+
+```{r, echo = FALSE}
+Power.small.summary <- rbind.data.frame(
+   cbind.data.frame(Power = result.fewsmall[, 10], Method = rep("BH", length(result.fewsmall[, 10])), Scenario = rep("Less Small Signals", length(result.fewsmall[, 10]))),
+   cbind.data.frame(Power = result.fewsmall[, 11], Method = rep("Knockoff", length(result.fewsmall[, 11])), Scenario = rep("Less Small Signals", length(result.fewsmall[, 11]))),
+   cbind.data.frame(Power = result.fewsmall[, 12], Method = rep("Knockoff+", length(result.fewsmall[, 12])), Scenario = rep("Less Small Signals", length(result.fewsmall[, 12]))),
+   cbind.data.frame(Power = result.manysmall[, 10], Method = rep("BH", length(result.manysmall[, 10])), Scenario = rep("More Small Signals", length(result.manysmall[, 10]))),
+   cbind.data.frame(Power = result.manysmall[, 11], Method = rep("Knockoff", length(result.manysmall[, 11])), Scenario = rep("More Small Signals", length(result.manysmall[, 11]))),
+   cbind.data.frame(Power = result.manysmall[, 12], Method = rep("Knockoff+", length(result.manysmall[, 12])), Scenario = rep("More Small Signals", length(result.manysmall[, 12])))
+ )
+
+ggplot(data = Power.small.summary,
+        aes(x = Method, y = Power, col = Method)) +
+  geom_violin(trim = TRUE) +
+  facet_wrap(~Scenario) +
+  stat_summary(fun.data = "mean_sdp", geom = "pointrange") +
+  scale_color_manual(values = method.col) +
+  labs(title = bquote(paste("Power for Small Signals at ", FDR == .(q), " Cutoff")), x = "", y = "Power") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 10), axis.title.y = element_text(size = 10), axis.text.x = element_text(size = 10), axis.text.y = element_text(size = 10))
+```
+
+### Local correlation design
+
+$X_{n \times p}$ has correlation $\Sigma_{ij} = \rho^{|i - j|}$. Each row is independently $N(0, \frac1n\Sigma)$.
+
+```{r, cache = TRUE}
+rho <- 0.5
+Sigma <- toeplitz(rho^(0 : (p - 1)))
+Sigma.5 <- chol(Sigma)
+Cov.X <- Sigma / n
+```
+
+```{r, echo = FALSE, cache = TRUE}
+result <- list()
+for (i in 1 : m) {
+beta <- rep(0, p)
+large <- sample(p, k)
+beta[large] <- A
+
+X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n, p)
+X <- X %*% Sigma.5
+y <- X %*% beta + rnorm(n)
+
+## Least squares
+lm.fit <- lm(y ~ X - 1)
+pvalue <- summary(lm.fit)$coefficients[, 4]
+
+## BH
+BH.fit <- p.adjust(pvalue, method = "BH")
+BH.selected <- (1 : p)[BH.fit <= q]
+
+## Knockoff
+Xk_m_g_s <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "sdp")
+gauss_sdp <- knockoff::stat.glmnet_coefdiff(X, Xk_m_g_s, y, cores = ncores)
+thres.knockoff = knockoff::knockoff.threshold(gauss_sdp, fdr = q, offset = 0) # less conservative
+thres.knockoff.plus = knockoff::knockoff.threshold(gauss_sdp, fdr = q, offset = 1) # more conservative
+knockoff.selected <- which(gauss_sdp >= thres.knockoff)
+knockoff.plus.selected <- which(gauss_sdp >= thres.knockoff.plus)
+
+result[[i]] <- c(
+  fdp.BH = fdp(BH.selected),
+  fdp.knockoff = fdp(knockoff.selected),
+  fdp.knockoff.plus = fdp(knockoff.plus.selected),
+  power.BH = power(BH.selected, sum(beta != 0)),
+  power.knockoff = power(knockoff.selected, sum(beta != 0)),
+  power.knockoff.plus = power(knockoff.plus.selected, sum(beta != 0))
+)
+}
+```
+
+```{r, echo = FALSE}
+result.summary <- matrix(unlist(result), m, 6, byrow = TRUE)
+colnames(result.summary) <- c("fdp.BH", "fdp.Knockoff", "fdp.Knockoff.plus", "power.BH", "power.Knockoff", "power.Knockoff.plus")
+result.nosmall <- result.summary
+```
+
+```{r, echo = FALSE}
+k.small <- 100
+```
+
+```{r, echo = FALSE, cache = TRUE}
+result <- list()
+for (i in 1 : m) {
+beta <- rep(0, p)
+large <- sample(p, k)
+small <- sample(setdiff(seq(p), large), k.small)
+beta[large] <- A
+beta[small] <- seq(0, 3, length = k.small + 1)[-1]
+  
+X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n, p)
+X <- X %*% Sigma.5
+y <- X %*% beta + rnorm(n)
+
+## Least squares
+lm.fit <- lm(y ~ X - 1)
+pvalue <- summary(lm.fit)$coefficients[, 4]
+
+## BH
+BH.fit <- p.adjust(pvalue, method = "BH")
+BH.selected <- (1 : p)[BH.fit <= q]
+
+## Knockoff
+Xk_m_g_s <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "sdp")
+gauss_sdp <- knockoff::stat.glmnet_coefdiff(X, Xk_m_g_s, y, cores = ncores)
+thres.knockoff = knockoff::knockoff.threshold(gauss_sdp, fdr = q, offset = 0) # less conservative
+thres.knockoff.plus = knockoff::knockoff.threshold(gauss_sdp, fdr = q, offset = 1) # more conservative
+knockoff.selected <- which(gauss_sdp >= thres.knockoff)
+knockoff.plus.selected <- which(gauss_sdp >= thres.knockoff.plus)
+
+result[[i]] <- c(
+  fdp.BH = fdp(BH.selected),
+  fdp.knockoff = fdp(knockoff.selected),
+  fdp.knockoff.plus = fdp(knockoff.plus.selected),
+  power.BH = power(BH.selected, sum(beta != 0)),
+  power.knockoff = power(knockoff.selected, sum(beta != 0)),
+  power.knockoff.plus = power(knockoff.plus.selected, sum(beta != 0)),
+  power.large.BH <- length(intersect(BH.selected, large)) / length(large),
+  power.large.knockoff <- length(intersect(knockoff.selected, large)) / length(large),
+  power.large.knockoff.plus <- length(intersect(knockoff.plus.selected, large)) / length(large),
+  power.small.BH <- length(intersect(BH.selected, small)) / length(small),
+  power.small.knockoff <- length(intersect(knockoff.selected, small)) / length(small),
+  power.small.knockoff.plus <- length(intersect(knockoff.plus.selected, small)) / length(small)
+)
+}
+```
+
+```{r, echo = FALSE}
+result.summary <- matrix(unlist(result), m, 12, byrow = TRUE)
+colnames(result.summary) <- c("fdp.BH", "fdp.Knockoff", "fdp.Knockoff.plus", "power.BH", "power.Knockoff", "power.Knockoff.plus", "power.large.BH", "power.large.Knockoff", "power.large.Knockoff.plus", "power.small.BH", "power.small.Knockoff", "power.small.Knockoff.plus")
+result.fewsmall <- result.summary
+```
+
+```{r, echo = FALSE}
+k.small <- 200
+```
+
+```{r, echo = FALSE, cache = TRUE}
+result <- list()
+for (i in 1 : m) {
+beta <- rep(0, p)
+large <- sample(p, k)
+small <- sample(setdiff(seq(p), large), k.small)
+beta[large] <- A
+beta[small] <- seq(0, 3, length = k.small + 1)[-1]
+
+X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n, p)
+y <- X %*% beta + rnorm(n)
+X <- X %*% Sigma.5
+
+## Least squares
+lm.fit <- lm(y ~ X - 1)
+pvalue <- summary(lm.fit)$coefficients[, 4]
+
+## BH
+BH.fit <- p.adjust(pvalue, method = "BH")
+BH.selected <- (1 : p)[BH.fit <= q]
+
+## Knockoff
+Xk_m_g_s <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "sdp")
+gauss_sdp <- knockoff::stat.glmnet_coefdiff(X, Xk_m_g_s, y, cores = ncores)
+thres.knockoff = knockoff::knockoff.threshold(gauss_sdp, fdr = q, offset = 0) # less conservative
+thres.knockoff.plus = knockoff::knockoff.threshold(gauss_sdp, fdr = q, offset = 1) # more conservative
+knockoff.selected <- which(gauss_sdp >= thres.knockoff)
+knockoff.plus.selected <- which(gauss_sdp >= thres.knockoff.plus)
+
+result[[i]] <- c(
+  fdp.BH = fdp(BH.selected),
+  fdp.knockoff = fdp(knockoff.selected),
+  fdp.knockoff.plus = fdp(knockoff.plus.selected),
+  power.BH = power(BH.selected, sum(beta != 0)),
+  power.knockoff = power(knockoff.selected, sum(beta != 0)),
+  power.knockoff.plus = power(knockoff.plus.selected, sum(beta != 0)),
+  power.large.BH <- length(intersect(BH.selected, large)) / length(large),
+  power.large.knockoff <- length(intersect(knockoff.selected, large)) / length(large),
+  power.large.knockoff.plus <- length(intersect(knockoff.plus.selected, large)) / length(large),
+  power.small.BH <- length(intersect(BH.selected, small)) / length(small),
+  power.small.knockoff <- length(intersect(knockoff.selected, small)) / length(small),
+  power.small.knockoff.plus <- length(intersect(knockoff.plus.selected, small)) / length(small)
+)
+}
+```
+
+```{r, echo = FALSE}
+result.summary <- matrix(unlist(result), m, 12, byrow = TRUE)
+colnames(result.summary) <- c("fdp.BH", "fdp.Knockoff", "fdp.Knockoff.plus", "power.BH", "power.Knockoff", "power.Knockoff.plus", "power.large.BH", "power.large.Knockoff", "power.large.Knockoff.plus", "power.small.BH", "power.small.Knockoff", "power.small.Knockoff.plus")
+result.manysmall <- result.summary
+```
+
+```{r, echo = FALSE}
+summary <- rbind.data.frame(colMeans(result.nosmall), colMeans(result.fewsmall), colMeans(result.manysmall))
+colnames(summary) <- c("FDP.BH", "FDP.Knockoff", "FDP.Knockoff.Plus", "Power.BH", "Power.Knockoff", "Power.Knockoff.Plus", "Power.Large.BH", "Power.Large.Knockoff", "Power.Large.Knockoff.Plus", "Power.Small.BH", "Power.Small.Knockoff", "Power.Small.Knockoff.Plus")
+summary[1, 7 : 9] <- summary[1, 4 : 6]
+summary[1, 10 : 12] <- NA
+library(knitr)
+kable(summary, digits = 4)
+
+plot(seq(3), seq(3), ylim = c(0, 2 * q), xaxt = "n", type = "n", xlab = "", ylab = "FDR")
+axis(1, labels = c("No Small", "Less Small", "More Small"), at = seq(3))
+for (i in seq(method.name)) {
+  lines(seq(3), c(mean(result.nosmall[, i]), mean(result.fewsmall[, i]), mean(result.manysmall[, i])), type = "o", pch = i, col = method.col[i])
+  arrows(x0 = seq(3), x1 = seq(3), y0 = c(mean(result.nosmall[, i]), mean(result.fewsmall[, i]), mean(result.manysmall[, i])) - 2 * c(sd(result.nosmall[, i]), sd(result.fewsmall[, i]), sd(result.manysmall[, i])) / sqrt(m), y1 = c(mean(result.nosmall[, i]), mean(result.fewsmall[, i]), mean(result.manysmall[, i])) + 2 * c(sd(result.nosmall[, i]), sd(result.fewsmall[, i]), sd(result.manysmall[, i])) / sqrt(m), length = 0.05, angle = 90, code = 3, col = method.col[i])
+}
+abline(h = q, lty = 2, lwd = 2)
+legend("top", horiz = TRUE, method.name, col = method.col, pch = seq(method.name), lty = 1)
+
+plot(seq(3), seq(3), ylim = c(0, 1), xaxt = "n", type = "n", xlab = "", ylab = "FDR", main = "Overall Power")
+axis(1, labels = c("No Small", "Less Small", "More Small"), at = seq(3))
+for (i in seq(method.name)) {
+  lines(seq(3), c(mean(result.nosmall[, i + 3]), mean(result.fewsmall[, i + 3]), mean(result.manysmall[, i + 3])), type = "o", pch = i, col = method.col[i])
+  arrows(x0 = seq(3), x1 = seq(3), y0 = c(mean(result.nosmall[, i + 3]), mean(result.fewsmall[, i + 3]), mean(result.manysmall[, i + 3])) - 2 * c(sd(result.nosmall[, i + 3]), sd(result.fewsmall[, i + 3]), sd(result.manysmall[, i + 3])) / sqrt(m), y1 = c(mean(result.nosmall[, i + 3]), mean(result.fewsmall[, i + 3]), mean(result.manysmall[, i + 3])) + 2 * c(sd(result.nosmall[, i + 3]), sd(result.fewsmall[, i + 3]), sd(result.manysmall[, i + 3])) / sqrt(m), length = 0.05, angle = 90, code = 3, col = method.col[i])
+}
+legend("top", horiz = TRUE, method.name, col = method.col, pch = seq(method.name), lty = 1)
+
+plot(seq(3), seq(3), ylim = c(0, 1), xaxt = "n", type = "n", xlab = "", ylab = "FDR", main = "Power for Large Signals")
+axis(1, labels = c("No Small", "Less Small", "More Small"), at = seq(3))
+for (i in seq(method.name)) {
+  lines(seq(3), c(mean(result.nosmall[, i + 3]), mean(result.fewsmall[, i + 6]), mean(result.manysmall[, i + 6])), type = "o", pch = i, col = method.col[i])
+  arrows(x0 = seq(3), x1 = seq(3), y0 = c(mean(result.nosmall[, i + 3]), mean(result.fewsmall[, i + 6]), mean(result.manysmall[, i + 6])) - 2 * c(sd(result.nosmall[, i + 3]), sd(result.fewsmall[, i + 6]), sd(result.manysmall[, i + 6])) / sqrt(m), y1 = c(mean(result.nosmall[, i + 3]), mean(result.fewsmall[, i + 6]), mean(result.manysmall[, i + 6])) + 2 * c(sd(result.nosmall[, i + 3]), sd(result.fewsmall[, i + 6]), sd(result.manysmall[, i + 6])) / sqrt(m), length = 0.05, angle = 90, code = 3, col = method.col[i])
+}
+legend("top", horiz = TRUE, method.name, col = method.col, pch = seq(method.name), lty = 1)
+
+plot(seq(2), seq(2), ylim = c(0, 1), xaxt = "n", type = "n", xlab = "", ylab = "FDR", main = "Power for Small Signals")
+axis(1, labels = c("Less Small", "More Small"), at = seq(2))
+for (i in seq(method.name)) {
+  lines(seq(2), c(mean(result.fewsmall[, i + 9]), mean(result.manysmall[, i + 9])), type = "o", pch = i, col = method.col[i])
+  arrows(x0 = seq(2), x1 = seq(2), y0 = c(mean(result.fewsmall[, i + 9]), mean(result.manysmall[, i + 9])) - 2 * c(sd(result.fewsmall[, i + 9]), sd(result.manysmall[, i + 9])) / sqrt(m), y1 = c(mean(result.fewsmall[, i + 9]), mean(result.manysmall[, i + 9])) + 2 * c(sd(result.fewsmall[, i + 9]), sd(result.manysmall[, i + 9])) / sqrt(m), length = 0.05, angle = 90, code = 3, col = method.col[i])
+}
+legend("top", horiz = TRUE, method.name, col = method.col, pch = seq(method.name), lty = 1)
+```
+
+```{r, echo = FALSE}
+FDP.summary <- rbind.data.frame(
+   cbind.data.frame(FDP = result.nosmall[, 1], Method = rep("BH", length(result.nosmall[, 1])), Scenario = rep("No Small Signals", length(result.nosmall[, 1]))),
+   cbind.data.frame(FDP = result.nosmall[, 2], Method = rep("Knockoff", length(result.nosmall[, 2])), Scenario = rep("No Small Signals", length(result.nosmall[, 2]))),
+   cbind.data.frame(FDP = result.nosmall[, 3], Method = rep("Knockoff+", length(result.nosmall[, 3])), Scenario = rep("No Small Signals", length(result.nosmall[, 3]))),
+   cbind.data.frame(FDP = result.fewsmall[, 1], Method = rep("BH", length(result.fewsmall[, 1])), Scenario = rep("Less Small Signals", length(result.fewsmall[, 1]))),
+   cbind.data.frame(FDP = result.fewsmall[, 2], Method = rep("Knockoff", length(result.fewsmall[, 2])), Scenario = rep("Less Small Signals", length(result.fewsmall[, 2]))),
+   cbind.data.frame(FDP = result.fewsmall[, 3], Method = rep("Knockoff+", length(result.fewsmall[, 3])), Scenario = rep("Less Small Signals", length(result.fewsmall[, 3]))),
+   cbind.data.frame(FDP = result.manysmall[, 1], Method = rep("BH", length(result.manysmall[, 1])), Scenario = rep("More Small Signals", length(result.manysmall[, 1]))),
+   cbind.data.frame(FDP = result.manysmall[, 2], Method = rep("Knockoff", length(result.manysmall[, 2])), Scenario = rep("More Small Signals", length(result.manysmall[, 2]))),
+   cbind.data.frame(FDP = result.manysmall[, 3], Method = rep("Knockoff+", length(result.manysmall[, 3])), Scenario = rep("More Small Signals", length(result.manysmall[, 3])))
+ )
+
+ggplot(data = FDP.summary,
+        aes(x = Method, y = FDP, col = Method)) +
+  geom_violin(trim = TRUE) +
+  facet_wrap(~Scenario) +
+  stat_summary(fun.data = "mean_sdp", geom = "pointrange") +
+  scale_color_manual(values = method.col) +
+  geom_hline(yintercept = q, col = "maroon", linetype = "dashed", size = 1) +
+  labs(title = bquote(paste("False Discovery Proportions at ", FDR == .(q), " Cutoff")), x = "", y = "FDP") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 10), axis.title.y = element_text(size = 10), axis.text.x = element_text(size = 10), axis.text.y = element_text(size = 10))
+```
+
+```{r, echo = FALSE}
+Power.summary <- rbind.data.frame(
+   cbind.data.frame(Power = result.nosmall[, 4], Method = rep("BH", length(result.nosmall[, 4])), Scenario = rep("No Small Signals", length(result.nosmall[, 4]))),
+   cbind.data.frame(Power = result.nosmall[, 5], Method = rep("Knockoff", length(result.nosmall[, 5])), Scenario = rep("No Small Signals", length(result.nosmall[, 5]))),
+   cbind.data.frame(Power = result.nosmall[, 6], Method = rep("Knockoff+", length(result.nosmall[, 6])), Scenario = rep("No Small Signals", length(result.nosmall[, 6]))),
+   cbind.data.frame(Power = result.fewsmall[, 4], Method = rep("BH", length(result.fewsmall[, 4])), Scenario = rep("Less Small Signals", length(result.fewsmall[, 4]))),
+   cbind.data.frame(Power = result.fewsmall[, 5], Method = rep("Knockoff", length(result.fewsmall[, 5])), Scenario = rep("Less Small Signals", length(result.fewsmall[, 5]))),
+   cbind.data.frame(Power = result.fewsmall[, 6], Method = rep("Knockoff+", length(result.fewsmall[, 6])), Scenario = rep("Less Small Signals", length(result.fewsmall[, 6]))),
+   cbind.data.frame(Power = result.manysmall[, 4], Method = rep("BH", length(result.manysmall[, 4])), Scenario = rep("More Small Signals", length(result.manysmall[, 4]))),
+   cbind.data.frame(Power = result.manysmall[, 5], Method = rep("Knockoff", length(result.manysmall[, 5])), Scenario = rep("More Small Signals", length(result.manysmall[, 5]))),
+   cbind.data.frame(Power = result.manysmall[, 6], Method = rep("Knockoff+", length(result.manysmall[, 6])), Scenario = rep("More Small Signals", length(result.manysmall[, 6])))
+ )
+
+ggplot(data = Power.summary,
+        aes(x = Method, y = Power, col = Method)) +
+  geom_violin(trim = TRUE) +
+  facet_wrap(~Scenario) +
+  stat_summary(fun.data = "mean_sdp", geom = "pointrange") +
+  scale_color_manual(values = method.col) +
+  labs(title = bquote(paste("Overall Power at ", FDR == .(q), " Cutoff")), x = "", y = "Power") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 10), axis.title.y = element_text(size = 10), axis.text.x = element_text(size = 10), axis.text.y = element_text(size = 10))
+```
+
+```{r, echo = FALSE}
+Power.large.summary <- rbind.data.frame(
+   cbind.data.frame(Power = result.nosmall[, 4], Method = rep("BH", length(result.nosmall[, 4])), Scenario = rep("No Small Signals", length(result.nosmall[, 4]))),
+   cbind.data.frame(Power = result.nosmall[, 5], Method = rep("Knockoff", length(result.nosmall[, 5])), Scenario = rep("No Small Signals", length(result.nosmall[, 5]))),
+   cbind.data.frame(Power = result.nosmall[, 6], Method = rep("Knockoff+", length(result.nosmall[, 6])), Scenario = rep("No Small Signals", length(result.nosmall[, 6]))),
+   cbind.data.frame(Power = result.fewsmall[, 7], Method = rep("BH", length(result.fewsmall[, 7])), Scenario = rep("Less Small Signals", length(result.fewsmall[, 7]))),
+   cbind.data.frame(Power = result.fewsmall[, 8], Method = rep("Knockoff", length(result.fewsmall[, 8])), Scenario = rep("Less Small Signals", length(result.fewsmall[, 8]))),
+   cbind.data.frame(Power = result.fewsmall[, 9], Method = rep("Knockoff+", length(result.fewsmall[, 9])), Scenario = rep("Less Small Signals", length(result.fewsmall[, 9]))),
+   cbind.data.frame(Power = result.manysmall[, 7], Method = rep("BH", length(result.manysmall[, 7])), Scenario = rep("More Small Signals", length(result.manysmall[, 7]))),
+   cbind.data.frame(Power = result.manysmall[, 8], Method = rep("Knockoff", length(result.manysmall[, 8])), Scenario = rep("More Small Signals", length(result.manysmall[, 8]))),
+   cbind.data.frame(Power = result.manysmall[, 9], Method = rep("Knockoff+", length(result.manysmall[, 9])), Scenario = rep("More Small Signals", length(result.manysmall[, 9])))
+ )
+
+ggplot(data = Power.large.summary,
+        aes(x = Method, y = Power, col = Method)) +
+  geom_violin(trim = TRUE) +
+  facet_wrap(~Scenario) +
+  stat_summary(fun.data = "mean_sdp", geom = "pointrange") +
+  scale_color_manual(values = method.col) +
+  labs(title = bquote(paste("Power for Large Signals at ", FDR == .(q), " Cutoff")), x = "", y = "Power") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 10), axis.title.y = element_text(size = 10), axis.text.x = element_text(size = 10), axis.text.y = element_text(size = 10))
+```
+
+```{r, echo = FALSE}
+Power.small.summary <- rbind.data.frame(
+   cbind.data.frame(Power = result.fewsmall[, 10], Method = rep("BH", length(result.fewsmall[, 10])), Scenario = rep("Less Small Signals", length(result.fewsmall[, 10]))),
+   cbind.data.frame(Power = result.fewsmall[, 11], Method = rep("Knockoff", length(result.fewsmall[, 11])), Scenario = rep("Less Small Signals", length(result.fewsmall[, 11]))),
+   cbind.data.frame(Power = result.fewsmall[, 12], Method = rep("Knockoff+", length(result.fewsmall[, 12])), Scenario = rep("Less Small Signals", length(result.fewsmall[, 12]))),
+   cbind.data.frame(Power = result.manysmall[, 10], Method = rep("BH", length(result.manysmall[, 10])), Scenario = rep("More Small Signals", length(result.manysmall[, 10]))),
+   cbind.data.frame(Power = result.manysmall[, 11], Method = rep("Knockoff", length(result.manysmall[, 11])), Scenario = rep("More Small Signals", length(result.manysmall[, 11]))),
+   cbind.data.frame(Power = result.manysmall[, 12], Method = rep("Knockoff+", length(result.manysmall[, 12])), Scenario = rep("More Small Signals", length(result.manysmall[, 12])))
+ )
+
+ggplot(data = Power.small.summary,
+        aes(x = Method, y = Power, col = Method)) +
+  geom_violin(trim = TRUE) +
+  facet_wrap(~Scenario) +
+  stat_summary(fun.data = "mean_sdp", geom = "pointrange") +
+  scale_color_manual(values = method.col) +
+  labs(title = bquote(paste("Power for Small Signals at ", FDR == .(q), " Cutoff")), x = "", y = "Power") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 10), axis.title.y = element_text(size = 10), axis.text.x = element_text(size = 10), axis.text.y = element_text(size = 10))
+```
 
 ## Session information
+
+
 
 <!-- Insert the session information into the document -->
 ```{r session-info}
