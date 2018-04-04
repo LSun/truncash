@@ -26,8 +26,12 @@ knitr::read_chunk("chunks.R")
 
 <!-- Add your analysis here -->
 
-```{r, eval = FALSE}
+```{r, echo = FALSE, cache = TRUE}
 library(knockoff)
+library(Matrix)
+```
+
+```{r, echo = FALSE, cache = TRUE}
 n <- 1e4
 p <- 4
 Sigma <- matrix(c(1, 0.99, 0, 0, 0.99, 1, 0, 0, 0, 0, 1, 0.01, 0, 0, 0.01, 1), byrow = TRUE, 4, 4)
@@ -46,6 +50,121 @@ for (i in 1 : 1000) {
   W[[i]] <- knockoff::stat.glmnet_coefdiff(X, Xk, y)
 }
 ```
+
+```{r, echo = FALSE, cache = TRUE}
+Sigma <- bdiag(
+  matrix(c(1, 0.9, 0.9, 1), 2, 2),
+  matrix(c(1, 0.8, 0.8, 1), 2, 2),
+  matrix(c(1, 0.7, 0.7, 1), 2, 2),
+  matrix(c(1, 0.6, 0.6, 1), 2, 2),
+  matrix(c(1, 0.5, 0.5, 1), 2, 2),
+  matrix(c(1, 0.4, 0.4, 1), 2, 2),
+  matrix(c(1, 0.3, 0.3, 1), 2, 2),
+  matrix(c(1, 0.2, 0.2, 1), 2, 2),
+  matrix(c(1, 0.1, 0.1, 1), 2, 2),
+  matrix(c(1, 0.0, 0.0, 1), 2, 2)
+)
+Sigma <- as.matrix(Sigma)
+Cov.X <- Sigma / n
+rho.X <- 9 : 0 / 10
+k <- 10
+q <- 0.2
+beta <- rep(c(5, 0), 10)
+```
+
+```{r, echo = FALSE, cache = TRUE}
+result <- selected <- list()
+for (i in 1 : m) {
+X <- matrix(0, n, 20)
+X[, seq(1, 20, by = 2)] <- matrix(rnorm(n * 10, 0, sqrt(1 / n)), n, 10)
+for (j in seq(2, 20, by = 2)) {
+  X[, j] <- rho.X[j / 2] * X[, j - 1] + sqrt(1 - rho.X[j / 2]^2) * rnorm(n, 0, sqrt(1 / n))
+}
+
+y <- X %*% beta + rnorm(n)
+
+## Least squares
+lm.fit <- lm(y ~ X - 1)
+pvalue <- summary(lm.fit)$coefficients[, 4]
+betahat <- summary(lm.fit)$coefficients[, 1]
+sebetahat <- summary(lm.fit)$coefficients[, 2]
+
+## BH
+BH.fit <- p.adjust(pvalue, method = "BH")
+BH.selected <- (1 : 20)[BH.fit <= q]
+
+## Knockoff
+Xk <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "sdp")
+W <- knockoff::stat.glmnet_coefdiff(X, Xk, y, cores = 4)
+thres.knockoff = knockoff::knockoff.threshold(W, fdr = q, offset = 0) # less conservative
+thres.knockoff.plus = knockoff::knockoff.threshold(W, fdr = q, offset = 1) # more conservative
+knockoff.selected <- which(W >= thres.knockoff)
+knockoff.plus.selected <- which(W >= thres.knockoff.plus)
+
+result[[i]] <- c(
+  fdp.BH = sum(beta[BH.selected] == 0) / max(1, length(BH.selected)),
+  fdp.knockoff = sum(beta[knockoff.selected] == 0) / max(1, length(knockoff.selected)),
+  fdp.knockoff.plus = sum(beta[knockoff.plus.selected] == 0) / max(1, length(knockoff.plus.selected)),
+  power.BH = sum(beta[BH.selected] != 0) / max(sum(beta != 0), 1),
+  power.knockoff = sum(beta[knockoff.selected] != 0) / max(sum(beta != 0), 1),
+  power.knockoff.plus = sum(beta[knockoff.plus.selected] != 0) / max(sum(beta != 0), 1)
+)
+
+selected[[i]] <- list(
+  BH.selected <- BH.selected,
+  knockoff.selected <- knockoff.selected,
+  knockoff.plus.selected <- knockoff.plus.selected
+)
+}
+```
+
+```{r, echo = FALSE, cache = TRUE}
+n <- 30
+result <- selected <- list()
+for (i in 1 : m) {
+X <- matrix(0, n, 20)
+X[, seq(1, 20, by = 2)] <- matrix(rnorm(n * 10, 0, sqrt(1 / n)), n, 10)
+for (j in seq(2, 20, by = 2)) {
+  X[, j] <- rho.X[j / 2] * X[, j - 1] + sqrt(1 - rho.X[j / 2]^2) * rnorm(n, 0, sqrt(1 / n))
+}
+
+y <- X %*% beta + rnorm(n)
+
+## Least squares
+lm.fit <- lm(y ~ X - 1)
+pvalue <- summary(lm.fit)$coefficients[, 4]
+betahat <- summary(lm.fit)$coefficients[, 1]
+sebetahat <- summary(lm.fit)$coefficients[, 2]
+
+## BH
+BH.fit <- p.adjust(pvalue, method = "BH")
+BH.selected <- (1 : 20)[BH.fit <= q]
+
+## Knockoff
+Xk <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "sdp")
+W <- knockoff::stat.glmnet_coefdiff(X, Xk, y, cores = 4)
+thres.knockoff = knockoff::knockoff.threshold(W, fdr = q, offset = 0) # less conservative
+thres.knockoff.plus = knockoff::knockoff.threshold(W, fdr = q, offset = 1) # more conservative
+knockoff.selected <- which(W >= thres.knockoff)
+knockoff.plus.selected <- which(W >= thres.knockoff.plus)
+
+result[[i]] <- c(
+  fdp.BH = sum(beta[BH.selected] == 0) / max(1, length(BH.selected)),
+  fdp.knockoff = sum(beta[knockoff.selected] == 0) / max(1, length(knockoff.selected)),
+  fdp.knockoff.plus = sum(beta[knockoff.plus.selected] == 0) / max(1, length(knockoff.plus.selected)),
+  power.BH = sum(beta[BH.selected] != 0) / max(sum(beta != 0), 1),
+  power.knockoff = sum(beta[knockoff.selected] != 0) / max(sum(beta != 0), 1),
+  power.knockoff.plus = sum(beta[knockoff.plus.selected] != 0) / max(sum(beta != 0), 1)
+)
+
+selected[[i]] <- list(
+  BH.selected <- BH.selected,
+  knockoff.selected <- knockoff.selected,
+  knockoff.plus.selected <- knockoff.plus.selected
+)
+}
+```
+
 
 ## Session information
 
