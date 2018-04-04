@@ -1,0 +1,173 @@
+---
+title: "ASH vs Knockoff"
+author: "Lei Sun"
+date: 2018-04-03
+output: html_document
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+```{r, echo = FALSE, cache = TRUE}
+library(ashr)
+library(knockoff)
+library(Matrix)
+library(reshape2)
+library(ggplot2)
+library(lattice)
+```
+
+```{r, echo = FALSE, cache = TRUE}
+n <- 2000
+p <- 1000
+k <- 200
+A <- 5
+m <- 100
+q <- 0.1
+```
+
+## Independent design
+
+$X_{n \times p}$ has independent columns simulated from $N(0, (1/\sqrt n)^2)$ so they are roughly normalized.
+
+```{r, echo = FALSE, cache = TRUE}
+Cov.X <- diag(1 / n, p)
+```
+
+```{r, echo = FALSE, cache = TRUE, message = FALSE, warning = FALSE}
+result <- list()
+for (i in 1 : m) {
+beta <- rep(0, p)
+nonzero <- sample(p, k)
+beta[nonzero] <- rnorm(k, 0, A)
+
+X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n, p)
+y <- X %*% beta + rnorm(n)
+
+## Least squares
+lm.fit <- lm(y ~ X - 1)
+pvalue <- summary(lm.fit)$coefficients[, 4]
+betahat <- summary(lm.fit)$coefficients[, 1]
+sebetahat <- summary(lm.fit)$coefficients[, 2]
+
+## BH
+BH.fit <- p.adjust(pvalue, method = "BH")
+BH.selected <- (1 : p)[BH.fit <= q]
+
+## ASH
+ash.fit <- ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+ash.selected <- (1 : p)[get_qvalue(ash.fit) <= q]
+
+## Knockoff
+Xk <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "sdp")
+W <- knockoff::stat.glmnet_coefdiff(X, Xk, y, cores = 4)
+thres.knockoff = knockoff::knockoff.threshold(W, fdr = q, offset = 0) # less conservative
+thres.knockoff.plus = knockoff::knockoff.threshold(W, fdr = q, offset = 1) # more conservative
+knockoff.selected <- which(W >= thres.knockoff)
+knockoff.plus.selected <- which(W >= thres.knockoff.plus)
+
+result[[i]] <- c(
+  fdp.BH = sum(beta[BH.selected] == 0) / max(1, length(BH.selected)),
+  fdp.ash = sum(beta[ash.selected] == 0) / max(1, length(ash.selected)),
+  fdp.knockoff = sum(beta[knockoff.selected] == 0) / max(1, length(knockoff.selected)),
+  fdp.knockoff.plus = sum(beta[knockoff.plus.selected] == 0) / max(1, length(knockoff.plus.selected)),
+  power.BH = sum(beta[BH.selected] != 0) / k,
+  power.ash = sum(beta[ash.selected] != 0) / k,
+  power.knockoff = sum(beta[knockoff.selected] != 0) / k,
+  power.knockoff.plus = sum(beta[knockoff.plus.selected] != 0) / k
+)
+}
+```
+
+```{r, echo = FALSE}
+result.summary <- matrix(unlist(result), m, 8, byrow = TRUE)
+boxplot(result.summary[, 1 : 4])
+boxplot(result.summary[, 5 : 8])
+```
+
+## Local correlation design
+
+$X_{n \times p}$ has correlation $\Sigma_{ij} = \rho^{|i - j|}$. Each row is independently $N(0, \frac1n\Sigma)$.
+
+```{r, cache = TRUE, echo = FALSE}
+rho <- 0.5
+Sigma <- toeplitz(rho^(0 : (p - 1)))
+Sigma.5 <- chol(Sigma)
+Cov.X <- Sigma / n
+```
+
+```{r, echo = FALSE, cache = TRUE, message = FALSE, warning = FALSE}
+result <- list()
+for (i in 1 : m) {
+beta <- rep(0, p)
+nonzero <- sample(p, k)
+beta[nonzero] <- rnorm(k, 0, A)
+
+X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n, p)
+X <- X %*% Sigma.5
+y <- X %*% beta + rnorm(n)
+
+## Least squares
+lm.fit <- lm(y ~ X - 1)
+pvalue <- summary(lm.fit)$coefficients[, 4]
+betahat <- summary(lm.fit)$coefficients[, 1]
+sebetahat <- summary(lm.fit)$coefficients[, 2]
+
+## BH
+BH.fit <- p.adjust(pvalue, method = "BH")
+BH.selected <- (1 : p)[BH.fit <= q]
+
+## ASH
+ash.fit <- ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+ash.selected <- (1 : p)[get_qvalue(ash.fit) <= q]
+
+## Knockoff
+Xk <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "sdp")
+W <- knockoff::stat.glmnet_coefdiff(X, Xk, y, cores = 4)
+thres.knockoff = knockoff::knockoff.threshold(W, fdr = q, offset = 0) # less conservative
+thres.knockoff.plus = knockoff::knockoff.threshold(W, fdr = q, offset = 1) # more conservative
+knockoff.selected <- which(W >= thres.knockoff)
+knockoff.plus.selected <- which(W >= thres.knockoff.plus)
+
+result[[i]] <- c(
+  fdp.BH = sum(beta[BH.selected] == 0) / max(1, length(BH.selected)),
+  fdp.ash = sum(beta[ash.selected] == 0) / max(1, length(ash.selected)),
+  fdp.knockoff = sum(beta[knockoff.selected] == 0) / max(1, length(knockoff.selected)),
+  fdp.knockoff.plus = sum(beta[knockoff.plus.selected] == 0) / max(1, length(knockoff.plus.selected)),
+  power.BH = sum(beta[BH.selected] != 0) / k,
+  power.ash = sum(beta[ash.selected] != 0) / k,
+  power.knockoff = sum(beta[knockoff.selected] != 0) / k,
+  power.knockoff.plus = sum(beta[knockoff.plus.selected] != 0) / k
+)
+}
+```
+
+```{r, echo = FALSE}
+result.summary <- matrix(unlist(result), m, 8, byrow = TRUE)
+boxplot(result.summary[, 1 : 4])
+boxplot(result.summary[, 5 : 8])
+```
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```
