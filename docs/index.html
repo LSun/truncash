@@ -257,7 +257,7 @@ $(document).ready(function () {
 <li><a href="correlated_z_3.html">Histogram of correlated <span class="math inline">\(z\)</span> scores, <code>BH</code>-hostile data sets</a></li>
 </ul>
 <p>An implicit key question of this inquiry is: what’s the behavior of <span class="math inline">\(z\)</span> scores under dependency? We take a look at their histograms. First for randomly sampled data sets. Second for those most “hostile” to <code>ash</code>. Third for those most “hostile” to <code>BH</code>. The bottom line is we are reproducing what Efron observed in microarray data, that “the theoretical null may fail” in different ways. Now the key questions are</p>
-<ol type="1">
+<ol style="list-style-type: decimal">
 <li><p>Why the theoretical null may fail? What does it mean by <strong>correlation</strong>?</p></li>
 <li><p>Can <code>truncash</code> make <code>ash</code> more robust against some of the foes that make the theoretical null fail?</p></li>
 <li><p>Generally, how robust is empirical Bayes? Is empirical Bayes robust or non-robust to certain kinds of correlation?</p></li>
@@ -410,14 +410,14 @@ $(document).ready(function () {
 </ul>
 <hr />
 <p>Next it’s a series of investigation of a number of variable selection and false discovery rate control methods in linear regression.</p>
-<ol type="1">
+<ol style="list-style-type: decimal">
 <li>Commonly used design matrix <span class="math inline">\(X\)</span> simulation schemes and its effects on <strong>average pairwise correlation</strong> in <span class="math inline">\(X\)</span> <span class="math inline">\(=\sqrt{\overline{\rho\left(X_i, X_j\right)^2}}\)</span> and in <span class="math inline">\(\hat\beta\)</span> <span class="math inline">\(=\sqrt{\overline{\rho\left(\hat\beta_i, \hat\beta_j\right)^2}}\)</span></li>
 </ol>
 <ul>
 <li><a href="design_matrix.html">Design matrix <span class="math inline">\(X\)</span> and its effect on the empirical distribution of the correlated null</a></li>
 <li><a href="design_matrix_2.html">Design matrix <span class="math inline">\(X\)</span> and its effect on the correlation pattern of <span class="math inline">\(X\)</span> and <span class="math inline">\(\hat\beta\)</span></a></li>
 </ul>
-<ol start="2" type="1">
+<ol start="2" style="list-style-type: decimal">
 <li>Initial comparison</li>
 </ol>
 <ul>
@@ -426,14 +426,16 @@ $(document).ready(function () {
 <li><a href="knockoff_2.html">Linear regression variable selection: <span class="math inline">\(X\)</span> has high collinearity</a></li>
 <li><a href="knockoff_3.html">Linear regression variable selection: Start from <span class="math inline">\(\Sigma_{\hat\beta} / \sigma_e^2 = (X^TX)^{-1}\)</span></a></li>
 </ul>
-<ol start="3" type="1">
-<li>Scenarios that might be hostile to <code>knockoff</code></li>
+<ol start="3" style="list-style-type: decimal">
+<li>Scenarios that might be less friendly to <code>knockoff</code></li>
 </ol>
 <ul>
 <li><a href="knockoff_6.html"><code>Knockoff</code> on small signals</a></li>
 <li><a href="knockoff_5.html"><code>Knockoff</code> on design matrix correlation</a></li>
-<li><a href="knockoff_7.html">A closer look at <code>Knockoff</code> on design matrix correlation</a></li>
-<li><a href="knockoff_8.html">Quality of Knockoffs and Power</a></li>
+<li><a href="knockoff_7.html">Column randomization for <code>Knockoff</code>: Factor model for <span class="math inline">\(\hat\beta\)</span></a></li>
+<li><a href="knockoff_8.html">Detailed simulations for Fixed-<span class="math inline">\(X\)</span> and Model-<span class="math inline">\(X\)</span> knockoffs</a></li>
+<li><a href="knockoff_9.html"><code>ASH</code> vs <code>Knockoff</code></a></li>
+<li><a href="knockoff_var.html">The variability of FDP by <code>Knockoff</code></a></li>
 </ul>
 <!-- The goal of this new template is to simplify the setup and maintenance of a research website. -->
 <!-- Specifically, -->
