@@ -26,13 +26,29 @@ knitr::read_chunk("chunks.R")
 
 <!-- Add your analysis here -->
 
-```{r, echo = FALSE, cache = TRUE}
+## Introduction
+
+We hypothesize that `Knockoff` might have a potential problem: the variability of the actual FDP could be large, although the mean of FDP is theoretically and empirically controlled at FDR.
+
+The reason is that `Knockoff` relies on the **flip sign property** of the test statistics $W_j$ for all null variables. Actually the events $\{W_j \geq t_j\}$ or $\{W_j \leq -t_j\}$ are independent for all null variables. However, they are **not identically distributed**.
+
+Therefore, if every null variable is "unique," in the sense that its test statistic has a distinct distribution, for example, if it tends to be larger or in a different region than anyone else, then this test statistic could randomly be positive or negative, and affect the estimate of FDP for different random samples.
+
+In common high-dimensional settings it's usually not a big problem since in those simulations no null variables are unique, meaning that we would expect to see $W_i$ and $W_j$ showing up in regions symmetric at zero.
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
 library(knockoff)
 library(Matrix)
+library(tidyverse)
+library(ggplot2)
 ```
 
+## A simple illustration
+
+$X$ is $30 \times 4$, $X_1$ and $X_3$ are "true" variables, and $X_2$ and $X_4$ are nulls. $X_2$ is highly correlated with $X_1$, $\rho = 0.99$, whereas $X_4$ is almost uncorrelated with $X_3$, $\rho = 0.01$.
+
 ```{r, echo = FALSE, cache = TRUE}
-n <- 1e4
+n <- 30
 p <- 4
 Sigma <- matrix(c(1, 0.99, 0, 0, 0.99, 1, 0, 0, 0, 0, 1, 0.01, 0, 0, 0.01, 1), byrow = TRUE, 4, 4)
 beta <- c(5, 0, 5, 0) / sqrt(n)
@@ -50,6 +66,22 @@ for (i in 1 : 1000) {
   W[[i]] <- knockoff::stat.glmnet_coefdiff(X, Xk, y)
 }
 ```
+
+Below is a plot of $W_2$ vs $W_4$. As we can see, $|W_2|$ is usually much greater than $|W_4|$, and in many samples, only $W_2$ will show up in the rejection region $W \geq t$ or its symmetric null estimation region $W \le -t$, which brings variability of $\hat{FDP}$ as the null statistic $W_2$ shows up in one region or the other.
+
+```{r, simple_var, echo = FALSE, cache = TRUE}
+W <- matrix(unlist(W), byrow = TRUE, 1000)
+Wlim <- max(abs(W[, c(2, 4)]))
+plot(W[, 2], W[, 4], xlim = c(-Wlim, Wlim), ylim = c(-Wlim, Wlim),
+     xlab = expression(W[2]),
+     ylab = expression(W[4]))
+abline(0, 1, lty = 2, col = "blue")
+abline(0, -1, lty = 2, col = "blue")
+```
+
+## Example
+
+$X$ is $n \times 20$. There are $10$ "true" variables: $X_1, X_3, X_5, \ldots, X_{17}, X_{19}$ and $10$ null variables: $X_2, X_4, X_6, \ldots, X_{18}, X_{20}$. The correlation between the true and null variables are decreasing such that $\rho(X_1, X_2) = 0.9, \rho(X_3, X_4) = 0.8, \rho(X_5, X_6) = 0.7, \ldots, \rho(X_{17}, X_{18}) = 0.2, \rho(X_{19}, X_{20}) = 0.1$, and all other pairwise correlations are zero.
 
 ```{r, echo = FALSE, cache = TRUE}
 Sigma <- bdiag(
@@ -72,55 +104,14 @@ q <- 0.2
 beta <- rep(c(5, 0), 10)
 ```
 
-```{r, echo = FALSE, cache = TRUE}
-result <- selected <- list()
-for (i in 1 : m) {
-X <- matrix(0, n, 20)
-X[, seq(1, 20, by = 2)] <- matrix(rnorm(n * 10, 0, sqrt(1 / n)), n, 10)
-for (j in seq(2, 20, by = 2)) {
-  X[, j] <- rho.X[j / 2] * X[, j - 1] + sqrt(1 - rho.X[j / 2]^2) * rnorm(n, 0, sqrt(1 / n))
-}
+### $n = 30$
 
-y <- X %*% beta + rnorm(n)
+The variability in FDP given by `Knockoff` is obvious.
 
-## Least squares
-lm.fit <- lm(y ~ X - 1)
-pvalue <- summary(lm.fit)$coefficients[, 4]
-betahat <- summary(lm.fit)$coefficients[, 1]
-sebetahat <- summary(lm.fit)$coefficients[, 2]
-
-## BH
-BH.fit <- p.adjust(pvalue, method = "BH")
-BH.selected <- (1 : 20)[BH.fit <= q]
-
-## Knockoff
-Xk <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "sdp")
-W <- knockoff::stat.glmnet_coefdiff(X, Xk, y, cores = 4)
-thres.knockoff = knockoff::knockoff.threshold(W, fdr = q, offset = 0) # less conservative
-thres.knockoff.plus = knockoff::knockoff.threshold(W, fdr = q, offset = 1) # more conservative
-knockoff.selected <- which(W >= thres.knockoff)
-knockoff.plus.selected <- which(W >= thres.knockoff.plus)
-
-result[[i]] <- c(
-  fdp.BH = sum(beta[BH.selected] == 0) / max(1, length(BH.selected)),
-  fdp.knockoff = sum(beta[knockoff.selected] == 0) / max(1, length(knockoff.selected)),
-  fdp.knockoff.plus = sum(beta[knockoff.plus.selected] == 0) / max(1, length(knockoff.plus.selected)),
-  power.BH = sum(beta[BH.selected] != 0) / max(sum(beta != 0), 1),
-  power.knockoff = sum(beta[knockoff.selected] != 0) / max(sum(beta != 0), 1),
-  power.knockoff.plus = sum(beta[knockoff.plus.selected] != 0) / max(sum(beta != 0), 1)
-)
-
-selected[[i]] <- list(
-  BH.selected <- BH.selected,
-  knockoff.selected <- knockoff.selected,
-  knockoff.plus.selected <- knockoff.plus.selected
-)
-}
-```
-
-```{r, echo = FALSE, cache = TRUE}
+```{r var30, echo = FALSE, cache = TRUE}
 n <- 30
-result <- selected <- list()
+m <- 1000
+result <- selected <- W.list <- list()
 for (i in 1 : m) {
 X <- matrix(0, n, 20)
 X[, seq(1, 20, by = 2)] <- matrix(rnorm(n * 10, 0, sqrt(1 / n)), n, 10)
@@ -148,6 +139,8 @@ thres.knockoff.plus = knockoff::knockoff.threshold(W, fdr = q, offset = 1) # mor
 knockoff.selected <- which(W >= thres.knockoff)
 knockoff.plus.selected <- which(W >= thres.knockoff.plus)
 
+W.list[[i]] <- W
+
 result[[i]] <- c(
   fdp.BH = sum(beta[BH.selected] == 0) / max(1, length(BH.selected)),
   fdp.knockoff = sum(beta[knockoff.selected] == 0) / max(1, length(knockoff.selected)),
@@ -165,6 +158,127 @@ selected[[i]] <- list(
 }
 ```
 
+```{r, echo = FALSE}
+mean_sdp <- function(x) {
+   m <- mean(x)
+   ymax <- m + sd(x)
+   return(c(y = m, ymax = ymax, ymin = m))
+}
+
+result.summary <- matrix(unlist(result), m, 6, byrow = TRUE)
+
+boxplot(result.summary[, 1 : 3], names = c("BH", "Knockoff", "Knockoff+"), ylab = "FDP")
+stripchart(as.vector(result.summary[, 1 : 3]) ~ factor(rep(1 : 3, each = m)), vertical = TRUE, method = "jitter", add = TRUE, pch = 20, col = 'blue')
+abline(h = q, lty = 2, col = "red")
+
+FDP <- as.vector((result.summary[, 1 : 3]))
+Method <- rep(c("BH", "Knockoff", "Knockoff+"), each = m)
+FDP <- cbind.data.frame(FDP, Method)
+ggplot(data = FDP,
+        aes(x = Method, y = FDP, col = Method)) +
+  geom_violin(trim = TRUE) +
+  geom_hline(yintercept = q, linetype = "dashed") +
+  stat_summary(fun.data = "mean_sdp", geom = "pointrange") +
+  labs(y = "FDP", x = "") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 10), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 15), axis.text.y = element_text(size = 10))
+
+boxplot(result.summary[, 4 : 6], names = c("BH", "Knockoff", "Knockoff+"), ylab = "TDP")
+stripchart(as.vector(result.summary[, 4 : 6]) ~ factor(rep(4 : 6, each = m)), vertical = TRUE, method = "jitter", add = TRUE, pch = 20, col = 'blue')
+
+TDP <- as.vector((result.summary[, 4 : 6]))
+TDP <- cbind.data.frame(TDP, Method)
+ggplot(data = TDP,
+        aes(x = Method, y = TDP, col = Method)) +
+  geom_violin(trim = TRUE) +
+  stat_summary(fun.data = "mean_sdp", geom = "pointrange") +
+  labs(y = "TDP", x = "") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 10), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 15), axis.text.y = element_text(size = 10))
+```
+
+### $n = 10K$
+
+The variability in FDP given by `Knockoff` is less than when $n = 30$, but still bigger than that given by `BH`.
+
+```{r var10000, echo = FALSE, cache = TRUE}
+n <- 1e4
+m <- 1000
+result <- selected <- W.list <- list()
+for (i in 1 : m) {
+X <- matrix(0, n, 20)
+X[, seq(1, 20, by = 2)] <- matrix(rnorm(n * 10, 0, sqrt(1 / n)), n, 10)
+for (j in seq(2, 20, by = 2)) {
+  X[, j] <- rho.X[j / 2] * X[, j - 1] + sqrt(1 - rho.X[j / 2]^2) * rnorm(n, 0, sqrt(1 / n))
+}
+
+y <- X %*% beta + rnorm(n)
+
+## Least squares
+lm.fit <- lm(y ~ X - 1)
+pvalue <- summary(lm.fit)$coefficients[, 4]
+betahat <- summary(lm.fit)$coefficients[, 1]
+sebetahat <- summary(lm.fit)$coefficients[, 2]
+
+## BH
+BH.fit <- p.adjust(pvalue, method = "BH")
+BH.selected <- (1 : 20)[BH.fit <= q]
+
+## Knockoff
+Xk <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "sdp")
+W <- knockoff::stat.glmnet_coefdiff(X, Xk, y, cores = 4)
+thres.knockoff = knockoff::knockoff.threshold(W, fdr = q, offset = 0) # less conservative
+thres.knockoff.plus = knockoff::knockoff.threshold(W, fdr = q, offset = 1) # more conservative
+knockoff.selected <- which(W >= thres.knockoff)
+knockoff.plus.selected <- which(W >= thres.knockoff.plus)
+
+W.list[[i]] <- W
+
+result[[i]] <- c(
+  fdp.BH = sum(beta[BH.selected] == 0) / max(1, length(BH.selected)),
+  fdp.knockoff = sum(beta[knockoff.selected] == 0) / max(1, length(knockoff.selected)),
+  fdp.knockoff.plus = sum(beta[knockoff.plus.selected] == 0) / max(1, length(knockoff.plus.selected)),
+  power.BH = sum(beta[BH.selected] != 0) / max(sum(beta != 0), 1),
+  power.knockoff = sum(beta[knockoff.selected] != 0) / max(sum(beta != 0), 1),
+  power.knockoff.plus = sum(beta[knockoff.plus.selected] != 0) / max(sum(beta != 0), 1)
+)
+
+selected[[i]] <- list(
+  BH.selected <- BH.selected,
+  knockoff.selected <- knockoff.selected,
+  knockoff.plus.selected <- knockoff.plus.selected
+)
+}
+```
+
+```{r, echo = FALSE}
+result.summary <- matrix(unlist(result), m, 6, byrow = TRUE)
+
+boxplot(result.summary[, 1 : 3], names = c("BH", "Knockoff", "Knockoff+"), ylab = "FDP")
+stripchart(as.vector(result.summary[, 1 : 3]) ~ factor(rep(1 : 3, each = m)), vertical = TRUE, method = "jitter", add = TRUE, pch = 20, col = 'blue')
+abline(h = q, lty = 2, col = "red")
+
+FDP <- as.vector((result.summary[, 1 : 3]))
+Method <- rep(c("BH", "Knockoff", "Knockoff+"), each = m)
+FDP <- cbind.data.frame(FDP, Method)
+ggplot(data = FDP,
+        aes(x = Method, y = FDP, col = Method)) +
+  geom_violin(trim = TRUE) +
+  geom_hline(yintercept = q, linetype = "dashed") +
+  stat_summary(fun.data = "mean_sdp", geom = "pointrange") +
+  labs(y = "FDP", x = "") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 10), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 15), axis.text.y = element_text(size = 10))
+
+boxplot(result.summary[, 4 : 6], names = c("BH", "Knockoff", "Knockoff+"), ylab = "TDP")
+stripchart(as.vector(result.summary[, 4 : 6]) ~ factor(rep(4 : 6, each = m)), vertical = TRUE, method = "jitter", add = TRUE, pch = 20, col = 'blue')
+
+TDP <- as.vector((result.summary[, 4 : 6]))
+TDP <- cbind.data.frame(TDP, Method)
+ggplot(data = TDP,
+        aes(x = Method, y = TDP, col = Method)) +
+  geom_violin(trim = TRUE) +
+  stat_summary(fun.data = "mean_sdp", geom = "pointrange") +
+  labs(y = "TDP", x = "") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 10), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 15), axis.text.y = element_text(size = 10))
+```
 
 ## Session information
 
