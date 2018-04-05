@@ -315,29 +315,38 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2018-04-03</p>
+<p><strong>Last updated:</strong> 2018-04-05</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 5bce84a</p>
+<p><strong>Code version:</strong> 1187399</p>
 <!-- Add your analysis here -->
-<pre class="r"><code>library(knockoff)
-n &lt;- 1e4
-p &lt;- 4
-Sigma &lt;- matrix(c(1, 0.99, 0, 0, 0.99, 1, 0, 0, 0, 0, 1, 0.01, 0, 0, 0.01, 1), byrow = TRUE, 4, 4)
-beta &lt;- c(5, 0, 5, 0) / sqrt(n)
-
-W &lt;- list()
-
-for (i in 1 : 1000) {
-  X1 &lt;- rnorm(n)
-  X2 &lt;- 0.99 * X1 + sqrt(1 - 0.99^2) * rnorm(n)
-  X3 &lt;- rnorm(n)
-  X4 &lt;- 0.01 * X3 + sqrt(1 - 0.01^2) * rnorm(n)
-  X &lt;- cbind(X1, X2, X3, X4)
-  Xk &lt;- knockoff::create.gaussian(X, mu = rep(0, 4), Sigma = Sigma, method = &quot;sdp&quot;)
-  y &lt;- X %*% beta + rnorm(n)
-  W[[i]] &lt;- knockoff::stat.glmnet_coefdiff(X, Xk, y)
-}</code></pre>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>We hypothesize that <code>Knockoff</code> might have a potential problem: the variability of the actual FDP could be large, although the mean of FDP is theoretically and empirically controlled at FDR.</p>
+<p>The reason is that <code>Knockoff</code> relies on the <strong>flip sign property</strong> of the test statistics <span class="math inline">\(W_j\)</span> for all null variables. Actually the events <span class="math inline">\(\{W_j \geq t_j\}\)</span> or <span class="math inline">\(\{W_j \leq -t_j\}\)</span> are independent for all null variables. However, they are <strong>not identically distributed</strong>.</p>
+<p>Therefore, if every null variable is “unique,” in the sense that its test statistic has a distinct distribution, for example, if it tends to be larger or in a different region than anyone else, then this test statistic could randomly be positive or negative, and affect the estimate of FDP for different random samples.</p>
+<p>In common high-dimensional settings it’s usually not a big problem since in those simulations no null variables are unique, meaning that we would expect to see <span class="math inline">\(W_i\)</span> and <span class="math inline">\(W_j\)</span> showing up in regions symmetric at zero.</p>
+</div>
+<div id="a-simple-illustration" class="section level2">
+<h2>A simple illustration</h2>
+<p><span class="math inline">\(X\)</span> is <span class="math inline">\(30 \times 4\)</span>, <span class="math inline">\(X_1\)</span> and <span class="math inline">\(X_3\)</span> are “true” variables, and <span class="math inline">\(X_2\)</span> and <span class="math inline">\(X_4\)</span> are nulls. <span class="math inline">\(X_2\)</span> is highly correlated with <span class="math inline">\(X_1\)</span>, <span class="math inline">\(\rho = 0.99\)</span>, whereas <span class="math inline">\(X_4\)</span> is almost uncorrelated with <span class="math inline">\(X_3\)</span>, <span class="math inline">\(\rho = 0.01\)</span>.</p>
+<p>Below is a plot of <span class="math inline">\(W_2\)</span> vs <span class="math inline">\(W_4\)</span>. As we can see, <span class="math inline">\(|W_2|\)</span> is usually much greater than <span class="math inline">\(|W_4|\)</span>, and in many samples, only <span class="math inline">\(W_2\)</span> will show up in the rejection region <span class="math inline">\(W \geq t\)</span> or its symmetric null estimation region <span class="math inline">\(W \le -t\)</span>, which brings variability of <span class="math inline">\(\hat{FDP}\)</span> as the null statistic <span class="math inline">\(W_2\)</span> shows up in one region or the other.</p>
+<p><img src="figure/knockoff_var.rmd/simple_var-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="example" class="section level2">
+<h2>Example</h2>
+<p><span class="math inline">\(X\)</span> is <span class="math inline">\(n \times 20\)</span>. There are <span class="math inline">\(10\)</span> “true” variables: <span class="math inline">\(X_1, X_3, X_5, \ldots, X_{17}, X_{19}\)</span> and <span class="math inline">\(10\)</span> null variables: <span class="math inline">\(X_2, X_4, X_6, \ldots, X_{18}, X_{20}\)</span>. The correlation between the true and null variables are decreasing such that <span class="math inline">\(\rho(X_1, X_2) = 0.9, \rho(X_3, X_4) = 0.8, \rho(X_5, X_6) = 0.7, \ldots, \rho(X_{17}, X_{18}) = 0.2, \rho(X_{19}, X_{20}) = 0.1\)</span>, and all other pairwise correlations are zero.</p>
+<div id="n-30" class="section level3">
+<h3><span class="math inline">\(n = 30\)</span></h3>
+<p>The variability in FDP given by <code>Knockoff</code> is obvious.</p>
+<p><img src="figure/knockoff_var.rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_var.rmd/unnamed-chunk-4-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_var.rmd/unnamed-chunk-4-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_var.rmd/unnamed-chunk-4-4.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="n-10k" class="section level3">
+<h3><span class="math inline">\(n = 10K\)</span></h3>
+<p>The variability in FDP given by <code>Knockoff</code> is less than when <span class="math inline">\(n = 30\)</span>, but still bigger than that given by <code>BH</code>.</p>
+<p><img src="figure/knockoff_var.rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_var.rmd/unnamed-chunk-5-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_var.rmd/unnamed-chunk-5-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_var.rmd/unnamed-chunk-5-4.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+</div>
 <div id="session-information" class="section level2">
 <h2>Session information</h2>
 <!-- Insert the session information into the document -->
@@ -356,11 +365,25 @@ locale:
 attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
+other attached packages:
+ [1] forcats_0.2.0   stringr_1.3.0   dplyr_0.7.4     purrr_0.2.4    
+ [5] readr_1.1.1     tidyr_0.7.2     tibble_1.4.1    ggplot2_2.2.1  
+ [9] tidyverse_1.2.1 Matrix_1.2-12   knockoff_0.3.0 
+
 loaded via a namespace (and not attached):
- [1] compiler_3.4.3  backports_1.1.2 magrittr_1.5    rprojroot_1.3-2
- [5] tools_3.4.3     htmltools_0.3.6 yaml_2.1.18     Rcpp_0.12.14   
- [9] stringi_1.1.6   rmarkdown_1.9   knitr_1.20      git2r_0.21.0   
-[13] stringr_1.3.0   digest_0.6.15   evaluate_0.10.1</code></pre>
+ [1] reshape2_1.4.3   haven_1.1.0      lattice_0.20-35  colorspace_1.3-2
+ [5] htmltools_0.3.6  yaml_2.1.18      rlang_0.1.6      pillar_1.0.1    
+ [9] foreign_0.8-69   glue_1.2.0       modelr_0.1.1     readxl_1.0.0    
+[13] bindrcpp_0.2     bindr_0.1        plyr_1.8.4       munsell_0.4.3   
+[17] gtable_0.2.0     cellranger_1.1.0 rvest_0.3.2      psych_1.7.8     
+[21] evaluate_0.10.1  labeling_0.3     knitr_1.20       parallel_3.4.3  
+[25] broom_0.4.3      Rcpp_0.12.14     backports_1.1.2  scales_0.5.0    
+[29] jsonlite_1.5     mnormt_1.5-5     hms_0.4.0        digest_0.6.15   
+[33] stringi_1.1.6    grid_3.4.3       rprojroot_1.3-2  cli_1.0.0       
+[37] tools_3.4.3      magrittr_1.5     lazyeval_0.2.1   crayon_1.3.4    
+[41] pkgconfig_2.0.1  xml2_1.1.1       lubridate_1.7.1  rstudioapi_0.7  
+[45] assertthat_0.2.0 rmarkdown_1.9    httr_1.3.1       R6_2.2.2        
+[49] nlme_3.1-131     git2r_0.21.0     compiler_3.4.3  </code></pre>
 </div>
 
 <hr>
