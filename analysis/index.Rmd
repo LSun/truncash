@@ -226,12 +226,14 @@ Next it's a series of investigation of a number of variable selection and false 
 * [Linear regression variable selection: $X$ has high collinearity](knockoff_2.html)
 * [Linear regression variable selection: Start from $\Sigma_{\hat\beta} / \sigma_e^2 = (X^TX)^{-1}$](knockoff_3.html)
 
-3. Scenarios that might be hostile to `knockoff`
+3. Scenarios that might be less friendly to `knockoff`
 
 * [`Knockoff` on small signals](knockoff_6.html)
 * [`Knockoff` on design matrix correlation](knockoff_5.html)
-* [A closer look at `Knockoff` on design matrix correlation](knockoff_7.html)
-* [Quality of Knockoffs and Power](knockoff_8.html)
+* [Column randomization for `Knockoff`: Factor model for $\hat\beta$](knockoff_7.html)
+* [Detailed simulations for Fixed-$X$ and Model-$X$ knockoffs](knockoff_8.html)
+* [`ASH` vs `Knockoff`](knockoff_9.html)
+* [The variability of FDP by `Knockoff`](knockoff_var.html)
 
 [`ashr`]: https://github.com/stephens999/ashr
 

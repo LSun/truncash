@@ -1,5 +1,5 @@
 ---
-title: "ASH vs Knockoff"
+title: "`ASH` vs `Knockoff`"
 author: "Lei Sun"
 date: 2018-04-03
 output: html_document
@@ -26,13 +26,18 @@ knitr::read_chunk("chunks.R")
 
 <!-- Add your analysis here -->
 
-```{r, echo = FALSE, cache = TRUE}
+## Introduction
+
+The true $\beta$ are simulated as $\beta \sim \pi_0\delta_0 + (1 - \pi_0)N(0, \sigma_\beta^2)$.
+
+```{r, echo = FALSE, cache = TRUE, message = FALSE, warning = FALSE}
 library(ashr)
 library(knockoff)
 library(Matrix)
 library(reshape2)
 library(ggplot2)
 library(lattice)
+library(doMC)
 ```
 
 ```{r, echo = FALSE, cache = TRUE}
@@ -84,23 +89,35 @@ thres.knockoff.plus = knockoff::knockoff.threshold(W, fdr = q, offset = 1) # mor
 knockoff.selected <- which(W >= thres.knockoff)
 knockoff.plus.selected <- which(W >= thres.knockoff.plus)
 
+Xk2 <- knockoff::create.second_order(X, method = "sdp")
+W2 <- knockoff::stat.glmnet_coefdiff(X, Xk2, y, cores = 4)
+thres.knockoff2 = knockoff::knockoff.threshold(W2, fdr = q, offset = 0) # less conservative
+thres.knockoff.plus2 = knockoff::knockoff.threshold(W2, fdr = q, offset = 1) # more conservative
+knockoff.selected2 <- which(W2 >= thres.knockoff2)
+knockoff.plus.selected2 <- which(W2 >= thres.knockoff.plus2)
+
 result[[i]] <- c(
   fdp.BH = sum(beta[BH.selected] == 0) / max(1, length(BH.selected)),
   fdp.ash = sum(beta[ash.selected] == 0) / max(1, length(ash.selected)),
   fdp.knockoff = sum(beta[knockoff.selected] == 0) / max(1, length(knockoff.selected)),
   fdp.knockoff.plus = sum(beta[knockoff.plus.selected] == 0) / max(1, length(knockoff.plus.selected)),
+  fdp.knockoff.est = sum(beta[knockoff.selected2] == 0) / max(1, length(knockoff.selected2)),
+  fdp.knockoff.plus.est = sum(beta[knockoff.plus.selected2] == 0) / max(1, length(knockoff.plus.selected2)),
   power.BH = sum(beta[BH.selected] != 0) / k,
   power.ash = sum(beta[ash.selected] != 0) / k,
   power.knockoff = sum(beta[knockoff.selected] != 0) / k,
-  power.knockoff.plus = sum(beta[knockoff.plus.selected] != 0) / k
+  power.knockoff.plus = sum(beta[knockoff.plus.selected] != 0) / k,
+  power.knockoff.est = sum(beta[knockoff.selected2] != 0) / k,
+  power.knockoff.plus.est = sum(beta[knockoff.plus.selected2] != 0) / k
 )
 }
 ```
 
 ```{r, echo = FALSE}
-result.summary <- matrix(unlist(result), m, 8, byrow = TRUE)
-boxplot(result.summary[, 1 : 4])
-boxplot(result.summary[, 5 : 8])
+result.summary <- matrix(unlist(result), m, 12, byrow = TRUE)
+boxplot(result.summary[, 1 : 6], names = c("BH", "ASH", "Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E"), ylab = "FDP", las = 2)
+abline(h = q, lty = 2, col = "red")
+boxplot(result.summary[, 7 : 12], names = c("BH", "ASH", "Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E"), ylab = "TDP", las = 2)
 ```
 
 ## Local correlation design
@@ -147,24 +164,117 @@ thres.knockoff.plus = knockoff::knockoff.threshold(W, fdr = q, offset = 1) # mor
 knockoff.selected <- which(W >= thres.knockoff)
 knockoff.plus.selected <- which(W >= thres.knockoff.plus)
 
+Xk2 <- knockoff::create.second_order(X, method = "sdp")
+W2 <- knockoff::stat.glmnet_coefdiff(X, Xk2, y, cores = 4)
+thres.knockoff2 = knockoff::knockoff.threshold(W2, fdr = q, offset = 0) # less conservative
+thres.knockoff.plus2 = knockoff::knockoff.threshold(W2, fdr = q, offset = 1) # more conservative
+knockoff.selected2 <- which(W2 >= thres.knockoff2)
+knockoff.plus.selected2 <- which(W2 >= thres.knockoff.plus2)
+
+
 result[[i]] <- c(
   fdp.BH = sum(beta[BH.selected] == 0) / max(1, length(BH.selected)),
   fdp.ash = sum(beta[ash.selected] == 0) / max(1, length(ash.selected)),
   fdp.knockoff = sum(beta[knockoff.selected] == 0) / max(1, length(knockoff.selected)),
   fdp.knockoff.plus = sum(beta[knockoff.plus.selected] == 0) / max(1, length(knockoff.plus.selected)),
+  fdp.knockoff.est = sum(beta[knockoff.selected2] == 0) / max(1, length(knockoff.selected2)),
+  fdp.knockoff.plus.est = sum(beta[knockoff.plus.selected2] == 0) / max(1, length(knockoff.plus.selected2)),
   power.BH = sum(beta[BH.selected] != 0) / k,
   power.ash = sum(beta[ash.selected] != 0) / k,
   power.knockoff = sum(beta[knockoff.selected] != 0) / k,
-  power.knockoff.plus = sum(beta[knockoff.plus.selected] != 0) / k
+  power.knockoff.plus = sum(beta[knockoff.plus.selected] != 0) / k,
+  power.knockoff.est = sum(beta[knockoff.selected2] != 0) / k,
+  power.knockoff.plus.est = sum(beta[knockoff.plus.selected2] != 0) / k
 )
 }
 ```
 
 ```{r, echo = FALSE}
-result.summary <- matrix(unlist(result), m, 8, byrow = TRUE)
-boxplot(result.summary[, 1 : 4])
-boxplot(result.summary[, 5 : 8])
+result.summary <- matrix(unlist(result), m, 12, byrow = TRUE)
+boxplot(result.summary[, 1 : 6], names = c("BH", "ASH", "Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E"), ylab = "FDP", las = 2)
+abline(h = q, lty = 2, col = "red")
+boxplot(result.summary[, 7 : 12], names = c("BH", "ASH", "Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E"), ylab = "TDP", las = 2)
 ```
+
+## Factor Model for $X$
+
+```{r, echo = FALSE, cache = TRUE}
+d <- 5
+B <- matrix(rnorm(p * d), p, d)
+Cor.X <- cov2cor(tcrossprod(B) + diag(p))
+Cov.X <- Cor.X / n
+A <- 7
+```
+
+```{r, echo = FALSE, cache = TRUE, message = FALSE, warning = FALSE}
+result <- list()
+for (i in 1 : m) {
+beta <- rep(0, p)
+nonzero <- sample(p, k)
+beta[nonzero] <- rnorm(k, 0, A)
+
+X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n) %*% chol(Cor.X)
+y <- X %*% beta + rnorm(n)
+
+## Least squares
+lm.fit <- lm(y ~ X - 1)
+pvalue <- summary(lm.fit)$coefficients[, 4]
+betahat <- summary(lm.fit)$coefficients[, 1]
+sebetahat <- summary(lm.fit)$coefficients[, 2]
+
+## BH
+BH.fit <- p.adjust(pvalue, method = "BH")
+BH.selected <- (1 : p)[BH.fit <= q]
+
+## ASH
+ash.fit <- ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+ash.selected <- (1 : p)[get_qvalue(ash.fit) <= q]
+
+## Knockoff
+Xk <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "equi")
+W <- knockoff::stat.glmnet_coefdiff(X, Xk, y, cores = 4)
+thres.knockoff = knockoff::knockoff.threshold(W, fdr = q, offset = 0) # less conservative
+thres.knockoff.plus = knockoff::knockoff.threshold(W, fdr = q, offset = 1) # more conservative
+knockoff.selected <- which(W >= thres.knockoff)
+knockoff.plus.selected <- which(W >= thres.knockoff.plus)
+
+Xk2 <- knockoff::create.second_order(X, method = "sdp")
+W2 <- knockoff::stat.glmnet_coefdiff(X, Xk2, y, cores = 4)
+thres.knockoff2 = knockoff::knockoff.threshold(W2, fdr = q, offset = 0) # less conservative
+thres.knockoff.plus2 = knockoff::knockoff.threshold(W2, fdr = q, offset = 1) # more conservative
+knockoff.selected2 <- which(W2 >= thres.knockoff2)
+knockoff.plus.selected2 <- which(W2 >= thres.knockoff.plus2)
+
+result[[i]] <- c(
+  fdp.BH = sum(beta[BH.selected] == 0) / max(1, length(BH.selected)),
+  fdp.ash = sum(beta[ash.selected] == 0) / max(1, length(ash.selected)),
+  fdp.knockoff = sum(beta[knockoff.selected] == 0) / max(1, length(knockoff.selected)),
+  fdp.knockoff.plus = sum(beta[knockoff.plus.selected] == 0) / max(1, length(knockoff.plus.selected)),
+  fdp.knockoff.est = sum(beta[knockoff.selected2] == 0) / max(1, length(knockoff.selected2)),
+  fdp.knockoff.plus.est = sum(beta[knockoff.plus.selected2] == 0) / max(1, length(knockoff.plus.selected2)),
+  power.BH = sum(beta[BH.selected] != 0) / k,
+  power.ash = sum(beta[ash.selected] != 0) / k,
+  power.knockoff = sum(beta[knockoff.selected] != 0) / k,
+  power.knockoff.plus = sum(beta[knockoff.plus.selected] != 0) / k,
+  power.knockoff.est = sum(beta[knockoff.selected2] != 0) / k,
+  power.knockoff.plus.est = sum(beta[knockoff.plus.selected2] != 0) / k
+)
+}
+```
+
+```{r, echo = FALSE}
+result.summary <- matrix(unlist(result), m, 12, byrow = TRUE)
+boxplot(result.summary[, 1 : 6], names = c("BH", "ASH", "Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E"), ylab = "FDP", las = 2)
+abline(h = q, lty = 2, col = "red")
+boxplot(result.summary[, 7 : 12], names = c("BH", "ASH", "Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E"), ylab = "TDP", las = 2)
+```
+
+## Observation
+
+1. Model-$X$ knockoff is very powerful.
+2. Using estimated distribution of $X$ rather than the true distribution hurts the power of Model-$X$ knockoff.
+3. The power of Model-$X$ knockoff using estimated distributio of $X$ is on par with that of `ASH` and `BH`, probably because [the presence of small signals makes knockoff less powerful](knockoff_6.html#model-(x)_knockoffs).
+4. Sometimes `equi` is better than `SDP` when generating knockoffs, as shown in [previous simulations using factor model for $X$](knockoff_8.html#model-(x)_design15).
 
 ## Session information
 

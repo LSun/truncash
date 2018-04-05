@@ -1,5 +1,5 @@
 ---
-title: "A closer look at `Knockoff` on heavy correlation design"
+title: "Factor Model for $\\hat\\beta$ and Column Randomization for `Knockoff`"
 author: "Lei Sun"
 date: 2018-02-20
 output: html_document
@@ -36,7 +36,7 @@ knitr::read_chunk("chunks.R")
 
 3. Find a cutoff threshold for those test statistics to control the estimated FDR under $q$.
 
-The default `knockoff::knockoff.filter` function uses `SDP` construction in step 1 and `LASSO`-related statistics in step 2. However, [we've found](knockoff_5.html#scenario_3:_(hatbeta)_from_a_factor_model7) that `Knockoff` coded in this way failed to control FDR in simulations when variables are generated such that $\hat\beta$ has heavy average absolute pairwise correlation, which seems to contradict Thoerem 2 in the `Knockoff` paper. Now we take a closer look to see what went wrong.
+The default `knockoff::knockoff.filter` function uses `SDP` construction in step 1 and `LASSO`-related statistics in step 2. However, [we've found](knockoff_5.html#scenario_3:_(hatbeta)_from_a_factor_model7) that `Knockoff` coded in this way failed to control FDR in simulations when variables are generated such that $\hat\beta$ has heavy average absolute pairwise correlation, which seems to contradict Theorem 2 in the `Knockoff` paper. Now we take a closer look to see what went wrong.
 
 In step 1, we use two construction methods: `equi` and `sdp`. `sdp` is believed to be more powerful. In step 2, we use two statistics: `marginal` and `lasso`-related. `lasso`-related is believed to be more powerful.
 

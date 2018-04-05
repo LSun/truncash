@@ -1,5 +1,5 @@
 ---
-title: "The Quality of Knockoffs"
+title: "A detailed study of Fixed-$X$ and Model-$X$ knockoffs"
 author: "Lei Sun"
 date: 2018-03-01
 output: html_document
