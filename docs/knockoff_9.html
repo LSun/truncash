@@ -13,7 +13,7 @@
 
 <meta name="date" content="2018-04-03" />
 
-<title>ASH vs Knockoff</title>
+<title>ASH vs Knockoff vs varbvs</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -304,7 +304,7 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore"><code>ASH</code> vs <code>Knockoff</code></h1>
+<h1 class="title toc-ignore"><code>ASH</code> vs <code>Knockoff</code> vs <code>varbvs</code></h1>
 <h4 class="author"><em>Lei Sun</em></h4>
 <h4 class="date"><em>2018-04-03</em></h4>
 
@@ -315,28 +315,35 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2018-04-05</p>
+<p><strong>Last updated:</strong> 2018-04-12</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 20ea328</p>
+<p><strong>Code version:</strong> 96579e4</p>
 <!-- Add your analysis here -->
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
 <p>The true <span class="math inline">\(\beta\)</span> are simulated as <span class="math inline">\(\beta \sim \pi_0\delta_0 + (1 - \pi_0)N(0, \sigma_\beta^2)\)</span>.</p>
 </div>
-<div id="independent-design" class="section level2">
-<h2>Independent design</h2>
+<div id="n-p" class="section level2">
+<h2><span class="math inline">\(n &gt; p\)</span></h2>
+<div id="independent-design" class="section level3">
+<h3>Independent design</h3>
 <p><span class="math inline">\(X_{n \times p}\)</span> has independent columns simulated from <span class="math inline">\(N(0, (1/\sqrt n)^2)\)</span> so they are roughly normalized.</p>
 <p><img src="figure/knockoff_9.rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_9.rmd/unnamed-chunk-5-2.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
-<div id="local-correlation-design" class="section level2">
-<h2>Local correlation design</h2>
+<div id="local-correlation-design" class="section level3">
+<h3>Local correlation design</h3>
 <p><span class="math inline">\(X_{n \times p}\)</span> has correlation <span class="math inline">\(\Sigma_{ij} = \rho^{|i - j|}\)</span>. Each row is independently <span class="math inline">\(N(0, \frac1n\Sigma)\)</span>.</p>
 <p><img src="figure/knockoff_9.rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_9.rmd/unnamed-chunk-8-2.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
-<div id="factor-model-for-x" class="section level2">
-<h2>Factor Model for <span class="math inline">\(X\)</span></h2>
+<div id="factor-model-for-x" class="section level3">
+<h3>Factor Model for <span class="math inline">\(X\)</span></h3>
 <p><img src="figure/knockoff_9.rmd/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_9.rmd/unnamed-chunk-11-2.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="factor-model-for-hatbeta" class="section level3">
+<h3>Factor Model for <span class="math inline">\(\hat\beta\)</span></h3>
+<p><img src="figure/knockoff_9.rmd/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_9.rmd/unnamed-chunk-14-2.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
 </div>
 <div id="observation" class="section level2">
 <h2>Observation</h2>
@@ -346,6 +353,30 @@ shared across the workflowr files. -->
 <li>The power of Model-<span class="math inline">\(X\)</span> knockoff using estimated distributio of <span class="math inline">\(X\)</span> is on par with that of <code>ASH</code> and <code>BH</code>, probably because <a href="knockoff_6.html#model-(x)_knockoffs">the presence of small signals makes knockoff less powerful</a>.</li>
 <li>Sometimes <code>equi</code> is better than <code>SDP</code> when generating knockoffs, as shown in <a href="knockoff_8.html#model-(x)_design15">previous simulations using factor model for <span class="math inline">\(X\)</span></a>.</li>
 </ol>
+</div>
+<div id="n-p-1" class="section level2">
+<h2><span class="math inline">\(n &lt; p\)</span></h2>
+<pre class="r"><code>n &lt;- 300
+p &lt;- 1000
+k &lt;- 200
+m &lt;- 100
+q &lt;- 0.1</code></pre>
+<div id="independent-design-1" class="section level3">
+<h3>Independent design</h3>
+<p><img src="figure/knockoff_9.rmd/unnamed-chunk-17-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_9.rmd/unnamed-chunk-17-2.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="local-correlation-design-1" class="section level3">
+<h3>Local correlation design</h3>
+<p><img src="figure/knockoff_9.rmd/unnamed-chunk-20-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_9.rmd/unnamed-chunk-20-2.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="factor-model-for-x-1" class="section level3">
+<h3>Factor Model for <span class="math inline">\(X\)</span></h3>
+<p><img src="figure/knockoff_9.rmd/unnamed-chunk-23-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_9.rmd/unnamed-chunk-23-2.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="factor-model-for-hatbeta-1" class="section level3">
+<h3>Factor Model for <span class="math inline">\(\hat\beta\)</span></h3>
+<p><img src="figure/knockoff_9.rmd/unnamed-chunk-26-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_9.rmd/unnamed-chunk-26-2.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
 </div>
 <div id="session-information" class="section level2">
 <h2>Session information</h2>
