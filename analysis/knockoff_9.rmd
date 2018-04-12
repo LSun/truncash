@@ -1,5 +1,5 @@
 ---
-title: "`ASH` vs `Knockoff`"
+title: "`ASH` vs `Knockoff` vs `varbvs`"
 author: "Lei Sun"
 date: 2018-04-03
 output: html_document
@@ -32,6 +32,7 @@ The true $\beta$ are simulated as $\beta \sim \pi_0\delta_0 + (1 - \pi_0)N(0, \s
 
 ```{r, echo = FALSE, cache = TRUE, message = FALSE, warning = FALSE}
 library(ashr)
+library(varbvs)
 library(knockoff)
 library(Matrix)
 library(reshape2)
@@ -44,12 +45,13 @@ library(doMC)
 n <- 2000
 p <- 1000
 k <- 200
-A <- 5
 m <- 100
 q <- 0.1
 ```
 
-## Independent design
+## $n > p$
+
+### Independent design
 
 $X_{n \times p}$ has independent columns simulated from $N(0, (1/\sqrt n)^2)$ so they are roughly normalized.
 
@@ -58,6 +60,7 @@ Cov.X <- diag(1 / n, p)
 ```
 
 ```{r, echo = FALSE, cache = TRUE, message = FALSE, warning = FALSE}
+A <- 5
 result <- list()
 for (i in 1 : m) {
 beta <- rep(0, p)
@@ -82,19 +85,26 @@ ash.fit <- ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
 ash.selected <- (1 : p)[get_qvalue(ash.fit) <= q]
 
 ## Knockoff
-Xk <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "sdp")
+Xk <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "equi")
 W <- knockoff::stat.glmnet_coefdiff(X, Xk, y, cores = 4)
 thres.knockoff = knockoff::knockoff.threshold(W, fdr = q, offset = 0) # less conservative
 thres.knockoff.plus = knockoff::knockoff.threshold(W, fdr = q, offset = 1) # more conservative
 knockoff.selected <- which(W >= thres.knockoff)
 knockoff.plus.selected <- which(W >= thres.knockoff.plus)
 
-Xk2 <- knockoff::create.second_order(X, method = "sdp")
+Xk2 <- knockoff::create.second_order(X, method = "equi")
 W2 <- knockoff::stat.glmnet_coefdiff(X, Xk2, y, cores = 4)
 thres.knockoff2 = knockoff::knockoff.threshold(W2, fdr = q, offset = 0) # less conservative
 thres.knockoff.plus2 = knockoff::knockoff.threshold(W2, fdr = q, offset = 1) # more conservative
 knockoff.selected2 <- which(W2 >= thres.knockoff2)
 knockoff.plus.selected2 <- which(W2 >= thres.knockoff.plus2)
+
+## varbvs
+
+varbvs.fit <- varbvs::varbvsmix(X, NULL, y, sa = ash.fit$fitted_g$sd, verbose = FALSE)
+varbvs.lfdr <- varbvs.fit$alpha[, 1]
+varbvs.q <- ashr::qval.from.lfdr(varbvs.lfdr)
+varbvs.selected <- (1 : p)[varbvs.q <= q]
 
 result[[i]] <- c(
   fdp.BH = sum(beta[BH.selected] == 0) / max(1, length(BH.selected)),
@@ -103,24 +113,26 @@ result[[i]] <- c(
   fdp.knockoff.plus = sum(beta[knockoff.plus.selected] == 0) / max(1, length(knockoff.plus.selected)),
   fdp.knockoff.est = sum(beta[knockoff.selected2] == 0) / max(1, length(knockoff.selected2)),
   fdp.knockoff.plus.est = sum(beta[knockoff.plus.selected2] == 0) / max(1, length(knockoff.plus.selected2)),
+  fdp.varbvs = sum(beta[varbvs.selected] == 0) / max(1, length(varbvs.selected)),
   power.BH = sum(beta[BH.selected] != 0) / k,
   power.ash = sum(beta[ash.selected] != 0) / k,
   power.knockoff = sum(beta[knockoff.selected] != 0) / k,
   power.knockoff.plus = sum(beta[knockoff.plus.selected] != 0) / k,
   power.knockoff.est = sum(beta[knockoff.selected2] != 0) / k,
-  power.knockoff.plus.est = sum(beta[knockoff.plus.selected2] != 0) / k
+  power.knockoff.plus.est = sum(beta[knockoff.plus.selected2] != 0) / k,
+  power.varbvs = sum(beta[varbvs.selected] != 0) / k
 )
 }
 ```
 
 ```{r, echo = FALSE}
-result.summary <- matrix(unlist(result), m, 12, byrow = TRUE)
-boxplot(result.summary[, 1 : 6], names = c("BH", "ASH", "Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E"), ylab = "FDP", las = 2)
+result.summary <- matrix(unlist(result), m, 14, byrow = TRUE)
+boxplot(result.summary[, 1 : 7], names = c("BH", "ASH", "Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "varbvsmix"), ylab = "FDP", las = 2)
 abline(h = q, lty = 2, col = "red")
-boxplot(result.summary[, 7 : 12], names = c("BH", "ASH", "Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E"), ylab = "TDP", las = 2)
+boxplot(result.summary[, 8 : 14], names = c("BH", "ASH", "Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "varbvsmix"), ylab = "TDP", las = 2)
 ```
 
-## Local correlation design
+### Local correlation design
 
 $X_{n \times p}$ has correlation $\Sigma_{ij} = \rho^{|i - j|}$. Each row is independently $N(0, \frac1n\Sigma)$.
 
@@ -132,6 +144,7 @@ Cov.X <- Sigma / n
 ```
 
 ```{r, echo = FALSE, cache = TRUE, message = FALSE, warning = FALSE}
+A <- 5
 result <- list()
 for (i in 1 : m) {
 beta <- rep(0, p)
@@ -157,20 +170,25 @@ ash.fit <- ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
 ash.selected <- (1 : p)[get_qvalue(ash.fit) <= q]
 
 ## Knockoff
-Xk <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "sdp")
+Xk <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "equi")
 W <- knockoff::stat.glmnet_coefdiff(X, Xk, y, cores = 4)
 thres.knockoff = knockoff::knockoff.threshold(W, fdr = q, offset = 0) # less conservative
 thres.knockoff.plus = knockoff::knockoff.threshold(W, fdr = q, offset = 1) # more conservative
 knockoff.selected <- which(W >= thres.knockoff)
 knockoff.plus.selected <- which(W >= thres.knockoff.plus)
 
-Xk2 <- knockoff::create.second_order(X, method = "sdp")
+Xk2 <- knockoff::create.second_order(X, method = "equi")
 W2 <- knockoff::stat.glmnet_coefdiff(X, Xk2, y, cores = 4)
 thres.knockoff2 = knockoff::knockoff.threshold(W2, fdr = q, offset = 0) # less conservative
 thres.knockoff.plus2 = knockoff::knockoff.threshold(W2, fdr = q, offset = 1) # more conservative
 knockoff.selected2 <- which(W2 >= thres.knockoff2)
 knockoff.plus.selected2 <- which(W2 >= thres.knockoff.plus2)
 
+## varbvs
+varbvs.fit <- varbvs::varbvsmix(X, NULL, y, sa = ash.fit$fitted_g$sd, verbose = FALSE)
+varbvs.lfdr <- varbvs.fit$alpha[, 1]
+varbvs.q <- ashr::qval.from.lfdr(varbvs.lfdr)
+varbvs.selected <- (1 : p)[varbvs.q <= q]
 
 result[[i]] <- c(
   fdp.BH = sum(beta[BH.selected] == 0) / max(1, length(BH.selected)),
@@ -179,41 +197,44 @@ result[[i]] <- c(
   fdp.knockoff.plus = sum(beta[knockoff.plus.selected] == 0) / max(1, length(knockoff.plus.selected)),
   fdp.knockoff.est = sum(beta[knockoff.selected2] == 0) / max(1, length(knockoff.selected2)),
   fdp.knockoff.plus.est = sum(beta[knockoff.plus.selected2] == 0) / max(1, length(knockoff.plus.selected2)),
+  fdp.varbvs = sum(beta[varbvs.selected] == 0) / max(1, length(varbvs.selected)),
   power.BH = sum(beta[BH.selected] != 0) / k,
   power.ash = sum(beta[ash.selected] != 0) / k,
   power.knockoff = sum(beta[knockoff.selected] != 0) / k,
   power.knockoff.plus = sum(beta[knockoff.plus.selected] != 0) / k,
   power.knockoff.est = sum(beta[knockoff.selected2] != 0) / k,
-  power.knockoff.plus.est = sum(beta[knockoff.plus.selected2] != 0) / k
+  power.knockoff.plus.est = sum(beta[knockoff.plus.selected2] != 0) / k,
+  power.varbvs = sum(beta[varbvs.selected] != 0) / k
 )
 }
 ```
 
 ```{r, echo = FALSE}
-result.summary <- matrix(unlist(result), m, 12, byrow = TRUE)
-boxplot(result.summary[, 1 : 6], names = c("BH", "ASH", "Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E"), ylab = "FDP", las = 2)
+result.summary <- matrix(unlist(result), m, 14, byrow = TRUE)
+boxplot(result.summary[, 1 : 7], names = c("BH", "ASH", "Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "varbvsmix"), ylab = "FDP", las = 2)
 abline(h = q, lty = 2, col = "red")
-boxplot(result.summary[, 7 : 12], names = c("BH", "ASH", "Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E"), ylab = "TDP", las = 2)
+boxplot(result.summary[, 8 : 14], names = c("BH", "ASH", "Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "varbvsmix"), ylab = "TDP", las = 2)
 ```
 
-## Factor Model for $X$
+### Factor Model for $X$
 
 ```{r, echo = FALSE, cache = TRUE}
 d <- 5
 B <- matrix(rnorm(p * d), p, d)
 Cor.X <- cov2cor(tcrossprod(B) + diag(p))
+Cor.X.5 <- chol(Cor.X)
 Cov.X <- Cor.X / n
-A <- 7
 ```
 
 ```{r, echo = FALSE, cache = TRUE, message = FALSE, warning = FALSE}
+A <- 7
 result <- list()
 for (i in 1 : m) {
 beta <- rep(0, p)
 nonzero <- sample(p, k)
 beta[nonzero] <- rnorm(k, 0, A)
 
-X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n) %*% chol(Cor.X)
+X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n) %*% Cor.X.5
 y <- X %*% beta + rnorm(n)
 
 ## Least squares
@@ -238,12 +259,18 @@ thres.knockoff.plus = knockoff::knockoff.threshold(W, fdr = q, offset = 1) # mor
 knockoff.selected <- which(W >= thres.knockoff)
 knockoff.plus.selected <- which(W >= thres.knockoff.plus)
 
-Xk2 <- knockoff::create.second_order(X, method = "sdp")
+Xk2 <- knockoff::create.second_order(X, method = "equi")
 W2 <- knockoff::stat.glmnet_coefdiff(X, Xk2, y, cores = 4)
 thres.knockoff2 = knockoff::knockoff.threshold(W2, fdr = q, offset = 0) # less conservative
 thres.knockoff.plus2 = knockoff::knockoff.threshold(W2, fdr = q, offset = 1) # more conservative
 knockoff.selected2 <- which(W2 >= thres.knockoff2)
 knockoff.plus.selected2 <- which(W2 >= thres.knockoff.plus2)
+
+## varbvs
+varbvs.fit <- varbvs::varbvsmix(X, NULL, y, sa = ash.fit$fitted_g$sd, verbose = FALSE)
+varbvs.lfdr <- varbvs.fit$alpha[, 1]
+varbvs.q <- ashr::qval.from.lfdr(varbvs.lfdr)
+varbvs.selected <- (1 : p)[varbvs.q <= q]
 
 result[[i]] <- c(
   fdp.BH = sum(beta[BH.selected] == 0) / max(1, length(BH.selected)),
@@ -252,21 +279,105 @@ result[[i]] <- c(
   fdp.knockoff.plus = sum(beta[knockoff.plus.selected] == 0) / max(1, length(knockoff.plus.selected)),
   fdp.knockoff.est = sum(beta[knockoff.selected2] == 0) / max(1, length(knockoff.selected2)),
   fdp.knockoff.plus.est = sum(beta[knockoff.plus.selected2] == 0) / max(1, length(knockoff.plus.selected2)),
+  fdp.varbvs = sum(beta[varbvs.selected] == 0) / max(1, length(varbvs.selected)),
   power.BH = sum(beta[BH.selected] != 0) / k,
   power.ash = sum(beta[ash.selected] != 0) / k,
   power.knockoff = sum(beta[knockoff.selected] != 0) / k,
   power.knockoff.plus = sum(beta[knockoff.plus.selected] != 0) / k,
   power.knockoff.est = sum(beta[knockoff.selected2] != 0) / k,
-  power.knockoff.plus.est = sum(beta[knockoff.plus.selected2] != 0) / k
+  power.knockoff.plus.est = sum(beta[knockoff.plus.selected2] != 0) / k,
+  power.varbvs = sum(beta[varbvs.selected] != 0) / k
 )
 }
 ```
 
 ```{r, echo = FALSE}
-result.summary <- matrix(unlist(result), m, 12, byrow = TRUE)
-boxplot(result.summary[, 1 : 6], names = c("BH", "ASH", "Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E"), ylab = "FDP", las = 2)
+result.summary <- matrix(unlist(result), m, 14, byrow = TRUE)
+boxplot(result.summary[, 1 : 7], names = c("BH", "ASH", "Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "varbvsmix"), ylab = "FDP", las = 2)
 abline(h = q, lty = 2, col = "red")
-boxplot(result.summary[, 7 : 12], names = c("BH", "ASH", "Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E"), ylab = "TDP", las = 2)
+boxplot(result.summary[, 8 : 14], names = c("BH", "ASH", "Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "varbvsmix"), ylab = "TDP", las = 2)
+```
+
+### Factor Model for $\hat\beta$
+
+```{r, echo = FALSE, cache = TRUE}
+d <- 5
+B <- matrix(rnorm(p * d), p, d)
+Cor.X <- signif(cov2cor(solve(tcrossprod(B) + diag(p))), digits = 6)
+Cor.X.5 <- chol(Cor.X)
+Cov.X <- Cor.X / n
+```
+
+```{r, echo = FALSE, cache = TRUE, message = FALSE, warning = FALSE}
+A <- 7
+result <- list()
+for (i in 1 : m) {
+beta <- rep(0, p)
+nonzero <- sample(p, k)
+beta[nonzero] <- rnorm(k, 0, A)
+
+X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n) %*% Cor.X.5
+y <- X %*% beta + rnorm(n)
+
+## Least squares
+lm.fit <- lm(y ~ X - 1)
+pvalue <- summary(lm.fit)$coefficients[, 4]
+betahat <- summary(lm.fit)$coefficients[, 1]
+sebetahat <- summary(lm.fit)$coefficients[, 2]
+
+## BH
+BH.fit <- p.adjust(pvalue, method = "BH")
+BH.selected <- (1 : p)[BH.fit <= q]
+
+## ASH
+ash.fit <- ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+ash.selected <- (1 : p)[get_qvalue(ash.fit) <= q]
+
+## Knockoff
+Xk <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "equi")
+W <- knockoff::stat.glmnet_coefdiff(X, Xk, y, cores = 4)
+thres.knockoff = knockoff::knockoff.threshold(W, fdr = q, offset = 0) # less conservative
+thres.knockoff.plus = knockoff::knockoff.threshold(W, fdr = q, offset = 1) # more conservative
+knockoff.selected <- which(W >= thres.knockoff)
+knockoff.plus.selected <- which(W >= thres.knockoff.plus)
+
+Xk2 <- knockoff::create.second_order(X, method = "equi")
+W2 <- knockoff::stat.glmnet_coefdiff(X, Xk2, y, cores = 4)
+thres.knockoff2 = knockoff::knockoff.threshold(W2, fdr = q, offset = 0) # less conservative
+thres.knockoff.plus2 = knockoff::knockoff.threshold(W2, fdr = q, offset = 1) # more conservative
+knockoff.selected2 <- which(W2 >= thres.knockoff2)
+knockoff.plus.selected2 <- which(W2 >= thres.knockoff.plus2)
+
+## varbvs
+varbvs.fit <- varbvs::varbvsmix(X, NULL, y, sa = ash.fit$fitted_g$sd, verbose = FALSE)
+varbvs.lfdr <- varbvs.fit$alpha[, 1]
+varbvs.q <- ashr::qval.from.lfdr(varbvs.lfdr)
+varbvs.selected <- (1 : p)[varbvs.q <= q]
+
+result[[i]] <- c(
+  fdp.BH = sum(beta[BH.selected] == 0) / max(1, length(BH.selected)),
+  fdp.ash = sum(beta[ash.selected] == 0) / max(1, length(ash.selected)),
+  fdp.knockoff = sum(beta[knockoff.selected] == 0) / max(1, length(knockoff.selected)),
+  fdp.knockoff.plus = sum(beta[knockoff.plus.selected] == 0) / max(1, length(knockoff.plus.selected)),
+  fdp.knockoff.est = sum(beta[knockoff.selected2] == 0) / max(1, length(knockoff.selected2)),
+  fdp.knockoff.plus.est = sum(beta[knockoff.plus.selected2] == 0) / max(1, length(knockoff.plus.selected2)),
+  fdp.varbvs = sum(beta[varbvs.selected] == 0) / max(1, length(varbvs.selected)),
+  power.BH = sum(beta[BH.selected] != 0) / k,
+  power.ash = sum(beta[ash.selected] != 0) / k,
+  power.knockoff = sum(beta[knockoff.selected] != 0) / k,
+  power.knockoff.plus = sum(beta[knockoff.plus.selected] != 0) / k,
+  power.knockoff.est = sum(beta[knockoff.selected2] != 0) / k,
+  power.knockoff.plus.est = sum(beta[knockoff.plus.selected2] != 0) / k,
+  power.varbvs = sum(beta[varbvs.selected] != 0) / k
+)
+}
+```
+
+```{r, echo = FALSE}
+result.summary <- matrix(unlist(result), m, 14, byrow = TRUE)
+boxplot(result.summary[, 1 : 7], names = c("BH", "ASH", "Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "varbvsmix"), ylab = "FDP", las = 2)
+abline(h = q, lty = 2, col = "red")
+boxplot(result.summary[, 8 : 14], names = c("BH", "ASH", "Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "varbvsmix"), ylab = "TDP", las = 2)
 ```
 
 ## Observation
@@ -275,6 +386,321 @@ boxplot(result.summary[, 7 : 12], names = c("BH", "ASH", "Knockoff.G", "Knockoff
 2. Using estimated distribution of $X$ rather than the true distribution hurts the power of Model-$X$ knockoff.
 3. The power of Model-$X$ knockoff using estimated distributio of $X$ is on par with that of `ASH` and `BH`, probably because [the presence of small signals makes knockoff less powerful](knockoff_6.html#model-(x)_knockoffs).
 4. Sometimes `equi` is better than `SDP` when generating knockoffs, as shown in [previous simulations using factor model for $X$](knockoff_8.html#model-(x)_design15).
+
+## $n < p$
+
+```{r}
+n <- 300
+p <- 1000
+k <- 200
+m <- 100
+q <- 0.1
+```
+
+### Independent design
+
+```{r, echo = FALSE, cache = TRUE, message = FALSE}
+A <- 5
+
+Cov.X <- diag(1 / n, p)
+result <- list()
+
+for (i in 1 : m) {
+  X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n, p)
+
+  beta <- rep(0, p)
+  nonzero <- sample(p, k)
+  beta[nonzero] <- rnorm(k, 0, A)
+  
+  y <- X %*% beta + rnorm(n)
+
+  ## Knockoff
+  Xk_g <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "equi")
+  Xk_2 <- knockoff::create.second_order(X, method = "equi")
+  gauss_equi <- knockoff::stat.glmnet_coefdiff(X, Xk_g, y, cores = 4)
+  est_equi <- knockoff::stat.glmnet_coefdiff(X, Xk_2, y, cores = 4)
+  Knockoff.threshold.g <- knockoff::knockoff.threshold(gauss_equi, fdr = q, offset = 0)
+  Knockoff.threshold.2 <- knockoff::knockoff.threshold(est_equi, fdr = q, offset = 0)
+  Knockoff.threshold.plus.g <- knockoff::knockoff.threshold(gauss_equi, fdr = q, offset = 1)
+  Knockoff.threshold.plus.2 <- knockoff::knockoff.threshold(est_equi, fdr = q, offset = 1)
+  Knockoff.g.selected <- (1 : p)[gauss_equi >= Knockoff.threshold.g]
+  Knockoff.plus.g.selected <- (1 : p)[gauss_equi >= Knockoff.threshold.plus.g]
+  Knockoff.2.selected <- (1 : p)[est_equi >= Knockoff.threshold.2]
+  Knockoff.plus.2.selected <- (1 : p)[est_equi >= Knockoff.threshold.plus.2]
+
+  ## ASH
+  betahat <- c()
+  sebetahat <- c()
+  for (j in 1 : p) {
+    fit <- lm(y ~ X[, j] - 1)
+    betahat[j] <- summary(fit)$coefficients[1]
+    sebetahat[j] <- summary(fit)$coefficients[2]
+  }
+  ash.fit <- ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+  ash.selected <- (1 : p)[get_qvalue(ash.fit) <= q]
+
+  ## varbvs
+  varbvs.fit <- varbvs::varbvsmix(X, NULL, y, sa = ash.fit$fitted_g$sd, verbose = FALSE)
+  varbvs.lfdr <- varbvs.fit$alpha[, 1]
+  varbvs.q <- ashr::qval.from.lfdr(varbvs.lfdr)
+  varbvs.selected <- (1 : p)[varbvs.q <= q]
+
+result[[i]] <- c(
+  fdp.knockoff.g = sum(beta[Knockoff.g.selected] == 0) / max(1, length(Knockoff.g.selected)),
+  fdp.knockoff.plus.g = sum(beta[Knockoff.plus.g.selected] == 0) / max(1, length(Knockoff.plus.g.selected)),
+  fdp.Knockoff.2 = sum(beta[Knockoff.2.selected] == 0) / max(1, length(Knockoff.2.selected)),
+  fdp.knockoff.plus.2 = sum(beta[Knockoff.plus.2.selected] == 0) / max(1, length(Knockoff.plus.2.selected)),
+  fdp.ash = sum(beta[ash.selected] == 0) / max(1, length(ash.selected)),
+  fdp.varbvs = sum(beta[varbvs.selected] == 0) / max(1, length(varbvs.selected)),
+  power.knockoff.g = sum(beta[Knockoff.g.selected] != 0) / k,
+  power.knockoff.plus.g = sum(beta[Knockoff.plus.g.selected] != 0) / k,
+  power.knockoff.2 = sum(beta[Knockoff.2.selected] != 0) / k,
+  power.knockoff.plus.2 = sum(beta[Knockoff.plus.2.selected] != 0) / k,
+  power.ash = sum(beta[ash.selected] != 0) / k,
+  power.varbvs = sum(beta[varbvs.selected] != 0) / k
+)
+}
+```
+
+```{r, echo = FALSE}
+result.summary <- matrix(unlist(result), m, 12, byrow = TRUE)
+boxplot(result.summary[, 1 : 6], names = c("Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "ASH", "varbvsmix"), ylab = "FDP", las = 2)
+abline(h = q, lty = 2, col = "red")
+boxplot(result.summary[, 7 : 12], names = c("Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "ASH", "varbvsmix"), ylab = "TDP", las = 2)
+```
+
+### Local correlation design
+
+```{r, echo = FALSE, cache = TRUE}
+rho <- 0.5
+Cor.X <- toeplitz(rho^{0 : (p - 1)})
+Cor.X.5 <- chol(Cor.X)
+Cov.X <- Cor.X / n
+```
+
+```{r, echo = FALSE, cache = TRUE, message = FALSE}
+A <- 5
+
+result <- list()
+
+for (i in 1 : m) {
+beta <- rep(0, p)
+nonzero <- sample(p, k)
+beta[nonzero] <- rnorm(k, 0, A)
+
+X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n) %*% Cor.X.5
+y <- X %*% beta + rnorm(n)
+
+  ## Knockoff
+  Xk_g <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "equi")
+  Xk_2 <- knockoff::create.second_order(X, method = "equi")
+  gauss_equi <- knockoff::stat.glmnet_coefdiff(X, Xk_g, y, cores = 4)
+  est_equi <- knockoff::stat.glmnet_coefdiff(X, Xk_2, y, cores = 4)
+  Knockoff.threshold.g <- knockoff::knockoff.threshold(gauss_equi, fdr = q, offset = 0)
+  Knockoff.threshold.2 <- knockoff::knockoff.threshold(est_equi, fdr = q, offset = 0)
+  Knockoff.threshold.plus.g <- knockoff::knockoff.threshold(gauss_equi, fdr = q, offset = 1)
+  Knockoff.threshold.plus.2 <- knockoff::knockoff.threshold(est_equi, fdr = q, offset = 1)
+  Knockoff.g.selected <- (1 : p)[gauss_equi >= Knockoff.threshold.g]
+  Knockoff.plus.g.selected <- (1 : p)[gauss_equi >= Knockoff.threshold.plus.g]
+  Knockoff.2.selected <- (1 : p)[est_equi >= Knockoff.threshold.2]
+  Knockoff.plus.2.selected <- (1 : p)[est_equi >= Knockoff.threshold.plus.2]
+
+  ## ASH
+  betahat <- c()
+  sebetahat <- c()
+  for (j in 1 : p) {
+    fit <- lm(y ~ X[, j] - 1)
+    betahat[j] <- summary(fit)$coefficients[1]
+    sebetahat[j] <- summary(fit)$coefficients[2]
+  }
+  ash.fit <- ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+  ash.selected <- (1 : p)[get_qvalue(ash.fit) <= q]
+
+  ## varbvs
+  varbvs.fit <- varbvs::varbvsmix(X, NULL, y, sa = ash.fit$fitted_g$sd, verbose = FALSE)
+  varbvs.lfdr <- varbvs.fit$alpha[, 1]
+  varbvs.q <- ashr::qval.from.lfdr(varbvs.lfdr)
+  varbvs.selected <- (1 : p)[varbvs.q <= q]
+
+result[[i]] <- c(
+  fdp.knockoff.g = sum(beta[Knockoff.g.selected] == 0) / max(1, length(Knockoff.g.selected)),
+  fdp.knockoff.plus.g = sum(beta[Knockoff.plus.g.selected] == 0) / max(1, length(Knockoff.plus.g.selected)),
+  fdp.Knockoff.2 = sum(beta[Knockoff.2.selected] == 0) / max(1, length(Knockoff.2.selected)),
+  fdp.knockoff.plus.2 = sum(beta[Knockoff.plus.2.selected] == 0) / max(1, length(Knockoff.plus.2.selected)),
+  fdp.ash = sum(beta[ash.selected] == 0) / max(1, length(ash.selected)),
+  fdp.varbvs = sum(beta[varbvs.selected] == 0) / max(1, length(varbvs.selected)),
+  power.knockoff.g = sum(beta[Knockoff.g.selected] != 0) / k,
+  power.knockoff.plus.g = sum(beta[Knockoff.plus.g.selected] != 0) / k,
+  power.knockoff.2 = sum(beta[Knockoff.2.selected] != 0) / k,
+  power.knockoff.plus.2 = sum(beta[Knockoff.plus.2.selected] != 0) / k,
+  power.ash = sum(beta[ash.selected] != 0) / k,
+  power.varbvs = sum(beta[varbvs.selected] != 0) / k
+)
+}
+```
+
+```{r, echo = FALSE}
+result.summary <- matrix(unlist(result), m, 12, byrow = TRUE)
+boxplot(result.summary[, 1 : 6], names = c("Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "ASH", "varbvsmix"), ylab = "FDP", las = 2)
+abline(h = q, lty = 2, col = "red")
+boxplot(result.summary[, 7 : 12], names = c("Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "ASH", "varbvsmix"), ylab = "TDP", las = 2)
+```
+
+### Factor Model for $X$
+
+```{r, echo = FALSE, cache = TRUE}
+d <- 5
+B <- matrix(rnorm(p * d), p, d)
+Cor.X <- cov2cor(tcrossprod(B) + diag(p))
+Cor.X.5 <- chol(Cor.X)
+Cov.X <- Cor.X / n
+```
+
+```{r, echo = FALSE, cache = TRUE, message = FALSE}
+A <- 7
+
+result <- list()
+
+for (i in 1 : m) {
+beta <- rep(0, p)
+nonzero <- sample(p, k)
+beta[nonzero] <- rnorm(k, 0, A)
+
+X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n) %*% Cor.X.5
+y <- X %*% beta + rnorm(n)
+
+  ## Knockoff
+  Xk_g <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "equi")
+  Xk_2 <- knockoff::create.second_order(X, method = "equi")
+  gauss_equi <- knockoff::stat.glmnet_coefdiff(X, Xk_g, y, cores = 4)
+  est_equi <- knockoff::stat.glmnet_coefdiff(X, Xk_2, y, cores = 4)
+  Knockoff.threshold.g <- knockoff::knockoff.threshold(gauss_equi, fdr = q, offset = 0)
+  Knockoff.threshold.2 <- knockoff::knockoff.threshold(est_equi, fdr = q, offset = 0)
+  Knockoff.threshold.plus.g <- knockoff::knockoff.threshold(gauss_equi, fdr = q, offset = 1)
+  Knockoff.threshold.plus.2 <- knockoff::knockoff.threshold(est_equi, fdr = q, offset = 1)
+  Knockoff.g.selected <- (1 : p)[gauss_equi >= Knockoff.threshold.g]
+  Knockoff.plus.g.selected <- (1 : p)[gauss_equi >= Knockoff.threshold.plus.g]
+  Knockoff.2.selected <- (1 : p)[est_equi >= Knockoff.threshold.2]
+  Knockoff.plus.2.selected <- (1 : p)[est_equi >= Knockoff.threshold.plus.2]
+
+  ## ASH
+  betahat <- c()
+  sebetahat <- c()
+  for (j in 1 : p) {
+    fit <- lm(y ~ X[, j] - 1)
+    betahat[j] <- summary(fit)$coefficients[1]
+    sebetahat[j] <- summary(fit)$coefficients[2]
+  }
+  ash.fit <- ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+  ash.selected <- (1 : p)[get_qvalue(ash.fit) <= q]
+
+  ## varbvs
+  varbvs.fit <- varbvs::varbvsmix(X, NULL, y, sa = ash.fit$fitted_g$sd, verbose = FALSE)
+  varbvs.lfdr <- varbvs.fit$alpha[, 1]
+  varbvs.q <- ashr::qval.from.lfdr(varbvs.lfdr)
+  varbvs.selected <- (1 : p)[varbvs.q <= q]
+
+result[[i]] <- c(
+  fdp.knockoff.g = sum(beta[Knockoff.g.selected] == 0) / max(1, length(Knockoff.g.selected)),
+  fdp.knockoff.plus.g = sum(beta[Knockoff.plus.g.selected] == 0) / max(1, length(Knockoff.plus.g.selected)),
+  fdp.Knockoff.2 = sum(beta[Knockoff.2.selected] == 0) / max(1, length(Knockoff.2.selected)),
+  fdp.knockoff.plus.2 = sum(beta[Knockoff.plus.2.selected] == 0) / max(1, length(Knockoff.plus.2.selected)),
+  fdp.ash = sum(beta[ash.selected] == 0) / max(1, length(ash.selected)),
+  fdp.varbvs = sum(beta[varbvs.selected] == 0) / max(1, length(varbvs.selected)),
+  power.knockoff.g = sum(beta[Knockoff.g.selected] != 0) / k,
+  power.knockoff.plus.g = sum(beta[Knockoff.plus.g.selected] != 0) / k,
+  power.knockoff.2 = sum(beta[Knockoff.2.selected] != 0) / k,
+  power.knockoff.plus.2 = sum(beta[Knockoff.plus.2.selected] != 0) / k,
+  power.ash = sum(beta[ash.selected] != 0) / k,
+  power.varbvs = sum(beta[varbvs.selected] != 0) / k
+)
+}
+```
+
+```{r, echo = FALSE}
+result.summary <- matrix(unlist(result), m, 12, byrow = TRUE)
+boxplot(result.summary[, 1 : 6], names = c("Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "ASH", "varbvsmix"), ylab = "FDP", las = 2)
+abline(h = q, lty = 2, col = "red")
+boxplot(result.summary[, 7 : 12], names = c("Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "ASH", "varbvsmix"), ylab = "TDP", las = 2)
+```
+
+### Factor Model for $\hat\beta$
+
+```{r, echo = FALSE, cache = TRUE}
+d <- 5
+B <- matrix(rnorm(p * d), p, d)
+Cor.X <- signif(cov2cor(solve(tcrossprod(B) + diag(p))), digits = 6)
+Cor.X.5 <- chol(Cor.X)
+Cov.X <- Cor.X / n
+```
+
+```{r, echo = FALSE, cache = TRUE, message = FALSE}
+A <- 7
+
+result <- list()
+
+for (i in 1 : m) {
+beta <- rep(0, p)
+nonzero <- sample(p, k)
+beta[nonzero] <- A
+
+X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n) %*% Cor.X.5
+y <- X %*% beta + rnorm(n)
+
+  ## Knockoff
+  Xk_g <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "equi")
+  Xk_2 <- knockoff::create.second_order(X, method = "equi")
+  gauss_equi <- knockoff::stat.glmnet_coefdiff(X, Xk_g, y, cores = 4)
+  est_equi <- knockoff::stat.glmnet_coefdiff(X, Xk_2, y, cores = 4)
+  Knockoff.threshold.g <- knockoff::knockoff.threshold(gauss_equi, fdr = q, offset = 0)
+  Knockoff.threshold.2 <- knockoff::knockoff.threshold(est_equi, fdr = q, offset = 0)
+  Knockoff.threshold.plus.g <- knockoff::knockoff.threshold(gauss_equi, fdr = q, offset = 1)
+  Knockoff.threshold.plus.2 <- knockoff::knockoff.threshold(est_equi, fdr = q, offset = 1)
+  Knockoff.g.selected <- (1 : p)[gauss_equi >= Knockoff.threshold.g]
+  Knockoff.plus.g.selected <- (1 : p)[gauss_equi >= Knockoff.threshold.plus.g]
+  Knockoff.2.selected <- (1 : p)[est_equi >= Knockoff.threshold.2]
+  Knockoff.plus.2.selected <- (1 : p)[est_equi >= Knockoff.threshold.plus.2]
+
+  ## ASH
+  betahat <- c()
+  sebetahat <- c()
+  for (j in 1 : p) {
+    fit <- lm(y ~ X[, j] - 1)
+    betahat[j] <- summary(fit)$coefficients[1]
+    sebetahat[j] <- summary(fit)$coefficients[2]
+  }
+  ash.fit <- ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+  ash.selected <- (1 : p)[get_qvalue(ash.fit) <= q]
+
+  ## varbvs
+  varbvs.fit <- varbvs::varbvsmix(X, NULL, y, sa = ash.fit$fitted_g$sd, verbose = FALSE)
+  varbvs.lfdr <- varbvs.fit$alpha[, 1]
+  varbvs.q <- ashr::qval.from.lfdr(varbvs.lfdr)
+  varbvs.selected <- (1 : p)[varbvs.q <= q]
+
+result[[i]] <- c(
+  fdp.knockoff.g = sum(beta[Knockoff.g.selected] == 0) / max(1, length(Knockoff.g.selected)),
+  fdp.knockoff.plus.g = sum(beta[Knockoff.plus.g.selected] == 0) / max(1, length(Knockoff.plus.g.selected)),
+  fdp.Knockoff.2 = sum(beta[Knockoff.2.selected] == 0) / max(1, length(Knockoff.2.selected)),
+  fdp.knockoff.plus.2 = sum(beta[Knockoff.plus.2.selected] == 0) / max(1, length(Knockoff.plus.2.selected)),
+  fdp.ash = sum(beta[ash.selected] == 0) / max(1, length(ash.selected)),
+  fdp.varbvs = sum(beta[varbvs.selected] == 0) / max(1, length(varbvs.selected)),
+  power.knockoff.g = sum(beta[Knockoff.g.selected] != 0) / k,
+  power.knockoff.plus.g = sum(beta[Knockoff.plus.g.selected] != 0) / k,
+  power.knockoff.2 = sum(beta[Knockoff.2.selected] != 0) / k,
+  power.knockoff.plus.2 = sum(beta[Knockoff.plus.2.selected] != 0) / k,
+  power.ash = sum(beta[ash.selected] != 0) / k,
+  power.varbvs = sum(beta[varbvs.selected] != 0) / k
+)
+}
+```
+
+```{r, echo = FALSE}
+result.summary <- matrix(unlist(result), m, 12, byrow = TRUE)
+boxplot(result.summary[, 1 : 6], names = c("Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "ASH", "varbvsmix"), ylab = "FDP", las = 2)
+abline(h = q, lty = 2, col = "red")
+boxplot(result.summary[, 7 : 12], names = c("Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "ASH", "varbvsmix"), ylab = "TDP", las = 2)
+```
 
 ## Session information
 
