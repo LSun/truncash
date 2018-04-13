@@ -615,6 +615,154 @@ for (j in seq(length(pi0.vec))) {
 }
 ```
 
+## Distribution of pairwise correlations
+
+```{r, echo = FALSE, cache = TRUE}
+d <- 10
+p <- 1e3
+B <- matrix(rnorm(p * d), p, d)
+Sigma <- B %*% t(B) + diag(p)
+Rho <- cov2cor(Sigma)
+par(mar = c(5, 5, 1, 1))
+hist(Rho[lower.tri(Rho)], breaks = 100, xlab = expression(rho[ij]), xlim = c(-1, 1), main = "")
+nsim <- 1000
+pi0.vec <- 0.9
+
+set.seed(1)
+z <- MASS::mvrnorm(n = 1, mu = rep(0, p), Sigma = Rho)
+histz <- hist(z, prob = TRUE, breaks = 20, xlab = "Z", main = "", xlim = c(-4, 4), ylim = c(0, 0.5))
+lines(seq(-4, 4, by = 0.1), dnorm(seq(-4, 4, by = 0.1)), col = "blue")
+legend("topright", lty = 1, col = "blue", "N(0, 1)")
+
+set.seed(7)
+z <- MASS::mvrnorm(n = 1, mu = rep(0, p), Sigma = Rho)
+histz <- hist(z, prob = TRUE, breaks = 20, xlab = "Z", main = "", xlim = c(-4, 4), ylim = c(0, 0.5))
+lines(seq(-4, 4, by = 0.1), dnorm(seq(-4, 4, by = 0.1)), col = "blue")
+```
+
+## Variability of FDR and Power
+
+```{r sim_z_2, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE, eval = FALSE}
+for (sigma.beta in 5) {
+for (w.lambda in 10) {
+# cat("sigma.beta =", sigma.beta, "; GD =", L, "; Constraints on w:", w.lambda != 0)
+qvalue.pi0.list <- qvalue.list <- list()
+z.pi0.list <- z.list <- list()
+
+for (j in seq(pi0.vec)) {
+  pi0 <- pi0.vec[j]
+for (i in 1 : nsim) {
+  z <- MASS::mvrnorm(n = 1, mu = rep(0, p), Sigma = Rho)
+  sebetahat <- rep(1, p)
+  beta <- sample(c(rep(0, round(pi0 * p)), rnorm(round((1 - pi0) * p), 0, sigma.beta)))
+  betahat <- beta + sebetahat * z
+  
+  pvalue = (1 - pnorm(abs(betahat / sebetahat))) * 2
+  
+  ## different methods
+  fit.ash = ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+  L <- ifelse(mean(abs(betahat / sebetahat)) < sqrt(2 / pi), 4, 10)
+  fit.gdash = gdash(betahat, sebetahat, gd.ord = L)
+  fit.qvalue = qvalue::qvalue(pvalue)
+  fit.BH = p.adjust(pvalue, method = "BH")
+
+  ## FDR
+  qvalue.list[[i]] <- cbind(
+    beta <- beta,
+    BH <- fit.BH,
+    qvalue <- fit.qvalue$qvalues,
+    ASH <- ashr::get_qvalue(fit.ash),
+    CASH <- fit.gdash$qvalue
+  )
+  z.list[[i]] <- z
+}
+qvalue.pi0.list[[j]] <- qvalue.list
+z.pi0.list[[j]] <- z.list
+}
+
+FDP.array <- pFDP.array <- power.array <- array(0, dim = c(nsim, length(q.vec), length(method.name), length(pi0.vec)))
+FDP.summary <- pFDP.summary <- power.summary <- array(0, dim = c(5, length(q.vec), length(method.name), length(pi0.vec)))
+for (j in seq(length(pi0.vec))) {
+  for (k in seq(length(method.name))) {
+    for (i in seq(nsim)) {
+      FDP.array[i, , k, j] <- sapply(q.vec, FDP, qvalue = qvalue.pi0.list[[j]][[i]][, k + 1], beta = qvalue.pi0.list[[j]][[i]][, 1])
+      pFDP.array[i, , k, j] <- sapply(q.vec, pFDP, qvalue = qvalue.pi0.list[[j]][[i]][, k + 1], beta = qvalue.pi0.list[[j]][[i]][, 1])
+      power.array[i, , k, j] <- sapply(q.vec, power, qvalue = qvalue.pi0.list[[j]][[i]][, k + 1], beta = qvalue.pi0.list[[j]][[i]][, 1])
+    }
+    FDP.summary[, , k, j] <- rbind(
+      avg <- colMeans(FDP.array[, , k, j]),
+      sd <- apply(FDP.array[, , k, j], 2, sd),
+      n <- colSums(!is.na(FDP.array[, , k, j])),
+      q975 <- apply(FDP.array[, , k, j], 2, quantile, probs = 0.975),
+      q025 <- apply(FDP.array[, , k, j], 2, quantile, probs = 0.025)
+    )
+    pFDP.summary[, , k, j] <- rbind(
+      avg <- colMeans(pFDP.array[, , k, j], na.rm = TRUE),
+      sd <- apply(pFDP.array[, , k, j], 2, sd, na.rm = TRUE),
+      n <- colSums(!is.na(pFDP.array[, , k, j])),
+      q975 <- apply(pFDP.array[, , k, j], 2, quantile, probs = 0.975, na.rm = TRUE),
+      q025 <- apply(pFDP.array[, , k, j], 2, quantile, probs = 0.025, na.rm = TRUE)
+    )
+    power.summary[, , k, j] <- rbind(
+      avg <- colMeans(power.array[, , k, j]),
+      sd <- apply(power.array[, , k, j], 2, sd),
+      n <- colSums(!is.na(power.array[, , k, j])),
+      q975 <- apply(power.array[, , k, j], 2, quantile, probs = 0.975),
+      q025 <- apply(power.array[, , k, j], 2, quantile, probs = 0.025)
+    )
+  }
+}
+
+for (j in seq(length(pi0.vec))) {
+  for (q in c(0.1, 0.05)) {
+  sd.z <- sapply(z.pi0.list[[j]], sd)
+  Noise <- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c("Deflated Error", "In-between", "Inflated Error"))
+
+  FDR.plot <- ggplot(data = melt(cbind(Noise, as.data.frame(FDP.array[, which(q.vec == q), , j])), id.vars = "Noise"),
+         aes(x = variable, y = value, col = variable)) +
+  geom_boxplot() +
+  stat_summary(fun.y = mean, geom = "point", shape = 13, size = 3) +
+  scale_color_manual(values = method.col) +
+  facet_wrap(~Noise) +
+  geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
+  scale_x_discrete(labels = method.name) +
+  labs(x = "", y = "FDP") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 12.5), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 7.5), axis.text.y = element_text(size = 15))
+  
+  # pFDR.plot <- ggplot(data = melt(cbind(Noise, as.data.frame(pFDP.array[, which(q.vec == q), , j])), id.vars = "Noise"),
+  #       aes(x = variable, y = value, col = variable)) +
+  # geom_boxplot(na.rm = TRUE) +
+  # stat_summary(fun.y = mean, geom = "point") +
+  # scale_color_manual(values = method.col) +
+  # facet_wrap(~Noise) +
+  # geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
+  # scale_x_discrete(labels = method.name) +
+  # labs(x = "", y = "Positive FDP") +
+  # theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 12.5), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 7.5), axis.text.y = element_text(size = 15))
+  
+  power.plot <- ggplot(data = melt(cbind(Noise, as.data.frame(power.array[, which(q.vec == q), , j])), id.vars = "Noise"),
+        aes(x = variable, y = value, col = variable)) +
+  geom_boxplot() +
+  stat_summary(fun.y = mean, geom = "point", shape = 8, size = 2) +
+  scale_color_manual(values = method.col) +
+  facet_wrap(~Noise) +
+  scale_x_discrete(labels = method.name) +
+  labs(x = "", y = "TPP") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 12.5), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 7.5), axis.text.y = element_text(size = 15))
+
+  grid.arrange(FDR.plot, power.plot
+               #, top = textGrob(bquote(paste(pi[0] == .(pi0.vec[j]), "; ", sigma[beta] == .(sigma.beta), "; ", .(L), "GDs; ", .(ifelse(w.lambda == 0, "No Constraints", "With Constraints")), "; ", q == .(q))))
+               )
+  
+  # pdf(paste("../output/fig/sim_cash_2_", sigma.beta, L, w.lambda, pi0.vec[j], "plot.pdf", sep = "_"), onefile = TRUE)
+  # grid.arrange(FDR.plot, power.plot, top = textGrob(bquote(paste(pi[0] == .(pi0.vec[j]), "; ", sigma[beta] == .(sigma.beta), "; ", .(L), "GDs; ", .(ifelse(w.lambda == 0, "No Constraints", "With Constraints")), "; ", q == .(q)))))
+  # dev.off()
+}
+}
+}
+}
+```
+
 ## Session information
 
 <!-- Insert the session information into the document -->
