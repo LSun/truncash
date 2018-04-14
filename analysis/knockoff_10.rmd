@@ -2,8 +2,9 @@
 title: "Knockoff vs Bayesian: Large signals"
 author: "Lei Sun"
 date: 2018-04-10
-output: html_document:
-  code_folding: hide
+output:
+  html_document:
+    code_folding: hide
 ---
 
 <!-- The file analysis/chunks.R contains chunks that define default settings
