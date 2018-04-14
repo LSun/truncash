@@ -718,7 +718,7 @@ for (j in seq(length(pi0.vec))) {
   sd.z <- sapply(z.pi0.list[[j]], sd)
   Noise <- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c("Deflated Error", "In-between", "Inflated Error"))
 
-  FDR.plot <- ggplot(data = melt(cbind(Noise, as.data.frame(FDP.array[, which(q.vec == q), , j])), id.vars = "Noise"),
+  FDR.plot <- ggplot(data = melt(cbind(Noise, as.data.frame(FDP.array[, which(round(q.vec, 2) == q), , j])), id.vars = "Noise"),
          aes(x = variable, y = value, col = variable)) +
   geom_boxplot() +
   stat_summary(fun.y = mean, geom = "point", shape = 13, size = 3) +
@@ -740,7 +740,7 @@ for (j in seq(length(pi0.vec))) {
   # labs(x = "", y = "Positive FDP") +
   # theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 12.5), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 7.5), axis.text.y = element_text(size = 15))
   
-  power.plot <- ggplot(data = melt(cbind(Noise, as.data.frame(power.array[, which(q.vec == q), , j])), id.vars = "Noise"),
+  power.plot <- ggplot(data = melt(cbind(Noise, as.data.frame(power.array[, which(round(q.vec, 2) == q), , j])), id.vars = "Noise"),
         aes(x = variable, y = value, col = variable)) +
   geom_boxplot() +
   stat_summary(fun.y = mean, geom = "point", shape = 8, size = 2) +
