@@ -232,7 +232,8 @@ Next it's a series of investigation of a number of variable selection and false 
 * [`Knockoff` on design matrix correlation](knockoff_5.html)
 * [Column randomization for `Knockoff`: Factor model for $\hat\beta$](knockoff_7.html)
 * [Detailed simulations for Fixed-$X$ and Model-$X$ knockoffs](knockoff_8.html)
-* [`ASH` vs `Knockoff`](knockoff_9.html)
+* [`Knockoff` vs Bayesian: Normal signals](knockoff_9.html)
+* [`Knockoff` vs Bayesian: Large signals](knockoff_10.html)
 * [The variability of FDP by `Knockoff`](knockoff_var.html)
 
 [`ashr`]: https://github.com/stephens999/ashr
