@@ -81,6 +81,8 @@ q <- 0.1
 
 ### Independent design
 
+$X_{n \times p}$ has independent columns simulated from $N(0, (1/\sqrt n)^2)$ so they are roughly normalized.
+
 ```{r, echo = FALSE, cache = TRUE, message = FALSE}
 A <- 5
 
@@ -184,6 +186,8 @@ boxplot(result.summary[, 15 : 28], names = c("BH", "ASH.q", "ASH.s", "ASH.s.TSP"
 ```
 
 ### Local correlation / AR model for $X$
+
+$X_{n \times p}$ has correlation $\Sigma_{ij} = \rho^{|i - j|}$. Each row is independently $N(0, \frac1n\Sigma)$.
 
 ```{r, echo = FALSE, cache = TRUE}
 rho <- 0.5
