@@ -25,6 +25,7 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
 <link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
@@ -165,6 +166,14 @@ $(document).ready(function () {
 </script>
 
 <!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
 
 
 
@@ -302,6 +311,14 @@ div.tocify {
 
 <div class="fluid-row" id="header">
 
+<div class="btn-group pull-right">
+<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
 
 
 <h1 class="title toc-ignore">Knockoff vs Bayesian: Large signals</h1>
@@ -315,13 +332,40 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2018-04-13</p>
+<p><strong>Last updated:</strong> 2018-04-14</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> c766b80</p>
+<p><strong>Code version:</strong> e10239b</p>
 <!-- Add your analysis here -->
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
+<pre class="r"><code>varbvs.get.lfsr &lt;- function (fit) {
+
+# For each variable, and each hyperparameter setting, get the
+# posterior probability that the regression coefficient is exactly
+# zero.
+p0 &lt;- 1 - fit$alpha
+
+# For each variable, and for each hyperparameter setting, get the
+# posterior probability that the regression coefficient is negative.
+pn &lt;- with(fit,alpha * pnorm(0,mu,sqrt(s)))
+
+# For each variable, and for each hyperparameter setting, ompute the
+# local false sign rate (LFSR) following the formula given in
+# Matthew&#39;s Biostatistics paper, &quot;False discovery rates: a new deal&quot;.
+p        &lt;- nrow(fit$alpha)
+k          &lt;- ncol(fit$alpha)
+lfsr     &lt;- matrix(0,p,k)
+b        &lt;- pn &gt; 0.5*(1 - p0)
+lfsr[b]  &lt;- 1 - pn[b]
+lfsr[!b] &lt;- p0[!b] + pn[!b]
+
+# Average the average LFSR over the hyperparameter settings, weighted
+# by the probability of each hyperparameter setting.
+lfsr &lt;-    c(lfsr %*% fit$w)
+
+return(lfsr)
+}</code></pre>
 </div>
 <div id="n-p" class="section level2">
 <h2><span class="math inline">\(n &gt; p\)</span></h2>
@@ -332,19 +376,21 @@ m &lt;- 100
 q &lt;- 0.1</code></pre>
 <div id="independent-design" class="section level3">
 <h3>Independent design</h3>
-<p><img src="figure/knockoff_10.rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_10.rmd/unnamed-chunk-4-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p><span class="math inline">\(X_{n \times p}\)</span> has independent columns simulated from <span class="math inline">\(N(0, (1/\sqrt n)^2)\)</span> so they are roughly normalized.</p>
+<p><img src="figure/knockoff_10.rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_10.rmd/unnamed-chunk-5-2.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="local-correlation-ar-model-for-x" class="section level3">
+<h3>Local correlation / AR model for <span class="math inline">\(X\)</span></h3>
+<p><span class="math inline">\(X_{n \times p}\)</span> has correlation <span class="math inline">\(\Sigma_{ij} = \rho^{|i - j|}\)</span>. Each row is independently <span class="math inline">\(N(0, \frac1n\Sigma)\)</span>.</p>
+<p><img src="figure/knockoff_10.rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_10.rmd/unnamed-chunk-8-2.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="factor-model-for-x" class="section level3">
 <h3>Factor Model for <span class="math inline">\(X\)</span></h3>
-<p><img src="figure/knockoff_10.rmd/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_10.rmd/unnamed-chunk-7-2.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="ar-model-for-x" class="section level3">
-<h3>AR Model for <span class="math inline">\(X\)</span></h3>
-<p><img src="figure/knockoff_10.rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_10.rmd/unnamed-chunk-10-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/knockoff_10.rmd/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_10.rmd/unnamed-chunk-11-2.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="factor-model-for-hatbeta" class="section level3">
 <h3>Factor Model for <span class="math inline">\(\hat\beta\)</span></h3>
-<p><img src="figure/knockoff_10.rmd/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_10.rmd/unnamed-chunk-13-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/knockoff_10.rmd/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_10.rmd/unnamed-chunk-14-2.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 </div>
 <div id="n-p-1" class="section level2">
@@ -356,19 +402,19 @@ m &lt;- 100
 q &lt;- 0.1</code></pre>
 <div id="independent-design-1" class="section level3">
 <h3>Independent design</h3>
-<p><img src="figure/knockoff_10.rmd/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_10.rmd/unnamed-chunk-16-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/knockoff_10.rmd/unnamed-chunk-17-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_10.rmd/unnamed-chunk-17-2.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="local-correlation-ar-model-for-x-1" class="section level3">
+<h3>Local correlation / AR model for <span class="math inline">\(X\)</span></h3>
+<p><img src="figure/knockoff_10.rmd/unnamed-chunk-20-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_10.rmd/unnamed-chunk-20-2.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="factor-model-for-x-1" class="section level3">
 <h3>Factor Model for <span class="math inline">\(X\)</span></h3>
-<p><img src="figure/knockoff_10.rmd/unnamed-chunk-19-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_10.rmd/unnamed-chunk-19-2.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
-<div id="ar-model-for-x-1" class="section level3">
-<h3>AR Model for <span class="math inline">\(X\)</span></h3>
-<p><img src="figure/knockoff_10.rmd/unnamed-chunk-22-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_10.rmd/unnamed-chunk-22-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/knockoff_10.rmd/unnamed-chunk-23-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_10.rmd/unnamed-chunk-23-2.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="factor-model-for-hatbeta-1" class="section level3">
 <h3>Factor Model for <span class="math inline">\(\hat\beta\)</span></h3>
-<p><img src="figure/knockoff_10.rmd/unnamed-chunk-25-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_10.rmd/unnamed-chunk-25-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/knockoff_10.rmd/unnamed-chunk-26-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_10.rmd/unnamed-chunk-26-2.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 </div>
 <div id="session-information" class="section level2">
