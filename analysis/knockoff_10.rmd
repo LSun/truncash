@@ -1,5 +1,5 @@
 ---
-title: "Knockoff vs Bayesian"
+title: "Knockoff vs Bayesian: Large signals"
 author: "Lei Sun"
 date: 2018-04-10
 output: html_document
