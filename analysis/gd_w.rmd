@@ -2,8 +2,9 @@
 title: "The Distribution of $W_j$"
 author: "Lei Sun"
 date: 2018-04-13
-output: html_document:
-  code_folding: hide
+output:
+  html_document:
+    code_folding: hide
 ---
 
 <!-- The file analysis/chunks.R contains chunks that define default settings
@@ -30,8 +31,13 @@ knitr::read_chunk("chunks.R")
 ```{r, cache = TRUE, message = FALSE}
 source("../code/gdash_lik.R")
 source("../code/gdfit.R")
+source("../code/count_to_summary.R")
+library(limma)
+library(edgeR)
 library(ashr)
 library(plyr)
+library(ggplot2)
+library(reshape2)
 ```
 
 ## Introduction
@@ -45,6 +51,7 @@ B <- matrix(rnorm(n * d), n, d)
 Sigma <- B %*% t(B) + diag(n)
 sigma <- diag(Sigma)
 Rho <- cov2cor(Sigma)
+qplot(Rho[lower.tri(Rho)], geom = "histogram", xlab = expression(rho[ij]))
 rhobar <- c()
 for (l in 1 : 10) {
   rhobar[l] <- (sum(Rho^l) - n) / (n * (n - 1))
@@ -52,45 +59,89 @@ for (l in 1 : 10) {
 nsim <- 1e5
 ```
 
-```{r, cache = TRUE}
+```{r, cache = TRUE, eval = FALSE}
+set.seed(20)
 z <- rnorm(d)
 Z <- B %*% z + rnorm(n)
 Z <- Z / sqrt(sigma)
+sd(Z)
 hist(Z, breaks = 20, prob = TRUE)
 lines(seq(-5, 5, by = 0.1), dnorm(seq(-5, 5, by = 0.1)), col = "blue")
 p <- pnorm(-abs(Z)) * 2
-plot(-log(p), ylim = range(-log(p), -log(pnorm(-sqrt(2 * log(n))) * 2)))
-abline(h = -log(pnorm(-sqrt(2 * log(n))) * 2), col = "red")
+
+par(mfcol = c(2, 2))
+par(mar = c(5.1, 4.1, 1, 2.1))
+hist(p, breaks = 100, main = "", xlab = "p-value")
+plot(-log(p), ylim = range(-log(p), -log(pnorm(-sqrt(2 * log(n))) * 2), -log(0.05 / n)))
+abline(h = -log(pnorm(-sqrt(2 * log(n))) * 2), col = "maroon")
+abline(h = -log(0.05 / n), col = "red")
+abline(h = -log(0.001), col = "green")
 abline(h = -log(0.05), col = "blue")
 
 Z <- rnorm(n)
 p <- pnorm(-abs(Z)) * 2
-plot(-log(p), ylim = range(-log(p), -log(pnorm(-sqrt(2 * log(n))) * 2)))
-abline(h = -log(pnorm(-sqrt(2 * log(n))) * 2), col = "red")
+hist(p, breaks = 100, main = "", xlab = "p-value")
+plot(-log(p), ylim = range(-log(p), -log(pnorm(-sqrt(2 * log(n))) * 2), -log(0.05 / n)))
+abline(h = -log(pnorm(-sqrt(2 * log(n))) * 2), col = "maroon")
+abline(h = -log(0.05 / n), col = "red")
+abline(h = -log(0.001), col = "green")
 abline(h = -log(0.05), col = "blue")
 ```
 
 ```{r, cache = TRUE, warnings = FALSE, message = FALSE}
-Z.list <- L <- W <- Loglik <- Status <- list()
+Z.list <- W <- list()
 for (i in 1 : nsim) {
 z <- rnorm(d)
 Z <- B %*% z + rnorm(n)
 Z <- Z / sqrt(sigma)
-Z.GD <- gdfit.mom(Z, 100)
 Z.list[[i]] <- Z
-L[[i]] <- Z.GD$gd.ord
+Z.GD <- gdfit.mom(Z, 100)
 W[[i]] <- Z.GD$w
-Loglik[[i]] <- Z.GD$loglik
-Status[[i]] <- Z.GD$status
 }
 W <- plyr::ldply(W, rbind)
-W <- W[!is.na(Loglik)]
-W <- plyr::ldply(W, rbind)
-var(W[, 3])
-rhobar
 ```
 
 ## Real Data from GTEx
+
+```{r}
+r <- readRDS("../data/liver.rds")
+```
+
+```{r}
+top_genes_index = function (g, X) {
+  return(order(rowSums(X), decreasing = TRUE)[1 : g])
+}
+lcpm = function (r) {
+  R = colSums(r)
+  t(log2(((t(r) + 0.5) / (R + 1)) * 10^6))
+}
+```
+
+```{r}
+nsamp <- 5
+ngene <- 1e5
+nsim <- 1e5
+```
+
+```{r, cache = TRUE}
+Y = lcpm(r)
+subset = top_genes_index(ngene, Y)
+r = r[subset,]
+
+Z.list <- W <- list()
+
+for (i in 1 : nsim) {
+  ## generate data
+  counts <- r[, sample(ncol(r), 2 * nsamp)]
+  design <- model.matrix(~c(rep(0, nsamp), rep(1, nsamp)))
+  summary <- count_to_summary(counts, design)
+  Z <- summary$z
+  Z.list[[i]] <- Z
+  Z.GD <- gdfit.mom(Z, 100)
+  W[[i]] <- Z.GD$w
+}
+W <- plyr::ldply(W, rbind)
+```
 
 ## Session information
 
