@@ -1,0 +1,99 @@
+---
+title: "The Distribution of $W_j$"
+author: "Lei Sun"
+date: 2018-04-13
+output: html_document:
+  code_folding: hide
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+```{r, cache = TRUE, message = FALSE}
+source("../code/gdash_lik.R")
+source("../code/gdfit.R")
+library(ashr)
+library(plyr)
+```
+
+## Introduction
+
+## Simulated Data
+
+```{r, cache = TRUE}
+d <- 10
+n <- 1e4
+B <- matrix(rnorm(n * d), n, d)
+Sigma <- B %*% t(B) + diag(n)
+sigma <- diag(Sigma)
+Rho <- cov2cor(Sigma)
+rhobar <- c()
+for (l in 1 : 10) {
+  rhobar[l] <- (sum(Rho^l) - n) / (n * (n - 1))
+}
+nsim <- 1e5
+```
+
+```{r, cache = TRUE}
+z <- rnorm(d)
+Z <- B %*% z + rnorm(n)
+Z <- Z / sqrt(sigma)
+hist(Z, breaks = 20, prob = TRUE)
+lines(seq(-5, 5, by = 0.1), dnorm(seq(-5, 5, by = 0.1)), col = "blue")
+p <- pnorm(-abs(Z)) * 2
+plot(-log(p), ylim = range(-log(p), -log(pnorm(-sqrt(2 * log(n))) * 2)))
+abline(h = -log(pnorm(-sqrt(2 * log(n))) * 2), col = "red")
+abline(h = -log(0.05), col = "blue")
+
+Z <- rnorm(n)
+p <- pnorm(-abs(Z)) * 2
+plot(-log(p), ylim = range(-log(p), -log(pnorm(-sqrt(2 * log(n))) * 2)))
+abline(h = -log(pnorm(-sqrt(2 * log(n))) * 2), col = "red")
+abline(h = -log(0.05), col = "blue")
+```
+
+```{r, cache = TRUE, warnings = FALSE, message = FALSE}
+Z.list <- L <- W <- Loglik <- Status <- list()
+for (i in 1 : nsim) {
+z <- rnorm(d)
+Z <- B %*% z + rnorm(n)
+Z <- Z / sqrt(sigma)
+Z.GD <- gdfit.mom(Z, 100)
+Z.list[[i]] <- Z
+L[[i]] <- Z.GD$gd.ord
+W[[i]] <- Z.GD$w
+Loglik[[i]] <- Z.GD$loglik
+Status[[i]] <- Z.GD$status
+}
+W <- plyr::ldply(W, rbind)
+W <- W[!is.na(Loglik)]
+W <- plyr::ldply(W, rbind)
+var(W[, 3])
+rhobar
+```
+
+## Real Data from GTEx
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```
