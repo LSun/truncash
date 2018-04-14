@@ -13,7 +13,7 @@
 
 <meta name="date" content="2018-04-03" />
 
-<title>ASH vs Knockoff vs varbvs</title>
+<title>Knockoff vs Bayesian: Mixture normal signals</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -304,7 +304,7 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore"><code>ASH</code> vs <code>Knockoff</code> vs <code>varbvs</code></h1>
+<h1 class="title toc-ignore">Knockoff vs Bayesian: Mixture normal signals</h1>
 <h4 class="author"><em>Lei Sun</em></h4>
 <h4 class="date"><em>2018-04-03</em></h4>
 
@@ -315,34 +315,66 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2018-04-12</p>
+<p><strong>Last updated:</strong> 2018-04-14</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 96579e4</p>
+<p><strong>Code version:</strong> 814cc09</p>
 <!-- Add your analysis here -->
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
 <p>The true <span class="math inline">\(\beta\)</span> are simulated as <span class="math inline">\(\beta \sim \pi_0\delta_0 + (1 - \pi_0)N(0, \sigma_\beta^2)\)</span>.</p>
+<pre class="r"><code>varbvs.get.lfsr &lt;- function (fit) {
+
+# For each variable, and each hyperparameter setting, get the
+# posterior probability that the regression coefficient is exactly
+# zero.
+p0 &lt;- 1 - fit$alpha
+
+# For each variable, and for each hyperparameter setting, get the
+# posterior probability that the regression coefficient is negative.
+pn &lt;- with(fit,alpha * pnorm(0,mu,sqrt(s)))
+
+# For each variable, and for each hyperparameter setting, ompute the
+# local false sign rate (LFSR) following the formula given in
+# Matthew&#39;s Biostatistics paper, &quot;False discovery rates: a new deal&quot;.
+p        &lt;- nrow(fit$alpha)
+k          &lt;- ncol(fit$alpha)
+lfsr     &lt;- matrix(0,p,k)
+b        &lt;- pn &gt; 0.5*(1 - p0)
+lfsr[b]  &lt;- 1 - pn[b]
+lfsr[!b] &lt;- p0[!b] + pn[!b]
+
+# Average the average LFSR over the hyperparameter settings, weighted
+# by the probability of each hyperparameter setting.
+lfsr &lt;-    c(lfsr %*% fit$w)
+
+return(lfsr)
+}</code></pre>
 </div>
 <div id="n-p" class="section level2">
 <h2><span class="math inline">\(n &gt; p\)</span></h2>
+<pre class="r"><code>n &lt;- 2000
+p &lt;- 1000
+k &lt;- 200
+m &lt;- 100
+q &lt;- 0.1</code></pre>
 <div id="independent-design" class="section level3">
 <h3>Independent design</h3>
 <p><span class="math inline">\(X_{n \times p}\)</span> has independent columns simulated from <span class="math inline">\(N(0, (1/\sqrt n)^2)\)</span> so they are roughly normalized.</p>
-<p><img src="figure/knockoff_9.rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_9.rmd/unnamed-chunk-5-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/knockoff_9.rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_9.rmd/unnamed-chunk-6-2.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
-<div id="local-correlation-design" class="section level3">
-<h3>Local correlation design</h3>
+<div id="local-correlation-ar-model-for-x" class="section level3">
+<h3>Local correlation / AR model for <span class="math inline">\(X\)</span></h3>
 <p><span class="math inline">\(X_{n \times p}\)</span> has correlation <span class="math inline">\(\Sigma_{ij} = \rho^{|i - j|}\)</span>. Each row is independently <span class="math inline">\(N(0, \frac1n\Sigma)\)</span>.</p>
-<p><img src="figure/knockoff_9.rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_9.rmd/unnamed-chunk-8-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/knockoff_9.rmd/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_9.rmd/unnamed-chunk-9-2.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="factor-model-for-x" class="section level3">
 <h3>Factor Model for <span class="math inline">\(X\)</span></h3>
-<p><img src="figure/knockoff_9.rmd/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_9.rmd/unnamed-chunk-11-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/knockoff_9.rmd/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_9.rmd/unnamed-chunk-12-2.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="factor-model-for-hatbeta" class="section level3">
 <h3>Factor Model for <span class="math inline">\(\hat\beta\)</span></h3>
-<p><img src="figure/knockoff_9.rmd/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_9.rmd/unnamed-chunk-14-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/knockoff_9.rmd/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_9.rmd/unnamed-chunk-15-2.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 </div>
 <div id="observation" class="section level2">
@@ -363,19 +395,19 @@ m &lt;- 100
 q &lt;- 0.1</code></pre>
 <div id="independent-design-1" class="section level3">
 <h3>Independent design</h3>
-<p><img src="figure/knockoff_9.rmd/unnamed-chunk-17-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_9.rmd/unnamed-chunk-17-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/knockoff_9.rmd/unnamed-chunk-18-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_9.rmd/unnamed-chunk-18-2.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
-<div id="local-correlation-design-1" class="section level3">
+<div id="local-correlation-design" class="section level3">
 <h3>Local correlation design</h3>
-<p><img src="figure/knockoff_9.rmd/unnamed-chunk-20-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_9.rmd/unnamed-chunk-20-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/knockoff_9.rmd/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_9.rmd/unnamed-chunk-21-2.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="factor-model-for-x-1" class="section level3">
 <h3>Factor Model for <span class="math inline">\(X\)</span></h3>
-<p><img src="figure/knockoff_9.rmd/unnamed-chunk-23-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_9.rmd/unnamed-chunk-23-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/knockoff_9.rmd/unnamed-chunk-24-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_9.rmd/unnamed-chunk-24-2.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="factor-model-for-hatbeta-1" class="section level3">
 <h3>Factor Model for <span class="math inline">\(\hat\beta\)</span></h3>
-<p><img src="figure/knockoff_9.rmd/unnamed-chunk-26-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_9.rmd/unnamed-chunk-26-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/knockoff_9.rmd/unnamed-chunk-27-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_9.rmd/unnamed-chunk-27-2.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 </div>
 <div id="session-information" class="section level2">
@@ -398,7 +430,7 @@ attached base packages:
 
 loaded via a namespace (and not attached):
  [1] compiler_3.4.3  backports_1.1.2 magrittr_1.5    rprojroot_1.3-2
- [5] tools_3.4.3     htmltools_0.3.6 yaml_2.1.18     Rcpp_0.12.14   
+ [5] tools_3.4.3     htmltools_0.3.6 yaml_2.1.18     Rcpp_0.12.16   
  [9] stringi_1.1.6   rmarkdown_1.9   knitr_1.20      git2r_0.21.0   
 [13] stringr_1.3.0   digest_0.6.15   evaluate_0.10.1</code></pre>
 </div>
