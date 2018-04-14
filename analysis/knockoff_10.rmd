@@ -2,7 +2,8 @@
 title: "Knockoff vs Bayesian: Large signals"
 author: "Lei Sun"
 date: 2018-04-10
-output: html_document
+output: html_document:
+  code_folding: hide
 ---
 
 <!-- The file analysis/chunks.R contains chunks that define default settings
@@ -38,6 +39,36 @@ library(doMC)
 library(lattice)
 ```
 
+```{r}
+varbvs.get.lfsr <- function (fit) {
+
+# For each variable, and each hyperparameter setting, get the
+# posterior probability that the regression coefficient is exactly
+# zero.
+p0 <- 1 - fit$alpha
+
+# For each variable, and for each hyperparameter setting, get the
+# posterior probability that the regression coefficient is negative.
+pn <- with(fit,alpha * pnorm(0,mu,sqrt(s)))
+
+# For each variable, and for each hyperparameter setting, ompute the
+# local false sign rate (LFSR) following the formula given in
+# Matthew's Biostatistics paper, "False discovery rates: a new deal".
+p        <- nrow(fit$alpha)
+k          <- ncol(fit$alpha)
+lfsr     <- matrix(0,p,k)
+b        <- pn > 0.5*(1 - p0)
+lfsr[b]  <- 1 - pn[b]
+lfsr[!b] <- p0[!b] + pn[!b]
+
+# Average the average LFSR over the hyperparameter settings, weighted
+# by the probability of each hyperparameter setting.
+lfsr <-    c(lfsr %*% fit$w)
+
+return(lfsr)
+}
+```
+
 ## $n > p$
 
 ```{r}
@@ -68,10 +99,17 @@ for (i in 1 : m) {
   ## Least squares
   lm.fit <- lm(y ~ X - 1)
   pvalue <- summary(lm.fit)$coefficients[, 4]
+  betahat <- summary(lm.fit)$coefficients[, 1]
+  sebetahat <- summary(lm.fit)$coefficients[, 2]
 
   ## BH
   BH.fit <- p.adjust(pvalue, method = "BH")
   BH.selected <- (1 : p)[BH.fit <= q]
+  
+  ## ASH
+  ash.fit <- ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+  ash.q.selected <- (1 : p)[ashr::get_qvalue(ash.fit) <= q]
+  ash.s.selected <- (1 : p)[ashr::get_svalue(ash.fit) <= q]
   
   ## Knockoff
   Xk_g <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "equi")
@@ -91,107 +129,61 @@ for (i in 1 : m) {
   varbvs.fit <- varbvs(X, NULL, y, verbose = FALSE)
   varbvs.lfdr <- 1 - varbvs.fit$pip
   varbvs.q <- ashr::qval.from.lfdr(varbvs.lfdr)
-  varbvs.selected <- (1 : p)[varbvs.q <= q]
-
-result[[i]] <- c(
-  fdp.BH = sum(beta[BH.selected] == 0) / max(1, length(BH.selected)),
-  fdp.knockoff.g = sum(beta[Knockoff.g.selected] == 0) / max(1, length(Knockoff.g.selected)),
-  fdp.knockoff.plus.g = sum(beta[Knockoff.plus.g.selected] == 0) / max(1, length(Knockoff.plus.g.selected)),
-  fdp.Knockoff.2 = sum(beta[Knockoff.2.selected] == 0) / max(1, length(Knockoff.2.selected)),
-  fdp.knockoff.plus.2 = sum(beta[Knockoff.plus.2.selected] == 0) / max(1, length(Knockoff.plus.2.selected)),
-  fdp.varbvs = sum(beta[varbvs.selected] == 0) / max(1, length(varbvs.selected)),
-  power.BH = sum(beta[BH.selected] != 0) / k,
-  power.knockoff.g = sum(beta[Knockoff.g.selected] != 0) / k,
-  power.knockoff.plus.g = sum(beta[Knockoff.plus.g.selected] != 0) / k,
-  power.knockoff.2 = sum(beta[Knockoff.2.selected] != 0) / k,
-  power.knockoff.plus.2 = sum(beta[Knockoff.plus.2.selected] != 0) / k,
-  power.varbvs = sum(beta[varbvs.selected] != 0) / k
-)
-}
-```
-
-```{r, echo = FALSE}
-result.summary <- matrix(unlist(result), m, 12, byrow = TRUE)
-boxplot(result.summary[, 1 : 6], names = c("BH", "Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "varbvs"), ylab = "FDP", las = 2)
-abline(h = q, lty = 2, col = "red")
-boxplot(result.summary[, 7 : 12], names = c("BH", "Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "varbvs"), ylab = "TDP", las = 2)
-```
-
-### Factor Model for $X$
-
-```{r, echo = FALSE, cache = TRUE}
-d <- 5
-B <- matrix(rnorm(p * d), p, d)
-Cor.X <- cov2cor(tcrossprod(B) + diag(p))
-Cov.X <- Cor.X / n
-```
-
-```{r, echo = FALSE, cache = TRUE, message = FALSE}
-A <- 12
-
-result <- list()
-
-for (i in 1 : m) {
-beta <- rep(0, p)
-nonzero <- sample(p, k)
-beta[nonzero] <- A
-
-X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n) %*% chol(Cor.X)
-y <- X %*% beta + rnorm(n)
-
-  ## Least squares
-  lm.fit <- lm(y ~ X - 1)
-  pvalue <- summary(lm.fit)$coefficients[, 4]
-
-  ## BH
-  BH.fit <- p.adjust(pvalue, method = "BH")
-  BH.selected <- (1 : p)[BH.fit <= q]
+  varbvs.q.selected <- (1 : p)[varbvs.q <= q]
+  varbvs.lfsr <- varbvs.get.lfsr(varbvs.fit)
+  varbvs.s <- ashr::qval.from.lfdr(varbvs.lfsr)
+  varbvs.s.selected <- (1 : p)[varbvs.s <= q]
   
-  ## Knockoff
-  Xk_g <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "equi")
-  Xk_2 <- knockoff::create.second_order(X, method = "equi")
-  gauss_equi <- knockoff::stat.glmnet_coefdiff(X, Xk_g, y, cores = 4)
-  est_equi <- knockoff::stat.glmnet_coefdiff(X, Xk_2, y, cores = 4)
-  Knockoff.threshold.g <- knockoff::knockoff.threshold(gauss_equi, fdr = q, offset = 0)
-  Knockoff.threshold.2 <- knockoff::knockoff.threshold(est_equi, fdr = q, offset = 0)
-  Knockoff.threshold.plus.g <- knockoff::knockoff.threshold(gauss_equi, fdr = q, offset = 1)
-  Knockoff.threshold.plus.2 <- knockoff::knockoff.threshold(est_equi, fdr = q, offset = 1)
-  Knockoff.g.selected <- (1 : p)[gauss_equi >= Knockoff.threshold.g]
-  Knockoff.plus.g.selected <- (1 : p)[gauss_equi >= Knockoff.threshold.plus.g]
-  Knockoff.2.selected <- (1 : p)[est_equi >= Knockoff.threshold.2]
-  Knockoff.plus.2.selected <- (1 : p)[est_equi >= Knockoff.threshold.plus.2]
-
-  ## varbvs
-  varbvs.fit <- varbvs(X, NULL, y, verbose = FALSE)
-  varbvs.lfdr <- 1 - varbvs.fit$pip
-  varbvs.q <- ashr::qval.from.lfdr(varbvs.lfdr)
-  varbvs.selected <- (1 : p)[varbvs.q <= q]
+  ## varbvsmix
+  varbvsmix.fit <- varbvs::varbvsmix(X, NULL, y, sa = ash.fit$fitted_g$sd, verbose = FALSE)
+  varbvsmix.lfdr <- varbvsmix.fit$alpha[, 1]
+  varbvsmix.q <- ashr::qval.from.lfdr(varbvsmix.lfdr)
+  varbvsmix.q.selected <- (1 : p)[varbvsmix.q <= q]
+  varbvsmix.lfsr <- varbvsmix.fit$lfsr
+  varbvsmix.s <- ashr::qval.from.lfdr(varbvsmix.lfsr)
+  varbvsmix.s.selected <- (1 : p)[varbvsmix.s <= q]
 
 result[[i]] <- c(
   fdp.BH = sum(beta[BH.selected] == 0) / max(1, length(BH.selected)),
+  fdp.ash.q = sum(beta[ash.q.selected] == 0) / max(1, length(ash.q.selected)),
+  fdp.ash.s = sum(beta[ash.s.selected] == 0) / max(1, length(ash.s.selected)),
+  fsp.ash.s = sum(sign(beta[ash.s.selected]) != sign(betahat[ash.s.selected]) | beta[ash.s.selected] == 0) / max(1, length(ash.s.selected)),
   fdp.knockoff.g = sum(beta[Knockoff.g.selected] == 0) / max(1, length(Knockoff.g.selected)),
   fdp.knockoff.plus.g = sum(beta[Knockoff.plus.g.selected] == 0) / max(1, length(Knockoff.plus.g.selected)),
   fdp.Knockoff.2 = sum(beta[Knockoff.2.selected] == 0) / max(1, length(Knockoff.2.selected)),
   fdp.knockoff.plus.2 = sum(beta[Knockoff.plus.2.selected] == 0) / max(1, length(Knockoff.plus.2.selected)),
-  fdp.varbvs = sum(beta[varbvs.selected] == 0) / max(1, length(varbvs.selected)),
-  power.BH = sum(beta[BH.selected] != 0) / k,
-  power.knockoff.g = sum(beta[Knockoff.g.selected] != 0) / k,
-  power.knockoff.plus.g = sum(beta[Knockoff.plus.g.selected] != 0) / k,
-  power.knockoff.2 = sum(beta[Knockoff.2.selected] != 0) / k,
-  power.knockoff.plus.2 = sum(beta[Knockoff.plus.2.selected] != 0) / k,
-  power.varbvs = sum(beta[varbvs.selected] != 0) / k
+  fdp.varbvs.q = sum(beta[varbvs.q.selected] == 0) / max(1, length(varbvs.q.selected)),
+  fdp.varbvs.s = sum(beta[varbvs.s.selected] == 0) / max(1, length(varbvs.s.selected)),
+  fsp.varbvs.s = sum(sign(beta[varbvs.s.selected]) != sign(betahat[varbvs.s.selected]) | beta[varbvs.s.selected] == 0) / max(1, length(varbvs.s.selected)),
+  fdp.varbvsmix.q = sum(beta[varbvsmix.q.selected] == 0) / max(1, length(varbvsmix.q.selected)),
+  fdp.varbvsmix.s = sum(beta[varbvsmix.s.selected] == 0) / max(1, length(varbvsmix.s.selected)),
+  fsp.varbvsmix.s = sum(sign(beta[varbvsmix.s.selected]) != sign(betahat[varbvsmix.s.selected]) | beta[varbvsmix.s.selected] == 0) / max(1, length(varbvsmix.s.selected)),
+  tpp.BH = sum(beta[BH.selected] != 0) / k,
+  tpp.ash.q = sum(beta[ash.q.selected] != 0) / k,
+  tpp.ash.s = sum(beta[ash.s.selected] != 0) / k,
+  tsp.ash.s = sum(sign(beta[ash.s.selected]) == sign(betahat[ash.s.selected]) & beta[ash.s.selected] != 0) / k,
+  tpp.knockoff.g = sum(beta[Knockoff.g.selected] != 0) / k,
+  tpp.knockoff.plus.g = sum(beta[Knockoff.plus.g.selected] != 0) / k,
+  tpp.knockoff.2 = sum(beta[Knockoff.2.selected] != 0) / k,
+  tpp.knockoff.plus.2 = sum(beta[Knockoff.plus.2.selected] != 0) / k,
+  tpp.varbvs.q = sum(beta[varbvs.q.selected] != 0) / k,
+  tpp.varbvs.s = sum(beta[varbvs.s.selected] != 0) / k,
+  tsp.varbvs.s = sum(sign(beta[varbvs.s.selected]) == sign(betahat[varbvs.s.selected]) & beta[varbvs.s.selected] != 0) / k,
+  tpp.varbvsmix.q = sum(beta[varbvsmix.q.selected] != 0) / k,
+  tpp.varbvsmix.s = sum(beta[varbvsmix.s.selected] != 0) / k,
+  tsp.varbvsmix.s = sum(sign(beta[varbvsmix.s.selected]) == sign(betahat[varbvsmix.s.selected]) & beta[varbvsmix.s.selected] != 0) / k
 )
 }
 ```
 
 ```{r, echo = FALSE}
-result.summary <- matrix(unlist(result), m, 12, byrow = TRUE)
-boxplot(result.summary[, 1 : 6], names = c("BH", "Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "varbvs"), ylab = "FDP", las = 2)
+result.summary <- matrix(unlist(result), m, 28, byrow = TRUE)
+boxplot(result.summary[, 1 : 14], names = c("BH", "ASH.q", "ASH.s", "ASH.s.FSP", "Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "varbvs.q", "varbvs.s", "varbvs.s.FSP", "varbvsmix.q", "varbvsmix.s", "varbvsmix.s.FSP"), ylab = "FDP/FSP", las = 2)
 abline(h = q, lty = 2, col = "red")
-boxplot(result.summary[, 7 : 12], names = c("BH", "Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "varbvs"), ylab = "TDP", las = 2)
+boxplot(result.summary[, 15 : 28], names = c("BH", "ASH.q", "ASH.s", "ASH.s.TSP", "Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "varbvs.q", "varbvs.s", "varbvs.s.FSP", "varbvsmix.q", "varbvsmix.s", "varbvsmix.s.TSP"), ylab = "TDP/TSP", las = 2)
 ```
 
-### AR Model for $X$
+### Local correlation / AR model for $X$
 
 ```{r, echo = FALSE, cache = TRUE}
 rho <- 0.5
@@ -215,10 +207,127 @@ y <- X %*% beta + rnorm(n)
   ## Least squares
   lm.fit <- lm(y ~ X - 1)
   pvalue <- summary(lm.fit)$coefficients[, 4]
+  betahat <- summary(lm.fit)$coefficients[, 1]
+  sebetahat <- summary(lm.fit)$coefficients[, 2]
 
   ## BH
   BH.fit <- p.adjust(pvalue, method = "BH")
   BH.selected <- (1 : p)[BH.fit <= q]
+  
+  ## ASH
+  ash.fit <- ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+  ash.q.selected <- (1 : p)[ashr::get_qvalue(ash.fit) <= q]
+  ash.s.selected <- (1 : p)[ashr::get_svalue(ash.fit) <= q]
+
+  ## Knockoff
+  Xk_g <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "equi")
+  Xk_2 <- knockoff::create.second_order(X, method = "equi")
+  gauss_equi <- knockoff::stat.glmnet_coefdiff(X, Xk_g, y, cores = 4)
+  est_equi <- knockoff::stat.glmnet_coefdiff(X, Xk_2, y, cores = 4)
+  Knockoff.threshold.g <- knockoff::knockoff.threshold(gauss_equi, fdr = q, offset = 0)
+  Knockoff.threshold.2 <- knockoff::knockoff.threshold(est_equi, fdr = q, offset = 0)
+  Knockoff.threshold.plus.g <- knockoff::knockoff.threshold(gauss_equi, fdr = q, offset = 1)
+  Knockoff.threshold.plus.2 <- knockoff::knockoff.threshold(est_equi, fdr = q, offset = 1)
+  Knockoff.g.selected <- (1 : p)[gauss_equi >= Knockoff.threshold.g]
+  Knockoff.plus.g.selected <- (1 : p)[gauss_equi >= Knockoff.threshold.plus.g]
+  Knockoff.2.selected <- (1 : p)[est_equi >= Knockoff.threshold.2]
+  Knockoff.plus.2.selected <- (1 : p)[est_equi >= Knockoff.threshold.plus.2]
+
+  ## varbvs
+  varbvs.fit <- varbvs(X, NULL, y, verbose = FALSE)
+  varbvs.lfdr <- 1 - varbvs.fit$pip
+  varbvs.q <- ashr::qval.from.lfdr(varbvs.lfdr)
+  varbvs.q.selected <- (1 : p)[varbvs.q <= q]
+  varbvs.lfsr <- varbvs.get.lfsr(varbvs.fit)
+  varbvs.s <- ashr::qval.from.lfdr(varbvs.lfsr)
+  varbvs.s.selected <- (1 : p)[varbvs.s <= q]
+  
+  ## varbvsmix
+  varbvsmix.fit <- varbvs::varbvsmix(X, NULL, y, sa = ash.fit$fitted_g$sd, verbose = FALSE)
+  varbvsmix.lfdr <- varbvsmix.fit$alpha[, 1]
+  varbvsmix.q <- ashr::qval.from.lfdr(varbvsmix.lfdr)
+  varbvsmix.q.selected <- (1 : p)[varbvsmix.q <= q]
+  varbvsmix.lfsr <- varbvsmix.fit$lfsr
+  varbvsmix.s <- ashr::qval.from.lfdr(varbvsmix.lfsr)
+  varbvsmix.s.selected <- (1 : p)[varbvsmix.s <= q]
+
+result[[i]] <- c(
+  fdp.BH = sum(beta[BH.selected] == 0) / max(1, length(BH.selected)),
+  fdp.ash.q = sum(beta[ash.q.selected] == 0) / max(1, length(ash.q.selected)),
+  fdp.ash.s = sum(beta[ash.s.selected] == 0) / max(1, length(ash.s.selected)),
+  fsp.ash.s = sum(sign(beta[ash.s.selected]) != sign(betahat[ash.s.selected]) | beta[ash.s.selected] == 0) / max(1, length(ash.s.selected)),
+  fdp.knockoff.g = sum(beta[Knockoff.g.selected] == 0) / max(1, length(Knockoff.g.selected)),
+  fdp.knockoff.plus.g = sum(beta[Knockoff.plus.g.selected] == 0) / max(1, length(Knockoff.plus.g.selected)),
+  fdp.Knockoff.2 = sum(beta[Knockoff.2.selected] == 0) / max(1, length(Knockoff.2.selected)),
+  fdp.knockoff.plus.2 = sum(beta[Knockoff.plus.2.selected] == 0) / max(1, length(Knockoff.plus.2.selected)),
+  fdp.varbvs.q = sum(beta[varbvs.q.selected] == 0) / max(1, length(varbvs.q.selected)),
+  fdp.varbvs.s = sum(beta[varbvs.s.selected] == 0) / max(1, length(varbvs.s.selected)),
+  fsp.varbvs.s = sum(sign(beta[varbvs.s.selected]) != sign(betahat[varbvs.s.selected]) | beta[varbvs.s.selected] == 0) / max(1, length(varbvs.s.selected)),
+  fdp.varbvsmix.q = sum(beta[varbvsmix.q.selected] == 0) / max(1, length(varbvsmix.q.selected)),
+  fdp.varbvsmix.s = sum(beta[varbvsmix.s.selected] == 0) / max(1, length(varbvsmix.s.selected)),
+  fsp.varbvsmix.s = sum(sign(beta[varbvsmix.s.selected]) != sign(betahat[varbvsmix.s.selected]) | beta[varbvsmix.s.selected] == 0) / max(1, length(varbvsmix.s.selected)),
+  tpp.BH = sum(beta[BH.selected] != 0) / k,
+  tpp.ash.q = sum(beta[ash.q.selected] != 0) / k,
+  tpp.ash.s = sum(beta[ash.s.selected] != 0) / k,
+  tsp.ash.s = sum(sign(beta[ash.s.selected]) == sign(betahat[ash.s.selected]) & beta[ash.s.selected] != 0) / k,
+  tpp.knockoff.g = sum(beta[Knockoff.g.selected] != 0) / k,
+  tpp.knockoff.plus.g = sum(beta[Knockoff.plus.g.selected] != 0) / k,
+  tpp.knockoff.2 = sum(beta[Knockoff.2.selected] != 0) / k,
+  tpp.knockoff.plus.2 = sum(beta[Knockoff.plus.2.selected] != 0) / k,
+  tpp.varbvs.q = sum(beta[varbvs.q.selected] != 0) / k,
+  tpp.varbvs.s = sum(beta[varbvs.s.selected] != 0) / k,
+  tsp.varbvs.s = sum(sign(beta[varbvs.s.selected]) == sign(betahat[varbvs.s.selected]) & beta[varbvs.s.selected] != 0) / k,
+  tpp.varbvsmix.q = sum(beta[varbvsmix.q.selected] != 0) / k,
+  tpp.varbvsmix.s = sum(beta[varbvsmix.s.selected] != 0) / k,
+  tsp.varbvsmix.s = sum(sign(beta[varbvsmix.s.selected]) == sign(betahat[varbvsmix.s.selected]) & beta[varbvsmix.s.selected] != 0) / k
+)
+}
+```
+
+```{r, echo = FALSE}
+result.summary <- matrix(unlist(result), m, 28, byrow = TRUE)
+boxplot(result.summary[, 1 : 14], names = c("BH", "ASH.q", "ASH.s", "ASH.s.FSP", "Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "varbvs.q", "varbvs.s", "varbvs.s.FSP", "varbvsmix.q", "varbvsmix.s", "varbvsmix.s.FSP"), ylab = "FDP/FSP", las = 2)
+abline(h = q, lty = 2, col = "red")
+boxplot(result.summary[, 15 : 28], names = c("BH", "ASH.q", "ASH.s", "ASH.s.TSP", "Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "varbvs.q", "varbvs.s", "varbvs.s.FSP", "varbvsmix.q", "varbvsmix.s", "varbvsmix.s.TSP"), ylab = "TDP/TSP", las = 2)
+```
+
+### Factor Model for $X$
+
+```{r, echo = FALSE, cache = TRUE}
+d <- 5
+B <- matrix(rnorm(p * d), p, d)
+Cor.X <- cov2cor(tcrossprod(B) + diag(p))
+Cov.X <- Cor.X / n
+```
+
+```{r, echo = FALSE, cache = TRUE, message = FALSE}
+A <- 12
+
+result <- list()
+
+for (i in 1 : m) {
+  X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n, p)
+
+  beta <- rep(0, p)
+  nonzero <- sample(p, k)
+  beta[nonzero] <- A
+  
+  y <- X %*% beta + rnorm(n)
+
+  ## Least squares
+  lm.fit <- lm(y ~ X - 1)
+  pvalue <- summary(lm.fit)$coefficients[, 4]
+  betahat <- summary(lm.fit)$coefficients[, 1]
+  sebetahat <- summary(lm.fit)$coefficients[, 2]
+
+  ## BH
+  BH.fit <- p.adjust(pvalue, method = "BH")
+  BH.selected <- (1 : p)[BH.fit <= q]
+  
+  ## ASH
+  ash.fit <- ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+  ash.q.selected <- (1 : p)[ashr::get_qvalue(ash.fit) <= q]
+  ash.s.selected <- (1 : p)[ashr::get_svalue(ash.fit) <= q]
   
   ## Knockoff
   Xk_g <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "equi")
@@ -238,30 +347,58 @@ y <- X %*% beta + rnorm(n)
   varbvs.fit <- varbvs(X, NULL, y, verbose = FALSE)
   varbvs.lfdr <- 1 - varbvs.fit$pip
   varbvs.q <- ashr::qval.from.lfdr(varbvs.lfdr)
-  varbvs.selected <- (1 : p)[varbvs.q <= q]
+  varbvs.q.selected <- (1 : p)[varbvs.q <= q]
+  varbvs.lfsr <- varbvs.get.lfsr(varbvs.fit)
+  varbvs.s <- ashr::qval.from.lfdr(varbvs.lfsr)
+  varbvs.s.selected <- (1 : p)[varbvs.s <= q]
+  
+  ## varbvsmix
+  varbvsmix.fit <- varbvs::varbvsmix(X, NULL, y, sa = ash.fit$fitted_g$sd, verbose = FALSE)
+  varbvsmix.lfdr <- varbvsmix.fit$alpha[, 1]
+  varbvsmix.q <- ashr::qval.from.lfdr(varbvsmix.lfdr)
+  varbvsmix.q.selected <- (1 : p)[varbvsmix.q <= q]
+  varbvsmix.lfsr <- varbvsmix.fit$lfsr
+  varbvsmix.s <- ashr::qval.from.lfdr(varbvsmix.lfsr)
+  varbvsmix.s.selected <- (1 : p)[varbvsmix.s <= q]
 
 result[[i]] <- c(
   fdp.BH = sum(beta[BH.selected] == 0) / max(1, length(BH.selected)),
+  fdp.ash.q = sum(beta[ash.q.selected] == 0) / max(1, length(ash.q.selected)),
+  fdp.ash.s = sum(beta[ash.s.selected] == 0) / max(1, length(ash.s.selected)),
+  fsp.ash.s = sum(sign(beta[ash.s.selected]) != sign(betahat[ash.s.selected]) | beta[ash.s.selected] == 0) / max(1, length(ash.s.selected)),
   fdp.knockoff.g = sum(beta[Knockoff.g.selected] == 0) / max(1, length(Knockoff.g.selected)),
   fdp.knockoff.plus.g = sum(beta[Knockoff.plus.g.selected] == 0) / max(1, length(Knockoff.plus.g.selected)),
   fdp.Knockoff.2 = sum(beta[Knockoff.2.selected] == 0) / max(1, length(Knockoff.2.selected)),
   fdp.knockoff.plus.2 = sum(beta[Knockoff.plus.2.selected] == 0) / max(1, length(Knockoff.plus.2.selected)),
-  fdp.varbvs = sum(beta[varbvs.selected] == 0) / max(1, length(varbvs.selected)),
-  power.BH = sum(beta[BH.selected] != 0) / k,
-  power.knockoff.g = sum(beta[Knockoff.g.selected] != 0) / k,
-  power.knockoff.plus.g = sum(beta[Knockoff.plus.g.selected] != 0) / k,
-  power.knockoff.2 = sum(beta[Knockoff.2.selected] != 0) / k,
-  power.knockoff.plus.2 = sum(beta[Knockoff.plus.2.selected] != 0) / k,
-  power.varbvs = sum(beta[varbvs.selected] != 0) / k
+  fdp.varbvs.q = sum(beta[varbvs.q.selected] == 0) / max(1, length(varbvs.q.selected)),
+  fdp.varbvs.s = sum(beta[varbvs.s.selected] == 0) / max(1, length(varbvs.s.selected)),
+  fsp.varbvs.s = sum(sign(beta[varbvs.s.selected]) != sign(betahat[varbvs.s.selected]) | beta[varbvs.s.selected] == 0) / max(1, length(varbvs.s.selected)),
+  fdp.varbvsmix.q = sum(beta[varbvsmix.q.selected] == 0) / max(1, length(varbvsmix.q.selected)),
+  fdp.varbvsmix.s = sum(beta[varbvsmix.s.selected] == 0) / max(1, length(varbvsmix.s.selected)),
+  fsp.varbvsmix.s = sum(sign(beta[varbvsmix.s.selected]) != sign(betahat[varbvsmix.s.selected]) | beta[varbvsmix.s.selected] == 0) / max(1, length(varbvsmix.s.selected)),
+  tpp.BH = sum(beta[BH.selected] != 0) / k,
+  tpp.ash.q = sum(beta[ash.q.selected] != 0) / k,
+  tpp.ash.s = sum(beta[ash.s.selected] != 0) / k,
+  tsp.ash.s = sum(sign(beta[ash.s.selected]) == sign(betahat[ash.s.selected]) & beta[ash.s.selected] != 0) / k,
+  tpp.knockoff.g = sum(beta[Knockoff.g.selected] != 0) / k,
+  tpp.knockoff.plus.g = sum(beta[Knockoff.plus.g.selected] != 0) / k,
+  tpp.knockoff.2 = sum(beta[Knockoff.2.selected] != 0) / k,
+  tpp.knockoff.plus.2 = sum(beta[Knockoff.plus.2.selected] != 0) / k,
+  tpp.varbvs.q = sum(beta[varbvs.q.selected] != 0) / k,
+  tpp.varbvs.s = sum(beta[varbvs.s.selected] != 0) / k,
+  tsp.varbvs.s = sum(sign(beta[varbvs.s.selected]) == sign(betahat[varbvs.s.selected]) & beta[varbvs.s.selected] != 0) / k,
+  tpp.varbvsmix.q = sum(beta[varbvsmix.q.selected] != 0) / k,
+  tpp.varbvsmix.s = sum(beta[varbvsmix.s.selected] != 0) / k,
+  tsp.varbvsmix.s = sum(sign(beta[varbvsmix.s.selected]) == sign(betahat[varbvsmix.s.selected]) & beta[varbvsmix.s.selected] != 0) / k
 )
 }
 ```
 
 ```{r, echo = FALSE}
-result.summary <- matrix(unlist(result), m, 12, byrow = TRUE)
-boxplot(result.summary[, 1 : 6], names = c("BH", "Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "varbvs"), ylab = "FDP", las = 2)
+result.summary <- matrix(unlist(result), m, 28, byrow = TRUE)
+boxplot(result.summary[, 1 : 14], names = c("BH", "ASH.q", "ASH.s", "ASH.s.FSP", "Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "varbvs.q", "varbvs.s", "varbvs.s.FSP", "varbvsmix.q", "varbvsmix.s", "varbvsmix.s.FSP"), ylab = "FDP/FSP", las = 2)
 abline(h = q, lty = 2, col = "red")
-boxplot(result.summary[, 7 : 12], names = c("BH", "Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "varbvs"), ylab = "TDP", las = 2)
+boxplot(result.summary[, 15 : 28], names = c("BH", "ASH.q", "ASH.s", "ASH.s.TSP", "Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "varbvs.q", "varbvs.s", "varbvs.s.FSP", "varbvsmix.q", "varbvsmix.s", "varbvsmix.s.TSP"), ylab = "TDP/TSP", las = 2)
 ```
 
 ### Factor Model for $\hat\beta$
@@ -280,20 +417,28 @@ A <- 12
 result <- list()
 
 for (i in 1 : m) {
-beta <- rep(0, p)
-nonzero <- sample(p, k)
-beta[nonzero] <- A
+  X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n, p)
 
-X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n) %*% Cor.X.5
-y <- X %*% beta + rnorm(n)
+  beta <- rep(0, p)
+  nonzero <- sample(p, k)
+  beta[nonzero] <- A
+  
+  y <- X %*% beta + rnorm(n)
 
   ## Least squares
   lm.fit <- lm(y ~ X - 1)
   pvalue <- summary(lm.fit)$coefficients[, 4]
+  betahat <- summary(lm.fit)$coefficients[, 1]
+  sebetahat <- summary(lm.fit)$coefficients[, 2]
 
   ## BH
   BH.fit <- p.adjust(pvalue, method = "BH")
   BH.selected <- (1 : p)[BH.fit <= q]
+  
+  ## ASH
+  ash.fit <- ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+  ash.q.selected <- (1 : p)[ashr::get_qvalue(ash.fit) <= q]
+  ash.s.selected <- (1 : p)[ashr::get_svalue(ash.fit) <= q]
   
   ## Knockoff
   Xk_g <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "equi")
@@ -313,30 +458,58 @@ y <- X %*% beta + rnorm(n)
   varbvs.fit <- varbvs(X, NULL, y, verbose = FALSE)
   varbvs.lfdr <- 1 - varbvs.fit$pip
   varbvs.q <- ashr::qval.from.lfdr(varbvs.lfdr)
-  varbvs.selected <- (1 : p)[varbvs.q <= q]
+  varbvs.q.selected <- (1 : p)[varbvs.q <= q]
+  varbvs.lfsr <- varbvs.get.lfsr(varbvs.fit)
+  varbvs.s <- ashr::qval.from.lfdr(varbvs.lfsr)
+  varbvs.s.selected <- (1 : p)[varbvs.s <= q]
+  
+  ## varbvsmix
+  varbvsmix.fit <- varbvs::varbvsmix(X, NULL, y, sa = ash.fit$fitted_g$sd, verbose = FALSE)
+  varbvsmix.lfdr <- varbvsmix.fit$alpha[, 1]
+  varbvsmix.q <- ashr::qval.from.lfdr(varbvsmix.lfdr)
+  varbvsmix.q.selected <- (1 : p)[varbvsmix.q <= q]
+  varbvsmix.lfsr <- varbvsmix.fit$lfsr
+  varbvsmix.s <- ashr::qval.from.lfdr(varbvsmix.lfsr)
+  varbvsmix.s.selected <- (1 : p)[varbvsmix.s <= q]
 
 result[[i]] <- c(
   fdp.BH = sum(beta[BH.selected] == 0) / max(1, length(BH.selected)),
+  fdp.ash.q = sum(beta[ash.q.selected] == 0) / max(1, length(ash.q.selected)),
+  fdp.ash.s = sum(beta[ash.s.selected] == 0) / max(1, length(ash.s.selected)),
+  fsp.ash.s = sum(sign(beta[ash.s.selected]) != sign(betahat[ash.s.selected]) | beta[ash.s.selected] == 0) / max(1, length(ash.s.selected)),
   fdp.knockoff.g = sum(beta[Knockoff.g.selected] == 0) / max(1, length(Knockoff.g.selected)),
   fdp.knockoff.plus.g = sum(beta[Knockoff.plus.g.selected] == 0) / max(1, length(Knockoff.plus.g.selected)),
   fdp.Knockoff.2 = sum(beta[Knockoff.2.selected] == 0) / max(1, length(Knockoff.2.selected)),
   fdp.knockoff.plus.2 = sum(beta[Knockoff.plus.2.selected] == 0) / max(1, length(Knockoff.plus.2.selected)),
-  fdp.varbvs = sum(beta[varbvs.selected] == 0) / max(1, length(varbvs.selected)),
-  power.BH = sum(beta[BH.selected] != 0) / k,
-  power.knockoff.g = sum(beta[Knockoff.g.selected] != 0) / k,
-  power.knockoff.plus.g = sum(beta[Knockoff.plus.g.selected] != 0) / k,
-  power.knockoff.2 = sum(beta[Knockoff.2.selected] != 0) / k,
-  power.knockoff.plus.2 = sum(beta[Knockoff.plus.2.selected] != 0) / k,
-  power.varbvs = sum(beta[varbvs.selected] != 0) / k
+  fdp.varbvs.q = sum(beta[varbvs.q.selected] == 0) / max(1, length(varbvs.q.selected)),
+  fdp.varbvs.s = sum(beta[varbvs.s.selected] == 0) / max(1, length(varbvs.s.selected)),
+  fsp.varbvs.s = sum(sign(beta[varbvs.s.selected]) != sign(betahat[varbvs.s.selected]) | beta[varbvs.s.selected] == 0) / max(1, length(varbvs.s.selected)),
+  fdp.varbvsmix.q = sum(beta[varbvsmix.q.selected] == 0) / max(1, length(varbvsmix.q.selected)),
+  fdp.varbvsmix.s = sum(beta[varbvsmix.s.selected] == 0) / max(1, length(varbvsmix.s.selected)),
+  fsp.varbvsmix.s = sum(sign(beta[varbvsmix.s.selected]) != sign(betahat[varbvsmix.s.selected]) | beta[varbvsmix.s.selected] == 0) / max(1, length(varbvsmix.s.selected)),
+  tpp.BH = sum(beta[BH.selected] != 0) / k,
+  tpp.ash.q = sum(beta[ash.q.selected] != 0) / k,
+  tpp.ash.s = sum(beta[ash.s.selected] != 0) / k,
+  tsp.ash.s = sum(sign(beta[ash.s.selected]) == sign(betahat[ash.s.selected]) & beta[ash.s.selected] != 0) / k,
+  tpp.knockoff.g = sum(beta[Knockoff.g.selected] != 0) / k,
+  tpp.knockoff.plus.g = sum(beta[Knockoff.plus.g.selected] != 0) / k,
+  tpp.knockoff.2 = sum(beta[Knockoff.2.selected] != 0) / k,
+  tpp.knockoff.plus.2 = sum(beta[Knockoff.plus.2.selected] != 0) / k,
+  tpp.varbvs.q = sum(beta[varbvs.q.selected] != 0) / k,
+  tpp.varbvs.s = sum(beta[varbvs.s.selected] != 0) / k,
+  tsp.varbvs.s = sum(sign(beta[varbvs.s.selected]) == sign(betahat[varbvs.s.selected]) & beta[varbvs.s.selected] != 0) / k,
+  tpp.varbvsmix.q = sum(beta[varbvsmix.q.selected] != 0) / k,
+  tpp.varbvsmix.s = sum(beta[varbvsmix.s.selected] != 0) / k,
+  tsp.varbvsmix.s = sum(sign(beta[varbvsmix.s.selected]) == sign(betahat[varbvsmix.s.selected]) & beta[varbvsmix.s.selected] != 0) / k
 )
 }
 ```
 
 ```{r, echo = FALSE}
-result.summary <- matrix(unlist(result), m, 12, byrow = TRUE)
-boxplot(result.summary[, 1 : 6], names = c("BH", "Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "varbvs"), ylab = "FDP", las = 2)
+result.summary <- matrix(unlist(result), m, 28, byrow = TRUE)
+boxplot(result.summary[, 1 : 14], names = c("BH", "ASH.q", "ASH.s", "ASH.s.FSP", "Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "varbvs.q", "varbvs.s", "varbvs.s.FSP", "varbvsmix.q", "varbvsmix.s", "varbvsmix.s.FSP"), ylab = "FDP/FSP", las = 2)
 abline(h = q, lty = 2, col = "red")
-boxplot(result.summary[, 7 : 12], names = c("BH", "Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "varbvs"), ylab = "TDP", las = 2)
+boxplot(result.summary[, 15 : 28], names = c("BH", "ASH.q", "ASH.s", "ASH.s.TSP", "Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "varbvs.q", "varbvs.s", "varbvs.s.FSP", "varbvsmix.q", "varbvsmix.s", "varbvsmix.s.TSP"), ylab = "TDP/TSP", las = 2)
 ```
 
 ## $n < p$
@@ -365,6 +538,26 @@ for (i in 1 : m) {
   beta[nonzero] <- A
   
   y <- X %*% beta + rnorm(n)
+  
+  # Univariate regression for BH, ASH
+  pvalue <- c()
+  betahat <- c()
+  sebetahat <- c()
+  for (j in 1 : p) {
+    fit <- lm(y ~ X[, j] - 1)
+    pvalue[j] <- summary(fit)$coefficients[4]
+    betahat[j] <- summary(fit)$coefficients[1]
+    sebetahat[j] <- summary(fit)$coefficients[2]
+  }
+
+  ## BH
+  BH.fit <- p.adjust(pvalue, method = "BH")
+  BH.selected <- (1 : p)[BH.fit <= q]
+  
+  ## ASH
+  ash.fit <- ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+  ash.q.selected <- (1 : p)[ashr::get_qvalue(ash.fit) <= q]
+  ash.s.selected <- (1 : p)[ashr::get_svalue(ash.fit) <= q]
 
   ## Knockoff
   Xk_g <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "equi")
@@ -384,28 +577,172 @@ for (i in 1 : m) {
   varbvs.fit <- varbvs(X, NULL, y, verbose = FALSE)
   varbvs.lfdr <- 1 - varbvs.fit$pip
   varbvs.q <- ashr::qval.from.lfdr(varbvs.lfdr)
-  varbvs.selected <- (1 : p)[varbvs.q <= q]
+  varbvs.q.selected <- (1 : p)[varbvs.q <= q]
+  varbvs.lfsr <- varbvs.get.lfsr(varbvs.fit)
+  varbvs.s <- ashr::qval.from.lfdr(varbvs.lfsr)
+  varbvs.s.selected <- (1 : p)[varbvs.s <= q]
+  
+  ## varbvsmix
+  varbvsmix.fit <- varbvs::varbvsmix(X, NULL, y, sa = ash.fit$fitted_g$sd, verbose = FALSE)
+  varbvsmix.lfdr <- varbvsmix.fit$alpha[, 1]
+  varbvsmix.q <- ashr::qval.from.lfdr(varbvsmix.lfdr)
+  varbvsmix.q.selected <- (1 : p)[varbvsmix.q <= q]
+  varbvsmix.lfsr <- varbvsmix.fit$lfsr
+  varbvsmix.s <- ashr::qval.from.lfdr(varbvsmix.lfsr)
+  varbvsmix.s.selected <- (1 : p)[varbvsmix.s <= q]
 
 result[[i]] <- c(
+  fdp.BH = sum(beta[BH.selected] == 0) / max(1, length(BH.selected)),
+  fdp.ash.q = sum(beta[ash.q.selected] == 0) / max(1, length(ash.q.selected)),
+  fdp.ash.s = sum(beta[ash.s.selected] == 0) / max(1, length(ash.s.selected)),
+  fsp.ash.s = sum(sign(beta[ash.s.selected]) != sign(betahat[ash.s.selected]) | beta[ash.s.selected] == 0) / max(1, length(ash.s.selected)),
   fdp.knockoff.g = sum(beta[Knockoff.g.selected] == 0) / max(1, length(Knockoff.g.selected)),
   fdp.knockoff.plus.g = sum(beta[Knockoff.plus.g.selected] == 0) / max(1, length(Knockoff.plus.g.selected)),
   fdp.Knockoff.2 = sum(beta[Knockoff.2.selected] == 0) / max(1, length(Knockoff.2.selected)),
   fdp.knockoff.plus.2 = sum(beta[Knockoff.plus.2.selected] == 0) / max(1, length(Knockoff.plus.2.selected)),
-  fdp.varbvs = sum(beta[varbvs.selected] == 0) / max(1, length(varbvs.selected)),
-  power.knockoff.g = sum(beta[Knockoff.g.selected] != 0) / k,
-  power.knockoff.plus.g = sum(beta[Knockoff.plus.g.selected] != 0) / k,
-  power.knockoff.2 = sum(beta[Knockoff.2.selected] != 0) / k,
-  power.knockoff.plus.2 = sum(beta[Knockoff.plus.2.selected] != 0) / k,
-  power.varbvs = sum(beta[varbvs.selected] != 0) / k
+  fdp.varbvs.q = sum(beta[varbvs.q.selected] == 0) / max(1, length(varbvs.q.selected)),
+  fdp.varbvs.s = sum(beta[varbvs.s.selected] == 0) / max(1, length(varbvs.s.selected)),
+  fsp.varbvs.s = sum(sign(beta[varbvs.s.selected]) != sign(betahat[varbvs.s.selected]) | beta[varbvs.s.selected] == 0) / max(1, length(varbvs.s.selected)),
+  fdp.varbvsmix.q = sum(beta[varbvsmix.q.selected] == 0) / max(1, length(varbvsmix.q.selected)),
+  fdp.varbvsmix.s = sum(beta[varbvsmix.s.selected] == 0) / max(1, length(varbvsmix.s.selected)),
+  fsp.varbvsmix.s = sum(sign(beta[varbvsmix.s.selected]) != sign(betahat[varbvsmix.s.selected]) | beta[varbvsmix.s.selected] == 0) / max(1, length(varbvsmix.s.selected)),
+  tpp.BH = sum(beta[BH.selected] != 0) / k,
+  tpp.ash.q = sum(beta[ash.q.selected] != 0) / k,
+  tpp.ash.s = sum(beta[ash.s.selected] != 0) / k,
+  tsp.ash.s = sum(sign(beta[ash.s.selected]) == sign(betahat[ash.s.selected]) & beta[ash.s.selected] != 0) / k,
+  tpp.knockoff.g = sum(beta[Knockoff.g.selected] != 0) / k,
+  tpp.knockoff.plus.g = sum(beta[Knockoff.plus.g.selected] != 0) / k,
+  tpp.knockoff.2 = sum(beta[Knockoff.2.selected] != 0) / k,
+  tpp.knockoff.plus.2 = sum(beta[Knockoff.plus.2.selected] != 0) / k,
+  tpp.varbvs.q = sum(beta[varbvs.q.selected] != 0) / k,
+  tpp.varbvs.s = sum(beta[varbvs.s.selected] != 0) / k,
+  tsp.varbvs.s = sum(sign(beta[varbvs.s.selected]) == sign(betahat[varbvs.s.selected]) & beta[varbvs.s.selected] != 0) / k,
+  tpp.varbvsmix.q = sum(beta[varbvsmix.q.selected] != 0) / k,
+  tpp.varbvsmix.s = sum(beta[varbvsmix.s.selected] != 0) / k,
+  tsp.varbvsmix.s = sum(sign(beta[varbvsmix.s.selected]) == sign(betahat[varbvsmix.s.selected]) & beta[varbvsmix.s.selected] != 0) / k
 )
 }
 ```
 
 ```{r, echo = FALSE}
-result.summary <- matrix(unlist(result), m, 10, byrow = TRUE)
-boxplot(result.summary[, 1 : 5], names = c("Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "varbvs"), ylab = "FDP", las = 2)
+result.summary <- matrix(unlist(result), m, 28, byrow = TRUE)
+boxplot(result.summary[, 1 : 14], names = c("BH", "ASH.q", "ASH.s", "ASH.s.FSP", "Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "varbvs.q", "varbvs.s", "varbvs.s.FSP", "varbvsmix.q", "varbvsmix.s", "varbvsmix.s.FSP"), ylab = "FDP/FSP", las = 2)
 abline(h = q, lty = 2, col = "red")
-boxplot(result.summary[, 6 : 10], names = c("Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "varbvs"), ylab = "TDP", las = 2)
+boxplot(result.summary[, 15 : 28], names = c("BH", "ASH.q", "ASH.s", "ASH.s.TSP", "Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "varbvs.q", "varbvs.s", "varbvs.s.FSP", "varbvsmix.q", "varbvsmix.s", "varbvsmix.s.TSP"), ylab = "TDP/TSP", las = 2)
+```
+
+### Local correlation / AR model for $X$
+
+```{r, echo = FALSE, cache = TRUE}
+rho <- 0.5
+Cor.X <- toeplitz(rho^{0 : (p - 1)})
+Cov.X <- Cor.X / n
+Cor.X.5 <- chol(Cor.X)
+```
+
+```{r, echo = FALSE, cache = TRUE, message = FALSE}
+A <- 6
+
+result <- list()
+
+for (i in 1 : m) {
+beta <- rep(0, p)
+nonzero <- sample(p, k)
+beta[nonzero] <- A
+
+X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n) %*% Cor.X.5
+y <- X %*% beta + rnorm(n)
+
+  # Univariate regression for BH, ASH
+  pvalue <- c()
+  betahat <- c()
+  sebetahat <- c()
+  for (j in 1 : p) {
+    fit <- lm(y ~ X[, j] - 1)
+    pvalue[j] <- summary(fit)$coefficients[4]
+    betahat[j] <- summary(fit)$coefficients[1]
+    sebetahat[j] <- summary(fit)$coefficients[2]
+  }
+
+  ## BH
+  BH.fit <- p.adjust(pvalue, method = "BH")
+  BH.selected <- (1 : p)[BH.fit <= q]
+  
+  ## ASH
+  ash.fit <- ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+  ash.q.selected <- (1 : p)[ashr::get_qvalue(ash.fit) <= q]
+  ash.s.selected <- (1 : p)[ashr::get_svalue(ash.fit) <= q]
+
+  ## Knockoff
+  Xk_g <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "equi")
+  Xk_2 <- knockoff::create.second_order(X, method = "equi")
+  gauss_equi <- knockoff::stat.glmnet_coefdiff(X, Xk_g, y, cores = 4)
+  est_equi <- knockoff::stat.glmnet_coefdiff(X, Xk_2, y, cores = 4)
+  Knockoff.threshold.g <- knockoff::knockoff.threshold(gauss_equi, fdr = q, offset = 0)
+  Knockoff.threshold.2 <- knockoff::knockoff.threshold(est_equi, fdr = q, offset = 0)
+  Knockoff.threshold.plus.g <- knockoff::knockoff.threshold(gauss_equi, fdr = q, offset = 1)
+  Knockoff.threshold.plus.2 <- knockoff::knockoff.threshold(est_equi, fdr = q, offset = 1)
+  Knockoff.g.selected <- (1 : p)[gauss_equi >= Knockoff.threshold.g]
+  Knockoff.plus.g.selected <- (1 : p)[gauss_equi >= Knockoff.threshold.plus.g]
+  Knockoff.2.selected <- (1 : p)[est_equi >= Knockoff.threshold.2]
+  Knockoff.plus.2.selected <- (1 : p)[est_equi >= Knockoff.threshold.plus.2]
+
+  ## varbvs
+  varbvs.fit <- varbvs(X, NULL, y, verbose = FALSE)
+  varbvs.lfdr <- 1 - varbvs.fit$pip
+  varbvs.q <- ashr::qval.from.lfdr(varbvs.lfdr)
+  varbvs.q.selected <- (1 : p)[varbvs.q <= q]
+  varbvs.lfsr <- varbvs.get.lfsr(varbvs.fit)
+  varbvs.s <- ashr::qval.from.lfdr(varbvs.lfsr)
+  varbvs.s.selected <- (1 : p)[varbvs.s <= q]
+  
+  ## varbvsmix
+  varbvsmix.fit <- varbvs::varbvsmix(X, NULL, y, sa = ash.fit$fitted_g$sd, verbose = FALSE)
+  varbvsmix.lfdr <- varbvsmix.fit$alpha[, 1]
+  varbvsmix.q <- ashr::qval.from.lfdr(varbvsmix.lfdr)
+  varbvsmix.q.selected <- (1 : p)[varbvsmix.q <= q]
+  varbvsmix.lfsr <- varbvsmix.fit$lfsr
+  varbvsmix.s <- ashr::qval.from.lfdr(varbvsmix.lfsr)
+  varbvsmix.s.selected <- (1 : p)[varbvsmix.s <= q]
+
+result[[i]] <- c(
+  fdp.BH = sum(beta[BH.selected] == 0) / max(1, length(BH.selected)),
+  fdp.ash.q = sum(beta[ash.q.selected] == 0) / max(1, length(ash.q.selected)),
+  fdp.ash.s = sum(beta[ash.s.selected] == 0) / max(1, length(ash.s.selected)),
+  fsp.ash.s = sum(sign(beta[ash.s.selected]) != sign(betahat[ash.s.selected]) | beta[ash.s.selected] == 0) / max(1, length(ash.s.selected)),
+  fdp.knockoff.g = sum(beta[Knockoff.g.selected] == 0) / max(1, length(Knockoff.g.selected)),
+  fdp.knockoff.plus.g = sum(beta[Knockoff.plus.g.selected] == 0) / max(1, length(Knockoff.plus.g.selected)),
+  fdp.Knockoff.2 = sum(beta[Knockoff.2.selected] == 0) / max(1, length(Knockoff.2.selected)),
+  fdp.knockoff.plus.2 = sum(beta[Knockoff.plus.2.selected] == 0) / max(1, length(Knockoff.plus.2.selected)),
+  fdp.varbvs.q = sum(beta[varbvs.q.selected] == 0) / max(1, length(varbvs.q.selected)),
+  fdp.varbvs.s = sum(beta[varbvs.s.selected] == 0) / max(1, length(varbvs.s.selected)),
+  fsp.varbvs.s = sum(sign(beta[varbvs.s.selected]) != sign(betahat[varbvs.s.selected]) | beta[varbvs.s.selected] == 0) / max(1, length(varbvs.s.selected)),
+  fdp.varbvsmix.q = sum(beta[varbvsmix.q.selected] == 0) / max(1, length(varbvsmix.q.selected)),
+  fdp.varbvsmix.s = sum(beta[varbvsmix.s.selected] == 0) / max(1, length(varbvsmix.s.selected)),
+  fsp.varbvsmix.s = sum(sign(beta[varbvsmix.s.selected]) != sign(betahat[varbvsmix.s.selected]) | beta[varbvsmix.s.selected] == 0) / max(1, length(varbvsmix.s.selected)),
+  tpp.BH = sum(beta[BH.selected] != 0) / k,
+  tpp.ash.q = sum(beta[ash.q.selected] != 0) / k,
+  tpp.ash.s = sum(beta[ash.s.selected] != 0) / k,
+  tsp.ash.s = sum(sign(beta[ash.s.selected]) == sign(betahat[ash.s.selected]) & beta[ash.s.selected] != 0) / k,
+  tpp.knockoff.g = sum(beta[Knockoff.g.selected] != 0) / k,
+  tpp.knockoff.plus.g = sum(beta[Knockoff.plus.g.selected] != 0) / k,
+  tpp.knockoff.2 = sum(beta[Knockoff.2.selected] != 0) / k,
+  tpp.knockoff.plus.2 = sum(beta[Knockoff.plus.2.selected] != 0) / k,
+  tpp.varbvs.q = sum(beta[varbvs.q.selected] != 0) / k,
+  tpp.varbvs.s = sum(beta[varbvs.s.selected] != 0) / k,
+  tsp.varbvs.s = sum(sign(beta[varbvs.s.selected]) == sign(betahat[varbvs.s.selected]) & beta[varbvs.s.selected] != 0) / k,
+  tpp.varbvsmix.q = sum(beta[varbvsmix.q.selected] != 0) / k,
+  tpp.varbvsmix.s = sum(beta[varbvsmix.s.selected] != 0) / k,
+  tsp.varbvsmix.s = sum(sign(beta[varbvsmix.s.selected]) == sign(betahat[varbvsmix.s.selected]) & beta[varbvsmix.s.selected] != 0) / k
+)
+}
+```
+
+```{r, echo = FALSE}
+result.summary <- matrix(unlist(result), m, 28, byrow = TRUE)
+boxplot(result.summary[, 1 : 14], names = c("BH", "ASH.q", "ASH.s", "ASH.s.FSP", "Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "varbvs.q", "varbvs.s", "varbvs.s.FSP", "varbvsmix.q", "varbvsmix.s", "varbvsmix.s.FSP"), ylab = "FDP/FSP", las = 2)
+abline(h = q, lty = 2, col = "red")
+boxplot(result.summary[, 15 : 28], names = c("BH", "ASH.q", "ASH.s", "ASH.s.TSP", "Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "varbvs.q", "varbvs.s", "varbvs.s.FSP", "varbvsmix.q", "varbvsmix.s", "varbvsmix.s.TSP"), ylab = "TDP/TSP", las = 2)
 ```
 
 ### Factor Model for $X$
@@ -431,69 +768,25 @@ beta[nonzero] <- A
 X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n) %*% Cor.X.5
 y <- X %*% beta + rnorm(n)
 
-  ## Knockoff
-  Xk_g <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "equi")
-  Xk_2 <- knockoff::create.second_order(X, method = "equi")
-  gauss_equi <- knockoff::stat.glmnet_coefdiff(X, Xk_g, y, cores = 4)
-  est_equi <- knockoff::stat.glmnet_coefdiff(X, Xk_2, y, cores = 4)
-  Knockoff.threshold.g <- knockoff::knockoff.threshold(gauss_equi, fdr = q, offset = 0)
-  Knockoff.threshold.2 <- knockoff::knockoff.threshold(est_equi, fdr = q, offset = 0)
-  Knockoff.threshold.plus.g <- knockoff::knockoff.threshold(gauss_equi, fdr = q, offset = 1)
-  Knockoff.threshold.plus.2 <- knockoff::knockoff.threshold(est_equi, fdr = q, offset = 1)
-  Knockoff.g.selected <- (1 : p)[gauss_equi >= Knockoff.threshold.g]
-  Knockoff.plus.g.selected <- (1 : p)[gauss_equi >= Knockoff.threshold.plus.g]
-  Knockoff.2.selected <- (1 : p)[est_equi >= Knockoff.threshold.2]
-  Knockoff.plus.2.selected <- (1 : p)[est_equi >= Knockoff.threshold.plus.2]
+  # Univariate regression for BH, ASH
+  pvalue <- c()
+  betahat <- c()
+  sebetahat <- c()
+  for (j in 1 : p) {
+    fit <- lm(y ~ X[, j] - 1)
+    pvalue[j] <- summary(fit)$coefficients[4]
+    betahat[j] <- summary(fit)$coefficients[1]
+    sebetahat[j] <- summary(fit)$coefficients[2]
+  }
 
-  ## varbvs
-  varbvs.fit <- varbvs::varbvs(X, NULL, y, verbose = FALSE)
-  varbvs.lfdr <- 1 - varbvs.fit$pip
-  varbvs.q <- ashr::qval.from.lfdr(varbvs.lfdr)
-  varbvs.selected <- (1 : p)[varbvs.q <= q]
-
-result[[i]] <- c(
-  fdp.knockoff.g = sum(beta[Knockoff.g.selected] == 0) / max(1, length(Knockoff.g.selected)),
-  fdp.knockoff.plus.g = sum(beta[Knockoff.plus.g.selected] == 0) / max(1, length(Knockoff.plus.g.selected)),
-  fdp.Knockoff.2 = sum(beta[Knockoff.2.selected] == 0) / max(1, length(Knockoff.2.selected)),
-  fdp.knockoff.plus.2 = sum(beta[Knockoff.plus.2.selected] == 0) / max(1, length(Knockoff.plus.2.selected)),
-  fdp.varbvs = sum(beta[varbvs.selected] == 0) / max(1, length(varbvs.selected)),
-  power.knockoff.g = sum(beta[Knockoff.g.selected] != 0) / k,
-  power.knockoff.plus.g = sum(beta[Knockoff.plus.g.selected] != 0) / k,
-  power.knockoff.2 = sum(beta[Knockoff.2.selected] != 0) / k,
-  power.knockoff.plus.2 = sum(beta[Knockoff.plus.2.selected] != 0) / k,
-  power.varbvs = sum(beta[varbvs.selected] != 0) / k
-)
-}
-```
-
-```{r, echo = FALSE}
-result.summary <- matrix(unlist(result), m, 10, byrow = TRUE)
-boxplot(result.summary[, 1 : 5], names = c("Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "varbvs"), ylab = "FDP", las = 2)
-abline(h = q, lty = 2, col = "red")
-boxplot(result.summary[, 6 : 10], names = c("Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "varbvs"), ylab = "TDP", las = 2)
-```
-
-### AR Model for $X$
-
-```{r, echo = FALSE, cache = TRUE}
-rho <- 0.5
-Cor.X <- toeplitz(rho^{0 : (p - 1)})
-Cov.X <- Cor.X / n
-Cor.X.5 <- chol(Cor.X)
-```
-
-```{r, echo = FALSE, cache = TRUE, message = FALSE}
-A <- 6
-
-result <- list()
-
-for (i in 1 : m) {
-beta <- rep(0, p)
-nonzero <- sample(p, k)
-beta[nonzero] <- A
-
-X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n) %*% Cor.X.5
-y <- X %*% beta + rnorm(n)
+  ## BH
+  BH.fit <- p.adjust(pvalue, method = "BH")
+  BH.selected <- (1 : p)[BH.fit <= q]
+  
+  ## ASH
+  ash.fit <- ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+  ash.q.selected <- (1 : p)[ashr::get_qvalue(ash.fit) <= q]
+  ash.s.selected <- (1 : p)[ashr::get_svalue(ash.fit) <= q]
 
   ## Knockoff
   Xk_g <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "equi")
@@ -510,31 +803,61 @@ y <- X %*% beta + rnorm(n)
   Knockoff.plus.2.selected <- (1 : p)[est_equi >= Knockoff.threshold.plus.2]
 
   ## varbvs
-  varbvs.fit <- varbvs::varbvs(X, NULL, y, verbose = FALSE)
+  varbvs.fit <- varbvs(X, NULL, y, verbose = FALSE)
   varbvs.lfdr <- 1 - varbvs.fit$pip
   varbvs.q <- ashr::qval.from.lfdr(varbvs.lfdr)
-  varbvs.selected <- (1 : p)[varbvs.q <= q]
+  varbvs.q.selected <- (1 : p)[varbvs.q <= q]
+  varbvs.lfsr <- varbvs.get.lfsr(varbvs.fit)
+  varbvs.s <- ashr::qval.from.lfdr(varbvs.lfsr)
+  varbvs.s.selected <- (1 : p)[varbvs.s <= q]
+  
+  ## varbvsmix
+  varbvsmix.fit <- varbvs::varbvsmix(X, NULL, y, sa = ash.fit$fitted_g$sd, verbose = FALSE)
+  varbvsmix.lfdr <- varbvsmix.fit$alpha[, 1]
+  varbvsmix.q <- ashr::qval.from.lfdr(varbvsmix.lfdr)
+  varbvsmix.q.selected <- (1 : p)[varbvsmix.q <= q]
+  varbvsmix.lfsr <- varbvsmix.fit$lfsr
+  varbvsmix.s <- ashr::qval.from.lfdr(varbvsmix.lfsr)
+  varbvsmix.s.selected <- (1 : p)[varbvsmix.s <= q]
 
 result[[i]] <- c(
+  fdp.BH = sum(beta[BH.selected] == 0) / max(1, length(BH.selected)),
+  fdp.ash.q = sum(beta[ash.q.selected] == 0) / max(1, length(ash.q.selected)),
+  fdp.ash.s = sum(beta[ash.s.selected] == 0) / max(1, length(ash.s.selected)),
+  fsp.ash.s = sum(sign(beta[ash.s.selected]) != sign(betahat[ash.s.selected]) | beta[ash.s.selected] == 0) / max(1, length(ash.s.selected)),
   fdp.knockoff.g = sum(beta[Knockoff.g.selected] == 0) / max(1, length(Knockoff.g.selected)),
   fdp.knockoff.plus.g = sum(beta[Knockoff.plus.g.selected] == 0) / max(1, length(Knockoff.plus.g.selected)),
   fdp.Knockoff.2 = sum(beta[Knockoff.2.selected] == 0) / max(1, length(Knockoff.2.selected)),
   fdp.knockoff.plus.2 = sum(beta[Knockoff.plus.2.selected] == 0) / max(1, length(Knockoff.plus.2.selected)),
-  fdp.varbvs = sum(beta[varbvs.selected] == 0) / max(1, length(varbvs.selected)),
-  power.knockoff.g = sum(beta[Knockoff.g.selected] != 0) / k,
-  power.knockoff.plus.g = sum(beta[Knockoff.plus.g.selected] != 0) / k,
-  power.knockoff.2 = sum(beta[Knockoff.2.selected] != 0) / k,
-  power.knockoff.plus.2 = sum(beta[Knockoff.plus.2.selected] != 0) / k,
-  power.varbvs = sum(beta[varbvs.selected] != 0) / k
+  fdp.varbvs.q = sum(beta[varbvs.q.selected] == 0) / max(1, length(varbvs.q.selected)),
+  fdp.varbvs.s = sum(beta[varbvs.s.selected] == 0) / max(1, length(varbvs.s.selected)),
+  fsp.varbvs.s = sum(sign(beta[varbvs.s.selected]) != sign(betahat[varbvs.s.selected]) | beta[varbvs.s.selected] == 0) / max(1, length(varbvs.s.selected)),
+  fdp.varbvsmix.q = sum(beta[varbvsmix.q.selected] == 0) / max(1, length(varbvsmix.q.selected)),
+  fdp.varbvsmix.s = sum(beta[varbvsmix.s.selected] == 0) / max(1, length(varbvsmix.s.selected)),
+  fsp.varbvsmix.s = sum(sign(beta[varbvsmix.s.selected]) != sign(betahat[varbvsmix.s.selected]) | beta[varbvsmix.s.selected] == 0) / max(1, length(varbvsmix.s.selected)),
+  tpp.BH = sum(beta[BH.selected] != 0) / k,
+  tpp.ash.q = sum(beta[ash.q.selected] != 0) / k,
+  tpp.ash.s = sum(beta[ash.s.selected] != 0) / k,
+  tsp.ash.s = sum(sign(beta[ash.s.selected]) == sign(betahat[ash.s.selected]) & beta[ash.s.selected] != 0) / k,
+  tpp.knockoff.g = sum(beta[Knockoff.g.selected] != 0) / k,
+  tpp.knockoff.plus.g = sum(beta[Knockoff.plus.g.selected] != 0) / k,
+  tpp.knockoff.2 = sum(beta[Knockoff.2.selected] != 0) / k,
+  tpp.knockoff.plus.2 = sum(beta[Knockoff.plus.2.selected] != 0) / k,
+  tpp.varbvs.q = sum(beta[varbvs.q.selected] != 0) / k,
+  tpp.varbvs.s = sum(beta[varbvs.s.selected] != 0) / k,
+  tsp.varbvs.s = sum(sign(beta[varbvs.s.selected]) == sign(betahat[varbvs.s.selected]) & beta[varbvs.s.selected] != 0) / k,
+  tpp.varbvsmix.q = sum(beta[varbvsmix.q.selected] != 0) / k,
+  tpp.varbvsmix.s = sum(beta[varbvsmix.s.selected] != 0) / k,
+  tsp.varbvsmix.s = sum(sign(beta[varbvsmix.s.selected]) == sign(betahat[varbvsmix.s.selected]) & beta[varbvsmix.s.selected] != 0) / k
 )
 }
 ```
 
 ```{r, echo = FALSE}
-result.summary <- matrix(unlist(result), m, 10, byrow = TRUE)
-boxplot(result.summary[, 1 : 5], names = c("Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "varbvs"), ylab = "FDP", las = 2)
+result.summary <- matrix(unlist(result), m, 28, byrow = TRUE)
+boxplot(result.summary[, 1 : 14], names = c("BH", "ASH.q", "ASH.s", "ASH.s.FSP", "Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "varbvs.q", "varbvs.s", "varbvs.s.FSP", "varbvsmix.q", "varbvsmix.s", "varbvsmix.s.FSP"), ylab = "FDP/FSP", las = 2)
 abline(h = q, lty = 2, col = "red")
-boxplot(result.summary[, 6 : 10], names = c("Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "varbvs"), ylab = "TDP", las = 2)
+boxplot(result.summary[, 15 : 28], names = c("BH", "ASH.q", "ASH.s", "ASH.s.TSP", "Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "varbvs.q", "varbvs.s", "varbvs.s.FSP", "varbvsmix.q", "varbvsmix.s", "varbvsmix.s.TSP"), ylab = "TDP/TSP", las = 2)
 ```
 
 ### Factor Model for $\hat\beta$
@@ -560,6 +883,26 @@ beta[nonzero] <- A
 X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n) %*% Cor.X.5
 y <- X %*% beta + rnorm(n)
 
+  # Univariate regression for BH, ASH
+  pvalue <- c()
+  betahat <- c()
+  sebetahat <- c()
+  for (j in 1 : p) {
+    fit <- lm(y ~ X[, j] - 1)
+    pvalue[j] <- summary(fit)$coefficients[4]
+    betahat[j] <- summary(fit)$coefficients[1]
+    sebetahat[j] <- summary(fit)$coefficients[2]
+  }
+
+  ## BH
+  BH.fit <- p.adjust(pvalue, method = "BH")
+  BH.selected <- (1 : p)[BH.fit <= q]
+  
+  ## ASH
+  ash.fit <- ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+  ash.q.selected <- (1 : p)[ashr::get_qvalue(ash.fit) <= q]
+  ash.s.selected <- (1 : p)[ashr::get_svalue(ash.fit) <= q]
+
   ## Knockoff
   Xk_g <- knockoff::create.gaussian(X, mu = rep(0, p), Sigma = Cov.X, method = "equi")
   Xk_2 <- knockoff::create.second_order(X, method = "equi")
@@ -575,31 +918,61 @@ y <- X %*% beta + rnorm(n)
   Knockoff.plus.2.selected <- (1 : p)[est_equi >= Knockoff.threshold.plus.2]
 
   ## varbvs
-  varbvs.fit <- varbvs::varbvs(X, NULL, y, verbose = FALSE)
+  varbvs.fit <- varbvs(X, NULL, y, verbose = FALSE)
   varbvs.lfdr <- 1 - varbvs.fit$pip
   varbvs.q <- ashr::qval.from.lfdr(varbvs.lfdr)
-  varbvs.selected <- (1 : p)[varbvs.q <= q]
+  varbvs.q.selected <- (1 : p)[varbvs.q <= q]
+  varbvs.lfsr <- varbvs.get.lfsr(varbvs.fit)
+  varbvs.s <- ashr::qval.from.lfdr(varbvs.lfsr)
+  varbvs.s.selected <- (1 : p)[varbvs.s <= q]
+  
+  ## varbvsmix
+  varbvsmix.fit <- varbvs::varbvsmix(X, NULL, y, sa = ash.fit$fitted_g$sd, verbose = FALSE)
+  varbvsmix.lfdr <- varbvsmix.fit$alpha[, 1]
+  varbvsmix.q <- ashr::qval.from.lfdr(varbvsmix.lfdr)
+  varbvsmix.q.selected <- (1 : p)[varbvsmix.q <= q]
+  varbvsmix.lfsr <- varbvsmix.fit$lfsr
+  varbvsmix.s <- ashr::qval.from.lfdr(varbvsmix.lfsr)
+  varbvsmix.s.selected <- (1 : p)[varbvsmix.s <= q]
 
 result[[i]] <- c(
+  fdp.BH = sum(beta[BH.selected] == 0) / max(1, length(BH.selected)),
+  fdp.ash.q = sum(beta[ash.q.selected] == 0) / max(1, length(ash.q.selected)),
+  fdp.ash.s = sum(beta[ash.s.selected] == 0) / max(1, length(ash.s.selected)),
+  fsp.ash.s = sum(sign(beta[ash.s.selected]) != sign(betahat[ash.s.selected]) | beta[ash.s.selected] == 0) / max(1, length(ash.s.selected)),
   fdp.knockoff.g = sum(beta[Knockoff.g.selected] == 0) / max(1, length(Knockoff.g.selected)),
   fdp.knockoff.plus.g = sum(beta[Knockoff.plus.g.selected] == 0) / max(1, length(Knockoff.plus.g.selected)),
   fdp.Knockoff.2 = sum(beta[Knockoff.2.selected] == 0) / max(1, length(Knockoff.2.selected)),
   fdp.knockoff.plus.2 = sum(beta[Knockoff.plus.2.selected] == 0) / max(1, length(Knockoff.plus.2.selected)),
-  fdp.varbvs = sum(beta[varbvs.selected] == 0) / max(1, length(varbvs.selected)),
-  power.knockoff.g = sum(beta[Knockoff.g.selected] != 0) / k,
-  power.knockoff.plus.g = sum(beta[Knockoff.plus.g.selected] != 0) / k,
-  power.knockoff.2 = sum(beta[Knockoff.2.selected] != 0) / k,
-  power.knockoff.plus.2 = sum(beta[Knockoff.plus.2.selected] != 0) / k,
-  power.varbvs = sum(beta[varbvs.selected] != 0) / k
+  fdp.varbvs.q = sum(beta[varbvs.q.selected] == 0) / max(1, length(varbvs.q.selected)),
+  fdp.varbvs.s = sum(beta[varbvs.s.selected] == 0) / max(1, length(varbvs.s.selected)),
+  fsp.varbvs.s = sum(sign(beta[varbvs.s.selected]) != sign(betahat[varbvs.s.selected]) | beta[varbvs.s.selected] == 0) / max(1, length(varbvs.s.selected)),
+  fdp.varbvsmix.q = sum(beta[varbvsmix.q.selected] == 0) / max(1, length(varbvsmix.q.selected)),
+  fdp.varbvsmix.s = sum(beta[varbvsmix.s.selected] == 0) / max(1, length(varbvsmix.s.selected)),
+  fsp.varbvsmix.s = sum(sign(beta[varbvsmix.s.selected]) != sign(betahat[varbvsmix.s.selected]) | beta[varbvsmix.s.selected] == 0) / max(1, length(varbvsmix.s.selected)),
+  tpp.BH = sum(beta[BH.selected] != 0) / k,
+  tpp.ash.q = sum(beta[ash.q.selected] != 0) / k,
+  tpp.ash.s = sum(beta[ash.s.selected] != 0) / k,
+  tsp.ash.s = sum(sign(beta[ash.s.selected]) == sign(betahat[ash.s.selected]) & beta[ash.s.selected] != 0) / k,
+  tpp.knockoff.g = sum(beta[Knockoff.g.selected] != 0) / k,
+  tpp.knockoff.plus.g = sum(beta[Knockoff.plus.g.selected] != 0) / k,
+  tpp.knockoff.2 = sum(beta[Knockoff.2.selected] != 0) / k,
+  tpp.knockoff.plus.2 = sum(beta[Knockoff.plus.2.selected] != 0) / k,
+  tpp.varbvs.q = sum(beta[varbvs.q.selected] != 0) / k,
+  tpp.varbvs.s = sum(beta[varbvs.s.selected] != 0) / k,
+  tsp.varbvs.s = sum(sign(beta[varbvs.s.selected]) == sign(betahat[varbvs.s.selected]) & beta[varbvs.s.selected] != 0) / k,
+  tpp.varbvsmix.q = sum(beta[varbvsmix.q.selected] != 0) / k,
+  tpp.varbvsmix.s = sum(beta[varbvsmix.s.selected] != 0) / k,
+  tsp.varbvsmix.s = sum(sign(beta[varbvsmix.s.selected]) == sign(betahat[varbvsmix.s.selected]) & beta[varbvsmix.s.selected] != 0) / k
 )
 }
 ```
 
 ```{r, echo = FALSE}
-result.summary <- matrix(unlist(result), m, 10, byrow = TRUE)
-boxplot(result.summary[, 1 : 5], names = c("Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "varbvs"), ylab = "FDP", las = 2)
+result.summary <- matrix(unlist(result), m, 28, byrow = TRUE)
+boxplot(result.summary[, 1 : 14], names = c("BH", "ASH.q", "ASH.s", "ASH.s.FSP", "Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "varbvs.q", "varbvs.s", "varbvs.s.FSP", "varbvsmix.q", "varbvsmix.s", "varbvsmix.s.FSP"), ylab = "FDP/FSP", las = 2)
 abline(h = q, lty = 2, col = "red")
-boxplot(result.summary[, 6 : 10], names = c("Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "varbvs"), ylab = "TDP", las = 2)
+boxplot(result.summary[, 15 : 28], names = c("BH", "ASH.q", "ASH.s", "ASH.s.TSP", "Knockoff.G", "Knockoff+.G", "Knockoff.E", "Knockoff+.E", "varbvs.q", "varbvs.s", "varbvs.s.FSP", "varbvsmix.q", "varbvsmix.s", "varbvsmix.s.TSP"), ylab = "TDP/TSP", las = 2)
 ```
 
 ## Session information
