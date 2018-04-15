@@ -38,26 +38,28 @@ library(ashr)
 library(plyr)
 library(ggplot2)
 library(reshape2)
+set.seed(777)
 ```
 
 ## Simulated Data
 
 ```{r, cache = TRUE}
-d <- 5
+d <- 10
 n <- 1e4
 B <- matrix(rnorm(n * d), n, d)
 Sigma <- B %*% t(B) + diag(n)
 sigma <- diag(Sigma)
 Rho <- cov2cor(Sigma)
-qplot(Rho[lower.tri(Rho)], geom = "histogram", xlab = expression(rho[ij]))
+par(mar = c(5.1, 4.1, 1, 2.1))
+hist(Rho[lower.tri(Rho)], xlab = expression(rho[ij]), main = "")
 rhobar <- c()
 for (l in 1 : 10) {
   rhobar[l] <- (sum(Rho^l) - n) / (n * (n - 1))
 }
-nsim <- 1e4
 ```
 
 ```{r, cache = TRUE, warnings = FALSE, message = FALSE}
+nsim <- 1e4
 Z.list <- W <- list()
 for (i in 1 : nsim) {
 z <- rnorm(d)
@@ -90,16 +92,17 @@ lcpm = function (r) {
 ```{r}
 nsamp <- 5
 ngene <- n
-nsim <- 1e4
 ```
 
 ```{r, cache = TRUE}
 Y = lcpm(r)
 subset = top_genes_index(ngene, Y)
 r = r[subset,]
+```
 
+```{r, cache = TRUE}
+nsim <- 1e4
 Z.list <- W <- list()
-
 for (i in 1 : nsim) {
   ## generate data
   counts <- r[, sample(ncol(r), 2 * nsamp)]
@@ -117,7 +120,7 @@ W.sim <- W
 ## BH
 
 ```{r, cache = TRUE}
-p <- apply(Z.sim, function(x) {pnorm(-abs(x)) * 2})
+p <- lapply(Z.sim, function(x) {pnorm(-abs(x)) * 2})
 q <- lapply(p, p.adjust, method = "BH")
 q.cutoff <- seq(0.01, 0.99, by = 0.01)
 fd <- list()
@@ -125,8 +128,10 @@ for (i in seq(q.cutoff)) {
   fd[[i]] <- lapply(q, function(x) {sum(x <= q.cutoff[i])})
 }
 fdp <- lapply(fd, function(x) {mean(x != 0)})
-plot(q.cutoff, fdp)
-abline(0, 1)
+plot(q.cutoff, fdp, xlab = "Nominal FDR", ylab = "FDP",
+     xlim = range(q.cutoff, fdp), ylim = range(q.cutoff, fdp),
+     type = "l")
+abline(0, 1, col = "red", lty = 3)
 
 p <- lapply(Z.gtex, function(x) {pnorm(-abs(x)) * 2})
 q <- lapply(p, p.adjust, method = "BH")
@@ -136,12 +141,16 @@ for (i in seq(q.cutoff)) {
   fd[[i]] <- lapply(q, function(x) {sum(x <= q.cutoff[i])})
 }
 fdp <- lapply(fd, function(x) {mean(x != 0)})
-plot(q.cutoff, fdp)
-abline(0, 1)
+plot(q.cutoff, fdp, xlab = "Nominal FDR", ylab = "FDP",
+     xlim = range(q.cutoff, fdp), ylim = range(q.cutoff, fdp),
+     type = "l")
+abline(0, 1, col = "red", lty = 3)
+```
 
+```{r, cache = TRUE}
 theta <- list()
 for (j in 1 : 1e4) {
-  theta[[j]] <- sample(c(rep(0, 9.9e3), rep(1, 1e2)))
+  theta[[j]] <- sample(c(rep(0, 9.5e3), rep(3, 0.5e3)))
 }
 X.gtex <- list()
 for (j in 1 : 1e4) {
