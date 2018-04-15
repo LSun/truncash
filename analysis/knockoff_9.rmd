@@ -4,7 +4,7 @@ author: "Lei Sun"
 date: 2018-04-03
 output:
   html_document:
-    code-folding: hide
+    code_folding: hide
 ---
 
 <!-- The file analysis/chunks.R contains chunks that define default settings
