@@ -195,9 +195,9 @@ $X_{n \times p}$ has correlation $\Sigma_{ij} = \rho^{|i - j|}$. Each row is ind
 
 ```{r, cache = TRUE, echo = FALSE}
 rho <- 0.5
-Sigma <- toeplitz(rho^(0 : (p - 1)))
-Sigma.5 <- chol(Sigma)
-Cov.X <- Sigma / n
+Cor.X <- toeplitz(rho^(0 : (p - 1)))
+Cor.X.5 <- chol(Cor.X)
+Cov.X <- Cor.X / n
 ```
 
 ```{r, echo = FALSE, cache = TRUE, message = FALSE, warning = FALSE}
@@ -208,8 +208,7 @@ beta <- rep(0, p)
 nonzero <- sample(p, k)
 beta[nonzero] <- rnorm(k, 0, A)
 
-X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n, p)
-X <- X %*% Sigma.5
+X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n, p) %*% Cor.X.5
 y <- X %*% beta + rnorm(n)
 
   ## Least squares
@@ -317,8 +316,7 @@ beta <- rep(0, p)
 nonzero <- sample(p, k)
 beta[nonzero] <- rnorm(k, 0, A)
 
-X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n, p)
-X <- X %*% Sigma.5
+X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n, p) %*% Cor.X.5
 y <- X %*% beta + rnorm(n)
 
   ## Least squares
@@ -426,8 +424,7 @@ beta <- rep(0, p)
 nonzero <- sample(p, k)
 beta[nonzero] <- rnorm(k, 0, A)
 
-X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n, p)
-X <- X %*% Sigma.5
+X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n, p) %*% Cor.X.5
 y <- X %*% beta + rnorm(n)
 
   ## Least squares
@@ -536,12 +533,13 @@ q <- 0.1
 
 ### Independent design
 
+```{r}
+Cov.X <- diag(1 / n, p)
+```
+
 ```{r, echo = FALSE, cache = TRUE, message = FALSE}
 A <- 5
-
-Cov.X <- diag(1 / n, p)
 result <- list()
-
 for (i in 1 : m) {
   X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n, p)
 
@@ -654,9 +652,7 @@ Cov.X <- Cor.X / n
 
 ```{r, echo = FALSE, cache = TRUE, message = FALSE}
 A <- 5
-
 result <- list()
-
 for (i in 1 : m) {
 beta <- rep(0, p)
 nonzero <- sample(p, k)
@@ -769,9 +765,7 @@ Cov.X <- Cor.X / n
 
 ```{r, echo = FALSE, cache = TRUE, message = FALSE}
 A <- 7
-
 result <- list()
-
 for (i in 1 : m) {
 beta <- rep(0, p)
 nonzero <- sample(p, k)
@@ -884,9 +878,7 @@ Cov.X <- Cor.X / n
 
 ```{r, echo = FALSE, cache = TRUE, message = FALSE}
 A <- 7
-
 result <- list()
-
 for (i in 1 : m) {
 beta <- rep(0, p)
 nonzero <- sample(p, k)

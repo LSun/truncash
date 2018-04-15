@@ -84,12 +84,13 @@ q <- 0.1
 
 $X_{n \times p}$ has independent columns simulated from $N(0, (1/\sqrt n)^2)$ so they are roughly normalized.
 
+```{r}
+Cov.X <- diag(1 / n, p)
+```
+
 ```{r, echo = FALSE, cache = TRUE, message = FALSE}
 A <- 5
-
-Cov.X <- diag(1 / n, p)
 result <- list()
-
 for (i in 1 : m) {
   X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n, p)
 
@@ -193,20 +194,19 @@ $X_{n \times p}$ has correlation $\Sigma_{ij} = \rho^{|i - j|}$. Each row is ind
 ```{r, echo = FALSE, cache = TRUE}
 rho <- 0.5
 Cor.X <- toeplitz(rho^{0 : (p - 1)})
+Cor.X.5 <- chol(Cor.X)
 Cov.X <- Cor.X / n
 ```
 
 ```{r, echo = FALSE, cache = TRUE, message = FALSE}
 A <- 6
-
 result <- list()
-
 for (i in 1 : m) {
 beta <- rep(0, p)
 nonzero <- sample(p, k)
 beta[nonzero] <- A
 
-X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n) %*% chol(Cor.X)
+X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n) %*% Cor.X.5
 y <- X %*% beta + rnorm(n)
 
   ## Least squares
@@ -302,16 +302,15 @@ boxplot(result.summary[, 15 : 28], names = c("BH", "ASH.q", "ASH.s", "ASH.s.TSP"
 d <- 5
 B <- matrix(rnorm(p * d), p, d)
 Cor.X <- cov2cor(tcrossprod(B) + diag(p))
+Cor.X.5 <- chol(Cor.X)
 Cov.X <- Cor.X / n
 ```
 
 ```{r, echo = FALSE, cache = TRUE, message = FALSE}
 A <- 12
-
 result <- list()
-
 for (i in 1 : m) {
-  X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n, p)
+  X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n, p) %*% Cor.X.5
 
   beta <- rep(0, p)
   nonzero <- sample(p, k)
@@ -412,17 +411,15 @@ boxplot(result.summary[, 15 : 28], names = c("BH", "ASH.q", "ASH.s", "ASH.s.TSP"
 d <- 5
 B <- matrix(rnorm(p * d), p, d)
 Cor.X <- signif(cov2cor(solve(tcrossprod(B) + diag(p))), digits = 6)
-Cov.X <- Cor.X / n
 Cor.X.5 <- chol(Cor.X)
+Cov.X <- Cor.X / n
 ```
 
 ```{r, echo = FALSE, cache = TRUE, message = FALSE}
 A <- 12
-
 result <- list()
-
 for (i in 1 : m) {
-  X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n, p)
+  X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n, p) %*% Cor.X.5
 
   beta <- rep(0, p)
   nonzero <- sample(p, k)
@@ -529,12 +526,13 @@ q <- 0.1
 
 ### Independent design
 
+```{r}
+Cov.X <- diag(1 / n, p)
+```
+
 ```{r, echo = FALSE, cache = TRUE, message = FALSE}
 A <- 5
-
-Cov.X <- diag(1 / n, p)
 result <- list()
-
 for (i in 1 : m) {
   X <- matrix(rnorm(n * p, 0, sqrt(1 / n)), n, p)
 
@@ -641,15 +639,13 @@ boxplot(result.summary[, 15 : 28], names = c("BH", "ASH.q", "ASH.s", "ASH.s.TSP"
 ```{r, echo = FALSE, cache = TRUE}
 rho <- 0.5
 Cor.X <- toeplitz(rho^{0 : (p - 1)})
-Cov.X <- Cor.X / n
 Cor.X.5 <- chol(Cor.X)
+Cov.X <- Cor.X / n
 ```
 
 ```{r, echo = FALSE, cache = TRUE, message = FALSE}
 A <- 6
-
 result <- list()
-
 for (i in 1 : m) {
 beta <- rep(0, p)
 nonzero <- sample(p, k)
@@ -756,15 +752,13 @@ boxplot(result.summary[, 15 : 28], names = c("BH", "ASH.q", "ASH.s", "ASH.s.TSP"
 d <- 5
 B <- matrix(rnorm(p * d), p, d)
 Cor.X <- cov2cor(tcrossprod(B) + diag(p))
-Cov.X <- Cor.X / n
 Cor.X.5 <- chol(Cor.X)
+Cov.X <- Cor.X / n
 ```
 
 ```{r, echo = FALSE, cache = TRUE, message = FALSE}
 A <- 12
-
 result <- list()
-
 for (i in 1 : m) {
 beta <- rep(0, p)
 nonzero <- sample(p, k)
@@ -871,15 +865,13 @@ boxplot(result.summary[, 15 : 28], names = c("BH", "ASH.q", "ASH.s", "ASH.s.TSP"
 d <- 5
 B <- matrix(rnorm(p * d), p, d)
 Cor.X <- signif(cov2cor(solve(tcrossprod(B) + diag(p))), digits = 6)
-Cov.X <- Cor.X / n
 Cor.X.5 <- chol(Cor.X)
+Cov.X <- Cor.X / n
 ```
 
 ```{r, echo = FALSE, cache = TRUE, message = FALSE}
 A <- 12
-
 result <- list()
-
 for (i in 1 : m) {
 beta <- rep(0, p)
 nonzero <- sample(p, k)
