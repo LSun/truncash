@@ -28,7 +28,7 @@ knitr::read_chunk("chunks.R")
 
 <!-- Add your analysis here -->
 
-```{r, cache = TRUE, message = FALSE}
+```{r, message = FALSE}
 source("../code/gdash_lik.R")
 source("../code/gdfit.R")
 source("../code/count_to_summary.R")
@@ -51,12 +51,12 @@ B <- matrix(rnorm(n * d), n, d)
 Sigma <- B %*% t(B) + diag(n)
 sigma <- diag(Sigma)
 Rho <- cov2cor(Sigma)
-qplot(Rho[lower.tri(Rho)], geom = "histogram", xlab = expression(rho[ij]))
+par(mar = c(5.1, 4.1, 1, 2.1))
+hist(Rho[lower.tri(Rho)], xlab = expression(rho[ij]), main = "")
 rhobar <- c()
 for (l in 1 : 10) {
   rhobar[l] <- (sum(Rho^l) - n) / (n * (n - 1))
 }
-nsim <- 1e5
 ```
 
 ```{r, cache = TRUE, eval = FALSE}
@@ -88,7 +88,8 @@ abline(h = -log(0.001), col = "green")
 abline(h = -log(0.05), col = "blue")
 ```
 
-```{r, cache = TRUE, warnings = FALSE, message = FALSE}
+```{r, cache = TRUE, message = FALSE}
+nsim <- 1e4
 Z.list <- W <- list()
 for (i in 1 : nsim) {
 z <- rnorm(d)
@@ -98,7 +99,8 @@ Z.list[[i]] <- Z
 Z.GD <- gdfit.mom(Z, 100)
 W[[i]] <- Z.GD$w
 }
-W <- plyr::ldply(W, rbind)
+Z.sim <- Z.list
+W.sim <- W
 ```
 
 ## Real Data from GTEx
@@ -119,17 +121,18 @@ lcpm = function (r) {
 
 ```{r}
 nsamp <- 5
-ngene <- 1e5
-nsim <- 1e5
+ngene <- 1e4
 ```
 
 ```{r, cache = TRUE}
 Y = lcpm(r)
 subset = top_genes_index(ngene, Y)
 r = r[subset,]
+```
 
+```{r, cache = TRUE, message = FALSE}
+nsim <- 1e4
 Z.list <- W <- list()
-
 for (i in 1 : nsim) {
   ## generate data
   counts <- r[, sample(ncol(r), 2 * nsamp)]
@@ -140,7 +143,16 @@ for (i in 1 : nsim) {
   Z.GD <- gdfit.mom(Z, 100)
   W[[i]] <- Z.GD$w
 }
-W <- plyr::ldply(W, rbind)
+```
+
+```{r}
+Z.gtex <- Z.list
+W.gtex <- W
+```
+
+```{r, cache = TRUE}
+quantile.vec <- seq(5e-5, 1 - 5e-5, by = 5e-5)
+emp.cdf.Z <- sapply(quantile.vec, function(x) {sapply(Z.gtex, function(y) mean(y <= qnorm(x)))})
 ```
 
 ## Session information
