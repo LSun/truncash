@@ -151,8 +151,12 @@ W.gtex <- W
 ```
 
 ```{r, cache = TRUE}
-quantile.vec <- seq(5e-5, 1 - 5e-5, by = 5e-5)
-emp.cdf.Z <- sapply(quantile.vec, function(x) {sapply(Z.gtex, function(y) mean(y <= qnorm(x)))})
+quantile.vec1 <- c(exp(seq(-30, -5, by = 0.01)), seq(0.007, 0.993, by = 0.001))
+emp.cdf.Z1 <- sapply(quantile.vec, function(x) {sapply(Z.gtex, function(y) mean(y <= qnorm(x)))})
+quantile.vec2 <- c(exp(seq(-5, -30, by = 0.01)))
+emp.cdf.Z2 <- sapply(quantile.vec, function(x) {sapply(Z.gtex, function(y) mean(y <= -qnorm(x)))})
+quantile.vec <- c(quantile.vec1, quantile.vec2)
+emp.cdf.Z <- cbind(emp.cdf.Z1, emp.cdf.Z2)
 ```
 
 ## Session information
