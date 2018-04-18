@@ -332,10 +332,10 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2018-04-15</p>
+<p><strong>Last updated:</strong> 2018-04-18</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 3b5dcc4</p>
+<p><strong>Code version:</strong> b82e2bc</p>
 <!-- Add your analysis here -->
 <pre class="r"><code>source(&quot;../code/gdash_lik.R&quot;)
 source(&quot;../code/gdfit.R&quot;)
@@ -351,31 +351,36 @@ library(reshape2)</code></pre>
 </div>
 <div id="simulated-data" class="section level2">
 <h2>Simulated Data</h2>
-<pre class="r"><code>d &lt;- 10
+<pre class="r"><code>set.seed(777)
+d &lt;- 10
 n &lt;- 1e4
 B &lt;- matrix(rnorm(n * d), n, d)
 Sigma &lt;- B %*% t(B) + diag(n)
 sigma &lt;- diag(Sigma)
 Rho &lt;- cov2cor(Sigma)
-par(mar = c(5.1, 4.1, 1, 2.1))
-hist(Rho[lower.tri(Rho)], xlab = expression(rho[ij]), main = &quot;&quot;)</code></pre>
-<p><img src="figure/gd_w.rmd/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>rhobar &lt;- c()
+rhobar &lt;- c()
 for (l in 1 : 10) {
   rhobar[l] &lt;- (sum(Rho^l) - n) / (n * (n - 1))
 }</code></pre>
+<pre class="r"><code>par(mar = c(5.1, 4.1, 1, 2.1))
+hist(Rho[lower.tri(Rho)], xlab = expression(rho[ij]), main = &quot;&quot;)</code></pre>
+<p><img src="figure/gd_w.rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>set.seed(20)
 z &lt;- rnorm(d)
 Z &lt;- B %*% z + rnorm(n)
 Z &lt;- Z / sqrt(sigma)
-sd(Z)
-hist(Z, breaks = 20, prob = TRUE)
-lines(seq(-5, 5, by = 0.1), dnorm(seq(-5, 5, by = 0.1)), col = &quot;blue&quot;)
-p &lt;- pnorm(-abs(Z)) * 2
+cat(&quot;sd(Z) =&quot;, sd(Z))</code></pre>
+<pre><code>sd(Z) = 1.262205</code></pre>
+<pre class="r"><code>hist(Z, breaks = 20, prob = TRUE, ylim = c(0, dnorm(0)))
+lines(seq(-5, 5, by = 0.1), dnorm(seq(-5, 5, by = 0.1)), col = &quot;blue&quot;)</code></pre>
+<p><img src="figure/gd_w.rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>p &lt;- pnorm(-abs(Z)) * 2
 
 par(mfcol = c(2, 2))
+par(mar = c(5.1, 4.1, 3, 2.1))
+hist(p, breaks = 100, main = &quot;Correlated&quot;, xlab = &quot;p-value&quot;)
+
 par(mar = c(5.1, 4.1, 1, 2.1))
-hist(p, breaks = 100, main = &quot;&quot;, xlab = &quot;p-value&quot;)
 plot(-log(p), ylim = range(-log(p), -log(pnorm(-sqrt(2 * log(n))) * 2), -log(0.05 / n)))
 abline(h = -log(pnorm(-sqrt(2 * log(n))) * 2), col = &quot;maroon&quot;)
 abline(h = -log(0.05 / n), col = &quot;red&quot;)
@@ -384,13 +389,18 @@ abline(h = -log(0.05), col = &quot;blue&quot;)
 
 Z &lt;- rnorm(n)
 p &lt;- pnorm(-abs(Z)) * 2
-hist(p, breaks = 100, main = &quot;&quot;, xlab = &quot;p-value&quot;)
+par(mar = c(5.1, 4.1, 3, 2.1))
+hist(p, breaks = 100, main = &quot;Independent&quot;, xlab = &quot;p-value&quot;)
+
+par(mar = c(5.1, 4.1, 1, 2.1))
 plot(-log(p), ylim = range(-log(p), -log(pnorm(-sqrt(2 * log(n))) * 2), -log(0.05 / n)))
 abline(h = -log(pnorm(-sqrt(2 * log(n))) * 2), col = &quot;maroon&quot;)
 abline(h = -log(0.05 / n), col = &quot;red&quot;)
 abline(h = -log(0.001), col = &quot;green&quot;)
 abline(h = -log(0.05), col = &quot;blue&quot;)</code></pre>
-<pre class="r"><code>nsim &lt;- 1e4
+<p><img src="figure/gd_w.rmd/unnamed-chunk-4-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>set.seed(777)
+nsim &lt;- 1e4
 Z.list &lt;- W &lt;- list()
 for (i in 1 : nsim) {
 z &lt;- rnorm(d)
@@ -418,7 +428,8 @@ ngene &lt;- 1e4</code></pre>
 <pre class="r"><code>Y = lcpm(r)
 subset = top_genes_index(ngene, Y)
 r = r[subset,]</code></pre>
-<pre class="r"><code>nsim &lt;- 1e4
+<pre class="r"><code>set.seed(7)
+nsim &lt;- 1e4
 Z.list &lt;- W &lt;- list()
 for (i in 1 : nsim) {
   ## generate data
@@ -429,11 +440,62 @@ for (i in 1 : nsim) {
   Z.list[[i]] &lt;- Z
   Z.GD &lt;- gdfit.mom(Z, 100)
   W[[i]] &lt;- Z.GD$w
-}</code></pre>
-<pre class="r"><code>Z.gtex &lt;- Z.list
+}
+Z.gtex &lt;- Z.list
 W.gtex &lt;- W</code></pre>
-<pre class="r"><code>quantile.vec &lt;- seq(5e-5, 1 - 5e-5, by = 5e-5)
-emp.cdf.Z &lt;- sapply(quantile.vec, function(x) {sapply(Z.gtex, function(y) mean(y &lt;= qnorm(x)))})</code></pre>
+<pre class="r"><code>quantile.vec1 &lt;- exp(seq(-21, -5, by = 0.01))
+quantile.vec2 &lt;- seq(0.007, 0.993, by = 0.001)
+quantile.vec3 &lt;- exp(seq(-5, -21, by = -0.01))
+emp.cdf.Z1 &lt;- sapply(quantile.vec1, function(x) {sapply(Z.gtex, function(y) mean(y &lt;= qnorm(x)))})
+emp.cdf.Z2 &lt;- sapply(quantile.vec2, function(x) {sapply(Z.gtex, function(y) mean(y &lt;= qnorm(x)))})
+emp.cdf.Z3 &lt;- sapply(quantile.vec3, function(x) {sapply(Z.gtex, function(y) mean(y &lt;= -qnorm(x)))})
+emp.cdf.Z4 &lt;- sapply(quantile.vec3, function(x) {sapply(Z.gtex, function(y) mean(y &gt; -qnorm(x)))})</code></pre>
+<pre class="r"><code>ecdf.avg1 &lt;- colMeans(emp.cdf.Z1)
+ecdf.avg2 &lt;- colMeans(emp.cdf.Z2)
+ecdf.avg3 &lt;- colMeans(emp.cdf.Z3)
+ecdf.avg4 &lt;- colMeans(emp.cdf.Z4)
+ecdf.avg &lt;- c(ecdf.avg1, ecdf.avg2, ecdf.avg3)
+ecdf.tail.avg.conf.int1 &lt;- apply(emp.cdf.Z1, 2, function(x) {t.test(x)$conf.int})
+ecdf.tail.avg.conf.int4 &lt;- apply(emp.cdf.Z4, 2, function(x) {t.test(x)$conf.int})</code></pre>
+<pre class="r"><code>plot(c(qnorm(quantile.vec1), qnorm(quantile.vec2), -qnorm(quantile.vec3)), ecdf.avg, type = &quot;l&quot;, col = &quot;red&quot;, xlab = &quot;z&quot;, ylab = &quot;Cumulative Distribution Function (CDF)&quot;)
+lines(c(qnorm(quantile.vec1), qnorm(quantile.vec2), -qnorm(quantile.vec3)), c(quantile.vec1, quantile.vec2, pnorm(-qnorm(quantile.vec3))), lty = 2)
+legend(&quot;bottomright&quot;, lty = c(1, 2), col = c(1, 2), legend = c(expression(bar(&quot;F&quot;)(z)), expression(Phi(z))))</code></pre>
+<p><img src="figure/gd_w.rmd/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>plot(qnorm(quantile.vec1), log(ecdf.avg1), type = &quot;l&quot;,
+     ylim = range(log(quantile.vec1), log(ecdf.avg1)),
+     xlab = &quot;z&quot;, ylab = &quot;log (CDF)&quot;)
+lines(qnorm(quantile.vec1), log(quantile.vec1), lty = 2, col = &quot;red&quot;)
+lines(qnorm(quantile.vec1), log(pnorm(qnorm(quantile.vec1), 0, 1.1)), lty = 2, col = &quot;green&quot;)
+lines(qnorm(quantile.vec1), log(pnorm(qnorm(quantile.vec1), 0, 1.05)), lty = 2, col = &quot;blue&quot;)
+polygon(x = c(qnorm(quantile.vec1), rev(qnorm(quantile.vec1))),
+        y = c(log(ecdf.tail.avg.conf.int1[1, ]), rev(log(ecdf.tail.avg.conf.int1[2, ]))),
+        border = NA,
+        col = grDevices::adjustcolor(&quot;grey75&quot;, alpha.f = 0.5))</code></pre>
+<pre><code>Warning in log(ecdf.tail.avg.conf.int1[1, ]): NaNs produced</code></pre>
+<pre class="r"><code>legend(&quot;bottomright&quot;, lty = c(1, 2, 2, 2), col = c(1, 2, 4, 3), legend = c(
+  expression(log(bar(&quot;F&quot;)(z))),
+  expression(log(Phi(z))),
+  expression(log(Phi(z / 1.05))),
+  expression(log(Phi(z / 1.1)))
+))</code></pre>
+<p><img src="figure/gd_w.rmd/unnamed-chunk-13-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>plot(-qnorm(quantile.vec3), log(ecdf.avg4), type = &quot;l&quot;,
+     ylim = range(log(quantile.vec3), log(ecdf.avg4)),
+     xlab = &quot;z&quot;, ylab = &quot;log (1 - CDF)&quot;)
+lines(-qnorm(quantile.vec3), log(quantile.vec3), lty = 2, col = &quot;red&quot;)
+lines(-qnorm(quantile.vec3), log(pnorm(qnorm(quantile.vec3), 0, 1.1)), lty = 2, col = &quot;green&quot;)
+lines(-qnorm(quantile.vec3), log(pnorm(qnorm(quantile.vec3), 0, 1.05)), lty = 2, col = &quot;blue&quot;)
+polygon(x = c(-qnorm(quantile.vec3), rev(-qnorm(quantile.vec3))),
+        y = c(log(ecdf.tail.avg.conf.int4[1, ]), rev(log(ecdf.tail.avg.conf.int4[2, ]))),
+        border = NA,
+        col = grDevices::adjustcolor(&quot;grey75&quot;, alpha.f = 0.5))
+legend(&quot;bottomleft&quot;, lty = c(1, 2, 2, 2), col = c(1, 2, 4, 3), legend = c(
+  expression(log(1 - bar(&quot;F&quot;)(z))),
+  expression(log(1 - Phi(z))),
+  expression(log(1 - Phi(z / 1.05))),
+  expression(log(1 - Phi(z / 1.1)))
+))</code></pre>
+<p><img src="figure/gd_w.rmd/unnamed-chunk-13-3.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="session-information" class="section level2">
 <h2>Session information</h2>
