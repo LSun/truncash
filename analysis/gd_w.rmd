@@ -45,33 +45,40 @@ library(reshape2)
 ## Simulated Data
 
 ```{r, cache = TRUE}
+set.seed(777)
 d <- 10
 n <- 1e4
 B <- matrix(rnorm(n * d), n, d)
 Sigma <- B %*% t(B) + diag(n)
 sigma <- diag(Sigma)
 Rho <- cov2cor(Sigma)
-par(mar = c(5.1, 4.1, 1, 2.1))
-hist(Rho[lower.tri(Rho)], xlab = expression(rho[ij]), main = "")
 rhobar <- c()
 for (l in 1 : 10) {
   rhobar[l] <- (sum(Rho^l) - n) / (n * (n - 1))
 }
 ```
 
-```{r, cache = TRUE, eval = FALSE}
+```{r}
+par(mar = c(5.1, 4.1, 1, 2.1))
+hist(Rho[lower.tri(Rho)], xlab = expression(rho[ij]), main = "")
+```
+
+```{r}
 set.seed(20)
 z <- rnorm(d)
 Z <- B %*% z + rnorm(n)
 Z <- Z / sqrt(sigma)
-sd(Z)
-hist(Z, breaks = 20, prob = TRUE)
+cat("sd(Z) =", sd(Z))
+hist(Z, breaks = 20, prob = TRUE, ylim = c(0, dnorm(0)))
 lines(seq(-5, 5, by = 0.1), dnorm(seq(-5, 5, by = 0.1)), col = "blue")
+
 p <- pnorm(-abs(Z)) * 2
 
 par(mfcol = c(2, 2))
+par(mar = c(5.1, 4.1, 3, 2.1))
+hist(p, breaks = 100, main = "Correlated", xlab = "p-value")
+
 par(mar = c(5.1, 4.1, 1, 2.1))
-hist(p, breaks = 100, main = "", xlab = "p-value")
 plot(-log(p), ylim = range(-log(p), -log(pnorm(-sqrt(2 * log(n))) * 2), -log(0.05 / n)))
 abline(h = -log(pnorm(-sqrt(2 * log(n))) * 2), col = "maroon")
 abline(h = -log(0.05 / n), col = "red")
@@ -80,7 +87,10 @@ abline(h = -log(0.05), col = "blue")
 
 Z <- rnorm(n)
 p <- pnorm(-abs(Z)) * 2
-hist(p, breaks = 100, main = "", xlab = "p-value")
+par(mar = c(5.1, 4.1, 3, 2.1))
+hist(p, breaks = 100, main = "Independent", xlab = "p-value")
+
+par(mar = c(5.1, 4.1, 1, 2.1))
 plot(-log(p), ylim = range(-log(p), -log(pnorm(-sqrt(2 * log(n))) * 2), -log(0.05 / n)))
 abline(h = -log(pnorm(-sqrt(2 * log(n))) * 2), col = "maroon")
 abline(h = -log(0.05 / n), col = "red")
@@ -89,6 +99,7 @@ abline(h = -log(0.05), col = "blue")
 ```
 
 ```{r, cache = TRUE, message = FALSE}
+set.seed(777)
 nsim <- 1e4
 Z.list <- W <- list()
 for (i in 1 : nsim) {
@@ -131,6 +142,7 @@ r = r[subset,]
 ```
 
 ```{r, cache = TRUE, message = FALSE}
+set.seed(7)
 nsim <- 1e4
 Z.list <- W <- list()
 for (i in 1 : nsim) {
@@ -143,20 +155,68 @@ for (i in 1 : nsim) {
   Z.GD <- gdfit.mom(Z, 100)
   W[[i]] <- Z.GD$w
 }
-```
-
-```{r}
 Z.gtex <- Z.list
 W.gtex <- W
 ```
 
 ```{r, cache = TRUE}
-quantile.vec1 <- c(exp(seq(-30, -5, by = 0.01)), seq(0.007, 0.993, by = 0.001))
-emp.cdf.Z1 <- sapply(quantile.vec, function(x) {sapply(Z.gtex, function(y) mean(y <= qnorm(x)))})
-quantile.vec2 <- c(exp(seq(-5, -30, by = 0.01)))
-emp.cdf.Z2 <- sapply(quantile.vec, function(x) {sapply(Z.gtex, function(y) mean(y <= -qnorm(x)))})
-quantile.vec <- c(quantile.vec1, quantile.vec2)
-emp.cdf.Z <- cbind(emp.cdf.Z1, emp.cdf.Z2)
+quantile.vec1 <- exp(seq(-21, -5, by = 0.01))
+quantile.vec2 <- seq(0.007, 0.993, by = 0.001)
+quantile.vec3 <- exp(seq(-5, -21, by = -0.01))
+emp.cdf.Z1 <- sapply(quantile.vec1, function(x) {sapply(Z.gtex, function(y) mean(y <= qnorm(x)))})
+emp.cdf.Z2 <- sapply(quantile.vec2, function(x) {sapply(Z.gtex, function(y) mean(y <= qnorm(x)))})
+emp.cdf.Z3 <- sapply(quantile.vec3, function(x) {sapply(Z.gtex, function(y) mean(y <= -qnorm(x)))})
+emp.cdf.Z4 <- sapply(quantile.vec3, function(x) {sapply(Z.gtex, function(y) mean(y > -qnorm(x)))})
+```
+
+```{r}
+ecdf.avg1 <- colMeans(emp.cdf.Z1)
+ecdf.avg2 <- colMeans(emp.cdf.Z2)
+ecdf.avg3 <- colMeans(emp.cdf.Z3)
+ecdf.avg4 <- colMeans(emp.cdf.Z4)
+ecdf.avg <- c(ecdf.avg1, ecdf.avg2, ecdf.avg3)
+ecdf.tail.avg.conf.int1 <- apply(emp.cdf.Z1, 2, function(x) {t.test(x)$conf.int})
+ecdf.tail.avg.conf.int4 <- apply(emp.cdf.Z4, 2, function(x) {t.test(x)$conf.int})
+```
+
+```{r}
+plot(c(qnorm(quantile.vec1), qnorm(quantile.vec2), -qnorm(quantile.vec3)), ecdf.avg, type = "l", col = "red", xlab = "z", ylab = "Cumulative Distribution Function (CDF)")
+lines(c(qnorm(quantile.vec1), qnorm(quantile.vec2), -qnorm(quantile.vec3)), c(quantile.vec1, quantile.vec2, pnorm(-qnorm(quantile.vec3))), lty = 2)
+legend("bottomright", lty = c(1, 2), col = c(1, 2), legend = c(expression(bar("F")(z)), expression(Phi(z))))
+
+plot(qnorm(quantile.vec1), log(ecdf.avg1), type = "l",
+     ylim = range(log(quantile.vec1), log(ecdf.avg1)),
+     xlab = "z", ylab = "log (CDF)")
+lines(qnorm(quantile.vec1), log(quantile.vec1), lty = 2, col = "red")
+lines(qnorm(quantile.vec1), log(pnorm(qnorm(quantile.vec1), 0, 1.1)), lty = 2, col = "green")
+lines(qnorm(quantile.vec1), log(pnorm(qnorm(quantile.vec1), 0, 1.05)), lty = 2, col = "blue")
+polygon(x = c(qnorm(quantile.vec1), rev(qnorm(quantile.vec1))),
+        y = c(log(ecdf.tail.avg.conf.int1[1, ]), rev(log(ecdf.tail.avg.conf.int1[2, ]))),
+        border = NA,
+        col = grDevices::adjustcolor("grey75", alpha.f = 0.5))
+legend("bottomright", lty = c(1, 2, 2, 2), col = c(1, 2, 4, 3), legend = c(
+  expression(log(bar("F")(z))),
+  expression(log(Phi(z))),
+  expression(log(Phi(z / 1.05))),
+  expression(log(Phi(z / 1.1)))
+))
+
+plot(-qnorm(quantile.vec3), log(ecdf.avg4), type = "l",
+     ylim = range(log(quantile.vec3), log(ecdf.avg4)),
+     xlab = "z", ylab = "log (1 - CDF)")
+lines(-qnorm(quantile.vec3), log(quantile.vec3), lty = 2, col = "red")
+lines(-qnorm(quantile.vec3), log(pnorm(qnorm(quantile.vec3), 0, 1.1)), lty = 2, col = "green")
+lines(-qnorm(quantile.vec3), log(pnorm(qnorm(quantile.vec3), 0, 1.05)), lty = 2, col = "blue")
+polygon(x = c(-qnorm(quantile.vec3), rev(-qnorm(quantile.vec3))),
+        y = c(log(ecdf.tail.avg.conf.int4[1, ]), rev(log(ecdf.tail.avg.conf.int4[2, ]))),
+        border = NA,
+        col = grDevices::adjustcolor("grey75", alpha.f = 0.5))
+legend("bottomleft", lty = c(1, 2, 2, 2), col = c(1, 2, 4, 3), legend = c(
+  expression(log(1 - bar("F")(z))),
+  expression(log(1 - Phi(z))),
+  expression(log(1 - Phi(z / 1.05))),
+  expression(log(1 - Phi(z / 1.1)))
+))
 ```
 
 ## Session information
