@@ -643,22 +643,23 @@ hist(z, breaks = 100, prob = TRUE, xlab = "", main = "Histogram of Correlated Z 
 lines(seq(-6, 6, 0.01), dnorm(seq(-6, 6, 0.01)), col = "red")
 
 xplot <- seq(-10, 10, length = 1000)
-hermite = Hermite(4)
+hermite = Hermite(11)
 gd0.std = dnorm(xplot)
 matrix_lik_w = cbind(gd0.std)
-for (i in 1 : 2) {
-  gd.std = (-1)^i * hermite[[i]](xplot) * gd0.std
+for (i in 1 : 11) {
+  gd.std = (-1)^i * hermite[[i]](xplot) * gd0.std / sqrt(factorial(i))
   matrix_lik_w = cbind(matrix_lik_w, gd.std)
 }
-plot(xplot, xplot, type = "n", xlim = c(-5, 5), ylim = range(matrix_lik_w[, 1 : 3]), bty = "n", xlab = "", ylab = "", main = "The First 2 Gaussian Derivatives")
-col = c(2, 3, 4)
-for (i in 1 : 3) {
-  lines(xplot, matrix_lik_w[, i], col = i + 1)
+plot(xplot, xplot, type = "n", xlim = c(-5, 5), ylim = range(matrix_lik_w[, 1 : 5]), bty = "n", xlab = "", ylab = "", main = "The First 2 Gaussian Derivatives")
+for (i in 1 : 5) {
+  lines(xplot, matrix_lik_w[, i], col = i, lty = i)
 }
-legend("topright", col = 2 : 4, lty = 1, c(expression(
+legend("topright", col = 1 : 5, lty = 1 : 5, c(expression(
     varphi,
     paste(varphi, "'"),
-    paste(varphi, '"')
+    paste(varphi, '"/', sqrt(2)),
+    paste(varphi^(3) / sqrt(6)),
+    paste(varphi^(4) / sqrt(24))
   )
 ), bty = "n"
 )
