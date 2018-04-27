@@ -2,7 +2,9 @@
 title: "`CASH` Simulations"
 author: "Lei Sun"
 date: 2018-02-10
-output: html_document
+output:
+  html_document:
+    code_folding: hide
 ---
 
 <!-- The file analysis/chunks.R contains chunks that define default settings
@@ -30,6 +32,7 @@ knitr::read_chunk("chunks.R")
 source("../code/gdash_lik.R")
 source("../code/count_to_summary.R")
 library(ashr)
+library(locfdr)
 library(reshape2)
 library(ggplot2)
 library(grid)
@@ -617,8 +620,8 @@ for (j in seq(length(pi0.vec))) {
 
 ## Distribution of pairwise correlations
 
-```{r, echo = FALSE, cache = TRUE}
-d <- 10
+```{r, echo = FALSE}
+d <- 5
 p <- 1e3
 B <- matrix(rnorm(p * d), p, d)
 Sigma <- B %*% t(B) + diag(p)
@@ -626,26 +629,35 @@ Rho <- cov2cor(Sigma)
 par(mar = c(5, 5, 1, 1))
 hist(Rho[lower.tri(Rho)], breaks = 100, xlab = expression(rho[ij]), xlim = c(-1, 1), main = "")
 nsim <- 1000
-pi0.vec <- 0.9
+pi0.vec <- c(0.9)
+```
 
+```{r, cache = TRUE}
 set.seed(1)
 z <- MASS::mvrnorm(n = 1, mu = rep(0, p), Sigma = Rho)
+```
+
+```{r}
 histz <- hist(z, prob = TRUE, breaks = 20, xlab = "Z", main = "", xlim = c(-4, 4), ylim = c(0, 0.5))
 lines(seq(-4, 4, by = 0.1), dnorm(seq(-4, 4, by = 0.1)), col = "blue")
 legend("topright", lty = 1, col = "blue", "N(0, 1)")
+```
 
+```{r, cache = TRUE}
 set.seed(7)
 z <- MASS::mvrnorm(n = 1, mu = rep(0, p), Sigma = Rho)
+```
+
+```{r}
 histz <- hist(z, prob = TRUE, breaks = 20, xlab = "Z", main = "", xlim = c(-4, 4), ylim = c(0, 0.5))
 lines(seq(-4, 4, by = 0.1), dnorm(seq(-4, 4, by = 0.1)), col = "blue")
 ```
 
 ## Variability of FDR and Power
 
-```{r sim_z_2, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE, eval = FALSE}
-for (sigma.beta in 5) {
-for (w.lambda in 10) {
+```{r sim_z_2, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
 # cat("sigma.beta =", sigma.beta, "; GD =", L, "; Constraints on w:", w.lambda != 0)
+sigma.beta <- 4
 qvalue.pi0.list <- qvalue.list <- list()
 z.pi0.list <- z.list <- list()
 
@@ -661,7 +673,7 @@ for (i in 1 : nsim) {
   
   ## different methods
   fit.ash = ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
-  L <- ifelse(mean(abs(betahat / sebetahat)) < sqrt(2 / pi), 4, 10)
+  L <- 8
   fit.gdash = gdash(betahat, sebetahat, gd.ord = L)
   fit.qvalue = qvalue::qvalue(pvalue)
   fit.BH = p.adjust(pvalue, method = "BH")
@@ -679,7 +691,9 @@ for (i in 1 : nsim) {
 qvalue.pi0.list[[j]] <- qvalue.list
 z.pi0.list[[j]] <- z.list
 }
+```
 
+```{r}
 FDP.array <- pFDP.array <- power.array <- array(0, dim = c(nsim, length(q.vec), length(method.name), length(pi0.vec)))
 FDP.summary <- pFDP.summary <- power.summary <- array(0, dim = c(5, length(q.vec), length(method.name), length(pi0.vec)))
 for (j in seq(length(pi0.vec))) {
@@ -718,7 +732,7 @@ for (j in seq(length(pi0.vec))) {
   sd.z <- sapply(z.pi0.list[[j]], sd)
   Noise <- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c("Deflated Error", "In-between", "Inflated Error"))
 
-  FDR.plot <- ggplot(data = melt(cbind(Noise, as.data.frame(FDP.array[, which(round(q.vec, 2) == q), , j])), id.vars = "Noise"),
+  FDR.plot <- ggplot(data = melt(cbind(Noise, as.data.frame(FDP.array[, which(round(q.vec, 4) == q), , j])), id.vars = "Noise"),
          aes(x = variable, y = value, col = variable)) +
   geom_boxplot() +
   stat_summary(fun.y = mean, geom = "point", shape = 13, size = 3) +
@@ -740,7 +754,7 @@ for (j in seq(length(pi0.vec))) {
   # labs(x = "", y = "Positive FDP") +
   # theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 12.5), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 7.5), axis.text.y = element_text(size = 15))
   
-  power.plot <- ggplot(data = melt(cbind(Noise, as.data.frame(power.array[, which(round(q.vec, 2) == q), , j])), id.vars = "Noise"),
+  power.plot <- ggplot(data = melt(cbind(Noise, as.data.frame(power.array[, which(round(q.vec, 4) == q), , j])), id.vars = "Noise"),
         aes(x = variable, y = value, col = variable)) +
   geom_boxplot() +
   stat_summary(fun.y = mean, geom = "point", shape = 8, size = 2) +
@@ -759,6 +773,430 @@ for (j in seq(length(pi0.vec))) {
   # dev.off()
 }
 }
+```
+
+## Large-scale simulation with real data
+
+```{r}
+r <- readRDS("../data/liver.rds")
+```
+
+```{r}
+top_genes_index = function (g, X) {
+  return(order(rowSums(X), decreasing = TRUE)[1 : g])
+}
+lcpm = function (r) {
+  R = colSums(r)
+  t(log2(((t(r) + 0.5) / (R + 1)) * 10^6))
+}
+```
+
+```{r}
+nsamp <- 5
+ngene <- 1e4
+nsim <- 1000
+pi0.vec <- 0.9
+```
+
+```{r, cache = TRUE}
+Y = lcpm(r)
+subset = top_genes_index(ngene, Y)
+r = r[subset,]
+```
+
+```{r gtex_z, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
+# cat("sigma.beta =", sigma.beta, "; GD =", L, "; Constraints on w:", w.lambda != 0)
+sigma.beta <- 3
+qvalue.pi0.list <- qvalue.list <- list()
+z.pi0.list <- z.list <- list()
+
+for (j in seq(pi0.vec)) {
+  pi0 <- pi0.vec[j]
+for (i in 1 : nsim) {
+  counts <- r[, sample(ncol(r), 2 * nsamp)]
+  design <- model.matrix(~c(rep(0, nsamp), rep(1, nsamp)))
+  summary <- count_to_summary(counts, design)
+  z <- summary$z
+  sebetahat <- summary$sebetahat
+  beta <- sample(c(rep(0, round(pi0 * ngene)), rnorm(round((1 - pi0) * ngene), 0, sigma.beta * sqrt(mean(sebetahat^2)))))
+  betahat <- beta + sebetahat * z
+  
+  pvalue = (1 - pnorm(abs(betahat / sebetahat))) * 2
+  
+  ## different methods
+  fit.ash = ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+  L <- 8
+  fit.gdash = gdash(betahat, sebetahat, gd.ord = L)
+  fit.qvalue = qvalue::qvalue(pvalue)
+  fit.BH = p.adjust(pvalue, method = "BH")
+  fit.locfdr <- tryCatch(locfdr::locfdr(betahat / sebetahat, plot = 0), error = function(e) {NA})
+
+  ## FDR
+  qvalue.list[[i]] <- cbind(
+    beta <- beta,
+    BH <- fit.BH,
+    qvalue <- fit.qvalue$qvalues,
+    locfdr <- tryCatch(ashr::qval.from.lfdr(fit.locfdr$fdr), error = function(e) {rep(NA, ngene)}),
+    ASH <- ashr::get_qvalue(fit.ash),
+    CASH <- fit.gdash$qvalue
+  )
+  z.list[[i]] <- z
+}
+qvalue.pi0.list[[j]] <- qvalue.list
+z.pi0.list[[j]] <- z.list
+}
+```
+
+```{r}
+z.over <- 1.025
+z.under <- 0.975
+method.name <- c("BH", "qvalue", "locfdr", "ASH", "CASH")
+```
+
+```{r}
+FDP.array <- pFDP.array <- power.array <- array(0, dim = c(nsim, length(q.vec), length(method.name), length(pi0.vec)))
+FDP.summary <- pFDP.summary <- power.summary <- array(0, dim = c(5, length(q.vec), length(method.name), length(pi0.vec)))
+for (j in seq(length(pi0.vec))) {
+  for (k in seq(length(method.name))) {
+    for (i in seq(nsim)) {
+      FDP.array[i, , k, j] <- sapply(q.vec, FDP, qvalue = qvalue.pi0.list[[j]][[i]][, k + 1], beta = qvalue.pi0.list[[j]][[i]][, 1])
+      pFDP.array[i, , k, j] <- sapply(q.vec, pFDP, qvalue = qvalue.pi0.list[[j]][[i]][, k + 1], beta = qvalue.pi0.list[[j]][[i]][, 1])
+      power.array[i, , k, j] <- sapply(q.vec, power, qvalue = qvalue.pi0.list[[j]][[i]][, k + 1], beta = qvalue.pi0.list[[j]][[i]][, 1])
+    }
+    FDP.summary[, , k, j] <- rbind(
+      avg <- colMeans(FDP.array[, , k, j]),
+      sd <- apply(FDP.array[, , k, j], 2, sd),
+      n <- colSums(!is.na(FDP.array[, , k, j])),
+      q975 <- apply(FDP.array[, , k, j], 2, quantile, probs = 0.975),
+      q025 <- apply(FDP.array[, , k, j], 2, quantile, probs = 0.025)
+    )
+    pFDP.summary[, , k, j] <- rbind(
+      avg <- colMeans(pFDP.array[, , k, j], na.rm = TRUE),
+      sd <- apply(pFDP.array[, , k, j], 2, sd, na.rm = TRUE),
+      n <- colSums(!is.na(pFDP.array[, , k, j])),
+      q975 <- apply(pFDP.array[, , k, j], 2, quantile, probs = 0.975, na.rm = TRUE),
+      q025 <- apply(pFDP.array[, , k, j], 2, quantile, probs = 0.025, na.rm = TRUE)
+    )
+    power.summary[, , k, j] <- rbind(
+      avg <- colMeans(power.array[, , k, j]),
+      sd <- apply(power.array[, , k, j], 2, sd),
+      n <- colSums(!is.na(power.array[, , k, j])),
+      q975 <- apply(power.array[, , k, j], 2, quantile, probs = 0.975),
+      q025 <- apply(power.array[, , k, j], 2, quantile, probs = 0.025)
+    )
+  }
+}
+
+for (j in seq(length(pi0.vec))) {
+  for (q in c(0.1, 0.05)) {
+  sd.z <- sapply(z.pi0.list[[j]], sd)
+  Noise <- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c("Deflated Error", "In-between", "Inflated Error"))
+
+  FDR.plot <- ggplot(data = melt(cbind(Noise, as.data.frame(FDP.array[, which(round(q.vec, 4) == q), , j])), id.vars = "Noise"),
+         aes(x = variable, y = value, col = variable)) +
+  geom_boxplot() +
+  stat_summary(fun.y = mean, geom = "point", shape = 8, size = 3) +
+#  scale_color_manual(values = method.col) +
+  facet_wrap(~Noise) +
+  geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
+  scale_x_discrete(labels = method.name) +
+  labs(x = "", y = "FDP") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 12.5), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 7.5), axis.text.y = element_text(size = 15))
+  
+  # pFDR.plot <- ggplot(data = melt(cbind(Noise, as.data.frame(pFDP.array[, which(q.vec == q), , j])), id.vars = "Noise"),
+  #       aes(x = variable, y = value, col = variable)) +
+  # geom_boxplot(na.rm = TRUE) +
+  # stat_summary(fun.y = mean, geom = "point") +
+  # scale_color_manual(values = method.col) +
+  # facet_wrap(~Noise) +
+  # geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
+  # scale_x_discrete(labels = method.name) +
+  # labs(x = "", y = "Positive FDP") +
+  # theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 12.5), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 7.5), axis.text.y = element_text(size = 15))
+  
+  power.plot <- ggplot(data = melt(cbind(Noise, as.data.frame(power.array[, which(round(q.vec, 4) == q), , j])), id.vars = "Noise"),
+        aes(x = variable, y = value, col = variable)) +
+  geom_boxplot() +
+  stat_summary(fun.y = mean, geom = "point", shape = 8, size = 3) +
+#  scale_color_manual(values = method.col) +
+  facet_wrap(~Noise) +
+  scale_x_discrete(labels = method.name) +
+  labs(x = "", y = "TPP") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 12.5), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 7.5), axis.text.y = element_text(size = 15))
+
+  grid.arrange(FDR.plot, power.plot
+               #, top = textGrob(bquote(paste(pi[0] == .(pi0.vec[j]), "; ", sigma[beta] == .(sigma.beta), "; ", .(L), "GDs; ", .(ifelse(w.lambda == 0, "No Constraints", "With Constraints")), "; ", q == .(q))))
+               )
+  
+  # pdf(paste("../output/fig/sim_cash_2_", sigma.beta, L, w.lambda, pi0.vec[j], "plot.pdf", sep = "_"), onefile = TRUE)
+  # grid.arrange(FDR.plot, power.plot, top = textGrob(bquote(paste(pi[0] == .(pi0.vec[j]), "; ", sigma[beta] == .(sigma.beta), "; ", .(L), "GDs; ", .(ifelse(w.lambda == 0, "No Constraints", "With Constraints")), "; ", q == .(q)))))
+  # dev.off()
+}
+}
+```
+
+- $\sigma = 1.5$
+
+```{r gtex_z_1, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
+# cat("sigma.beta =", sigma.beta, "; GD =", L, "; Constraints on w:", w.lambda != 0)
+sigma.beta <- 1.5
+qvalue.pi0.list <- qvalue.list <- list()
+z.pi0.list <- z.list <- list()
+
+for (j in seq(pi0.vec)) {
+  pi0 <- pi0.vec[j]
+for (i in 1 : nsim) {
+  counts <- r[, sample(ncol(r), 2 * nsamp)]
+  design <- model.matrix(~c(rep(0, nsamp), rep(1, nsamp)))
+  summary <- count_to_summary(counts, design)
+  z <- summary$z
+  sebetahat <- summary$sebetahat
+  beta <- sample(c(rep(0, round(pi0 * ngene)), rnorm(round((1 - pi0) * ngene), 0, sigma.beta * sqrt(mean(sebetahat^2)))))
+  betahat <- beta + sebetahat * z
+  
+  pvalue = (1 - pnorm(abs(betahat / sebetahat))) * 2
+  
+  ## different methods
+  fit.ash = ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+  L <- 8
+  fit.gdash = gdash(betahat, sebetahat, gd.ord = L)
+  fit.qvalue = qvalue::qvalue(pvalue)
+  fit.BH = p.adjust(pvalue, method = "BH")
+  fit.locfdr <- tryCatch(locfdr::locfdr(betahat / sebetahat, plot = 0), error = function(e) {NA})
+
+  ## FDR
+  qvalue.list[[i]] <- cbind(
+    beta <- beta,
+    BH <- fit.BH,
+    qvalue <- fit.qvalue$qvalues,
+    locfdr <- tryCatch(ashr::qval.from.lfdr(fit.locfdr$fdr), error = function(e) {rep(NA, ngene)}),
+    ASH <- ashr::get_qvalue(fit.ash),
+    CASH <- fit.gdash$qvalue
+  )
+  z.list[[i]] <- z
+}
+qvalue.pi0.list[[j]] <- qvalue.list
+z.pi0.list[[j]] <- z.list
+}
+```
+
+```{r}
+z.over <- 1.025
+z.under <- 0.975
+method.name <- c("BH", "qvalue", "locfdr", "ASH", "CASH")
+```
+
+```{r}
+FDP.array <- pFDP.array <- power.array <- array(0, dim = c(nsim, length(q.vec), length(method.name), length(pi0.vec)))
+FDP.summary <- pFDP.summary <- power.summary <- array(0, dim = c(5, length(q.vec), length(method.name), length(pi0.vec)))
+for (j in seq(length(pi0.vec))) {
+  for (k in seq(length(method.name))) {
+    for (i in seq(nsim)) {
+      FDP.array[i, , k, j] <- sapply(q.vec, FDP, qvalue = qvalue.pi0.list[[j]][[i]][, k + 1], beta = qvalue.pi0.list[[j]][[i]][, 1])
+      pFDP.array[i, , k, j] <- sapply(q.vec, pFDP, qvalue = qvalue.pi0.list[[j]][[i]][, k + 1], beta = qvalue.pi0.list[[j]][[i]][, 1])
+      power.array[i, , k, j] <- sapply(q.vec, power, qvalue = qvalue.pi0.list[[j]][[i]][, k + 1], beta = qvalue.pi0.list[[j]][[i]][, 1])
+    }
+    FDP.summary[, , k, j] <- rbind(
+      avg <- colMeans(FDP.array[, , k, j]),
+      sd <- apply(FDP.array[, , k, j], 2, sd),
+      n <- colSums(!is.na(FDP.array[, , k, j])),
+      q975 <- apply(FDP.array[, , k, j], 2, quantile, probs = 0.975),
+      q025 <- apply(FDP.array[, , k, j], 2, quantile, probs = 0.025)
+    )
+    pFDP.summary[, , k, j] <- rbind(
+      avg <- colMeans(pFDP.array[, , k, j], na.rm = TRUE),
+      sd <- apply(pFDP.array[, , k, j], 2, sd, na.rm = TRUE),
+      n <- colSums(!is.na(pFDP.array[, , k, j])),
+      q975 <- apply(pFDP.array[, , k, j], 2, quantile, probs = 0.975, na.rm = TRUE),
+      q025 <- apply(pFDP.array[, , k, j], 2, quantile, probs = 0.025, na.rm = TRUE)
+    )
+    power.summary[, , k, j] <- rbind(
+      avg <- colMeans(power.array[, , k, j]),
+      sd <- apply(power.array[, , k, j], 2, sd),
+      n <- colSums(!is.na(power.array[, , k, j])),
+      q975 <- apply(power.array[, , k, j], 2, quantile, probs = 0.975),
+      q025 <- apply(power.array[, , k, j], 2, quantile, probs = 0.025)
+    )
+  }
+}
+
+for (j in seq(length(pi0.vec))) {
+  for (q in c(0.1)) {
+  sd.z <- sapply(z.pi0.list[[j]], sd)
+  Noise <- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c("Deflated Error", "In-between", "Inflated Error"))
+
+  FDR.plot <- ggplot(data = melt(cbind(Noise, as.data.frame(FDP.array[, which(round(q.vec, 4) == q), , j])), id.vars = "Noise"),
+         aes(x = variable, y = value, col = variable)) +
+  geom_boxplot() +
+  stat_summary(fun.y = mean, geom = "point", shape = 8, size = 3) +
+#  scale_color_manual(values = method.col) +
+  facet_wrap(~Noise) +
+  geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
+  scale_x_discrete(labels = method.name) +
+  labs(x = "", y = "FDP") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 12.5), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 7.5), axis.text.y = element_text(size = 15))
+  
+  # pFDR.plot <- ggplot(data = melt(cbind(Noise, as.data.frame(pFDP.array[, which(q.vec == q), , j])), id.vars = "Noise"),
+  #       aes(x = variable, y = value, col = variable)) +
+  # geom_boxplot(na.rm = TRUE) +
+  # stat_summary(fun.y = mean, geom = "point") +
+  # scale_color_manual(values = method.col) +
+  # facet_wrap(~Noise) +
+  # geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
+  # scale_x_discrete(labels = method.name) +
+  # labs(x = "", y = "Positive FDP") +
+  # theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 12.5), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 7.5), axis.text.y = element_text(size = 15))
+  
+  power.plot <- ggplot(data = melt(cbind(Noise, as.data.frame(power.array[, which(round(q.vec, 4) == q), , j])), id.vars = "Noise"),
+        aes(x = variable, y = value, col = variable)) +
+  geom_boxplot() +
+  stat_summary(fun.y = mean, geom = "point", shape = 8, size = 3) +
+#  scale_color_manual(values = method.col) +
+  facet_wrap(~Noise) +
+  scale_x_discrete(labels = method.name) +
+  labs(x = "", y = "TPP") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 12.5), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 7.5), axis.text.y = element_text(size = 15))
+
+  grid.arrange(FDR.plot, power.plot
+               #, top = textGrob(bquote(paste(pi[0] == .(pi0.vec[j]), "; ", sigma[beta] == .(sigma.beta), "; ", .(L), "GDs; ", .(ifelse(w.lambda == 0, "No Constraints", "With Constraints")), "; ", q == .(q))))
+               )
+  
+  # pdf(paste("../output/fig/sim_cash_2_", sigma.beta, L, w.lambda, pi0.vec[j], "plot.pdf", sep = "_"), onefile = TRUE)
+  # grid.arrange(FDR.plot, power.plot, top = textGrob(bquote(paste(pi[0] == .(pi0.vec[j]), "; ", sigma[beta] == .(sigma.beta), "; ", .(L), "GDs; ", .(ifelse(w.lambda == 0, "No Constraints", "With Constraints")), "; ", q == .(q)))))
+  # dev.off()
+}
+}
+```
+
+- $\sigma = 2$
+
+```{r gtex_z_2, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
+# cat("sigma.beta =", sigma.beta, "; GD =", L, "; Constraints on w:", w.lambda != 0)
+sigma.beta <- 2
+qvalue.pi0.list <- qvalue.list <- list()
+z.pi0.list <- z.list <- list()
+
+for (j in seq(pi0.vec)) {
+  pi0 <- pi0.vec[j]
+for (i in 1 : nsim) {
+  counts <- r[, sample(ncol(r), 2 * nsamp)]
+  design <- model.matrix(~c(rep(0, nsamp), rep(1, nsamp)))
+  summary <- count_to_summary(counts, design)
+  z <- summary$z
+  sebetahat <- summary$sebetahat
+  beta <- sample(c(rep(0, round(pi0 * ngene)), rnorm(round((1 - pi0) * ngene), 0, sigma.beta * sqrt(mean(sebetahat^2)))))
+  betahat <- beta + sebetahat * z
+  
+  pvalue = (1 - pnorm(abs(betahat / sebetahat))) * 2
+  
+  ## different methods
+  fit.ash = ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+  L <- 8
+  fit.gdash = gdash(betahat, sebetahat, gd.ord = L)
+  fit.qvalue = qvalue::qvalue(pvalue)
+  fit.BH = p.adjust(pvalue, method = "BH")
+  fit.locfdr <- tryCatch(locfdr::locfdr(betahat / sebetahat, plot = 0), error = function(e) {NA})
+
+  ## FDR
+  qvalue.list[[i]] <- cbind(
+    beta <- beta,
+    BH <- fit.BH,
+    qvalue <- fit.qvalue$qvalues,
+    locfdr <- tryCatch(ashr::qval.from.lfdr(fit.locfdr$fdr), error = function(e) {rep(NA, ngene)}),
+    ASH <- ashr::get_qvalue(fit.ash),
+    CASH <- fit.gdash$qvalue
+  )
+  z.list[[i]] <- z
+}
+qvalue.pi0.list[[j]] <- qvalue.list
+z.pi0.list[[j]] <- z.list
+}
+```
+
+```{r}
+z.over <- 1.05
+z.under <- 0.95
+method.name <- c("BH", "qvalue", "locfdr", "ASH", "CASH")
+```
+
+```{r}
+FDP.array <- pFDP.array <- power.array <- array(0, dim = c(nsim, length(q.vec), length(method.name), length(pi0.vec)))
+FDP.summary <- pFDP.summary <- power.summary <- array(0, dim = c(5, length(q.vec), length(method.name), length(pi0.vec)))
+for (j in seq(length(pi0.vec))) {
+  for (k in seq(length(method.name))) {
+    for (i in seq(nsim)) {
+      FDP.array[i, , k, j] <- sapply(q.vec, FDP, qvalue = qvalue.pi0.list[[j]][[i]][, k + 1], beta = qvalue.pi0.list[[j]][[i]][, 1])
+      pFDP.array[i, , k, j] <- sapply(q.vec, pFDP, qvalue = qvalue.pi0.list[[j]][[i]][, k + 1], beta = qvalue.pi0.list[[j]][[i]][, 1])
+      power.array[i, , k, j] <- sapply(q.vec, power, qvalue = qvalue.pi0.list[[j]][[i]][, k + 1], beta = qvalue.pi0.list[[j]][[i]][, 1])
+    }
+    FDP.summary[, , k, j] <- rbind(
+      avg <- colMeans(FDP.array[, , k, j]),
+      sd <- apply(FDP.array[, , k, j], 2, sd),
+      n <- colSums(!is.na(FDP.array[, , k, j])),
+      q975 <- apply(FDP.array[, , k, j], 2, quantile, probs = 0.975),
+      q025 <- apply(FDP.array[, , k, j], 2, quantile, probs = 0.025)
+    )
+    pFDP.summary[, , k, j] <- rbind(
+      avg <- colMeans(pFDP.array[, , k, j], na.rm = TRUE),
+      sd <- apply(pFDP.array[, , k, j], 2, sd, na.rm = TRUE),
+      n <- colSums(!is.na(pFDP.array[, , k, j])),
+      q975 <- apply(pFDP.array[, , k, j], 2, quantile, probs = 0.975, na.rm = TRUE),
+      q025 <- apply(pFDP.array[, , k, j], 2, quantile, probs = 0.025, na.rm = TRUE)
+    )
+    power.summary[, , k, j] <- rbind(
+      avg <- colMeans(power.array[, , k, j]),
+      sd <- apply(power.array[, , k, j], 2, sd),
+      n <- colSums(!is.na(power.array[, , k, j])),
+      q975 <- apply(power.array[, , k, j], 2, quantile, probs = 0.975),
+      q025 <- apply(power.array[, , k, j], 2, quantile, probs = 0.025)
+    )
+  }
+}
+
+for (j in seq(length(pi0.vec))) {
+  for (q in c(0.1)) {
+  sd.z <- sapply(z.pi0.list[[j]], sd)
+  Noise <- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c("Deflated Error", "In-between", "Inflated Error"))
+
+  FDR.plot <- ggplot(data = melt(cbind(Noise, as.data.frame(FDP.array[, which(round(q.vec, 4) == q), , j])), id.vars = "Noise"),
+         aes(x = variable, y = value, col = variable)) +
+  geom_boxplot() +
+  stat_summary(fun.y = mean, geom = "point", shape = 8, size = 3) +
+#  scale_color_manual(values = method.col) +
+  facet_wrap(~Noise) +
+  geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
+  scale_x_discrete(labels = method.name) +
+  labs(x = "", y = "FDP") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 12.5), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 7.5), axis.text.y = element_text(size = 15))
+  
+  # pFDR.plot <- ggplot(data = melt(cbind(Noise, as.data.frame(pFDP.array[, which(q.vec == q), , j])), id.vars = "Noise"),
+  #       aes(x = variable, y = value, col = variable)) +
+  # geom_boxplot(na.rm = TRUE) +
+  # stat_summary(fun.y = mean, geom = "point") +
+  # scale_color_manual(values = method.col) +
+  # facet_wrap(~Noise) +
+  # geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
+  # scale_x_discrete(labels = method.name) +
+  # labs(x = "", y = "Positive FDP") +
+  # theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 12.5), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 7.5), axis.text.y = element_text(size = 15))
+  
+  power.plot <- ggplot(data = melt(cbind(Noise, as.data.frame(power.array[, which(round(q.vec, 4) == q), , j])), id.vars = "Noise"),
+        aes(x = variable, y = value, col = variable)) +
+  geom_boxplot() +
+  stat_summary(fun.y = mean, geom = "point", shape = 8, size = 3) +
+#  scale_color_manual(values = method.col) +
+  facet_wrap(~Noise) +
+  scale_x_discrete(labels = method.name) +
+  labs(x = "", y = "TPP") +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 12.5), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 7.5), axis.text.y = element_text(size = 15))
+
+  grid.arrange(FDR.plot, power.plot
+               #, top = textGrob(bquote(paste(pi[0] == .(pi0.vec[j]), "; ", sigma[beta] == .(sigma.beta), "; ", .(L), "GDs; ", .(ifelse(w.lambda == 0, "No Constraints", "With Constraints")), "; ", q == .(q))))
+               )
+  
+  # pdf(paste("../output/fig/sim_cash_2_", sigma.beta, L, w.lambda, pi0.vec[j], "plot.pdf", sep = "_"), onefile = TRUE)
+  # grid.arrange(FDR.plot, power.plot, top = textGrob(bquote(paste(pi[0] == .(pi0.vec[j]), "; ", sigma[beta] == .(sigma.beta), "; ", .(L), "GDs; ", .(ifelse(w.lambda == 0, "No Constraints", "With Constraints")), "; ", q == .(q)))))
+  # dev.off()
 }
 }
 ```
