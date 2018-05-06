@@ -332,10 +332,10 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2018-04-18</p>
+<p><strong>Last updated:</strong> 2018-05-06</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> b82e2bc</p>
+<p><strong>Code version:</strong> 0b0a394</p>
 <!-- Add your analysis here -->
 <pre class="r"><code>source(&quot;../code/gdash_lik.R&quot;)
 source(&quot;../code/gdfit.R&quot;)
@@ -496,6 +496,77 @@ legend(&quot;bottomleft&quot;, lty = c(1, 2, 2, 2), col = c(1, 2, 4, 3), legend 
   expression(log(1 - Phi(z / 1.1)))
 ))</code></pre>
 <p><img src="figure/gd_w.rmd/unnamed-chunk-13-3.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>set.seed(777)
+nsamp &lt;- 50
+nsim &lt;- 1e3
+z &lt;- sebetahat &lt;- list()
+for (i in 1 : nsim) {
+  ## generate data
+  counts &lt;- r[, sample(ncol(r), 2 * nsamp)]
+  design &lt;- model.matrix(~c(rep(0, nsamp), rep(1, nsamp)))
+  summary &lt;- count_to_summary(counts, design)
+  z[[i]] &lt;- summary$z
+  sebetahat[[i]] &lt;- summary$sebetahat
+}</code></pre>
+<pre class="r"><code>sd.vec &lt;- sapply(z, sd)
+median.vec &lt;- sapply(z, median)
+fd.vec &lt;- sapply(z, function(x) {
+  p &lt;- pnorm(-abs(x)) * 2
+  sum(p &lt;= 0.005)
+})
+sel &lt;- c(834, 211, 397, 748)
+par(mfrow = c(2, 2))
+for (i in seq(sel)) {
+  fit &lt;- gdfit(z[[sel[i]]], 10)
+  plot.gdfit(z[[sel[i]]], fit$w, fit$L, legend = FALSE)
+}</code></pre>
+<p><img src="figure/gd_w.rmd/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>set.seed(6)
+par(mfrow = c(2, 3))
+par(mar = c(4.5, 4.5, 2, 2))
+hist(pnorm(-abs(z[[834]])) * 2, prob = TRUE, xlab = &quot;&quot;, breaks = 100, main = &quot;(a): Histogram of two-sided p-values&quot;)
+lines(c(0, 1), c(1, 1), col = &quot;red&quot;)
+hist(z[[834]], prob = TRUE, breaks = 100, xlab = &quot;&quot;, xlim = c(-4.5, -2), main = &quot;(b): Left tail of correlated z-scores&quot;)
+lines(seq(-6, 6, by = 0.01), dnorm(seq(-6, 6, by = 0.01), 0, sd(z[[834]])), col = &quot;blue&quot;)
+lines(seq(-6, 6, by = 0.01), dnorm(seq(-6, 6, by = 0.01)), col = &quot;red&quot;)
+hist(z[[834]], prob = TRUE, breaks = 100, xlab = &quot;&quot;, xlim = c(2, 4.5), main = &quot;(c): Right tail of correlated z-scores&quot;)
+lines(seq(-6, 6, by = 0.01), dnorm(seq(-6, 6, by = 0.01)), col = &quot;red&quot;)
+p &lt;- pnorm(-abs(z[[834]])) * 2
+plot(sample(-log(pnorm(-abs(z[[834]])) * 2)), ylim = c(0, 20), ylab = &quot;-log(p)&quot;, main = expression(paste(&quot;(d): Correlated &quot;, N(0, 1))))
+abline(h = -log(0.005), col = &quot;red&quot;)
+abline(h = -log(pnorm(-sqrt(2 * log(1e4))) * 2), col = &quot;blue&quot;)
+abline(h = -log(0.05 / 1e4), col = &quot;green&quot;)
+plot(-log(pnorm(-abs(rnorm(1e4))) * 2), ylim = c(0, 20), ylab = &quot;-log(p)&quot;, main = expression(paste(&quot;(e): Independent &quot;, N(0, 1))))
+abline(h = -log(0.005), col = &quot;red&quot;)
+abline(h = -log(pnorm(-sqrt(2 * log(1e4))) * 2), col = &quot;blue&quot;)
+abline(h = -log(0.05 / 1e4), col = &quot;green&quot;)
+plot(-log(pnorm(-abs(rnorm(1e4, 0, 1.6))) * 2), ylim = c(0, 20), ylab = &quot;-log(p)&quot;, main = expression(paste(&quot;(f): Independent &quot;, N(0, 1.6^2))))
+abline(h = -log(0.005), col = &quot;red&quot;)
+abline(h = -log(pnorm(-sqrt(2 * log(1e4))) * 2), col = &quot;blue&quot;)
+abline(h = -log(0.05 / 1e4), col = &quot;green&quot;)</code></pre>
+<p><img src="figure/gd_w.rmd/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>p.bh &lt;- p.adjust(p, method = &quot;BH&quot;)
+sum(p.bh &lt;= 0.05)</code></pre>
+<pre><code>[1] 575</code></pre>
+<pre class="r"><code>plot(sort(log(p)), cex = 0.25, pch = 19, ylim = c(-19, 0), xlab = &quot;Order&quot;, ylab = &quot;log(p)&quot;)
+
+set.seed(6)
+z.indep &lt;- rnorm(1e4)
+points(sort(log(pnorm(-abs(z.indep)) * 2)), cex = 0.25, pch = 19, col = &quot;blue&quot;)
+z.indep &lt;- rnorm(1e4, 0, 1.6)
+points(sort(log(pnorm(-abs(z.indep)) * 2)), cex = 0.25, pch = 19, col = &quot;green&quot;)
+
+plot(sort(log(p)), cex = 0.25, pch = 19, ylim = c(-19, -2.5), xlim = c(1, 850), xlab = &quot;Order&quot;, ylab = &quot;log(p)&quot;)
+
+set.seed(6)
+z.indep &lt;- rnorm(1e4)
+points(sort(log(pnorm(-abs(z.indep)) * 2)), cex = 0.25, pch = 19, col = &quot;blue&quot;)
+z.indep &lt;- rnorm(1e4, 0, 1.6)
+points(sort(log(pnorm(-abs(z.indep)) * 2)), cex = 0.25, pch = 19, col = &quot;green&quot;)
+abline(h = log(0.005), col = &quot;red&quot;, lty = 2)
+abline(h = log(pnorm(-sqrt(2 * log(1e4))) * 2), col = &quot;red&quot;, lty = 2)
+abline(h = log(0.05 / 1e4), col = &quot;red&quot;, lty = 2)</code></pre>
+<p><img src="figure/gd_w.rmd/unnamed-chunk-16-2.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="session-information" class="section level2">
 <h2>Session information</h2>
@@ -518,7 +589,7 @@ attached base packages:
 other attached packages:
  [1] reshape2_1.4.3    ggplot2_2.2.1     plyr_1.8.4       
  [4] edgeR_3.20.2      limma_3.34.4      ashr_2.2-2       
- [7] Rmosek_8.0.69     PolynomF_1.0-1    CVXR_0.94-4      
+ [7] Rmosek_8.0.69     PolynomF_1.0-1    CVXR_0.95        
 [10] REBayes_1.2       Matrix_1.2-12     SQUAREM_2017.10-1
 [13] EQL_1.0-0         ttutils_1.0-1    
 
@@ -529,7 +600,7 @@ loaded via a namespace (and not attached):
 [10] digest_0.6.15     bit_1.1-12        tibble_1.4.1     
 [13] gtable_0.2.0      evaluate_0.10.1   lattice_0.20-35  
 [16] rlang_0.1.6       foreach_1.4.4     yaml_2.1.18      
-[19] parallel_3.4.3    Rmpfr_0.6-1       ECOSolveR_0.3-2  
+[19] parallel_3.4.3    Rmpfr_0.6-1       ECOSolveR_0.4    
 [22] stringr_1.3.0     knitr_1.20        locfit_1.5-9.1   
 [25] rprojroot_1.3-2   bit64_0.9-7       grid_3.4.3       
 [28] R6_2.2.2          rmarkdown_1.9     magrittr_1.5     
