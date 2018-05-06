@@ -1,0 +1,171 @@
+---
+title: "Re-Analyze Efron's Leukemia Data"
+author: "Lei Sun"
+date: 2018-04-16
+output:
+  html_document:
+    code_folding: hide
+---
+
+<!-- The file analysis/chunks.R contains chunks that define default settings
+shared across the workflowr files. -->
+```{r read-chunk, include=FALSE, cache=FALSE}
+knitr::read_chunk("chunks.R")
+```
+
+<!-- Update knitr chunk options -->
+```{r knitr-opts-chunk, include=FALSE}
+```
+
+<!-- Insert the date the file was last updated -->
+```{r last-updated, echo=FALSE, results='asis'}
+```
+
+<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
+ package git2r is installed -->
+```{r code-version, echo=FALSE, results='asis'}
+```
+
+<!-- Add your analysis here -->
+
+```{r, message = FALSE, warning = FALSE}
+source("../code/gdash_lik.R")
+source("../code/gdfit.R")
+library(limma)
+library(locfdr)
+```
+
+```{r}
+leukemia <- read.csv("http://web.stanford.edu/~hastie/CASI_files/DATA/leukemia_big.csv")
+design <- c(rep(0, 20), rep(1, 14), rep(0, 27), rep(1, 11))
+lim = limma::lmFit(leukemia, model.matrix(~design))
+r.ebayes = limma::eBayes(lim)
+p = r.ebayes$p.value[, 2]
+t = r.ebayes$t[, 2]
+z = -sign(t) * qnorm(p/2)
+betahat = lim$coefficients[,2]
+sebetahat = betahat / z
+```
+
+```{r}
+hist(p)
+hist(z, prob = TRUE, ylim = c(0, dnorm(0)))
+lines(seq(-10, 10, by = 0.01), dnorm(seq(-10, 10, by = 0.01)), col = "red")
+```
+
+```{r}
+fit <- gdash(betahat, sebetahat, gd.ord = 10)
+# rand.sign <- sample(c(rep(1, nrow(leukemia) / 2), rep(-1, nrow(leukemia) / 2)))
+# fit.sym <- gdash(rand.sign * betahat, sebetahat, gd.ord = 10)
+fit.locfdr <- locfdr(z)
+fit.ash <- ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+fit.qvalue <- qvalue::qvalue(p)
+
+hist(z[abs(z) >= 5])
+hist(betahat[abs(z) >= 5])
+
+x.plot <- seq(-2, 2, length = 1000)
+y.plot <- sapply(fit.sym$fitted_g$sd, function(x) {sapply(x.plot, dnorm, sd = x)})
+y.plot <- y.plot %*% fit.sym$fitted_g$pi
+plot(x.plot, y.plot, type = "l", col = "red")
+y.plot <- sapply(fit$fitted_g$sd, function(x) {sapply(x.plot, dnorm, sd = x)})
+y.plot <- y.plot %*% fit$fitted_g$pi
+lines(x.plot, y.plot)
+
+x.plot <- seq(-10, 10, length = 1000)
+gd.ord <- 10
+hermite = Hermite(gd.ord)
+gd0.std = dnorm(x.plot)
+matrix_lik_plot = cbind(gd0.std)
+for (i in 1 : gd.ord) {
+  gd.std = (-1)^i * hermite[[i]](x.plot) * gd0.std / sqrt(factorial(i))
+  matrix_lik_plot = cbind(matrix_lik_plot, gd.std)
+}
+y.plot = matrix_lik_plot %*% fit$w * fit$fitted_g$pi[1]
+
+library(scales)
+method.col <- hue_pal()(5)
+
+par(mfrow = c(1, 2))
+hist(z, prob = TRUE, main = "", xlab = expression(paste(z, "-scores")))
+lines(x.plot, y.plot, col = method.col[5], lwd = 2)
+lines(x.plot, dnorm(x.plot), col = 
+       "orange"
+      #  method.col[2]
+      , lty = 2, lwd = 2)
+lines(x.plot, dnorm(x.plot, fit.locfdr$fp0[3, 1], fit.locfdr$fp0[3, 2]) * fit.locfdr$fp0[3, 3], col = method.col[3], lty = 2, lwd = 2)
+text(-3, 0.22, "N(0,1)", col = "orange")
+text(-5, 0.15, bquote(atop("Efron's empirical null", .(round(fit.locfdr$fp0[3, 3], 2)) %*% N(.(round(fit.locfdr$fp0[3, 1], 2)), .(round(fit.locfdr$fp0[3, 2], 2))^2))), col = method.col[3])
+text(4.5, 0.10, "CASH null", col = method.col[5])
+arrows(-1.8, 0.22, -1.1, 0.215, length = 0.1, angle = 20, col = "orange")
+arrows(-2, 0.15, -1.5, 0.145, length = 0.1, angle = 20, col = method.col[3])
+arrows(2.9, 0.10, 2, 0.095, length = 0.1, angle = 20, col = method.col[5])
+
+plot(z, fit$lfdr, pch = 18, cex = 0.5, ylim = c(0, 1), col = method.col[5], ylab = "Local FDR", xlab = expression(paste(z, "-scores")))
+points(z, fit.locfdr$fdr, pch = 16, cex = 0.5, col = method.col[3])
+points(z, ashr::get_lfdr(fit.ash), pch = 17, cex = 0.5, col = method.col[4])
+points(z, fit.qvalue$lfdr, pch = 15, cex = 0.5, col = method.col[2])
+abline(h = 0.2, lty = 2)
+legend("topright", bty = "n", pch = 15 : 18, col = method.col[2 : 5], c("qvalue", "locfdr", "ASH", "CASH"))
+
+library(lattice)
+test <- seq(z)[fit$lfdr <= 0.1 & fit.locfdr$fdr > 0.1]
+hist(z, prob = TRUE)
+hist(z[test], xlim = c(-10, 10))
+
+
+betahat <- c()
+p <- c()
+z <- c()
+t <- c()
+leukemia.rank <- apply(leukemia, 2, function(x) {qnorm((rank(x) - 0.5) / 7128)})
+for (i in seq(nrow(leukemia))) {
+  ttest <- t.test(leukemia[i, ][design == 0], leukemia[i, ][design == 1], var.equal = TRUE)
+  betahat[i] <- ttest$estimate[1] - ttest$estimate[2]
+  t[i] <- ttest$statistic
+  p[i] <- ttest$p.value
+  z[i] <- -qnorm(ttest$p.value / 2) * sign(ttest$statistic)
+}
+z1 <- qnorm(pt(t, 70))
+z2 <- -qnorm(pt(-t, 70))
+z <- z1
+z[abs(z1) > abs(z2)] <- z2[abs(z1) > abs(z2)]
+sebetahat <- betahat / z
+```
+
+```{r}
+prostate <- read.csv("http://web.stanford.edu/~hastie/CASI_files/DATA/prostmat.csv")
+design <- c(rep(0, 50), rep(1, 52))
+lim = limma::lmFit(prostate, model.matrix(~design))
+r.ebayes = limma::eBayes(lim)
+p = r.ebayes$p.value[, 2]
+t = r.ebayes$t[, 2]
+z = -sign(t) * qnorm(p/2)
+betahat = lim$coefficients[,2]
+sebetahat = betahat / z
+```
+
+```{r}
+hist(p)
+hist(z, prob = TRUE, ylim = c(0, dnorm(0)))
+lines(seq(-10, 10, by = 0.01), dnorm(seq(-10, 10, by = 0.01)), col = "red")
+```
+
+```{r}
+fit <- gdash(betahat, sebetahat, gd.ord = 10)
+rand.sign <- sample(c(rep(1, nrow(prostate) / 2), rep(-1, nrow(prostate) / 2)))
+fit.sym <- gdash(rand.sign * betahat, sebetahat, gd.ord = 10)
+fit.locfdr <- locfdr(z)
+```
+
+```{r}
+police <- scan("https://web.stanford.edu/~hastie/CASI_files/DATA/police.txt")
+fit <- gdash(police, rep(1, length(police)), gd.ord = 10)
+DTI <- scan("https://web.stanford.edu/~hastie/CASI_files/DATA/DTI.txt")
+```
+
+## Session information
+
+<!-- Insert the session information into the document -->
+```{r session-info}
+```
