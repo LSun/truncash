@@ -332,10 +332,10 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2018-04-27</p>
+<p><strong>Last updated:</strong> 2018-05-06</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 37ad456</p>
+<p><strong>Code version:</strong> 797cd69</p>
 <!-- Add your analysis here -->
 <div id="sigma_beta-2.5-4-gaussian-derivatives" class="section level2">
 <h2><span class="math inline">\(\sigma_\beta = 2.5\)</span>, 4 Gaussian derivatives</h2>
@@ -737,13 +737,267 @@ for (j in seq(length(pi0.vec))) {
   grid.arrange(FDR.plot, power.plot
                #, top = textGrob(bquote(paste(pi[0] == .(pi0.vec[j]), &quot;; &quot;, sigma[beta] == .(sigma.beta), &quot;; &quot;, .(L), &quot;GDs; &quot;, .(ifelse(w.lambda == 0, &quot;No Constraints&quot;, &quot;With Constraints&quot;)), &quot;; &quot;, q == .(q))))
                )
-  
-  # pdf(paste(&quot;../output/fig/sim_cash_2_&quot;, sigma.beta, L, w.lambda, pi0.vec[j], &quot;plot.pdf&quot;, sep = &quot;_&quot;), onefile = TRUE)
-  # grid.arrange(FDR.plot, power.plot, top = textGrob(bquote(paste(pi[0] == .(pi0.vec[j]), &quot;; &quot;, sigma[beta] == .(sigma.beta), &quot;; &quot;, .(L), &quot;GDs; &quot;, .(ifelse(w.lambda == 0, &quot;No Constraints&quot;, &quot;With Constraints&quot;)), &quot;; &quot;, q == .(q)))))
-  # dev.off()
+  g &lt;- arrangeGrob(FDR.plot, power.plot) #generates g
+  ggsave(&quot;../output/fig/fdp_tpp_sep.eps&quot;, g)
 }
 }</code></pre>
+<pre><code>Saving 7 x 5 in image</code></pre>
 <p><img src="figure/cash_plots.rmd/unnamed-chunk-22-1.png" width="672" style="display: block; margin: auto;" /></p>
+<ul>
+<li><span class="math inline">\(\sigma = 3\)</span></li>
+</ul>
+<pre class="r"><code>z.over &lt;- 1.05
+z.under &lt;- 0.95
+method.name &lt;- c(&quot;BH&quot;, &quot;qvalue&quot;, &quot;locfdr&quot;, &quot;ASH&quot;, &quot;CASH&quot;)</code></pre>
+<pre class="r"><code>FDP.array &lt;- pFDP.array &lt;- power.array &lt;- array(0, dim = c(nsim, length(q.vec), length(method.name), length(pi0.vec)))
+FDP.summary &lt;- pFDP.summary &lt;- power.summary &lt;- array(0, dim = c(5, length(q.vec), length(method.name), length(pi0.vec)))
+for (j in seq(length(pi0.vec))) {
+  for (k in seq(length(method.name))) {
+    for (i in seq(nsim)) {
+      FDP.array[i, , k, j] &lt;- sapply(q.vec, FDP, qvalue = qvalue.pi0.list[[j]][[i]][, k + 1], beta = qvalue.pi0.list[[j]][[i]][, 1])
+      pFDP.array[i, , k, j] &lt;- sapply(q.vec, pFDP, qvalue = qvalue.pi0.list[[j]][[i]][, k + 1], beta = qvalue.pi0.list[[j]][[i]][, 1])
+      power.array[i, , k, j] &lt;- sapply(q.vec, power, qvalue = qvalue.pi0.list[[j]][[i]][, k + 1], beta = qvalue.pi0.list[[j]][[i]][, 1])
+    }
+    FDP.summary[, , k, j] &lt;- rbind(
+      avg &lt;- colMeans(FDP.array[, , k, j]),
+      sd &lt;- apply(FDP.array[, , k, j], 2, sd),
+      n &lt;- colSums(!is.na(FDP.array[, , k, j])),
+      q975 &lt;- apply(FDP.array[, , k, j], 2, quantile, probs = 0.975),
+      q025 &lt;- apply(FDP.array[, , k, j], 2, quantile, probs = 0.025)
+    )
+    pFDP.summary[, , k, j] &lt;- rbind(
+      avg &lt;- colMeans(pFDP.array[, , k, j], na.rm = TRUE),
+      sd &lt;- apply(pFDP.array[, , k, j], 2, sd, na.rm = TRUE),
+      n &lt;- colSums(!is.na(pFDP.array[, , k, j])),
+      q975 &lt;- apply(pFDP.array[, , k, j], 2, quantile, probs = 0.975, na.rm = TRUE),
+      q025 &lt;- apply(pFDP.array[, , k, j], 2, quantile, probs = 0.025, na.rm = TRUE)
+    )
+    power.summary[, , k, j] &lt;- rbind(
+      avg &lt;- colMeans(power.array[, , k, j]),
+      sd &lt;- apply(power.array[, , k, j], 2, sd),
+      n &lt;- colSums(!is.na(power.array[, , k, j])),
+      q975 &lt;- apply(power.array[, , k, j], 2, quantile, probs = 0.975),
+      q025 &lt;- apply(power.array[, , k, j], 2, quantile, probs = 0.025)
+    )
+  }
+}
+
+for (j in seq(length(pi0.vec))) {
+  for (q in c(0.1)) {
+  sd.z &lt;- sapply(z.pi0.list[[j]], sd)
+  Noise &lt;- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c(&quot;Deflated Error&quot;, &quot;In-between&quot;, &quot;Inflated Error&quot;))
+
+  FDR.plot &lt;- ggplot(data = melt(cbind(Noise, as.data.frame(FDP.array[, which(round(q.vec, 4) == q), , j])), id.vars = &quot;Noise&quot;),
+         aes(x = variable, y = value, col = variable)) +
+  geom_boxplot() +
+  stat_summary(fun.y = mean, geom = &quot;point&quot;, shape = 8, size = 3) +
+#  scale_color_manual(values = method.col) +
+  facet_wrap(~Noise) +
+  geom_hline(yintercept = q, col = &quot;black&quot;, linetype = &quot;dashed&quot;, size = 1) +
+  scale_x_discrete(labels = method.name) +
+  labs(x = &quot;&quot;, y = &quot;FDP&quot;) +
+  theme(legend.position = &quot;none&quot;, plot.title = element_text(hjust = 0.5, size = 12.5), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 7.5), axis.text.y = element_text(size = 15))
+  
+  # pFDR.plot &lt;- ggplot(data = melt(cbind(Noise, as.data.frame(pFDP.array[, which(q.vec == q), , j])), id.vars = &quot;Noise&quot;),
+  #       aes(x = variable, y = value, col = variable)) +
+  # geom_boxplot(na.rm = TRUE) +
+  # stat_summary(fun.y = mean, geom = &quot;point&quot;) +
+  # scale_color_manual(values = method.col) +
+  # facet_wrap(~Noise) +
+  # geom_hline(yintercept = q, col = &quot;black&quot;, linetype = &quot;dashed&quot;, size = 1) +
+  # scale_x_discrete(labels = method.name) +
+  # labs(x = &quot;&quot;, y = &quot;Positive FDP&quot;) +
+  # theme(legend.position = &quot;none&quot;, plot.title = element_text(hjust = 0.5, size = 12.5), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 7.5), axis.text.y = element_text(size = 15))
+  
+  power.plot &lt;- ggplot(data = melt(cbind(Noise, as.data.frame(power.array[, which(round(q.vec, 4) == q), , j])), id.vars = &quot;Noise&quot;),
+        aes(x = variable, y = value, col = variable)) +
+  geom_boxplot() +
+  stat_summary(fun.y = mean, geom = &quot;point&quot;, shape = 8, size = 3) +
+#  scale_color_manual(values = method.col) +
+  facet_wrap(~Noise) +
+  scale_x_discrete(labels = method.name) +
+  labs(x = &quot;&quot;, y = &quot;TPP&quot;) +
+  theme(legend.position = &quot;none&quot;, plot.title = element_text(hjust = 0.5, size = 12.5), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 7.5), axis.text.y = element_text(size = 15))
+
+  grid.arrange(FDR.plot, power.plot
+               #, top = textGrob(bquote(paste(pi[0] == .(pi0.vec[j]), &quot;; &quot;, sigma[beta] == .(sigma.beta), &quot;; &quot;, .(L), &quot;GDs; &quot;, .(ifelse(w.lambda == 0, &quot;No Constraints&quot;, &quot;With Constraints&quot;)), &quot;; &quot;, q == .(q))))
+               )
+  g &lt;- arrangeGrob(FDR.plot, power.plot) #generates g
+  ggsave(&quot;../output/fig/fdp_tpp_sep.eps&quot;, g)
+}
+}</code></pre>
+<pre><code>Saving 7 x 5 in image</code></pre>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-24-1.png" width="672" style="display: block; margin: auto;" /></p>
+<ul>
+<li>mixture</li>
+</ul>
+<pre class="r"><code>z.over &lt;- 1.05
+z.under &lt;- 0.95
+method.name &lt;- c(&quot;BH&quot;, &quot;qvalue&quot;, &quot;locfdr&quot;, &quot;ASH&quot;, &quot;CASH&quot;)</code></pre>
+<pre class="r"><code>FDP.array &lt;- pFDP.array &lt;- power.array &lt;- array(0, dim = c(nsim, length(q.vec), length(method.name), length(pi0.vec)))
+FDP.summary &lt;- pFDP.summary &lt;- power.summary &lt;- array(0, dim = c(5, length(q.vec), length(method.name), length(pi0.vec)))
+for (j in seq(length(pi0.vec))) {
+  for (k in seq(length(method.name))) {
+    for (i in seq(nsim)) {
+      FDP.array[i, , k, j] &lt;- sapply(q.vec, FDP, qvalue = qvalue.pi0.list[[j]][[i]][, k + 1], beta = qvalue.pi0.list[[j]][[i]][, 1])
+      pFDP.array[i, , k, j] &lt;- sapply(q.vec, pFDP, qvalue = qvalue.pi0.list[[j]][[i]][, k + 1], beta = qvalue.pi0.list[[j]][[i]][, 1])
+      power.array[i, , k, j] &lt;- sapply(q.vec, power, qvalue = qvalue.pi0.list[[j]][[i]][, k + 1], beta = qvalue.pi0.list[[j]][[i]][, 1])
+    }
+    FDP.summary[, , k, j] &lt;- rbind(
+      avg &lt;- colMeans(FDP.array[, , k, j]),
+      sd &lt;- apply(FDP.array[, , k, j], 2, sd),
+      n &lt;- colSums(!is.na(FDP.array[, , k, j])),
+      q975 &lt;- apply(FDP.array[, , k, j], 2, quantile, probs = 0.975),
+      q025 &lt;- apply(FDP.array[, , k, j], 2, quantile, probs = 0.025)
+    )
+    pFDP.summary[, , k, j] &lt;- rbind(
+      avg &lt;- colMeans(pFDP.array[, , k, j], na.rm = TRUE),
+      sd &lt;- apply(pFDP.array[, , k, j], 2, sd, na.rm = TRUE),
+      n &lt;- colSums(!is.na(pFDP.array[, , k, j])),
+      q975 &lt;- apply(pFDP.array[, , k, j], 2, quantile, probs = 0.975, na.rm = TRUE),
+      q025 &lt;- apply(pFDP.array[, , k, j], 2, quantile, probs = 0.025, na.rm = TRUE)
+    )
+    power.summary[, , k, j] &lt;- rbind(
+      avg &lt;- colMeans(power.array[, , k, j]),
+      sd &lt;- apply(power.array[, , k, j], 2, sd),
+      n &lt;- colSums(!is.na(power.array[, , k, j])),
+      q975 &lt;- apply(power.array[, , k, j], 2, quantile, probs = 0.975),
+      q025 &lt;- apply(power.array[, , k, j], 2, quantile, probs = 0.025)
+    )
+  }
+}
+
+for (j in seq(length(pi0.vec))) {
+  for (q in c(0.1)) {
+  sd.z &lt;- sapply(z.pi0.list[[j]], sd)
+  Noise &lt;- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c(&quot;Deflated Error&quot;, &quot;In-between&quot;, &quot;Inflated Error&quot;))
+
+  FDR.plot &lt;- ggplot(data = melt(cbind(Noise, as.data.frame(FDP.array[, which(round(q.vec, 4) == q), , j])), id.vars = &quot;Noise&quot;),
+         aes(x = variable, y = value, col = variable)) +
+  geom_boxplot() +
+  stat_summary(fun.y = mean, geom = &quot;point&quot;, shape = 8, size = 3) +
+#  scale_color_manual(values = method.col) +
+  facet_wrap(~Noise) +
+  geom_hline(yintercept = q, col = &quot;black&quot;, linetype = &quot;dashed&quot;, size = 1) +
+  scale_x_discrete(labels = method.name) +
+  labs(x = &quot;&quot;, y = &quot;FDP&quot;) +
+  theme(legend.position = &quot;none&quot;, plot.title = element_text(hjust = 0.5, size = 12.5), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 7.5), axis.text.y = element_text(size = 15))
+  
+  # pFDR.plot &lt;- ggplot(data = melt(cbind(Noise, as.data.frame(pFDP.array[, which(q.vec == q), , j])), id.vars = &quot;Noise&quot;),
+  #       aes(x = variable, y = value, col = variable)) +
+  # geom_boxplot(na.rm = TRUE) +
+  # stat_summary(fun.y = mean, geom = &quot;point&quot;) +
+  # scale_color_manual(values = method.col) +
+  # facet_wrap(~Noise) +
+  # geom_hline(yintercept = q, col = &quot;black&quot;, linetype = &quot;dashed&quot;, size = 1) +
+  # scale_x_discrete(labels = method.name) +
+  # labs(x = &quot;&quot;, y = &quot;Positive FDP&quot;) +
+  # theme(legend.position = &quot;none&quot;, plot.title = element_text(hjust = 0.5, size = 12.5), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 7.5), axis.text.y = element_text(size = 15))
+  
+  power.plot &lt;- ggplot(data = melt(cbind(Noise, as.data.frame(power.array[, which(round(q.vec, 4) == q), , j])), id.vars = &quot;Noise&quot;),
+        aes(x = variable, y = value, col = variable)) +
+  geom_boxplot() +
+  stat_summary(fun.y = mean, geom = &quot;point&quot;, shape = 8, size = 3) +
+#  scale_color_manual(values = method.col) +
+  facet_wrap(~Noise) +
+  scale_x_discrete(labels = method.name) +
+  labs(x = &quot;&quot;, y = &quot;TPP&quot;) +
+  theme(legend.position = &quot;none&quot;, plot.title = element_text(hjust = 0.5, size = 12.5), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 7.5), axis.text.y = element_text(size = 15))
+
+  grid.arrange(FDR.plot, power.plot
+               #, top = textGrob(bquote(paste(pi[0] == .(pi0.vec[j]), &quot;; &quot;, sigma[beta] == .(sigma.beta), &quot;; &quot;, .(L), &quot;GDs; &quot;, .(ifelse(w.lambda == 0, &quot;No Constraints&quot;, &quot;With Constraints&quot;)), &quot;; &quot;, q == .(q))))
+               )
+  g &lt;- arrangeGrob(FDR.plot, power.plot) #generates g
+  ggsave(&quot;../output/fig/fdp_tpp_sep.eps&quot;, g)
+}
+}</code></pre>
+<pre><code>Saving 7 x 5 in image</code></pre>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-26-1.png" width="672" style="display: block; margin: auto;" /></p>
+<ul>
+<li>homoskedasticity</li>
+</ul>
+<pre class="r"><code>z.over &lt;- 1.05
+z.under &lt;- 0.95
+method.name &lt;- c(&quot;BH&quot;, &quot;qvalue&quot;, &quot;locfdr&quot;, &quot;ASH&quot;, &quot;CASH&quot;)</code></pre>
+<pre class="r"><code>FDP.array &lt;- pFDP.array &lt;- power.array &lt;- array(0, dim = c(nsim, length(q.vec), length(method.name), length(pi0.vec)))
+FDP.summary &lt;- pFDP.summary &lt;- power.summary &lt;- array(0, dim = c(5, length(q.vec), length(method.name), length(pi0.vec)))
+for (j in seq(length(pi0.vec))) {
+  for (k in seq(length(method.name))) {
+    for (i in seq(nsim)) {
+      FDP.array[i, , k, j] &lt;- sapply(q.vec, FDP, qvalue = qvalue.pi0.list[[j]][[i]][, k + 1], beta = qvalue.pi0.list[[j]][[i]][, 1])
+      pFDP.array[i, , k, j] &lt;- sapply(q.vec, pFDP, qvalue = qvalue.pi0.list[[j]][[i]][, k + 1], beta = qvalue.pi0.list[[j]][[i]][, 1])
+      power.array[i, , k, j] &lt;- sapply(q.vec, power, qvalue = qvalue.pi0.list[[j]][[i]][, k + 1], beta = qvalue.pi0.list[[j]][[i]][, 1])
+    }
+    FDP.summary[, , k, j] &lt;- rbind(
+      avg &lt;- colMeans(FDP.array[, , k, j]),
+      sd &lt;- apply(FDP.array[, , k, j], 2, sd),
+      n &lt;- colSums(!is.na(FDP.array[, , k, j])),
+      q975 &lt;- apply(FDP.array[, , k, j], 2, quantile, probs = 0.975),
+      q025 &lt;- apply(FDP.array[, , k, j], 2, quantile, probs = 0.025)
+    )
+    pFDP.summary[, , k, j] &lt;- rbind(
+      avg &lt;- colMeans(pFDP.array[, , k, j], na.rm = TRUE),
+      sd &lt;- apply(pFDP.array[, , k, j], 2, sd, na.rm = TRUE),
+      n &lt;- colSums(!is.na(pFDP.array[, , k, j])),
+      q975 &lt;- apply(pFDP.array[, , k, j], 2, quantile, probs = 0.975, na.rm = TRUE),
+      q025 &lt;- apply(pFDP.array[, , k, j], 2, quantile, probs = 0.025, na.rm = TRUE)
+    )
+    power.summary[, , k, j] &lt;- rbind(
+      avg &lt;- colMeans(power.array[, , k, j]),
+      sd &lt;- apply(power.array[, , k, j], 2, sd),
+      n &lt;- colSums(!is.na(power.array[, , k, j])),
+      q975 &lt;- apply(power.array[, , k, j], 2, quantile, probs = 0.975),
+      q025 &lt;- apply(power.array[, , k, j], 2, quantile, probs = 0.025)
+    )
+  }
+}
+
+for (j in seq(length(pi0.vec))) {
+  for (q in c(0.1)) {
+  sd.z &lt;- sapply(z.pi0.list[[j]], sd)
+  Noise &lt;- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c(&quot;Deflated Error&quot;, &quot;In-between&quot;, &quot;Inflated Error&quot;))
+
+  FDR.plot &lt;- ggplot(data = melt(cbind(Noise, as.data.frame(FDP.array[, which(round(q.vec, 4) == q), , j])), id.vars = &quot;Noise&quot;),
+         aes(x = variable, y = value, col = variable)) +
+  geom_boxplot() +
+  stat_summary(fun.y = mean, geom = &quot;point&quot;, shape = 8, size = 3) +
+#  scale_color_manual(values = method.col) +
+  facet_wrap(~Noise) +
+  geom_hline(yintercept = q, col = &quot;black&quot;, linetype = &quot;dashed&quot;, size = 1) +
+  scale_x_discrete(labels = method.name) +
+  labs(x = &quot;&quot;, y = &quot;FDP&quot;) +
+  theme(legend.position = &quot;none&quot;, plot.title = element_text(hjust = 0.5, size = 12.5), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 7.5), axis.text.y = element_text(size = 15))
+  
+  # pFDR.plot &lt;- ggplot(data = melt(cbind(Noise, as.data.frame(pFDP.array[, which(q.vec == q), , j])), id.vars = &quot;Noise&quot;),
+  #       aes(x = variable, y = value, col = variable)) +
+  # geom_boxplot(na.rm = TRUE) +
+  # stat_summary(fun.y = mean, geom = &quot;point&quot;) +
+  # scale_color_manual(values = method.col) +
+  # facet_wrap(~Noise) +
+  # geom_hline(yintercept = q, col = &quot;black&quot;, linetype = &quot;dashed&quot;, size = 1) +
+  # scale_x_discrete(labels = method.name) +
+  # labs(x = &quot;&quot;, y = &quot;Positive FDP&quot;) +
+  # theme(legend.position = &quot;none&quot;, plot.title = element_text(hjust = 0.5, size = 12.5), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 7.5), axis.text.y = element_text(size = 15))
+  
+  power.plot &lt;- ggplot(data = melt(cbind(Noise, as.data.frame(power.array[, which(round(q.vec, 4) == q), , j])), id.vars = &quot;Noise&quot;),
+        aes(x = variable, y = value, col = variable)) +
+  geom_boxplot() +
+  stat_summary(fun.y = mean, geom = &quot;point&quot;, shape = 8, size = 3) +
+#  scale_color_manual(values = method.col) +
+  facet_wrap(~Noise) +
+  scale_x_discrete(labels = method.name) +
+  labs(x = &quot;&quot;, y = &quot;TPP&quot;) +
+  theme(legend.position = &quot;none&quot;, plot.title = element_text(hjust = 0.5, size = 12.5), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 7.5), axis.text.y = element_text(size = 15))
+
+  grid.arrange(FDR.plot, power.plot
+               #, top = textGrob(bquote(paste(pi[0] == .(pi0.vec[j]), &quot;; &quot;, sigma[beta] == .(sigma.beta), &quot;; &quot;, .(L), &quot;GDs; &quot;, .(ifelse(w.lambda == 0, &quot;No Constraints&quot;, &quot;With Constraints&quot;)), &quot;; &quot;, q == .(q))))
+               )
+  g &lt;- arrangeGrob(FDR.plot, power.plot) #generates g
+  ggsave(&quot;../output/fig/fdp_tpp_sep.eps&quot;, g)
+}
+}</code></pre>
+<pre><code>Saving 7 x 5 in image</code></pre>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-28-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="session-information" class="section level2">
 <h2>Session information</h2>
