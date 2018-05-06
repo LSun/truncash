@@ -65,12 +65,12 @@ hist(z[abs(z) >= 5])
 hist(betahat[abs(z) >= 5])
 
 x.plot <- seq(-2, 2, length = 1000)
-y.plot <- sapply(fit.sym$fitted_g$sd, function(x) {sapply(x.plot, dnorm, sd = x)})
-y.plot <- y.plot %*% fit.sym$fitted_g$pi
-plot(x.plot, y.plot, type = "l", col = "red")
-y.plot <- sapply(fit$fitted_g$sd, function(x) {sapply(x.plot, dnorm, sd = x)})
-y.plot <- y.plot %*% fit$fitted_g$pi
-lines(x.plot, y.plot)
+# y.plot <- sapply(fit.sym$fitted_g$sd, function(x) {sapply(x.plot, dnorm, sd = x)})
+# y.plot <- y.plot %*% fit.sym$fitted_g$pi
+# plot(x.plot, y.plot, type = "l", col = "red")
+# y.plot <- sapply(fit$fitted_g$sd, function(x) {sapply(x.plot, dnorm, sd = x)})
+# y.plot <- y.plot %*% fit$fitted_g$pi
+# lines(x.plot, y.plot)
 
 x.plot <- seq(-10, 10, length = 1000)
 gd.ord <- 10
