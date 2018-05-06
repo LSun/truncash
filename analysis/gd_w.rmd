@@ -219,6 +219,83 @@ legend("bottomleft", lty = c(1, 2, 2, 2), col = c(1, 2, 4, 3), legend = c(
 ))
 ```
 
+```{r}
+set.seed(777)
+nsamp <- 50
+nsim <- 1e3
+z <- sebetahat <- list()
+for (i in 1 : nsim) {
+  ## generate data
+  counts <- r[, sample(ncol(r), 2 * nsamp)]
+  design <- model.matrix(~c(rep(0, nsamp), rep(1, nsamp)))
+  summary <- count_to_summary(counts, design)
+  z[[i]] <- summary$z
+  sebetahat[[i]] <- summary$sebetahat
+}
+```
+
+```{r}
+sd.vec <- sapply(z, sd)
+median.vec <- sapply(z, median)
+fd.vec <- sapply(z, function(x) {
+  p <- pnorm(-abs(x)) * 2
+  sum(p <= 0.005)
+})
+sel <- c(834, 211, 397, 748)
+par(mfrow = c(2, 2))
+for (i in seq(sel)) {
+  fit <- gdfit(z[[sel[i]]], 10)
+  plot.gdfit(z[[sel[i]]], fit$w, fit$L, legend = FALSE)
+}
+```
+
+```{r}
+set.seed(6)
+par(mfrow = c(2, 3))
+par(mar = c(4.5, 4.5, 2, 2))
+hist(pnorm(-abs(z[[834]])) * 2, prob = TRUE, xlab = "", breaks = 100, main = "(a): Histogram of two-sided p-values")
+lines(c(0, 1), c(1, 1), col = "red")
+hist(z[[834]], prob = TRUE, breaks = 100, xlab = "", xlim = c(-4.5, -2), main = "(b): Left tail of correlated z-scores")
+lines(seq(-6, 6, by = 0.01), dnorm(seq(-6, 6, by = 0.01), 0, sd(z[[834]])), col = "blue")
+lines(seq(-6, 6, by = 0.01), dnorm(seq(-6, 6, by = 0.01)), col = "red")
+hist(z[[834]], prob = TRUE, breaks = 100, xlab = "", xlim = c(2, 4.5), main = "(c): Right tail of correlated z-scores")
+lines(seq(-6, 6, by = 0.01), dnorm(seq(-6, 6, by = 0.01)), col = "red")
+p <- pnorm(-abs(z[[834]])) * 2
+plot(sample(-log(pnorm(-abs(z[[834]])) * 2)), ylim = c(0, 20), ylab = "-log(p)", main = expression(paste("(d): Correlated ", N(0, 1))))
+abline(h = -log(0.005), col = "red")
+abline(h = -log(pnorm(-sqrt(2 * log(1e4))) * 2), col = "blue")
+abline(h = -log(0.05 / 1e4), col = "green")
+plot(-log(pnorm(-abs(rnorm(1e4))) * 2), ylim = c(0, 20), ylab = "-log(p)", main = expression(paste("(e): Independent ", N(0, 1))))
+abline(h = -log(0.005), col = "red")
+abline(h = -log(pnorm(-sqrt(2 * log(1e4))) * 2), col = "blue")
+abline(h = -log(0.05 / 1e4), col = "green")
+plot(-log(pnorm(-abs(rnorm(1e4, 0, 1.6))) * 2), ylim = c(0, 20), ylab = "-log(p)", main = expression(paste("(f): Independent ", N(0, 1.6^2))))
+abline(h = -log(0.005), col = "red")
+abline(h = -log(pnorm(-sqrt(2 * log(1e4))) * 2), col = "blue")
+abline(h = -log(0.05 / 1e4), col = "green")
+p.bh <- p.adjust(p, method = "BH")
+sum(p.bh <= 0.05)
+
+plot(sort(log(p)), cex = 0.25, pch = 19, ylim = c(-19, 0), xlab = "Order", ylab = "log(p)")
+
+set.seed(6)
+z.indep <- rnorm(1e4)
+points(sort(log(pnorm(-abs(z.indep)) * 2)), cex = 0.25, pch = 19, col = "blue")
+z.indep <- rnorm(1e4, 0, 1.6)
+points(sort(log(pnorm(-abs(z.indep)) * 2)), cex = 0.25, pch = 19, col = "green")
+
+plot(sort(log(p)), cex = 0.25, pch = 19, ylim = c(-19, -2.5), xlim = c(1, 850), xlab = "Order", ylab = "log(p)")
+
+set.seed(6)
+z.indep <- rnorm(1e4)
+points(sort(log(pnorm(-abs(z.indep)) * 2)), cex = 0.25, pch = 19, col = "blue")
+z.indep <- rnorm(1e4, 0, 1.6)
+points(sort(log(pnorm(-abs(z.indep)) * 2)), cex = 0.25, pch = 19, col = "green")
+abline(h = log(0.005), col = "red", lty = 2)
+abline(h = log(pnorm(-sqrt(2 * log(1e4))) * 2), col = "red", lty = 2)
+abline(h = log(0.05 / 1e4), col = "red", lty = 2)
+```
+
 ## Session information
 
 <!-- Insert the session information into the document -->

@@ -147,6 +147,7 @@ plot(q.cutoff, fdp, xlab = "Nominal FDR", ylab = "FDP",
 abline(0, 1, col = "red", lty = 3)
 ```
 
+
 ```{r, cache = TRUE}
 theta <- list()
 for (j in 1 : 1e4) {
