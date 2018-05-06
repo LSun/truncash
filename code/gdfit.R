@@ -1,24 +1,31 @@
 library(PolynomF)
 
-gdfit = function (z, gd.ord, w.lambda = NULL, w.rho = 0.5) {
+gdfit = function (z, L, w.lambda = NULL, w.rho = 0.5) {
   if (is.null(w.lambda)) {
-    w_prior = rep(0, gd.ord)
+    w_prior = rep(0, L)
   } else {
-    w_prior = w.lambda / sqrt(w.rho^(1 : gd.ord))
-    w_prior[seq(1, gd.ord, by = 2)] = 0
+    w_prior = w.lambda / sqrt(w.rho^(1 : L))
+    w_prior[seq(1, L, by = 2)] = 0
   }
-  hermite = Hermite(gd.ord)
+  hermite = Hermite(L)
   gd0.std = dnorm(z)
   matrix_lik_w = cbind(gd0.std)
-  for (i in 1 : gd.ord) {
+  for (i in 1 : L) {
     gd.std = (-1)^i * hermite[[i]](z) * gd0.std / sqrt(factorial(i))
     matrix_lik_w = cbind(matrix_lik_w, gd.std)
   }
-  w.fit = w.mosek(matrix_lik_w, w_prior, w.init = NULL)
+  z.extra = seq(-10, 10, by = 0.001)
+  gd0.std = dnorm(z.extra)
+  matrix_lik_z = cbind(gd0.std)
+  for (i in 1 : L) {
+    gd.std = (-1)^i * hermite[[i]](z.extra) * gd0.std / sqrt(factorial(i))
+    matrix_lik_z = cbind(matrix_lik_z, gd.std)
+  }
+  w.fit = w.mosek(matrix_lik_w, matrix_lik_z, w_prior, w.init = NULL)
   w.hat = c(1, w.fit$w)
   w.status = w.fit$status
   loglik.hat = sum(log(matrix_lik_w %*% w.hat))
-  return(list(gd.ord = gd.ord, w = w.hat, loglik = loglik.hat, status = w.status))
+  return(list(L = L, w = w.hat, loglik = loglik.hat, status = w.status))
 }
 
 gdfit.mom = function (z, gd.ord) {
@@ -70,4 +77,43 @@ plot.gdfit = function (z, w, gd.ord, symm = TRUE, breaks = 100, std.norm = TRUE,
       legend("topleft", lty = 1, col = "red", "N(0, 1)")
     }
   }
+}
+
+
+w.mosek = function (matrix_lik_w, matrix_lik_z, w_prior, w.init = NULL) {
+  A = matrix_lik_w[, -1]
+  a = matrix_lik_w[, 1]
+  B = matrix_lik_z[, -1]
+  b = matrix_lik_z[, 1]
+  m = ncol(A)
+  nA = nrow(A)
+  nB = nrow(B)
+  AB <- rbind(A, B)
+  P <- list(sense = "min")
+  if (!is.null(w.init)) {
+    g.init <- as.vector(matrix_lik_w %*% w.init)
+    v.init <- c(1 / g.init, rep(0, nB))
+    v.init.list <- list(xx = v.init)
+    P$sol <- list(itr = v.init.list, bas = v.init.list)
+  }
+  P$c <- c(a, b)
+  P$A <- Matrix::Matrix(t(AB), sparse = TRUE)
+  if (is.null(w_prior) | all(w_prior == 0) | missing(w_prior)) {
+    P$bc <- rbind(rep(0, m), rep(0, m))
+  } else {
+    P$bc <- rbind(-w_prior, w_prior)
+  }
+  P$bx <- rbind(rep(0, nA + nB), rep(Inf, nA + nB))
+  opro <- matrix(list(), nrow = 5, ncol = nA)
+  rownames(opro) <- c("type", "j", "f", "g", "h")
+  opro[1, ] <- as.list(rep("log", nA))
+  opro[2, ] <- as.list(1 : nA)
+  opro[3, ] <- as.list(rep(-1, nA))
+  opro[4, ] <- as.list(rep(1, nA))
+  opro[5, ] <- as.list(rep(0, nA))
+  P$scopt <- list(opro = opro)
+  z <- Rmosek::mosek(P, opts = list(verbose = 0, usesol = TRUE))
+  status <- z$sol$itr$solsta
+  w <- z$sol$itr$suc - z$sol$itr$slc
+  list(w = w, status = status)
 }

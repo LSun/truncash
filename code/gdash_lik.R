@@ -19,6 +19,14 @@ gdash = function (betahat, sebetahat,
     sd = autoselect.mixsd(betahat, sebetahat, mult = sqrt(2))
     pi_prior = rep(1, length(sd))
   }
+  hermite = Hermite(gd.ord)
+  z.extra = seq(-10, 10, by = 0.001)
+  gd0.std = dnorm(z.extra)
+  matrix_lik_z = cbind(gd0.std)
+  for (i in 1 : gd.ord) {
+    gd.std = (-1)^i * hermite[[i]](z.extra) * gd0.std / sqrt(factorial(i))
+    matrix_lik_z = cbind(matrix_lik_z, gd.std)
+  }
   array_F = array_f(betahat, sebetahat, sd, gd.ord, mixcompdist, gd.normalized)
   array_F = aperm(array_F, c(2, 3, 1))
   if (is.null(w.pen)) {
@@ -31,7 +39,7 @@ gdash = function (betahat, sebetahat,
   } else {
     w_prior = w.pen
   }
-  res = biopt(array_F, pi_prior, w_prior, control, primal, gd.priority)
+  res = biopt(array_F, matrix_lik_z, pi_prior, w_prior, control, primal, gd.priority)
   pihat = res$pihat
   what = res$what
   fitted_g = normalmix(pi = pihat, mean = 0, sd = sd)
@@ -44,7 +52,7 @@ gdash = function (betahat, sebetahat,
   return(list(fitted_g = fitted_g, w = what, loglik = loglik, niter = res$niter, converged = res$converged, array_F = array_F, array_PM = array_PM, pm = beta_pm, lfdr = as.vector(lfdr), qvalue = qvalue))
 }
 
-bifixpoint = function(pinw, array_F, pi_prior, w_prior, primal, gd.priority){
+bifixpoint = function(pinw, array_F, matrix_lik_z, pi_prior, w_prior, primal, gd.priority){
   Kpi = dim(array_F)[1]
   Lw = dim(array_F)[2]
   pi = pinw[1 : Kpi]
@@ -55,7 +63,7 @@ bifixpoint = function(pinw, array_F, pi_prior, w_prior, primal, gd.priority){
       g_current = matrix_lik_w %*% w
       w_new = c(1, w.mosek.primal(matrix_lik_w, w_prior, w.init = c(g_current, w[-1]))$w)
     } else {
-      w_new = c(1, w.mosek(matrix_lik_w, w_prior, w.init = w)$w)
+      w_new = c(1, w.mosek(matrix_lik_w, matrix_lik_z, w_prior, w.init = w)$w)
     }
     matrix_lik_pi = apply(aperm(array_F, c(2, 1, 3)) * w_new, 2, colSums)
     pi_new = mixIP(matrix_lik_pi, pi_prior, pi)$pihat
@@ -67,7 +75,7 @@ bifixpoint = function(pinw, array_F, pi_prior, w_prior, primal, gd.priority){
       g_current = matrix_lik_w %*% w
       w_new = c(1, w.mosek.primal(matrix_lik_w, w_prior, w.init = c(g_current, w[-1]))$w)
     } else {
-      w_new = c(1, w.mosek(matrix_lik_w, w_prior, w.init = w)$w)
+      w_new = c(1, w.mosek(matrix_lik_w, matrix_lik_z, w_prior, w.init = w)$w)
     }
   }
   # w_new = c(1, w.cvxr.uncns(matrix_lik_w, w.init = w)$primal_values[[1]])
@@ -89,40 +97,43 @@ w.cvxr.uncns = function (matrix_lik_w, w.init = NULL) {
   return(result)
 }
 
-w.mosek = function (matrix_lik_w, w_prior, w.init = NULL) {
+w.mosek = function (matrix_lik_w, matrix_lik_z, w_prior, w.init = NULL) {
   A = matrix_lik_w[, -1]
-  a = matrix_lik_w[,1]
+  a = matrix_lik_w[, 1]
+  B = matrix_lik_z[, -1]
+  b = matrix_lik_z[, 1]
   m = ncol(A)
-  n = nrow(A)
+  nA = nrow(A)
+  nB = nrow(B)
+  AB <- rbind(A, B)
   P <- list(sense = "min")
   if (!is.null(w.init)) {
     g.init <- as.vector(matrix_lik_w %*% w.init)
-    v.init <- 1 / g.init
+    v.init <- c(1 / g.init, rep(0, nB))
     v.init.list <- list(xx = v.init)
     P$sol <- list(itr = v.init.list, bas = v.init.list)
   }
-  P$c <- a
-  P$A <- Matrix::Matrix(t(A), sparse = TRUE)
+  P$c <- c(a, b)
+  P$A <- Matrix::Matrix(t(AB), sparse = TRUE)
   if (is.null(w_prior) | all(w_prior == 0) | missing(w_prior)) {
     P$bc <- rbind(rep(0, m), rep(0, m))
   } else {
     P$bc <- rbind(-w_prior, w_prior)
   }
-  P$bx <- rbind(rep(0, n), rep(Inf, n))
-  opro <- matrix(list(), nrow = 5, ncol = n)
+  P$bx <- rbind(rep(0, nA + nB), rep(Inf, nA + nB))
+  opro <- matrix(list(), nrow = 5, ncol = nA)
   rownames(opro) <- c("type", "j", "f", "g", "h")
-  opro[1, ] <- as.list(rep("log", n))
-  opro[2, ] <- as.list(1:n)
-  opro[3, ] <- as.list(rep(-1, n))
-  opro[4, ] <- as.list(rep(1, n))
-  opro[5, ] <- as.list(rep(0, n))
+  opro[1, ] <- as.list(rep("log", nA))
+  opro[2, ] <- as.list(1 : nA)
+  opro[3, ] <- as.list(rep(-1, nA))
+  opro[4, ] <- as.list(rep(1, nA))
+  opro[5, ] <- as.list(rep(0, nA))
   P$scopt <- list(opro = opro)
   z <- Rmosek::mosek(P, opts = list(verbose = 0, usesol = TRUE))
   status <- z$sol$itr$solsta
   w <- z$sol$itr$suc - z$sol$itr$slc
   list(w = w, status = status)
 }
-
 
 w.mosek.primal = function (matrix_lik_w, w_prior, w.init = NULL) {
   A = matrix_lik_w[, -1]
@@ -199,7 +210,7 @@ set_control_mixIP=function(control){
   return(control)
 }
 
-biopt = function (array_F, pi_prior, w_prior, control, primal, gd.priority) {
+biopt = function (array_F, matrix_lik_z, pi_prior, w_prior, control, primal, gd.priority) {
   control.default = list(K = 1, method = 3, square = TRUE,
                          step.min0 = 1, step.max0 = 1, mstep = 4, kr = 1, objfn.inc = 1,
                          tol = 1e-07, maxiter = 5000, trace = FALSE)
@@ -211,7 +222,7 @@ biopt = function (array_F, pi_prior, w_prior, control, primal, gd.priority) {
   Lw = dim(array_F)[2]
   pinw_init = c(1, rep(0, Kpi - 1), 1, rep(0, Lw - 1))
   res = squarem(par = pinw_init, fixptfn = bifixpoint, objfn = binegpenloglik,
-                array_F = array_F, pi_prior = pi_prior, w_prior = w_prior, primal = primal, gd.priority = gd.priority, control = controlinput)
+                array_F = array_F, matrix_lik_z = matrix_lik_z, pi_prior = pi_prior, w_prior = w_prior, primal = primal, gd.priority = gd.priority, control = controlinput)
   return(list(pihat = normalize(pmax(0, res$par[1 : Kpi])),
               what = res$par[-(1 : Kpi)],
               B = res$value.objfn,
@@ -223,7 +234,7 @@ normalmix = function (pi, mean, sd) {
   structure(data.frame(pi, mean, sd), class = "normalmix")
 }
 
-binegpenloglik = function (pinw, array_F, pi_prior, w_prior, primal, gd.priority)
+binegpenloglik = function (pinw, array_F, matrix_lik_z, pi_prior, w_prior, primal, gd.priority)
 {
   return(-bipenloglik(pinw, array_F, pi_prior, w_prior))
 }
