@@ -332,50 +332,55 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2018-05-05</p>
+<p><strong>Last updated:</strong> 2018-05-06</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> fbfd54d</p>
+<p><strong>Code version:</strong> 63936e7</p>
 <!-- Add your analysis here -->
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
 <pre class="r"><code>source(&quot;../code/gdash_lik.R&quot;)
 source(&quot;../code/gdfit.R&quot;)
 library(limma)
-library(locfdr)</code></pre>
-<pre class="r"><code>leukemia &lt;- read.csv(&quot;http://web.stanford.edu/~hastie/CASI_files/DATA/leukemia_big.csv&quot;)
-design &lt;- c(rep(0, 20), rep(1, 14), rep(0, 27), rep(1, 11))
-lim = limma::lmFit(leukemia, model.matrix(~design))
+library(locfdr)
+library(scales)</code></pre>
+<pre class="r"><code>load(&quot;../data/LSI/leukdata.RData&quot;)
+load(&quot;../data/LSI/leukz.RData&quot;)
+design &lt;- design &lt;- c(rep(0, 47), rep(1, 25))</code></pre>
+<pre class="r"><code>temp &lt;- locfdr(leukz)</code></pre>
+<p><img src="figure/efron_leukemia.rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="reproduce-efrons-empirical-null-analysis" class="section level2">
+<h2>Reproduce Efron’s empirical null analysis</h2>
+<pre class="r"><code>t &lt;- apply(leukdata, 1, function (x) {
+  t.test(x[design == 1], x[design == 0], var.equal = TRUE)$statistic
+})
+z &lt;- -qnorm(pt(-abs(t), 70)) * sign(t)</code></pre>
+<pre class="r"><code>temp &lt;- locfdr(z)</code></pre>
+<p><img src="figure/efron_leukemia.rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="use-smyths-pipeline-to-obtain-better-summary-statistics" class="section level2">
+<h2>Use Smyth’s pipeline to obtain better summary statistics</h2>
+<pre class="r"><code>lim = limma::lmFit(leukdata, model.matrix(~design))
 r.ebayes = limma::eBayes(lim)
 p = r.ebayes$p.value[, 2]
 t = r.ebayes$t[, 2]
-z = -sign(t) * qnorm(p/2)
-betahat = lim$coefficients[,2]
-sebetahat = betahat / z</code></pre>
-<pre class="r"><code>hist(p)</code></pre>
-<p><img src="figure/efron_leukemia.rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>hist(z, prob = TRUE, ylim = c(0, dnorm(0)))
-lines(seq(-10, 10, by = 0.01), dnorm(seq(-10, 10, by = 0.01)), col = &quot;red&quot;)</code></pre>
-<p><img src="figure/efron_leukemia.rmd/unnamed-chunk-3-2.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>fit &lt;- gdash(betahat, sebetahat, gd.ord = 10)
-# rand.sign &lt;- sample(c(rep(1, nrow(leukemia) / 2), rep(-1, nrow(leukemia) / 2)))
-# fit.sym &lt;- gdash(rand.sign * betahat, sebetahat, gd.ord = 10)
-fit.locfdr &lt;- locfdr(z)</code></pre>
-<p><img src="figure/efron_leukemia.rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>fit.ash &lt;- ashr::ash(betahat, sebetahat, mixcompdist = &quot;normal&quot;, method = &quot;fdr&quot;)
-fit.qvalue &lt;- qvalue::qvalue(p)
-
-hist(z[abs(z) &gt;= 5])</code></pre>
-<p><img src="figure/efron_leukemia.rmd/unnamed-chunk-4-2.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>hist(betahat[abs(z) &gt;= 5])</code></pre>
-<p><img src="figure/efron_leukemia.rmd/unnamed-chunk-4-3.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>x.plot &lt;- seq(-2, 2, length = 1000)
-# y.plot &lt;- sapply(fit.sym$fitted_g$sd, function(x) {sapply(x.plot, dnorm, sd = x)})
-# y.plot &lt;- y.plot %*% fit.sym$fitted_g$pi
-# plot(x.plot, y.plot, type = &quot;l&quot;, col = &quot;red&quot;)
-# y.plot &lt;- sapply(fit$fitted_g$sd, function(x) {sapply(x.plot, dnorm, sd = x)})
-# y.plot &lt;- y.plot %*% fit$fitted_g$pi
-# lines(x.plot, y.plot)
-
-x.plot &lt;- seq(-10, 10, length = 1000)
+z = -sign(t) * qnorm(p/2)</code></pre>
+<pre class="r"><code>fit.locfdr &lt;- locfdr(z)</code></pre>
+<p><img src="figure/efron_leukemia.rmd/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>fit.qvalue &lt;- qvalue::qvalue(p)</code></pre>
+</div>
+<div id="cash-fitting" class="section level2">
+<h2>CASH fitting</h2>
+<ul>
+<li>betahat = sebetahat * z</li>
+</ul>
+<pre class="r"><code>betahat = lim$coefficients[, 2]
+sebetahat = betahat / t
+betahat = sebetahat * z</code></pre>
+<pre class="r"><code>fit.cash &lt;- gdash(betahat, sebetahat, gd.ord = 10)
+fit.ash &lt;- ashr::ash(betahat, sebetahat, mixcompdist = &quot;normal&quot;, method = &quot;fdr&quot;)</code></pre>
+<pre class="r"><code>x.plot &lt;- seq(-10, 10, length = 1000)
 gd.ord &lt;- 10
 hermite = Hermite(gd.ord)
 gd0.std = dnorm(x.plot)
@@ -384,13 +389,12 @@ for (i in 1 : gd.ord) {
   gd.std = (-1)^i * hermite[[i]](x.plot) * gd0.std / sqrt(factorial(i))
   matrix_lik_plot = cbind(matrix_lik_plot, gd.std)
 }
-y.plot = matrix_lik_plot %*% fit$w * fit$fitted_g$pi[1]
+y.plot = matrix_lik_plot %*% fit.cash$w * fit.cash$fitted_g$pi[1]
 
-library(scales)
-method.col &lt;- hue_pal()(5)
+method.col &lt;- scales::hue_pal()(5)
 
 par(mfrow = c(1, 2))
-hist(z, prob = TRUE, main = &quot;&quot;, xlab = expression(paste(z, &quot;-scores&quot;)))
+hist(z, prob = TRUE, main = &quot;&quot;, xlab = expression(paste(z, &quot;-scores&quot;)), cex.lab = 1.25)
 lines(x.plot, y.plot, col = method.col[5], lwd = 2)
 lines(x.plot, dnorm(x.plot), col = 
        &quot;orange&quot;
@@ -404,67 +408,103 @@ arrows(-1.8, 0.22, -1.1, 0.215, length = 0.1, angle = 20, col = &quot;orange&quo
 arrows(-2, 0.15, -1.5, 0.145, length = 0.1, angle = 20, col = method.col[3])
 arrows(2.9, 0.10, 2, 0.095, length = 0.1, angle = 20, col = method.col[5])
 
-plot(z, fit$lfdr, pch = 18, cex = 0.5, ylim = c(0, 1), col = method.col[5], ylab = &quot;Local FDR&quot;, xlab = expression(paste(z, &quot;-scores&quot;)))
+plot(z, fit.cash$lfdr, pch = 18, cex = 0.5, ylim = c(0, 1), col = method.col[5], ylab = &quot;Local FDR&quot;, xlab = expression(paste(z, &quot;-scores&quot;)), cex.lab = 1.25)
 points(z, fit.locfdr$fdr, pch = 16, cex = 0.5, col = method.col[3])
 points(z, ashr::get_lfdr(fit.ash), pch = 17, cex = 0.5, col = method.col[4])
 points(z, fit.qvalue$lfdr, pch = 15, cex = 0.5, col = method.col[2])
 abline(h = 0.2, lty = 2)
 legend(&quot;topright&quot;, bty = &quot;n&quot;, pch = 15 : 18, col = method.col[2 : 5], c(&quot;qvalue&quot;, &quot;locfdr&quot;, &quot;ASH&quot;, &quot;CASH&quot;))</code></pre>
-<p><img src="figure/efron_leukemia.rmd/unnamed-chunk-4-4.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>library(lattice)
-test &lt;- seq(z)[fit$lfdr &lt;= 0.1 &amp; fit.locfdr$fdr &gt; 0.1]
-hist(z, prob = TRUE)
-hist(z[test], xlim = c(-10, 10))</code></pre>
-<p><img src="figure/efron_leukemia.rmd/unnamed-chunk-4-5.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>betahat &lt;- c()
-p &lt;- c()
-z &lt;- c()
-t &lt;- c()
-leukemia.rank &lt;- apply(leukemia, 2, function(x) {qnorm((rank(x) - 0.5) / 7128)})
-for (i in seq(nrow(leukemia))) {
-  ttest &lt;- t.test(leukemia[i, ][design == 0], leukemia[i, ][design == 1], var.equal = TRUE)
-  betahat[i] &lt;- ttest$estimate[1] - ttest$estimate[2]
-  t[i] &lt;- ttest$statistic
-  p[i] &lt;- ttest$p.value
-  z[i] &lt;- -qnorm(ttest$p.value / 2) * sign(ttest$statistic)
-}
-z1 &lt;- qnorm(pt(t, 70))
-z2 &lt;- -qnorm(pt(-t, 70))
-z &lt;- z1
-z[abs(z1) &gt; abs(z2)] &lt;- z2[abs(z1) &gt; abs(z2)]
-sebetahat &lt;- betahat / z</code></pre>
-<pre class="r"><code>prostate &lt;- read.csv(&quot;http://web.stanford.edu/~hastie/CASI_files/DATA/prostmat.csv&quot;)
-design &lt;- c(rep(0, 50), rep(1, 52))
-lim = limma::lmFit(prostate, model.matrix(~design))
+<p><img src="figure/efron_leukemia.rmd/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
+<ul>
+<li>sebetahat = betahat / z</li>
+</ul>
+<pre class="r"><code>betahat = lim$coefficients[, 2]
+sebetahat = betahat / z</code></pre>
+<pre class="r"><code>fit.cash2 &lt;- gdash(betahat, sebetahat, gd.ord = 10)</code></pre>
+<pre class="r"><code>y.plot2 = matrix_lik_plot %*% fit.cash2$w * fit.cash2$fitted_g$pi[1]
+
+par(mfrow = c(1, 2))
+hist(z, prob = TRUE, main = &quot;&quot;, xlab = expression(paste(z, &quot;-scores&quot;)), cex.lab = 1.25)
+lines(x.plot, y.plot, col = &quot;red&quot;, lwd = 2)
+lines(x.plot, y.plot2, col = &quot;blue&quot;, lwd = 2)
+lines(x.plot, dnorm(x.plot, fit.locfdr$fp0[3, 1], fit.locfdr$fp0[3, 2]) * fit.locfdr$fp0[3, 3], col = &#39;green&#39;, lty = 2, lwd = 2)
+
+plot(z, fit.cash$lfdr, pch = 18, cex = 0.5, ylim = c(0, 1), col = &quot;red&quot;, ylab = &quot;Local FDR&quot;, xlab = expression(paste(z, &quot;-scores&quot;)), cex.lab = 1.25)
+points(z, fit.cash2$lfdr, pch = 17, cex = 0.5, col = &quot;blue&quot;)
+points(z, fit.locfdr$fdr, pch = 16, cex = 0.5, col = &quot;green&quot;)
+abline(h = 0.2, lty = 2)
+legend(&quot;topright&quot;, bty = &quot;n&quot;, pch = c(16, 18, 17), col = c(&quot;green&quot;, &quot;red&quot;, &quot;blue&quot;), c(&quot;qvalue&quot;, &quot;CASH: 1&quot;, &quot;CASH: 2&quot;))</code></pre>
+<p><img src="figure/efron_leukemia.rmd/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="hiv" class="section level2">
+<h2>HIV</h2>
+<pre class="r"><code>load(&quot;../data/LSI/hivdata.RData&quot;)
+load(&quot;../data/LSI/hivz.RData&quot;)
+design &lt;- rep(0 : 1, each = 4)</code></pre>
+<div id="reproduce-efrons-empirical-null-analysis-1" class="section level3">
+<h3>Reproduce Efron’s empirical null analysis</h3>
+<pre class="r"><code>temp &lt;- locfdr(hivz)</code></pre>
+<p><img src="figure/efron_leukemia.rmd/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="use-smyths-pipeline-to-obtain-better-summary-statistics-1" class="section level3">
+<h3>Use Smyth’s pipeline to obtain better summary statistics</h3>
+<pre class="r"><code>loghivdata &lt;- log2(hivdata)
+loghivdata &lt;- limma::normalizeBetweenArrays(loghivdata)
+lim = limma::lmFit(loghivdata, model.matrix(~design))
 r.ebayes = limma::eBayes(lim)
 p = r.ebayes$p.value[, 2]
 t = r.ebayes$t[, 2]
-z = -sign(t) * qnorm(p/2)
-betahat = lim$coefficients[,2]
-sebetahat = betahat / z</code></pre>
-<pre class="r"><code>hist(p)</code></pre>
-<p><img src="figure/efron_leukemia.rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>hist(z, prob = TRUE, ylim = c(0, dnorm(0)))
-lines(seq(-10, 10, by = 0.01), dnorm(seq(-10, 10, by = 0.01)), col = &quot;red&quot;)</code></pre>
-<p><img src="figure/efron_leukemia.rmd/unnamed-chunk-6-2.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>fit &lt;- gdash(betahat, sebetahat, gd.ord = 10)
-rand.sign &lt;- sample(c(rep(1, nrow(prostate) / 2), rep(-1, nrow(prostate) / 2)))
-fit.sym &lt;- gdash(rand.sign * betahat, sebetahat, gd.ord = 10)</code></pre>
-<pre><code>Warning in rand.sign * betahat: longer object length is not a multiple of
-shorter object length</code></pre>
+z = -sign(t) * qnorm(p/2)</code></pre>
 <pre class="r"><code>fit.locfdr &lt;- locfdr(z)</code></pre>
-<p><img src="figure/efron_leukemia.rmd/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>police &lt;- scan(&quot;https://web.stanford.edu/~hastie/CASI_files/DATA/police.txt&quot;)
-fit &lt;- gdash(police, rep(1, length(police)), gd.ord = 10)</code></pre>
-<pre><code>Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
-               consider reducing rtol
+<p><img src="figure/efron_leukemia.rmd/unnamed-chunk-18-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>fit.qvalue &lt;- qvalue::qvalue(p)</code></pre>
+</div>
+<div id="cash-fitting-1" class="section level3">
+<h3>CASH fitting</h3>
+<ul>
+<li>sebetahat = betahat / z</li>
+</ul>
+<pre class="r"><code>betahat = lim$coefficients[, 2]
+sebetahat = betahat / z</code></pre>
+<pre class="r"><code>fit.cash &lt;- gdash(betahat, sebetahat, gd.ord = 10)
+fit.ash &lt;- ashr::ash(betahat, sebetahat, mixcompdist = &quot;normal&quot;, method = &quot;fdr&quot;)</code></pre>
+<pre class="r"><code>x.plot &lt;- seq(-7, 5, length = 1000)
+gd.ord &lt;- 10
+hermite = Hermite(gd.ord)
+gd0.std = dnorm(x.plot)
+matrix_lik_plot = cbind(gd0.std)
+for (i in 1 : gd.ord) {
+  gd.std = (-1)^i * hermite[[i]](x.plot) * gd0.std / sqrt(factorial(i))
+  matrix_lik_plot = cbind(matrix_lik_plot, gd.std)
+}
+y.plot = matrix_lik_plot %*% fit.cash$w * fit.cash$fitted_g$pi[1]
 
-Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
-               consider reducing rtol
+method.col &lt;- scales::hue_pal()(5)
 
-Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
-               consider reducing rtol</code></pre>
-<pre class="r"><code>DTI &lt;- scan(&quot;https://web.stanford.edu/~hastie/CASI_files/DATA/DTI.txt&quot;)</code></pre>
+par(mfrow = c(1, 2))
+hist(z, prob = TRUE, main = &quot;&quot;, xlab = expression(paste(z, &quot;-scores&quot;)), cex.lab = 1.25, breaks = 50)
+lines(x.plot, y.plot, col = method.col[5], lwd = 2)
+lines(x.plot, dnorm(x.plot), col = 
+       &quot;orange&quot;
+      #  method.col[2]
+      , lty = 2, lwd = 2)
+lines(x.plot, dnorm(x.plot, fit.locfdr$fp0[3, 1], fit.locfdr$fp0[3, 2]) * fit.locfdr$fp0[3, 3], col = method.col[3], lty = 2, lwd = 2)
+text(-3, 0.22, &quot;N(0,1)&quot;, col = &quot;orange&quot;)
+text(-5, 0.15, bquote(atop(&quot;Efron&#39;s empirical null&quot;, .(round(fit.locfdr$fp0[3, 3], 2)) %*% N(.(round(fit.locfdr$fp0[3, 1], 2)), .(round(fit.locfdr$fp0[3, 2], 2))^2))), col = method.col[3])
+text(4.5, 0.10, &quot;CASH null&quot;, col = method.col[5])
+arrows(-1.8, 0.22, -1.1, 0.215, length = 0.1, angle = 20, col = &quot;orange&quot;)
+arrows(-2, 0.15, -1.5, 0.145, length = 0.1, angle = 20, col = method.col[3])
+arrows(2.9, 0.10, 2, 0.095, length = 0.1, angle = 20, col = method.col[5])
+
+plot(z, fit.cash$lfdr, pch = 18, cex = 0.5, ylim = c(0, 1), col = method.col[5], ylab = &quot;Local FDR&quot;, xlab = expression(paste(z, &quot;-scores&quot;)), cex.lab = 1.25)
+points(z, fit.locfdr$fdr, pch = 16, cex = 0.5, col = method.col[3])
+points(z, ashr::get_lfdr(fit.ash), pch = 17, cex = 0.5, col = method.col[4])
+points(z, fit.qvalue$lfdr, pch = 15, cex = 0.5, col = method.col[2])
+abline(h = 0.2, lty = 2)
+legend(&quot;topleft&quot;, bty = &quot;n&quot;, pch = 15 : 18, col = method.col[2 : 5], c(&quot;qvalue&quot;, &quot;locfdr&quot;, &quot;ASH&quot;, &quot;CASH&quot;))</code></pre>
+<p><img src="figure/efron_leukemia.rmd/unnamed-chunk-22-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+</div>
 <div id="session-information" class="section level2">
 <h2>Session information</h2>
 <!-- Insert the session information into the document -->
@@ -484,11 +524,10 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] lattice_0.20-35   scales_0.5.0      locfdr_1.1-8     
- [4] limma_3.34.4      ashr_2.2-2        Rmosek_8.0.69    
- [7] PolynomF_1.0-1    CVXR_0.95         REBayes_1.2      
-[10] Matrix_1.2-12     SQUAREM_2017.10-1 EQL_1.0-0        
-[13] ttutils_1.0-1    
+ [1] scales_0.5.0      locfdr_1.1-8      limma_3.34.4     
+ [4] ashr_2.2-2        Rmosek_8.0.69     PolynomF_1.0-1   
+ [7] CVXR_0.95         REBayes_1.2       Matrix_1.2-12    
+[10] SQUAREM_2017.10-1 EQL_1.0-0         ttutils_1.0-1    
 
 loaded via a namespace (and not attached):
  [1] gmp_0.5-13.1      Rcpp_0.12.16      pillar_1.0.1     
@@ -496,17 +535,17 @@ loaded via a namespace (and not attached):
  [7] R.methodsS3_1.7.1 R.utils_2.6.0     iterators_1.0.9  
 [10] tools_3.4.3       digest_0.6.15     bit_1.1-12       
 [13] tibble_1.4.1      gtable_0.2.0      evaluate_0.10.1  
-[16] rlang_0.1.6       foreach_1.4.4     yaml_2.1.18      
-[19] parallel_3.4.3    Rmpfr_0.6-1       ECOSolveR_0.4    
-[22] stringr_1.3.0     knitr_1.20        rprojroot_1.3-2  
-[25] bit64_0.9-7       grid_3.4.3        qvalue_2.10.0    
-[28] R6_2.2.2          rmarkdown_1.9     reshape2_1.4.3   
-[31] ggplot2_2.2.1     magrittr_1.5      splines_3.4.3    
-[34] MASS_7.3-47       backports_1.1.2   codetools_0.2-15 
-[37] htmltools_0.3.6   scs_1.1-1         assertthat_0.2.0 
-[40] colorspace_1.3-2  stringi_1.1.6     lazyeval_0.2.1   
-[43] munsell_0.4.3     doParallel_1.0.11 pscl_1.5.2       
-[46] truncnorm_1.0-7   R.oo_1.21.0      </code></pre>
+[16] lattice_0.20-35   rlang_0.1.6       foreach_1.4.4    
+[19] yaml_2.1.18       parallel_3.4.3    Rmpfr_0.6-1      
+[22] ECOSolveR_0.4     stringr_1.3.0     knitr_1.20       
+[25] rprojroot_1.3-2   bit64_0.9-7       grid_3.4.3       
+[28] qvalue_2.10.0     R6_2.2.2          rmarkdown_1.9    
+[31] reshape2_1.4.3    ggplot2_2.2.1     magrittr_1.5     
+[34] splines_3.4.3     MASS_7.3-47       backports_1.1.2  
+[37] codetools_0.2-15  htmltools_0.3.6   scs_1.1-1        
+[40] assertthat_0.2.0  colorspace_1.3-2  stringi_1.1.6    
+[43] lazyeval_0.2.1    munsell_0.4.3     doParallel_1.0.11
+[46] pscl_1.5.2        truncnorm_1.0-7   R.oo_1.21.0      </code></pre>
 </div>
 
 <hr>
