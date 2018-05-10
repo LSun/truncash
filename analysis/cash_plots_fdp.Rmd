@@ -7,7 +7,7 @@ output:
     code_folding: hide
 ---
 
-```{r packages, message = FALSE, warning = FALSE, echo = FALSE}
+```{r packages, message = FALSE, warning = FALSE}
 source("../code/gdash_lik.R")
 source("../code/count_to_summary.R")
 library(ashr)
@@ -17,10 +17,10 @@ library(reshape2)
 library(ggplot2)
 library(grid)
 library(gridExtra)
-library(wesanderson)
+library(RColorBrewer)
 ```
 
-```{r functions, echo = FALSE}
+```{r functions}
 mean_sdp <- function(x) {
    m <- mean(x)
    ymax <- m + sd(x)
@@ -54,7 +54,6 @@ lcpm = function (r) {
 ```{r}
 nsamp <- 5
 ngene <- 1e4
-nsim <- 500
 pi0.vec <- 0.9
 ```
 
@@ -64,9 +63,9 @@ subset = top_genes_index(ngene, Y)
 r = r[subset,]
 ```
 
-- $\sigma = 1$
-
 ```{r gtex_z_1, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
+nsim <- 1000
+
 qvalue.pi0.list <- qvalue.list <- pi0.list <- pi0.pi0.list <- list()
 z.pi0.list <- z.list <- list()
 
@@ -79,7 +78,8 @@ for (i in 1 : nsim) {
   z <- summary$z
   sebetahat <- summary$sebetahat
   beta <- sample(c(
-    rep(0, round(pi0 * ngene)), rnorm(round((1 - pi0) * ngene), 0, 1)
+    rep(0, round(pi0 * ngene)),
+    rnorm(round((1 - pi0) * ngene), 0, 3 * sqrt(mean(sebetahat^2)))
     ))
   betahat <- beta + sebetahat * z
   
@@ -87,7 +87,7 @@ for (i in 1 : nsim) {
 
   ## different methods
   fit.ash = ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
-  fit.gdash = gdash(betahat, sebetahat, gd.ord = 10)
+  fit.gdash = gdash(betahat, sebetahat, gd.ord = 10, w.rho = 0.5)
   fit.qvalue = qvalue::qvalue(pvalue)
   fit.BH = p.adjust(pvalue, method = "BH")
   fit.locfdr <- tryCatch(locfdr::locfdr(betahat / sebetahat, plot = 0), error = function(e) {NA})
@@ -118,7 +118,7 @@ z.pi0.list[[j]] <- z.list
 ```
 
 ```{r}
-q.vec <- seq(0.005, 0.20, by = 0.005)
+q.vec <- seq(0.001, 0.20, by = 0.001)
 method.name <- c("BH", "qvalue", "locfdr", "ASH", "CASH")
 ```
 
@@ -159,15 +159,16 @@ for (j in seq(length(pi0.vec))) {
 
 ```{r}
 q <- 0.1
-z.over <- 1.05
-z.under <- 0.95
-method.col <- wesanderson::wes_palette(name = "Zissou1", length(method.name))
+z.over <- 1.1
+z.under <- 0.9
+method.col <- c("#377eb8", "#984ea3", "#4daf4a", "#ff7f00", "#e41a1c")
 ```
 
-```{r}
+```{r, message = FALSE, warning = FALSE}
 for (j in seq(length(pi0.vec))) {
   sd.z <- sapply(z.pi0.list[[j]], sd)
-  Noise <- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
+  Noise <- cut(sd.z, breaks = c(0, quantile(sd.z, probs = 1 : 2 / 3), Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
+  # Noise <- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
 
   pi0.pi0 <- matrix(unlist(pi0.pi0.list[[j]]), byrow = TRUE, length(pi0.pi0.list[[j]]))
   pi0.pi0.noise <- rbind.data.frame(cbind.data.frame(Noise, pi0.pi0), cbind.data.frame(Noise = rep("All", length(Noise)), pi0.pi0))
@@ -196,14 +197,39 @@ for (j in seq(length(pi0.vec))) {
     "Method", "FDR", "FDP", "sd", "n", "q975", "q025"
   )
   
-  FDR.calib.plot <- ggplot(data = FDP.summary.pi0.method, aes(x = FDR, y = FDP, group = Method, col = Method)) +
+  FDP.array.pi0 <- aperm(FDP.array[, , , j], c(2, 1, 3))
+  FDP.pi0.noise <- as.vector(aperm(apply(FDP.array.pi0, c(1, 3), tapply, Noise, mean, na.rm = TRUE), c(2, 1, 3)))
+  sd.pi0.noise <- as.vector(aperm(apply(FDP.array.pi0, c(1, 3), tapply, Noise, sd, na.rm = TRUE), c(2, 1, 3)))
+  n.pi0.noise <- as.vector(aperm(apply(FDP.array.pi0, c(1, 3), tapply, Noise, function(x){sum(!is.na(x))}), c(2, 1, 3)))
+  q975.pi0.noise <- as.vector(aperm(apply(FDP.array.pi0, c(1, 3), tapply, Noise, quantile, probs = 0.975, na.rm = TRUE), c(2, 1, 3)))
+  q025.pi0.noise <- as.vector(aperm(apply(FDP.array.pi0, c(1, 3), tapply, Noise, quantile, probs = 0.025, na.rm = TRUE), c(2, 1, 3)))
+  FDP.summary.pi0.method.noise <- cbind.data.frame(
+    rep(rep(levels(Noise), each = length(q.vec)), length(method.name)),
+    rep(factor(seq(method.name)), each = length(levels(Noise)) * length(q.vec)),
+    rep(q.vec, length(levels(Noise)) * length(method.name)),
+    FDP.pi0.noise,
+    sd.pi0.noise,
+    n.pi0.noise,
+    q975.pi0.noise,
+    q025.pi0.noise
+  )
+  colnames(FDP.summary.pi0.method.noise) <- c(
+    "Noise", "Method", "FDR", "FDP", "sd", "n", "q975", "q025"
+  )
+  FDP.summary.pi0.method.noise <- rbind.data.frame(
+    FDP.summary.pi0.method.noise,
+    cbind.data.frame(Noise = rep("All", dim(FDP.summary.pi0.method)[1]), FDP.summary.pi0.method)
+  )
+  
+  FDR.calib.plot <- ggplot(data = FDP.summary.pi0.method.noise, aes(x = FDR, y = FDP, group = Method, col = Method)) +
   geom_line() +
   geom_ribbon(aes(ymin = FDP - sd, ymax = FDP + sd, fill = Method), alpha = 0.2, linetype = "blank") +
-  scale_color_manual(values = method.col) +
-  scale_fill_manual(values = method.col) +
+  scale_color_manual(labels = method.name, values = method.col) +
+  scale_fill_manual(labels = method.name, values = method.col) +
+  facet_wrap(~Noise, nrow = 1, ncol = 4) +
   geom_abline(slope = 1, intercept = 0, linetype = "dashed", size = 1, col = "black") +
   labs(x = "Nominal FDR", y = "FDP") +
-  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 15), axis.title.x = element_text(size = 15), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 15), axis.text.y = element_text(size = 15), strip.text = element_text(size = 15))
+  theme(legend.position = "top", legend.text = element_text(size = 15), plot.title = element_text(hjust = 0.5, size = 15), axis.title.x = element_text(size = 15), axis.title.y = element_text(size = 15), axis.text.x = element_text(angle = 45, size = 15), axis.text.y = element_text(size = 15), strip.text = element_text(size = 15))
   
   FDP.q <- FDP.array[, which(round(q.vec, 4) == q), , j]
   FDP.q.noise <- rbind.data.frame(cbind.data.frame(Noise, FDP.q), cbind.data.frame(Noise = rep("All", length(Noise)), FDP.q))
@@ -230,8 +256,13 @@ for (j in seq(length(pi0.vec))) {
   labs(x = "", y = "TPP") +
   theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 15), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 15, angle = 45, hjust = 1), axis.text.y = element_text(size = 15), strip.text = element_text(size = 15))
 
-  grid.arrange(FDR.calib.plot, pi0.plot, FDR.plot, power.plot)
-  # g <- arrangeGrob(FDR.plot, power.plot) #generates g
-  # ggsave("../output/fig/fdp_tpp_sep.eps", g)
+  print(pi0.plot)
+  ggsave("../output/fig/pi0_sep.eps", pi0.plot, width = 7.5, height = 3)
+  print(FDR.calib.plot)
+  ggsave("../output/fig/fdr_calib.pdf", FDR.calib.plot, width = 7.5, height = 3)
+  grid.arrange(FDR.plot, power.plot, top = textGrob(bquote(paste("At Nominal FDR = ", .(q))),
+                                                    gp = gpar(fontsize = 15, font = 3)))
+  g <- arrangeGrob(FDR.plot, power.plot, top = textGrob(bquote(paste("At Nominal FDR = ", .(q))), gp = gpar(fontsize = 15, font = 3)))
+  ggsave("../output/fig/fdp_tpp_sep.eps", g)
 }
 ```
