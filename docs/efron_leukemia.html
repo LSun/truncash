@@ -332,10 +332,10 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2018-05-06</p>
+<p><strong>Last updated:</strong> 2018-05-09</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 63936e7</p>
+<p><strong>Code version:</strong> 4070fcd</p>
 <!-- Add your analysis here -->
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
@@ -391,7 +391,7 @@ for (i in 1 : gd.ord) {
 }
 y.plot = matrix_lik_plot %*% fit.cash$w * fit.cash$fitted_g$pi[1]
 
-method.col &lt;- scales::hue_pal()(5)
+method.col &lt;- c(&quot;#377eb8&quot;, &quot;#984ea3&quot;, &quot;#4daf4a&quot;, &quot;#ff7f00&quot;, &quot;#e41a1c&quot;)
 
 par(mfrow = c(1, 2))
 hist(z, prob = TRUE, main = &quot;&quot;, xlab = expression(paste(z, &quot;-scores&quot;)), cex.lab = 1.25)
@@ -435,6 +435,54 @@ points(z, fit.locfdr$fdr, pch = 16, cex = 0.5, col = &quot;green&quot;)
 abline(h = 0.2, lty = 2)
 legend(&quot;topright&quot;, bty = &quot;n&quot;, pch = c(16, 18, 17), col = c(&quot;green&quot;, &quot;red&quot;, &quot;blue&quot;), c(&quot;qvalue&quot;, &quot;CASH: 1&quot;, &quot;CASH: 2&quot;))</code></pre>
 <p><img src="figure/efron_leukemia.rmd/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
+<ul>
+<li>sebetahat = betahat / z</li>
+</ul>
+<pre class="r"><code>betahat = lim$coefficients[, 2]
+sebetahat = betahat / z</code></pre>
+<pre class="r"><code>fit.cash &lt;- gdash(betahat, sebetahat, gd.ord = 10)
+fit.ash &lt;- ashr::ash(betahat, sebetahat, mixcompdist = &quot;normal&quot;, method = &quot;fdr&quot;)</code></pre>
+<pre class="r"><code>x.plot &lt;- seq(-10, 10, length = 1000)
+gd.ord &lt;- 10
+hermite = Hermite(gd.ord)
+gd0.std = dnorm(x.plot)
+matrix_lik_plot = cbind(gd0.std)
+for (i in 1 : gd.ord) {
+  gd.std = (-1)^i * hermite[[i]](x.plot) * gd0.std / sqrt(factorial(i))
+  matrix_lik_plot = cbind(matrix_lik_plot, gd.std)
+}
+y.plot = matrix_lik_plot %*% fit.cash$w * fit.cash$fitted_g$pi[1]
+
+method.col &lt;- c(&quot;#377eb8&quot;, &quot;#984ea3&quot;, &quot;#4daf4a&quot;, &quot;#ff7f00&quot;, &quot;#e41a1c&quot;)
+
+setEPS()
+postscript(&quot;../output/fig/leukemia.eps&quot;, height = 5, width = 12)
+
+par(mfrow = c(1, 2))
+hist(z, prob = TRUE, main = &quot;&quot;, xlab = expression(paste(z, &quot;-scores&quot;)), cex.lab = 1.25)
+lines(x.plot, y.plot, col = method.col[5], lwd = 2)
+lines(x.plot, dnorm(x.plot), col = 
+       &quot;orange&quot;
+      #  method.col[2]
+      , lty = 2, lwd = 2)
+lines(x.plot, dnorm(x.plot, fit.locfdr$fp0[3, 1], fit.locfdr$fp0[3, 2]) * fit.locfdr$fp0[3, 3], col = method.col[3], lty = 2, lwd = 2)
+text(-3, 0.22, &quot;N(0,1)&quot;, col = &quot;orange&quot;)
+text(-5, 0.15, bquote(atop(&quot;Efron&#39;s empirical null&quot;, .(round(fit.locfdr$fp0[3, 3], 2)) %*% N(.(round(fit.locfdr$fp0[3, 1], 2)), .(round(fit.locfdr$fp0[3, 2], 2))^2))), col = method.col[3])
+text(4.5, 0.10, &quot;CASH null&quot;, col = method.col[5])
+arrows(-1.8, 0.22, -1.1, 0.215, length = 0.1, angle = 20, col = &quot;orange&quot;)
+arrows(-2, 0.15, -1.5, 0.145, length = 0.1, angle = 20, col = method.col[3])
+arrows(2.9, 0.10, 2, 0.095, length = 0.1, angle = 20, col = method.col[5])
+
+plot(z, fit.cash$lfdr, pch = 18, cex = 0.5, ylim = c(0, 1), col = method.col[5], ylab = &quot;Local FDR&quot;, xlab = expression(paste(z, &quot;-scores&quot;)), cex.lab = 1.25)
+points(z, fit.locfdr$fdr, pch = 16, cex = 0.5, col = method.col[3])
+points(z, ashr::get_lfdr(fit.ash), pch = 17, cex = 0.5, col = method.col[4])
+points(z, fit.qvalue$lfdr, pch = 15, cex = 0.5, col = method.col[2])
+abline(h = 0.2, lty = 2)
+legend(&quot;topright&quot;, bty = &quot;n&quot;, pch = 15 : 18, col = method.col[2 : 5], c(&quot;qvalue&quot;, &quot;locfdr&quot;, &quot;ASH&quot;, &quot;CASH&quot;))
+
+dev.off()</code></pre>
+<pre><code>quartz_off_screen 
+                2 </code></pre>
 </div>
 <div id="hiv" class="section level2">
 <h2>HIV</h2>
@@ -444,7 +492,7 @@ design &lt;- rep(0 : 1, each = 4)</code></pre>
 <div id="reproduce-efrons-empirical-null-analysis-1" class="section level3">
 <h3>Reproduce Efron’s empirical null analysis</h3>
 <pre class="r"><code>temp &lt;- locfdr(hivz)</code></pre>
-<p><img src="figure/efron_leukemia.rmd/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/efron_leukemia.rmd/unnamed-chunk-19-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="use-smyths-pipeline-to-obtain-better-summary-statistics-1" class="section level3">
 <h3>Use Smyth’s pipeline to obtain better summary statistics</h3>
@@ -456,7 +504,7 @@ p = r.ebayes$p.value[, 2]
 t = r.ebayes$t[, 2]
 z = -sign(t) * qnorm(p/2)</code></pre>
 <pre class="r"><code>fit.locfdr &lt;- locfdr(z)</code></pre>
-<p><img src="figure/efron_leukemia.rmd/unnamed-chunk-18-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/efron_leukemia.rmd/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>fit.qvalue &lt;- qvalue::qvalue(p)</code></pre>
 </div>
 <div id="cash-fitting-1" class="section level3">
@@ -502,7 +550,7 @@ points(z, ashr::get_lfdr(fit.ash), pch = 17, cex = 0.5, col = method.col[4])
 points(z, fit.qvalue$lfdr, pch = 15, cex = 0.5, col = method.col[2])
 abline(h = 0.2, lty = 2)
 legend(&quot;topleft&quot;, bty = &quot;n&quot;, pch = 15 : 18, col = method.col[2 : 5], c(&quot;qvalue&quot;, &quot;locfdr&quot;, &quot;ASH&quot;, &quot;CASH&quot;))</code></pre>
-<p><img src="figure/efron_leukemia.rmd/unnamed-chunk-22-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/efron_leukemia.rmd/unnamed-chunk-25-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 </div>
 <div id="session-information" class="section level2">
