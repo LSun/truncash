@@ -106,7 +106,8 @@ for (i in 1 : gd.ord) {
 }
 y.plot = matrix_lik_plot %*% fit.cash$w * fit.cash$fitted_g$pi[1]
 
-method.col <- c("#377eb8", "#984ea3", "#4daf4a", "#ff7f00", "#e41a1c")
+method.col <- scales::hue_pal()(5)
+# method.col <- c("#377eb8", "#984ea3", "#4daf4a", "#ff7f00", "#e41a1c")
 
 par(mfrow = c(1, 2))
 hist(z, prob = TRUE, main = "", xlab = expression(paste(z, "-scores")), cex.lab = 1.25)
@@ -182,7 +183,8 @@ for (i in 1 : gd.ord) {
 }
 y.plot = matrix_lik_plot %*% fit.cash$w * fit.cash$fitted_g$pi[1]
 
-method.col <- c("#377eb8", "#984ea3", "#4daf4a", "#ff7f00", "#e41a1c")
+method.col <- scales::hue_pal()(5)
+# method.col <- c("#377eb8", "#984ea3", "#4daf4a", "#ff7f00", "#e41a1c")
 
 setEPS()
 postscript("../output/fig/leukemia.eps", height = 5, width = 12)

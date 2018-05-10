@@ -18,6 +18,7 @@ library(ggplot2)
 library(grid)
 library(gridExtra)
 library(RColorBrewer)
+library(scales)
 ```
 
 ```{r functions}
@@ -164,7 +165,8 @@ for (j in seq(length(pi0.vec))) {
 q <- 0.1
 z.over <- 1.05
 z.under <- 0.95
-method.col <- c("#377eb8", "#984ea3", "#4daf4a", "#ff7f00", "#e41a1c")
+method.col <- scales::hue_pal()(5)
+# method.col <- c("#377eb8", "#984ea3", "#4daf4a", "#ff7f00", "#e41a1c")
 ```
 
 ```{r, message = FALSE, warning = FALSE}
@@ -230,7 +232,7 @@ for (j in seq(length(pi0.vec))) {
   
   FDR.calib.plot <- ggplot(data = FDP.summary.pi0.method.noise, aes(x = FDR, y = FDP, group = Method, col = Method)) +
   geom_line() +
-  geom_ribbon(aes(ymin = q025, ymax = q975, fill = Method), alpha = 0.2, linetype = "blank") +
+  geom_ribbon(aes(ymin = q025, ymax = q975, fill = Method), alpha = 0.35, linetype = "blank") +
   scale_color_manual(labels = method.name, values = method.col) +
   scale_fill_manual(labels = method.name, values = method.col) +
   facet_wrap(~Noise, nrow = 1, ncol = 4) +
