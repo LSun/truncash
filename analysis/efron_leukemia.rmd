@@ -106,7 +106,7 @@ for (i in 1 : gd.ord) {
 }
 y.plot = matrix_lik_plot %*% fit.cash$w * fit.cash$fitted_g$pi[1]
 
-method.col <- scales::hue_pal()(5)
+method.col <- c("#377eb8", "#984ea3", "#4daf4a", "#ff7f00", "#e41a1c")
 
 par(mfrow = c(1, 2))
 hist(z, prob = TRUE, main = "", xlab = expression(paste(z, "-scores")), cex.lab = 1.25)
@@ -156,6 +156,60 @@ points(z, fit.cash2$lfdr, pch = 17, cex = 0.5, col = "blue")
 points(z, fit.locfdr$fdr, pch = 16, cex = 0.5, col = "green")
 abline(h = 0.2, lty = 2)
 legend("topright", bty = "n", pch = c(16, 18, 17), col = c("green", "red", "blue"), c("qvalue", "CASH: 1", "CASH: 2"))
+```
+
+- sebetahat = betahat / z
+
+```{r}
+betahat = lim$coefficients[, 2]
+sebetahat = betahat / z
+```
+
+```{r}
+fit.cash <- gdash(betahat, sebetahat, gd.ord = 10)
+fit.ash <- ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+```
+
+```{r}
+x.plot <- seq(-10, 10, length = 1000)
+gd.ord <- 10
+hermite = Hermite(gd.ord)
+gd0.std = dnorm(x.plot)
+matrix_lik_plot = cbind(gd0.std)
+for (i in 1 : gd.ord) {
+  gd.std = (-1)^i * hermite[[i]](x.plot) * gd0.std / sqrt(factorial(i))
+  matrix_lik_plot = cbind(matrix_lik_plot, gd.std)
+}
+y.plot = matrix_lik_plot %*% fit.cash$w * fit.cash$fitted_g$pi[1]
+
+method.col <- c("#377eb8", "#984ea3", "#4daf4a", "#ff7f00", "#e41a1c")
+
+setEPS()
+postscript("../output/fig/leukemia.eps", height = 5, width = 12)
+
+par(mfrow = c(1, 2))
+hist(z, prob = TRUE, main = "", xlab = expression(paste(z, "-scores")), cex.lab = 1.25)
+lines(x.plot, y.plot, col = method.col[5], lwd = 2)
+lines(x.plot, dnorm(x.plot), col = 
+       "orange"
+      #  method.col[2]
+      , lty = 2, lwd = 2)
+lines(x.plot, dnorm(x.plot, fit.locfdr$fp0[3, 1], fit.locfdr$fp0[3, 2]) * fit.locfdr$fp0[3, 3], col = method.col[3], lty = 2, lwd = 2)
+text(-3, 0.22, "N(0,1)", col = "orange")
+text(-5, 0.15, bquote(atop("Efron's empirical null", .(round(fit.locfdr$fp0[3, 3], 2)) %*% N(.(round(fit.locfdr$fp0[3, 1], 2)), .(round(fit.locfdr$fp0[3, 2], 2))^2))), col = method.col[3])
+text(4.5, 0.10, "CASH null", col = method.col[5])
+arrows(-1.8, 0.22, -1.1, 0.215, length = 0.1, angle = 20, col = "orange")
+arrows(-2, 0.15, -1.5, 0.145, length = 0.1, angle = 20, col = method.col[3])
+arrows(2.9, 0.10, 2, 0.095, length = 0.1, angle = 20, col = method.col[5])
+
+plot(z, fit.cash$lfdr, pch = 18, cex = 0.5, ylim = c(0, 1), col = method.col[5], ylab = "Local FDR", xlab = expression(paste(z, "-scores")), cex.lab = 1.25)
+points(z, fit.locfdr$fdr, pch = 16, cex = 0.5, col = method.col[3])
+points(z, ashr::get_lfdr(fit.ash), pch = 17, cex = 0.5, col = method.col[4])
+points(z, fit.qvalue$lfdr, pch = 15, cex = 0.5, col = method.col[2])
+abline(h = 0.2, lty = 2)
+legend("topright", bty = "n", pch = 15 : 18, col = method.col[2 : 5], c("qvalue", "locfdr", "ASH", "CASH"))
+
+dev.off()
 ```
 
 ## HIV
