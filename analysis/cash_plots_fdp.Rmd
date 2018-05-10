@@ -8,6 +8,7 @@ output:
 ---
 
 ```{r packages, message = FALSE, warning = FALSE}
+source("../code/gdfit.R")
 source("../code/gdash_lik.R")
 source("../code/count_to_summary.R")
 library(ashr)
@@ -65,6 +66,8 @@ r = r[subset,]
 ```
 
 ```{r gtex_z_1, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
+set.seed(777)
+
 nsim <- 1000
 
 qvalue.pi0.list <- qvalue.list <- pi0.list <- pi0.pi0.list <- list()
@@ -80,7 +83,7 @@ for (i in 1 : nsim) {
   sebetahat <- summary$sebetahat
   beta <- sample(c(
     rep(0, round(pi0 * ngene)),
-    rnorm(round((1 - pi0) * ngene), 0, 3 * sqrt(mean(sebetahat^2)))
+    rnorm(round((1 - pi0) * ngene), 0, 2 * sqrt(mean(sebetahat^2)))
     ))
   betahat <- beta + sebetahat * z
   
@@ -88,7 +91,7 @@ for (i in 1 : nsim) {
 
   ## different methods
   fit.ash = ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
-  fit.gdash = gdash(betahat, sebetahat, gd.ord = 15, w.rho = 0.75)
+  fit.gdash = gdash(betahat, sebetahat, gd.ord = 10, w.rho = 0.15)
   fit.qvalue = qvalue::qvalue(pvalue)
   fit.BH = p.adjust(pvalue, method = "BH")
   fit.locfdr <- tryCatch(locfdr::locfdr(betahat / sebetahat, plot = 0), error = function(e) {NA})
@@ -120,7 +123,7 @@ z.pi0.list[[j]] <- z.list
 
 ```{r}
 q.vec <- seq(0.001, 0.20, by = 0.001)
-method.name <- c("BH", "qvalue", "locfdr", "ASH", "CASH")
+method.name <- c("BHq", "qvalue", "locfdr", "ASH", "CASH")
 ```
 
 ```{r}
@@ -164,7 +167,7 @@ for (j in seq(length(pi0.vec))) {
 ```{r}
 q <- 0.1
 z.over <- 1.05
-z.under <- 0.9
+z.under <- 0.95
 method.col <- scales::hue_pal()(5)
 # method.col <- c("#377eb8", "#984ea3", "#4daf4a", "#ff7f00", "#e41a1c")
 ```
@@ -172,8 +175,8 @@ method.col <- scales::hue_pal()(5)
 ```{r, message = FALSE, warning = FALSE}
 for (j in seq(length(pi0.vec))) {
   sd.z <- sapply(z.pi0.list[[j]], sd)
-  Noise <- cut(sd.z, breaks = c(0, quantile(sd.z, probs = 1 : 2 / 3), Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
-#  Noise <- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
+# Noise <- cut(sd.z, breaks = c(0, quantile(sd.z, probs = 1 : 2 / 3), Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
+  Noise <- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
 
   pi0.pi0 <- matrix(unlist(pi0.pi0.list[[j]]), byrow = TRUE, length(pi0.pi0.list[[j]]))
   pi0.pi0.noise <- rbind.data.frame(cbind.data.frame(Noise, pi0.pi0), cbind.data.frame(Noise = rep("All", length(Noise)), pi0.pi0))
