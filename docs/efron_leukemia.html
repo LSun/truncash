@@ -332,10 +332,10 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2018-05-09</p>
+<p><strong>Last updated:</strong> 2018-05-10</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 4070fcd</p>
+<p><strong>Code version:</strong> a2904d9</p>
 <!-- Add your analysis here -->
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
@@ -391,7 +391,8 @@ for (i in 1 : gd.ord) {
 }
 y.plot = matrix_lik_plot %*% fit.cash$w * fit.cash$fitted_g$pi[1]
 
-method.col &lt;- c(&quot;#377eb8&quot;, &quot;#984ea3&quot;, &quot;#4daf4a&quot;, &quot;#ff7f00&quot;, &quot;#e41a1c&quot;)
+method.col &lt;- scales::hue_pal()(5)
+# method.col &lt;- c(&quot;#377eb8&quot;, &quot;#984ea3&quot;, &quot;#4daf4a&quot;, &quot;#ff7f00&quot;, &quot;#e41a1c&quot;)
 
 par(mfrow = c(1, 2))
 hist(z, prob = TRUE, main = &quot;&quot;, xlab = expression(paste(z, &quot;-scores&quot;)), cex.lab = 1.25)
@@ -453,7 +454,8 @@ for (i in 1 : gd.ord) {
 }
 y.plot = matrix_lik_plot %*% fit.cash$w * fit.cash$fitted_g$pi[1]
 
-method.col &lt;- c(&quot;#377eb8&quot;, &quot;#984ea3&quot;, &quot;#4daf4a&quot;, &quot;#ff7f00&quot;, &quot;#e41a1c&quot;)
+method.col &lt;- scales::hue_pal()(5)
+# method.col &lt;- c(&quot;#377eb8&quot;, &quot;#984ea3&quot;, &quot;#4daf4a&quot;, &quot;#ff7f00&quot;, &quot;#e41a1c&quot;)
 
 setEPS()
 postscript(&quot;../output/fig/leukemia.eps&quot;, height = 5, width = 12)
