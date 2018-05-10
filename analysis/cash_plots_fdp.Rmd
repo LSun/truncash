@@ -79,7 +79,7 @@ for (i in 1 : nsim) {
   sebetahat <- summary$sebetahat
   beta <- sample(c(
     rep(0, round(pi0 * ngene)),
-    rnorm(round((1 - pi0) * ngene), 0, 2 * sqrt(mean(sebetahat^2)))
+    rnorm(round((1 - pi0) * ngene), 0, 3 * sqrt(mean(sebetahat^2)))
     ))
   betahat <- beta + sebetahat * z
   
@@ -87,7 +87,7 @@ for (i in 1 : nsim) {
 
   ## different methods
   fit.ash = ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
-  fit.gdash = gdash(betahat, sebetahat, gd.ord = 10, w.rho = 0.25)
+  fit.gdash = gdash(betahat, sebetahat, gd.ord = 15, w.rho = 0.75)
   fit.qvalue = qvalue::qvalue(pvalue)
   fit.BH = p.adjust(pvalue, method = "BH")
   fit.locfdr <- tryCatch(locfdr::locfdr(betahat / sebetahat, plot = 0), error = function(e) {NA})
