@@ -164,7 +164,7 @@ for (j in seq(length(pi0.vec))) {
 ```{r}
 q <- 0.1
 z.over <- 1.05
-z.under <- 0.95
+z.under <- 0.9
 method.col <- scales::hue_pal()(5)
 # method.col <- c("#377eb8", "#984ea3", "#4daf4a", "#ff7f00", "#e41a1c")
 ```
@@ -173,7 +173,7 @@ method.col <- scales::hue_pal()(5)
 for (j in seq(length(pi0.vec))) {
   sd.z <- sapply(z.pi0.list[[j]], sd)
   Noise <- cut(sd.z, breaks = c(0, quantile(sd.z, probs = 1 : 2 / 3), Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
-# Noise <- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
+#  Noise <- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
 
   pi0.pi0 <- matrix(unlist(pi0.pi0.list[[j]]), byrow = TRUE, length(pi0.pi0.list[[j]]))
   pi0.pi0.noise <- rbind.data.frame(cbind.data.frame(Noise, pi0.pi0), cbind.data.frame(Noise = rep("All", length(Noise)), pi0.pi0))
@@ -268,10 +268,10 @@ for (j in seq(length(pi0.vec))) {
   print(pi0.plot)
   ggsave("../output/fig/pi0_sep.eps", pi0.plot, width = 7.5, height = 3)
   print(FDR.calib.plot)
-  ggsave("../output/fig/fdr_calib.pdf", FDR.calib.plot, width = 7.5, height = 3)
+  ggsave("../output/fig/fdr_calib.pdf", FDR.calib.plot, width = 7.5, height = 3.36)
   grid.arrange(FDR.plot, power.plot, top = textGrob(bquote(paste("At Nominal FDR = ", .(q))),
                                                     gp = gpar(fontsize = 15, font = 3)))
   g <- arrangeGrob(FDR.plot, power.plot, top = textGrob(bquote(paste("At Nominal FDR = ", .(q))), gp = gpar(fontsize = 15, font = 3)))
-  ggsave("../output/fig/fdp_tpp_sep.eps", g)
+  ggsave("../output/fig/fdp_tpp_sep.eps", g, width = 7.5, height = 6)
 }
 ```
