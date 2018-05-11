@@ -279,12 +279,12 @@ for (j in seq(length(pi0.vec))) {
   theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 15), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 15, angle = 45, hjust = 1), axis.text.y = element_text(size = 15), strip.text = element_text(size = 15))
 
   print(pi0.plot)
-  ggsave("../output/fig/pi0_sep.eps", pi0.plot, width = 7.5, height = 3)
   print(FDR.calib.plot)
+  grid.arrange(FDR.plot, power.plot, top = textGrob(bquote(paste("At Nominal FDR = ", .(q))), gp = gpar(fontsize = 15, font = 3)))
+  ggsave("../output/fig/pi0_sep.eps", pi0.plot, width = 7.5, height = 3)
   ggsave("../output/fig/fdr_calib.pdf", FDR.calib.plot, width = 7.5, height = 3.36)
-  grid.arrange(FDR.plot, power.plot, top = textGrob(bquote(paste("At Nominal FDR = ", .(q))),
-                                                    gp = gpar(fontsize = 15, font = 3)))
-  g <- arrangeGrob(FDR.plot, power.plot, top = textGrob(bquote(paste("At Nominal FDR = ", .(q))), gp = gpar(fontsize = 15, font = 3)))
+  g <- arrangeGrob(FDR.plot, power.plot, top = textGrob(bquote(paste("At Nominal FDR = ", .(q)), "\n"), gp = gpar(fontsize = 15, font = 3)))
   ggsave("../output/fig/fdp_tpp_sep.eps", g, width = 7.5, height = 6)
+  g <- arrangeGrob(FDR.calib.plot, g, heights = 1 : 2.2)
 }
 ```
