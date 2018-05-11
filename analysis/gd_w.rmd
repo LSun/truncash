@@ -301,10 +301,6 @@ W.gtex.gd <- sapply(Z.gtex, function (z) {fit.z <- gdfit(z, L = 10); return(
   list(w = fit.z$w, status = fit.z$status))})
 ```
 
-```{r}
-saveRDS(W.gtex.gd, "~/Desktop/W.gtex.gd.rds")
-```
-
 ## Session information
 
 <!-- Insert the session information into the document -->
