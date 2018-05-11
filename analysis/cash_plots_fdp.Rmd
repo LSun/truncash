@@ -71,7 +71,7 @@ r = r[subset,]
 ```{r gtex_z_1, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
 set.seed(777)
 
-nsim <- 200
+nsim <- 1000
 
 qvalue.pi0.list <- qvalue.list <- pi0.list <- pi0.pi0.list <- list()
 z.pi0.list <- z.list <- list()
@@ -110,13 +110,9 @@ for (i in 1 : nsim) {
     ASH <- ashr::get_pi0(fit.ash),
     CASH <- fit.gdash$fitted_g$pi[1]
   )
-  
-  sebetahat.list[[i]] <- sebetahat
-  beta.list[[i]] <- beta
 
   ## FDR
   qvalue.list[[i]] <- cbind(
-    beta <- beta,
     BH <- fit.BH,
     qvalue <- fit.qvalue$qvalues,
     locfdr <- tryCatch(ashr::qval.from.lfdr(fit.locfdr$fdr), error = function(e) {rep(NA, ngene)}),
@@ -124,6 +120,8 @@ for (i in 1 : nsim) {
     CASH <- fit.gdash$qvalue
   )
   z.list[[i]] <- z
+  sebetahat.list[[i]] <- sebetahat
+  beta.list[[i]] <- beta
 }
 pi0.pi0.list[[j]] <- pi0.list
 qvalue.pi0.list[[j]] <- qvalue.list
@@ -145,9 +143,9 @@ pFDP.summary <- power.summary <- array(0, dim = c(5, length(q.vec), length(metho
 for (j in seq(length(pi0.vec))) {
   for (k in seq(length(method.name))) {
     for (i in seq(nsim)) {
-      FDP.array[i, , k, j] <- sapply(q.vec, FDP, qvalue = qvalue.pi0.list[[j]][[i]][, k + 1], beta = qvalue.pi0.list[[j]][[i]][, 1])
-      pFDP.array[i, , k, j] <- sapply(q.vec, pFDP, qvalue = qvalue.pi0.list[[j]][[i]][, k + 1], beta = qvalue.pi0.list[[j]][[i]][, 1])
-      power.array[i, , k, j] <- sapply(q.vec, power, qvalue = qvalue.pi0.list[[j]][[i]][, k + 1], beta = qvalue.pi0.list[[j]][[i]][, 1])
+      FDP.array[i, , k, j] <- sapply(q.vec, FDP, qvalue = qvalue.pi0.list[[j]][[i]][, k], beta = beta.pi0.list[[j]][[i]])
+      pFDP.array[i, , k, j] <- sapply(q.vec, pFDP, qvalue = qvalue.pi0.list[[j]][[i]][, k], beta = beta.pi0.list[[j]][[i]])
+      power.array[i, , k, j] <- sapply(q.vec, power, qvalue = qvalue.pi0.list[[j]][[i]][, k], beta = beta.pi0.list[[j]][[i]])
     }
     FDP.summary[, , k, j] <- rbind(
       avg <- colMeans(FDP.array[, , k, j], na.rm = TRUE),
