@@ -296,6 +296,11 @@ abline(h = log(pnorm(-sqrt(2 * log(1e4))) * 2), col = "red", lty = 2)
 abline(h = log(0.05 / 1e4), col = "red", lty = 2)
 ```
 
+```{r W_sim, cache = TRUE}
+W.sim.gd <- sapply(Z.sim, function (z) {fit.z <- gdfit(z, L = 10); return(
+  list(w = fit.z$w, status = fit.z$status))})
+```
+
 ```{r W_gtex, cache = TRUE}
 W.gtex.gd <- sapply(Z.gtex, function (z) {fit.z <- gdfit(z, L = 10); return(
   list(w = fit.z$w, status = fit.z$status))})
