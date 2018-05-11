@@ -335,7 +335,7 @@ shared across the workflowr files. -->
 <p><strong>Last updated:</strong> 2018-05-11</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 5c9aeac</p>
+<p><strong>Code version:</strong> 548070e</p>
 <!-- Add your analysis here -->
 <pre class="r"><code>source(&quot;../code/gdash_lik.R&quot;)
 source(&quot;../code/gdfit.R&quot;)
@@ -567,6 +567,8 @@ abline(h = log(0.005), col = &quot;red&quot;, lty = 2)
 abline(h = log(pnorm(-sqrt(2 * log(1e4))) * 2), col = &quot;red&quot;, lty = 2)
 abline(h = log(0.05 / 1e4), col = &quot;red&quot;, lty = 2)</code></pre>
 <p><img src="figure/gd_w.rmd/unnamed-chunk-16-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>W.sim.gd &lt;- sapply(Z.sim, function (z) {fit.z &lt;- gdfit(z, L = 10); return(
+  list(w = fit.z$w, status = fit.z$status))})</code></pre>
 <pre class="r"><code>W.gtex.gd &lt;- sapply(Z.gtex, function (z) {fit.z &lt;- gdfit(z, L = 10); return(
   list(w = fit.z$w, status = fit.z$status))})</code></pre>
 </div>
