@@ -23,10 +23,13 @@ library(scales)
 ```
 
 ```{r functions}
-mean_sdp <- function(x) {
+mean_sdp <- function (x) {
    m <- mean(x)
    ymax <- m + sd(x)
    return(c(y = m, ymax = ymax, ymin = m))
+}
+mad.mean <- function (x) {
+  return(mean(abs(x - median(x))))
 }
 FDP <- function (FDR, qvalue, beta) {
   return(sum(qvalue <= FDR & beta == 0) / max(sum(qvalue <= FDR), 1))
@@ -68,10 +71,12 @@ r = r[subset,]
 ```{r gtex_z_1, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
 set.seed(777)
 
-nsim <- 1000
+nsim <- 200
 
 qvalue.pi0.list <- qvalue.list <- pi0.list <- pi0.pi0.list <- list()
 z.pi0.list <- z.list <- list()
+sebetahat.pi0.list <- sebetahat.list <- list()
+beta.pi0.list <- beta.list <- list()
 
 for (j in seq(pi0.vec)) {
   pi0 <- pi0.vec[j]
@@ -87,14 +92,16 @@ for (i in 1 : nsim) {
     ))
   betahat <- beta + sebetahat * z
   
-  pvalue = pnorm(-abs(betahat / sebetahat)) * 2
+  zscore <- betahat / sebetahat
+  pvalue = pnorm(-abs(zscore)) * 2
 
   ## different methods
   fit.ash = ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
-  fit.gdash = gdash(betahat, sebetahat, gd.ord = 10, w.rho = 0.15)
+  w.rho <- ifelse(mad.mean(zscore) > sqrt(2 / pi), 0.5, 0.1)
+  fit.gdash = gdash(betahat, sebetahat, gd.ord = 10, w.rho = w.rho)
   fit.qvalue = qvalue::qvalue(pvalue)
   fit.BH = p.adjust(pvalue, method = "BH")
-  fit.locfdr <- tryCatch(locfdr::locfdr(betahat / sebetahat, plot = 0), error = function(e) {NA})
+  fit.locfdr <- tryCatch(locfdr::locfdr(zscore, plot = 0), error = function(e) {NA})
 
   ## pi0
   pi0.list[[i]] <- c(
@@ -103,6 +110,9 @@ for (i in 1 : nsim) {
     ASH <- ashr::get_pi0(fit.ash),
     CASH <- fit.gdash$fitted_g$pi[1]
   )
+  
+  sebetahat.list[[i]] <- sebetahat
+  beta.list[[i]] <- beta
 
   ## FDR
   qvalue.list[[i]] <- cbind(
@@ -118,6 +128,8 @@ for (i in 1 : nsim) {
 pi0.pi0.list[[j]] <- pi0.list
 qvalue.pi0.list[[j]] <- qvalue.list
 z.pi0.list[[j]] <- z.list
+sebetahat.pi0.list[[j]] <- sebetahat.list
+beta.pi0.list[[j]] <- beta.list
 }
 ```
 
