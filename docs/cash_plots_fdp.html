@@ -340,10 +340,13 @@ library(grid)
 library(gridExtra)
 library(RColorBrewer)
 library(scales)</code></pre>
-<pre class="r"><code>mean_sdp &lt;- function(x) {
+<pre class="r"><code>mean_sdp &lt;- function (x) {
    m &lt;- mean(x)
    ymax &lt;- m + sd(x)
    return(c(y = m, ymax = ymax, ymin = m))
+}
+mad.mean &lt;- function (x) {
+  return(mean(abs(x - median(x))))
 }
 FDP &lt;- function (FDR, qvalue, beta) {
   return(sum(qvalue &lt;= FDR &amp; beta == 0) / max(sum(qvalue &lt;= FDR), 1))
@@ -376,9 +379,9 @@ pFDP.summary &lt;- power.summary &lt;- array(0, dim = c(5, length(q.vec), length
 for (j in seq(length(pi0.vec))) {
   for (k in seq(length(method.name))) {
     for (i in seq(nsim)) {
-      FDP.array[i, , k, j] &lt;- sapply(q.vec, FDP, qvalue = qvalue.pi0.list[[j]][[i]][, k + 1], beta = qvalue.pi0.list[[j]][[i]][, 1])
-      pFDP.array[i, , k, j] &lt;- sapply(q.vec, pFDP, qvalue = qvalue.pi0.list[[j]][[i]][, k + 1], beta = qvalue.pi0.list[[j]][[i]][, 1])
-      power.array[i, , k, j] &lt;- sapply(q.vec, power, qvalue = qvalue.pi0.list[[j]][[i]][, k + 1], beta = qvalue.pi0.list[[j]][[i]][, 1])
+      FDP.array[i, , k, j] &lt;- sapply(q.vec, FDP, qvalue = qvalue.pi0.list[[j]][[i]][, k], beta = beta.pi0.list[[j]][[i]])
+      pFDP.array[i, , k, j] &lt;- sapply(q.vec, pFDP, qvalue = qvalue.pi0.list[[j]][[i]][, k], beta = beta.pi0.list[[j]][[i]])
+      power.array[i, , k, j] &lt;- sapply(q.vec, power, qvalue = qvalue.pi0.list[[j]][[i]][, k], beta = beta.pi0.list[[j]][[i]])
     }
     FDP.summary[, , k, j] &lt;- rbind(
       avg &lt;- colMeans(FDP.array[, , k, j], na.rm = TRUE),

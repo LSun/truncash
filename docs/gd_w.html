@@ -332,10 +332,10 @@ div.tocify {
 shared across the workflowr files. -->
 <!-- Update knitr chunk options -->
 <!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2018-05-06</p>
+<p><strong>Last updated:</strong> 2018-05-11</p>
 <!-- Insert the code version (Git commit SHA1) if Git repository exists and R
  package git2r is installed -->
-<p><strong>Code version:</strong> 0b0a394</p>
+<p><strong>Code version:</strong> 5c9aeac</p>
 <!-- Add your analysis here -->
 <pre class="r"><code>source(&quot;../code/gdash_lik.R&quot;)
 source(&quot;../code/gdfit.R&quot;)
@@ -567,6 +567,8 @@ abline(h = log(0.005), col = &quot;red&quot;, lty = 2)
 abline(h = log(pnorm(-sqrt(2 * log(1e4))) * 2), col = &quot;red&quot;, lty = 2)
 abline(h = log(0.05 / 1e4), col = &quot;red&quot;, lty = 2)</code></pre>
 <p><img src="figure/gd_w.rmd/unnamed-chunk-16-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>W.gtex.gd &lt;- sapply(Z.gtex, function (z) {fit.z &lt;- gdfit(z, L = 10); return(
+  list(w = fit.z$w, status = fit.z$status))})</code></pre>
 </div>
 <div id="session-information" class="section level2">
 <h2>Session information</h2>
