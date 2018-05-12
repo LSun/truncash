@@ -300,6 +300,13 @@ div.tocify {
   </div><!--/.container -->
 </div><!--/.navbar -->
 
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
 <div class="fluid-row" id="header">
 
 
@@ -311,63 +318,915 @@ div.tocify {
 </div>
 
 
-<!-- The file analysis/chunks.R contains chunks that define default settings
-shared across the workflowr files. -->
-<!-- Update knitr chunk options -->
-<!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2017-12-21</p>
-<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
- package git2r is installed -->
-<p><strong>Code version:</strong> 6e42447</p>
-<!-- Add your analysis here -->
-<section id="introduction" class="level2">
+<p><strong>Last updated:</strong> 2018-05-12</p>
+<strong>workflowr checks:</strong> <small>(Click a bullet for more information)</small>
+<ul>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>R Markdown file:</strong> up-to-date </summary></p>
+<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Environment:</strong> empty </summary></p>
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Seed:</strong> <code>set.seed(12345)</code> </summary></p>
+<p>The command <code>set.seed(12345)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Session information:</strong> recorded </summary></p>
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/5b37742d7cdd7ba50dd641579d2705df67b8b441" target="_blank">5b37742</a> </summary></p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    analysis/.DS_Store
+    Ignored:    analysis/BH_robustness_cache/
+    Ignored:    analysis/FDR_Null_cache/
+    Ignored:    analysis/FDR_null_betahat_cache/
+    Ignored:    analysis/Rmosek_cache/
+    Ignored:    analysis/StepDown_cache/
+    Ignored:    analysis/alternative2_cache/
+    Ignored:    analysis/alternative_cache/
+    Ignored:    analysis/ash_gd_cache/
+    Ignored:    analysis/average_cor_gtex_2_cache/
+    Ignored:    analysis/average_cor_gtex_cache/
+    Ignored:    analysis/brca_cache/
+    Ignored:    analysis/cash_deconv_cache/
+    Ignored:    analysis/cash_fdr_1_cache/
+    Ignored:    analysis/cash_fdr_2_cache/
+    Ignored:    analysis/cash_fdr_3_cache/
+    Ignored:    analysis/cash_fdr_4_cache/
+    Ignored:    analysis/cash_fdr_5_cache/
+    Ignored:    analysis/cash_fdr_6_cache/
+    Ignored:    analysis/cash_plots_cache/
+    Ignored:    analysis/cash_plots_fdp_cache/
+    Ignored:    analysis/cash_sim_1_cache/
+    Ignored:    analysis/cash_sim_2_cache/
+    Ignored:    analysis/cash_sim_3_cache/
+    Ignored:    analysis/cash_sim_4_cache/
+    Ignored:    analysis/cash_sim_5_cache/
+    Ignored:    analysis/cash_sim_6_cache/
+    Ignored:    analysis/cash_sim_7_cache/
+    Ignored:    analysis/correlated_z_2_cache/
+    Ignored:    analysis/correlated_z_3_cache/
+    Ignored:    analysis/correlated_z_cache/
+    Ignored:    analysis/create_null_cache/
+    Ignored:    analysis/cutoff_null_cache/
+    Ignored:    analysis/design_matrix_2_cache/
+    Ignored:    analysis/design_matrix_cache/
+    Ignored:    analysis/diagnostic_ash_cache/
+    Ignored:    analysis/diagnostic_correlated_z_2_cache/
+    Ignored:    analysis/diagnostic_correlated_z_3_cache/
+    Ignored:    analysis/diagnostic_correlated_z_cache/
+    Ignored:    analysis/diagnostic_plot_2_cache/
+    Ignored:    analysis/diagnostic_plot_cache/
+    Ignored:    analysis/efron_leukemia_cache/
+    Ignored:    analysis/fitting_normal_cache/
+    Ignored:    analysis/gaussian_derivatives_2_cache/
+    Ignored:    analysis/gaussian_derivatives_3_cache/
+    Ignored:    analysis/gaussian_derivatives_4_cache/
+    Ignored:    analysis/gaussian_derivatives_5_cache/
+    Ignored:    analysis/gaussian_derivatives_cache/
+    Ignored:    analysis/gd-ash_cache/
+    Ignored:    analysis/gd_delta_cache/
+    Ignored:    analysis/gd_lik_2_cache/
+    Ignored:    analysis/gd_lik_cache/
+    Ignored:    analysis/gd_w_cache/
+    Ignored:    analysis/knockoff_10_cache/
+    Ignored:    analysis/knockoff_2_cache/
+    Ignored:    analysis/knockoff_3_cache/
+    Ignored:    analysis/knockoff_4_cache/
+    Ignored:    analysis/knockoff_5_cache/
+    Ignored:    analysis/knockoff_6_cache/
+    Ignored:    analysis/knockoff_7_cache/
+    Ignored:    analysis/knockoff_8_cache/
+    Ignored:    analysis/knockoff_9_cache/
+    Ignored:    analysis/knockoff_cache/
+    Ignored:    analysis/knockoff_var_cache/
+    Ignored:    analysis/marginal_z_alternative_cache/
+    Ignored:    analysis/marginal_z_cache/
+    Ignored:    analysis/mosek_reg_2_cache/
+    Ignored:    analysis/mosek_reg_4_cache/
+    Ignored:    analysis/mosek_reg_5_cache/
+    Ignored:    analysis/mosek_reg_6_cache/
+    Ignored:    analysis/mosek_reg_cache/
+    Ignored:    analysis/pihat0_null_cache/
+    Ignored:    analysis/plot_diagnostic_cache/
+    Ignored:    analysis/poster_obayes17_cache/
+    Ignored:    analysis/real_data_simulation_2_cache/
+    Ignored:    analysis/real_data_simulation_3_cache/
+    Ignored:    analysis/real_data_simulation_4_cache/
+    Ignored:    analysis/real_data_simulation_5_cache/
+    Ignored:    analysis/real_data_simulation_cache/
+    Ignored:    analysis/rmosek_primal_dual_2_cache/
+    Ignored:    analysis/rmosek_primal_dual_cache/
+    Ignored:    analysis/seqgendiff_cache/
+    Ignored:    analysis/simulated_correlated_null_2_cache/
+    Ignored:    analysis/simulated_correlated_null_3_cache/
+    Ignored:    analysis/simulated_correlated_null_cache/
+    Ignored:    analysis/simulation_real_se_2_cache/
+    Ignored:    analysis/simulation_real_se_cache/
+    Ignored:    analysis/smemo_2_cache/
+    Ignored:    data/LSI/
+    Ignored:    docs/.DS_Store
+    Ignored:    docs/figure/.DS_Store
+    Ignored:    output/fig/
+
+Untracked files:
+    Untracked:  analysis/cash_plots_fdp_files/
+    Untracked:  docs/cash_plots_fdp_files/
+
+</code></pre>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</details>
+</li>
+</ul>
+<details>
+<summary> <small><strong>Expand here to see past versions:</strong></small> </summary>
+<ul>
+<table style="border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+File
+</th>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+<th style="text-align:left;">
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/cc0ab8379469bc3726f1508cd81e4ecd6fef1b1a/analysis/cash_fdr_4.rmd" target="_blank">cc0ab83</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-05-11
+</td>
+<td style="text-align:left;">
+update
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/cash_fdr_4.html" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/fb76f412865a1be76a38632ecc7c1a48d3cbca39/docs/cash_fdr_4.html" target="_blank">fb76f41</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-29
+</td>
+<td style="text-align:left;">
+webpages
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/8966bc7cb2b886853e38e08c960ade347535de69/analysis/cash_fdr_4.rmd" target="_blank">8966bc7</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-29
+</td>
+<td style="text-align:left;">
+CASH on FDR
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/e52e79c81da790c74301dafae9f3fd0770120ad4/docs/cash_fdr_4.html" target="_blank">e52e79c</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-28
+</td>
+<td style="text-align:left;">
+building sites
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/e3da93de63fd33bad1463d0456921aee04774755/analysis/cash_fdr_4.rmd" target="_blank">e3da93d</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-28
+</td>
+<td style="text-align:left;">
+cosmetic
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/92244e417c57d2a86d681e51dd01f51e6f7e11d1/docs/cash_fdr_4.html" target="_blank">92244e4</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-28
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/b8bcdda84824e5e827de5bd1588a8db70f7b5cd7/analysis/cash_fdr_4.rmd" target="_blank">b8bcdda</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-28
+</td>
+<td style="text-align:left;">
+wflow_publish(c(“analysis/index.Rmd”, “analysis/cash_fdr_1.rmd”,
+</td>
+</tr>
+</tbody>
+</table>
+</ul>
+</details>
+<hr />
+<div id="introduction" class="section level2">
 <h2>Introduction</h2>
 <p><span class="math display">\[
 g = 0.9\delta_0 + 0.1N(0, (2\sigma_n)^2)
 \]</span></p>
-</section>
-<section id="correlated-noise-real-data" class="level2">
+</div>
+<div id="correlated-noise-real-data" class="section level2">
 <h2>Correlated noise, real data</h2>
-<pre><code>Warning: Computation failed in `stat_summary()`:
-Hmisc package required for this function</code></pre>
 <p><img src="figure/cash_fdr_4.rmd/cor%20pihat0-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of cor pihat0-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/figure/cash_fdr_4.rmd/cor pihat0-1.png" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/fb76f412865a1be76a38632ecc7c1a48d3cbca39/docs/figure/cash_fdr_4.rmd/cor pihat0-1.png" target="_blank">fb76f41</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-29
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/92244e417c57d2a86d681e51dd01f51e6f7e11d1/docs/figure/cash_fdr_4.rmd/cor pihat0-1.png" target="_blank">92244e4</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-28
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <p><img src="figure/cash_fdr_4.rmd/cor%20FDR%20plotting-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of cor FDR plotting-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/figure/cash_fdr_4.rmd/cor FDR plotting-1.png" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/fb76f412865a1be76a38632ecc7c1a48d3cbca39/docs/figure/cash_fdr_4.rmd/cor FDR plotting-1.png" target="_blank">fb76f41</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-29
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/92244e417c57d2a86d681e51dd01f51e6f7e11d1/docs/figure/cash_fdr_4.rmd/cor FDR plotting-1.png" target="_blank">92244e4</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-28
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre><code>No id variables; using all as measure variables</code></pre>
-<pre><code>Warning: Computation failed in `stat_summary()`:
-object &#39;mean_sdp&#39; of mode &#39;function&#39; was not found</code></pre>
 <p><img src="figure/cash_fdr_4.rmd/cor%20FDR%20violin-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre><code>Warning: Computation failed in `stat_summary()`:
-object &#39;mean_sdp&#39; of mode &#39;function&#39; was not found
-
-Warning: Computation failed in `stat_summary()`:
-object &#39;mean_sdp&#39; of mode &#39;function&#39; was not found
-
-Warning: Computation failed in `stat_summary()`:
-object &#39;mean_sdp&#39; of mode &#39;function&#39; was not found</code></pre>
+<details>
+<summary><em>Expand here to see past versions of cor FDR violin-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/figure/cash_fdr_4.rmd/cor FDR violin-1.png" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/fb76f412865a1be76a38632ecc7c1a48d3cbca39/docs/figure/cash_fdr_4.rmd/cor FDR violin-1.png" target="_blank">fb76f41</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-29
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/e52e79c81da790c74301dafae9f3fd0770120ad4/docs/figure/cash_fdr_4.rmd/cor FDR violin-1.png" target="_blank">e52e79c</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-28
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/92244e417c57d2a86d681e51dd01f51e6f7e11d1/docs/figure/cash_fdr_4.rmd/cor FDR violin-1.png" target="_blank">92244e4</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-28
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <p><img src="figure/cash_fdr_4.rmd/cor%20FDR%20variability-1.png" width="960" style="display: block; margin: auto;" /></p>
-<p><img src="figure/cash_fdr_4.rmd/cor%20FDR%20tail-1.png" width="960" style="display: block; margin: auto;" /><img src="figure/cash_fdr_4.rmd/cor%20FDR%20tail-2.png" width="960" style="display: block; margin: auto;" /></p>
-</section>
-<section id="independent-noise" class="level2">
+<details>
+<summary><em>Expand here to see past versions of cor FDR variability-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/figure/cash_fdr_4.rmd/cor FDR variability-1.png" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/fb76f412865a1be76a38632ecc7c1a48d3cbca39/docs/figure/cash_fdr_4.rmd/cor FDR variability-1.png" target="_blank">fb76f41</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-29
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/e52e79c81da790c74301dafae9f3fd0770120ad4/docs/figure/cash_fdr_4.rmd/cor FDR variability-1.png" target="_blank">e52e79c</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-28
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/92244e417c57d2a86d681e51dd01f51e6f7e11d1/docs/figure/cash_fdr_4.rmd/cor FDR variability-1.png" target="_blank">92244e4</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-28
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_fdr_4.rmd/cor%20FDR%20tail-1.png" width="960" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of cor FDR tail-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/figure/cash_fdr_4.rmd/cor FDR tail-1.png" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/fb76f412865a1be76a38632ecc7c1a48d3cbca39/docs/figure/cash_fdr_4.rmd/cor FDR tail-1.png" target="_blank">fb76f41</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-29
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/e52e79c81da790c74301dafae9f3fd0770120ad4/docs/figure/cash_fdr_4.rmd/cor FDR tail-1.png" target="_blank">e52e79c</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-28
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/92244e417c57d2a86d681e51dd01f51e6f7e11d1/docs/figure/cash_fdr_4.rmd/cor FDR tail-1.png" target="_blank">92244e4</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-28
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_fdr_4.rmd/cor%20FDR%20tail-2.png" width="960" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of cor FDR tail-2.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/figure/cash_fdr_4.rmd/cor FDR tail-2.png" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/fb76f412865a1be76a38632ecc7c1a48d3cbca39/docs/figure/cash_fdr_4.rmd/cor FDR tail-2.png" target="_blank">fb76f41</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-29
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/e52e79c81da790c74301dafae9f3fd0770120ad4/docs/figure/cash_fdr_4.rmd/cor FDR tail-2.png" target="_blank">e52e79c</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-28
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/92244e417c57d2a86d681e51dd01f51e6f7e11d1/docs/figure/cash_fdr_4.rmd/cor FDR tail-2.png" target="_blank">92244e4</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-28
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+</div>
+<div id="independent-noise" class="section level2">
 <h2>Independent noise</h2>
-<pre><code>Warning: Computation failed in `stat_summary()`:
-Hmisc package required for this function</code></pre>
 <p><img src="figure/cash_fdr_4.rmd/indep%20pihat0-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of indep pihat0-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/figure/cash_fdr_4.rmd/indep pihat0-1.png" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/fb76f412865a1be76a38632ecc7c1a48d3cbca39/docs/figure/cash_fdr_4.rmd/indep pihat0-1.png" target="_blank">fb76f41</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-29
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/92244e417c57d2a86d681e51dd01f51e6f7e11d1/docs/figure/cash_fdr_4.rmd/indep pihat0-1.png" target="_blank">92244e4</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-28
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <p><img src="figure/cash_fdr_4.rmd/indep%20FDR%20plotting-1.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="correlated-noise-synthetic-data" class="level2">
+<details>
+<summary><em>Expand here to see past versions of indep FDR plotting-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/figure/cash_fdr_4.rmd/indep FDR plotting-1.png" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/fb76f412865a1be76a38632ecc7c1a48d3cbca39/docs/figure/cash_fdr_4.rmd/indep FDR plotting-1.png" target="_blank">fb76f41</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-29
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/92244e417c57d2a86d681e51dd01f51e6f7e11d1/docs/figure/cash_fdr_4.rmd/indep FDR plotting-1.png" target="_blank">92244e4</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-28
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+</div>
+<div id="correlated-noise-synthetic-data" class="section level2">
 <h2>Correlated noise, synthetic data</h2>
-<pre><code>Warning: Computation failed in `stat_summary()`:
-Hmisc package required for this function</code></pre>
 <p><img src="figure/cash_fdr_4.rmd/syn%20pihat0-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of syn pihat0-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/figure/cash_fdr_4.rmd/syn pihat0-1.png" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/fb76f412865a1be76a38632ecc7c1a48d3cbca39/docs/figure/cash_fdr_4.rmd/syn pihat0-1.png" target="_blank">fb76f41</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-29
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/92244e417c57d2a86d681e51dd01f51e6f7e11d1/docs/figure/cash_fdr_4.rmd/syn pihat0-1.png" target="_blank">92244e4</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-28
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <p><img src="figure/cash_fdr_4.rmd/syn%20FDR%20plotting-1.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="session-information" class="level2">
+<details>
+<summary><em>Expand here to see past versions of syn FDR plotting-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/figure/cash_fdr_4.rmd/syn FDR plotting-1.png" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/fb76f412865a1be76a38632ecc7c1a48d3cbca39/docs/figure/cash_fdr_4.rmd/syn FDR plotting-1.png" target="_blank">fb76f41</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-29
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/92244e417c57d2a86d681e51dd01f51e6f7e11d1/docs/figure/cash_fdr_4.rmd/syn FDR plotting-1.png" target="_blank">92244e4</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-28
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+</div>
+<div id="session-information" class="section level2">
 <h2>Session information</h2>
-<!-- Insert the session information into the document -->
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS High Sierra 10.13.2
+Running under: macOS High Sierra 10.13.4
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -382,31 +1241,38 @@ attached base packages:
 other attached packages:
  [1] edgeR_3.20.2      limma_3.34.4      ggplot2_2.2.1    
  [4] reshape2_1.4.3    ashr_2.2-2        Rmosek_8.0.69    
- [7] PolynomF_1.0-1    CVXR_0.94-4       REBayes_1.2      
+ [7] PolynomF_1.0-1    CVXR_0.95         REBayes_1.2      
 [10] Matrix_1.2-12     SQUAREM_2017.10-1 EQL_1.0-0        
 [13] ttutils_1.0-1    
 
 loaded via a namespace (and not attached):
- [1] gmp_0.5-13.1      Rcpp_0.12.14      plyr_1.8.4       
- [4] compiler_3.4.3    git2r_0.20.0      R.methodsS3_1.7.1
- [7] R.utils_2.6.0     iterators_1.0.9   tools_3.4.3      
-[10] digest_0.6.13     bit_1.1-12        tibble_1.3.4     
-[13] gtable_0.2.0      evaluate_0.10.1   lattice_0.20-35  
-[16] rlang_0.1.4       foreach_1.4.4     yaml_2.1.16      
-[19] parallel_3.4.3    Rmpfr_0.6-1       ECOSolveR_0.3-2  
-[22] stringr_1.2.0     knitr_1.17        locfit_1.5-9.1   
-[25] rprojroot_1.3-1   bit64_0.9-7       grid_3.4.3       
-[28] R6_2.2.2          rmarkdown_1.8     magrittr_1.5     
-[31] scales_0.5.0      MASS_7.3-47       backports_1.1.2  
-[34] codetools_0.2-15  htmltools_0.3.6   scs_1.1-1        
-[37] colorspace_1.3-2  labeling_0.3      stringi_1.1.6    
-[40] lazyeval_0.2.1    munsell_0.4.3     doParallel_1.0.11
-[43] pscl_1.5.2        truncnorm_1.0-7   R.oo_1.21.0      </code></pre>
-</section>
+ [1] Rcpp_0.12.16        locfit_1.5-9.1      lattice_0.20-35    
+ [4] rprojroot_1.3-2     digest_0.6.15       foreach_1.4.4      
+ [7] gmp_0.5-13.1        truncnorm_1.0-7     R6_2.2.2           
+[10] plyr_1.8.4          backports_1.1.2     acepack_1.4.1      
+[13] evaluate_0.10.1     pillar_1.0.1        rlang_0.1.6        
+[16] lazyeval_0.2.1      pscl_1.5.2          data.table_1.10.4-3
+[19] rstudioapi_0.7      whisker_0.3-2       R.utils_2.6.0      
+[22] R.oo_1.21.0         rpart_4.1-11        checkmate_1.8.5    
+[25] rmarkdown_1.9       labeling_0.3        splines_3.4.3      
+[28] stringr_1.3.0       foreign_0.8-69      htmlwidgets_0.9    
+[31] bit_1.1-12          munsell_0.4.3       compiler_3.4.3     
+[34] base64enc_0.1-3     htmltools_0.3.6     nnet_7.3-12        
+[37] htmlTable_1.11.1    tibble_1.4.1        gridExtra_2.3      
+[40] workflowr_1.0.1     Hmisc_4.1-0         codetools_0.2-15   
+[43] MASS_7.3-47         R.methodsS3_1.7.1   grid_3.4.3         
+[46] gtable_0.2.0        git2r_0.21.0        magrittr_1.5       
+[49] scales_0.5.0        stringi_1.1.6       Rmpfr_0.6-1        
+[52] doParallel_1.0.11   latticeExtra_0.6-28 Formula_1.2-2      
+[55] RColorBrewer_1.1-2  iterators_1.0.9     tools_3.4.3        
+[58] bit64_0.9-7         parallel_3.4.3      survival_2.41-3    
+[61] yaml_2.1.18         colorspace_1.3-2    cluster_2.0.6      
+[64] scs_1.1-1           ECOSolveR_0.4       knitr_1.20         </code></pre>
+</div>
 
 <hr>
 <p>
-    This <a href="http://rmarkdown.rstudio.com">R Markdown</a> site was created with <a href="https://github.com/jdblischak/workflowr">workflowr</a>
+    
 </p>
 <hr>
 
@@ -428,6 +1294,25 @@ loaded via a namespace (and not attached):
     <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
     <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
 -->
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+<hr>
+<p>
+  This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a>
+  analysis was created with
+  <a href="https://github.com/jdblischak/workflowr">workflowr</a> 1.0.1
+</p>
+<hr>
 
 
 </div>

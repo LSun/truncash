@@ -300,6 +300,13 @@ div.tocify {
   </div><!--/.container -->
 </div><!--/.navbar -->
 
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
 <div class="fluid-row" id="header">
 
 
@@ -311,16 +318,463 @@ div.tocify {
 </div>
 
 
-<!-- The file analysis/chunks.R contains chunks that define default settings
-shared across the workflowr files. -->
-<!-- Update knitr chunk options -->
-<!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2017-12-21</p>
-<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
- package git2r is installed -->
-<p><strong>Code version:</strong> 6e42447</p>
-<!-- Add your analysis here -->
-<section id="identifiablity-of-true-signals-from-correlated-noise" class="level2">
+<p><strong>Last updated:</strong> 2018-05-12</p>
+<strong>workflowr checks:</strong> <small>(Click a bullet for more information)</small>
+<ul>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>R Markdown file:</strong> up-to-date </summary></p>
+<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Environment:</strong> empty </summary></p>
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Seed:</strong> <code>set.seed(12345)</code> </summary></p>
+<p>The command <code>set.seed(12345)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Session information:</strong> recorded </summary></p>
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/5b37742d7cdd7ba50dd641579d2705df67b8b441" target="_blank">5b37742</a> </summary></p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    analysis/.DS_Store
+    Ignored:    analysis/BH_robustness_cache/
+    Ignored:    analysis/FDR_Null_cache/
+    Ignored:    analysis/FDR_null_betahat_cache/
+    Ignored:    analysis/Rmosek_cache/
+    Ignored:    analysis/StepDown_cache/
+    Ignored:    analysis/alternative2_cache/
+    Ignored:    analysis/alternative_cache/
+    Ignored:    analysis/ash_gd_cache/
+    Ignored:    analysis/average_cor_gtex_2_cache/
+    Ignored:    analysis/average_cor_gtex_cache/
+    Ignored:    analysis/brca_cache/
+    Ignored:    analysis/cash_deconv_cache/
+    Ignored:    analysis/cash_fdr_1_cache/
+    Ignored:    analysis/cash_fdr_2_cache/
+    Ignored:    analysis/cash_fdr_3_cache/
+    Ignored:    analysis/cash_fdr_4_cache/
+    Ignored:    analysis/cash_fdr_5_cache/
+    Ignored:    analysis/cash_fdr_6_cache/
+    Ignored:    analysis/cash_plots_cache/
+    Ignored:    analysis/cash_plots_fdp_cache/
+    Ignored:    analysis/cash_sim_1_cache/
+    Ignored:    analysis/cash_sim_2_cache/
+    Ignored:    analysis/cash_sim_3_cache/
+    Ignored:    analysis/cash_sim_4_cache/
+    Ignored:    analysis/cash_sim_5_cache/
+    Ignored:    analysis/cash_sim_6_cache/
+    Ignored:    analysis/cash_sim_7_cache/
+    Ignored:    analysis/correlated_z_2_cache/
+    Ignored:    analysis/correlated_z_3_cache/
+    Ignored:    analysis/correlated_z_cache/
+    Ignored:    analysis/create_null_cache/
+    Ignored:    analysis/cutoff_null_cache/
+    Ignored:    analysis/design_matrix_2_cache/
+    Ignored:    analysis/design_matrix_cache/
+    Ignored:    analysis/diagnostic_ash_cache/
+    Ignored:    analysis/diagnostic_correlated_z_2_cache/
+    Ignored:    analysis/diagnostic_correlated_z_3_cache/
+    Ignored:    analysis/diagnostic_correlated_z_cache/
+    Ignored:    analysis/diagnostic_plot_2_cache/
+    Ignored:    analysis/diagnostic_plot_cache/
+    Ignored:    analysis/efron_leukemia_cache/
+    Ignored:    analysis/fitting_normal_cache/
+    Ignored:    analysis/gaussian_derivatives_2_cache/
+    Ignored:    analysis/gaussian_derivatives_3_cache/
+    Ignored:    analysis/gaussian_derivatives_4_cache/
+    Ignored:    analysis/gaussian_derivatives_5_cache/
+    Ignored:    analysis/gaussian_derivatives_cache/
+    Ignored:    analysis/gd-ash_cache/
+    Ignored:    analysis/gd_delta_cache/
+    Ignored:    analysis/gd_lik_2_cache/
+    Ignored:    analysis/gd_lik_cache/
+    Ignored:    analysis/gd_w_cache/
+    Ignored:    analysis/knockoff_10_cache/
+    Ignored:    analysis/knockoff_2_cache/
+    Ignored:    analysis/knockoff_3_cache/
+    Ignored:    analysis/knockoff_4_cache/
+    Ignored:    analysis/knockoff_5_cache/
+    Ignored:    analysis/knockoff_6_cache/
+    Ignored:    analysis/knockoff_7_cache/
+    Ignored:    analysis/knockoff_8_cache/
+    Ignored:    analysis/knockoff_9_cache/
+    Ignored:    analysis/knockoff_cache/
+    Ignored:    analysis/knockoff_var_cache/
+    Ignored:    analysis/marginal_z_alternative_cache/
+    Ignored:    analysis/marginal_z_cache/
+    Ignored:    analysis/mosek_reg_2_cache/
+    Ignored:    analysis/mosek_reg_4_cache/
+    Ignored:    analysis/mosek_reg_5_cache/
+    Ignored:    analysis/mosek_reg_6_cache/
+    Ignored:    analysis/mosek_reg_cache/
+    Ignored:    analysis/pihat0_null_cache/
+    Ignored:    analysis/plot_diagnostic_cache/
+    Ignored:    analysis/poster_obayes17_cache/
+    Ignored:    analysis/real_data_simulation_2_cache/
+    Ignored:    analysis/real_data_simulation_3_cache/
+    Ignored:    analysis/real_data_simulation_4_cache/
+    Ignored:    analysis/real_data_simulation_5_cache/
+    Ignored:    analysis/real_data_simulation_cache/
+    Ignored:    analysis/rmosek_primal_dual_2_cache/
+    Ignored:    analysis/rmosek_primal_dual_cache/
+    Ignored:    analysis/seqgendiff_cache/
+    Ignored:    analysis/simulated_correlated_null_2_cache/
+    Ignored:    analysis/simulated_correlated_null_3_cache/
+    Ignored:    analysis/simulated_correlated_null_cache/
+    Ignored:    analysis/simulation_real_se_2_cache/
+    Ignored:    analysis/simulation_real_se_cache/
+    Ignored:    analysis/smemo_2_cache/
+    Ignored:    data/LSI/
+    Ignored:    docs/.DS_Store
+    Ignored:    docs/figure/.DS_Store
+    Ignored:    output/fig/
+
+Untracked files:
+    Untracked:  analysis/cash_plots_fdp_files/
+    Untracked:  docs/cash_plots_fdp_files/
+
+</code></pre>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</details>
+</li>
+</ul>
+<details>
+<summary> <small><strong>Expand here to see past versions:</strong></small> </summary>
+<ul>
+<table style="border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+File
+</th>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+<th style="text-align:left;">
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/cc0ab8379469bc3726f1508cd81e4ecd6fef1b1a/analysis/alternative.rmd" target="_blank">cc0ab83</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-05-11
+</td>
+<td style="text-align:left;">
+update
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/alternative.html" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/853a484bfacf347e109f6c8fb3ffaab5f4d6cc02/docs/alternative.html" target="_blank">853a484</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-07
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/043bf895b4a909cf842ddfa19a7187908f608fa8/docs/alternative.html" target="_blank">043bf89</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-05
+</td>
+<td style="text-align:left;">
+transfer
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/321f66afc30209ec649ade7fb799f5649e96adde/docs/alternative.html" target="_blank">321f66a</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-30
+</td>
+<td style="text-align:left;">
+alternative
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0f49e8acfa54a62535e4c5d346cd89cdc4826731/analysis/alternative.rmd" target="_blank">0f49e8a</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-03-31
+</td>
+<td style="text-align:left;">
+alternative simulation
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/0f49e8acfa54a62535e4c5d346cd89cdc4826731/docs/alternative.html" target="_blank">0f49e8a</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-03-31
+</td>
+<td style="text-align:left;">
+alternative simulation
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/2a9b0b7220e4b3802de7bc196687fbd3b2b80baf/analysis/alternative.rmd" target="_blank">2a9b0b7</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-03-30
+</td>
+<td style="text-align:left;">
+weights
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/2a9b0b7220e4b3802de7bc196687fbd3b2b80baf/docs/alternative.html" target="_blank">2a9b0b7</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-03-30
+</td>
+<td style="text-align:left;">
+weights
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/3c146da67c701b9e7e005c7561d04d09907ad1b7/analysis/alternative.rmd" target="_blank">3c146da</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-03-30
+</td>
+<td style="text-align:left;">
+N(0, 2) pdf
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/3c146da67c701b9e7e005c7561d04d09907ad1b7/docs/alternative.html" target="_blank">3c146da</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-03-30
+</td>
+<td style="text-align:left;">
+N(0, 2) pdf
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/e5e405c5e889dbade93ff25ca7b1aff36932d843/analysis/alternative.rmd" target="_blank">e5e405c</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-03-30
+</td>
+<td style="text-align:left;">
+tails
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/e5e405c5e889dbade93ff25ca7b1aff36932d843/docs/alternative.html" target="_blank">e5e405c</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-03-30
+</td>
+<td style="text-align:left;">
+tails
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/e36f50558437b0d21302e1d8d2f5b5bb0528da78/analysis/alternative.rmd" target="_blank">e36f505</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-03-30
+</td>
+<td style="text-align:left;">
+tail
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/e36f50558437b0d21302e1d8d2f5b5bb0528da78/docs/alternative.html" target="_blank">e36f505</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-03-30
+</td>
+<td style="text-align:left;">
+tail
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/c472cb31aaef6987dea256a249b819b229f78b2c/analysis/alternative.rmd" target="_blank">c472cb3</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-03-29
+</td>
+<td style="text-align:left;">
+n(0,2)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/c472cb31aaef6987dea256a249b819b229f78b2c/docs/alternative.html" target="_blank">c472cb3</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-03-29
+</td>
+<td style="text-align:left;">
+n(0,2)
+</td>
+</tr>
+</tbody>
+</table>
+</ul>
+</details>
+<hr />
+<div id="identifiablity-of-true-signals-from-correlated-noise" class="section level2">
 <h2>Identifiablity of true signals from correlated noise</h2>
 <p><a href="gaussian_derivatives_2.html#examples">We’ve shown</a> that in many real data sets when we have correlated null <span class="math inline">\(z\)</span> scores, we can <a href="gaussian_derivatives.html#empirical_null">fit their empirical distribution with Gaussian and its derivatives</a>.</p>
 <p>But what if we have true signals instead of the global null? Theoretically, any distribution can be decomposed by Gaussian and its derivatives, also called <a href="https://en.wikipedia.org/wiki/Edgeworth_series">Edgeworth series or Edgeworth expansion</a>. We’ve shown that the Dirac delta function <span class="math inline">\(\delta_z\)</span> and the associated <span class="math inline">\(0\)</span>-<span class="math inline">\(1\)</span> step function <a href="gaussian_derivatives_4.html#extreme_case:_(rho_%7Bij%7D_equiv_1)">can be decomposed</a> by Gaussian derivatives. Essentially all distributions can be represented by (usually infinitely many) <span class="math inline">\(\delta_z\)</span>, and thus be decomposed by Gaussian and its derivatives. <strong>There is a rich literature on this topic, probably of further use to this project.</strong></p>
@@ -334,8 +788,8 @@ z_j \sim N(\beta_j, 1)
 \end{array}
 \]</span></p>
 <p>That is, a <span class="math inline">\(N(0, 1)\)</span> true signal is polluted by a <span class="math inline">\(N(0, 1)\)</span> noise.</p>
-</section>
-<section id="illustration" class="level2">
+</div>
+<div id="illustration" class="section level2">
 <h2>Illustration</h2>
 <pre class="r"><code>n = 1e4
 m = 5
@@ -407,14 +861,13 @@ Normalized weights:
 <p><img src="figure/alternative.rmd/unnamed-chunk-4-34.png" width="672" style="display: block; margin: auto;" /></p>
 <pre><code>Zoom in to the right tail:</code></pre>
 <p><img src="figure/alternative.rmd/unnamed-chunk-4-35.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-36.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-37.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-38.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-39.png" width="672" style="display: block; margin: auto;" /><img src="figure/alternative.rmd/unnamed-chunk-4-40.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="session-information" class="level2">
+</div>
+<div id="session-information" class="section level2">
 <h2>Session information</h2>
-<!-- Insert the session information into the document -->
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS High Sierra 10.13.2
+Running under: macOS High Sierra 10.13.4
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -427,15 +880,18 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 loaded via a namespace (and not attached):
- [1] compiler_3.4.3  backports_1.1.2 magrittr_1.5    rprojroot_1.3-1
- [5] tools_3.4.3     htmltools_0.3.6 yaml_2.1.16     Rcpp_0.12.14   
- [9] stringi_1.1.6   rmarkdown_1.8   knitr_1.17      git2r_0.20.0   
-[13] stringr_1.2.0   digest_0.6.13   evaluate_0.10.1</code></pre>
-</section>
+ [1] workflowr_1.0.1   Rcpp_0.12.16      digest_0.6.15    
+ [4] rprojroot_1.3-2   R.methodsS3_1.7.1 backports_1.1.2  
+ [7] git2r_0.21.0      magrittr_1.5      evaluate_0.10.1  
+[10] stringi_1.1.6     whisker_0.3-2     R.oo_1.21.0      
+[13] R.utils_2.6.0     rmarkdown_1.9     tools_3.4.3      
+[16] stringr_1.3.0     yaml_2.1.18       compiler_3.4.3   
+[19] htmltools_0.3.6   knitr_1.20       </code></pre>
+</div>
 
 <hr>
 <p>
-    This <a href="http://rmarkdown.rstudio.com">R Markdown</a> site was created with <a href="https://github.com/jdblischak/workflowr">workflowr</a>
+    
 </p>
 <hr>
 
@@ -457,6 +913,25 @@ loaded via a namespace (and not attached):
     <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
     <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
 -->
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+<hr>
+<p>
+  This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a>
+  analysis was created with
+  <a href="https://github.com/jdblischak/workflowr">workflowr</a> 1.0.1
+</p>
+<hr>
 
 
 </div>

@@ -300,6 +300,13 @@ div.tocify {
   </div><!--/.container -->
 </div><!--/.navbar -->
 
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
 <div class="fluid-row" id="header">
 
 
@@ -311,16 +318,292 @@ div.tocify {
 </div>
 
 
-<!-- The file analysis/chunks.R contains chunks that define default settings
-shared across the workflowr files. -->
-<!-- Update knitr chunk options -->
-<!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2017-12-21</p>
-<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
- package git2r is installed -->
-<p><strong>Code version:</strong> 6e42447</p>
-<!-- Add your analysis here -->
-<section id="problem-setting" class="level2">
+<p><strong>Last updated:</strong> 2018-05-12</p>
+<strong>workflowr checks:</strong> <small>(Click a bullet for more information)</small>
+<ul>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>R Markdown file:</strong> up-to-date </summary></p>
+<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/5b37742d7cdd7ba50dd641579d2705df67b8b441" target="_blank">5b37742</a> </summary></p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    analysis/.DS_Store
+    Ignored:    analysis/BH_robustness_cache/
+    Ignored:    analysis/FDR_Null_cache/
+    Ignored:    analysis/FDR_null_betahat_cache/
+    Ignored:    analysis/Rmosek_cache/
+    Ignored:    analysis/StepDown_cache/
+    Ignored:    analysis/alternative2_cache/
+    Ignored:    analysis/alternative_cache/
+    Ignored:    analysis/ash_gd_cache/
+    Ignored:    analysis/average_cor_gtex_2_cache/
+    Ignored:    analysis/average_cor_gtex_cache/
+    Ignored:    analysis/brca_cache/
+    Ignored:    analysis/cash_deconv_cache/
+    Ignored:    analysis/cash_fdr_1_cache/
+    Ignored:    analysis/cash_fdr_2_cache/
+    Ignored:    analysis/cash_fdr_3_cache/
+    Ignored:    analysis/cash_fdr_4_cache/
+    Ignored:    analysis/cash_fdr_5_cache/
+    Ignored:    analysis/cash_fdr_6_cache/
+    Ignored:    analysis/cash_plots_cache/
+    Ignored:    analysis/cash_plots_fdp_cache/
+    Ignored:    analysis/cash_sim_1_cache/
+    Ignored:    analysis/cash_sim_2_cache/
+    Ignored:    analysis/cash_sim_3_cache/
+    Ignored:    analysis/cash_sim_4_cache/
+    Ignored:    analysis/cash_sim_5_cache/
+    Ignored:    analysis/cash_sim_6_cache/
+    Ignored:    analysis/cash_sim_7_cache/
+    Ignored:    analysis/correlated_z_2_cache/
+    Ignored:    analysis/correlated_z_3_cache/
+    Ignored:    analysis/correlated_z_cache/
+    Ignored:    analysis/create_null_cache/
+    Ignored:    analysis/cutoff_null_cache/
+    Ignored:    analysis/design_matrix_2_cache/
+    Ignored:    analysis/design_matrix_cache/
+    Ignored:    analysis/diagnostic_ash_cache/
+    Ignored:    analysis/diagnostic_correlated_z_2_cache/
+    Ignored:    analysis/diagnostic_correlated_z_3_cache/
+    Ignored:    analysis/diagnostic_correlated_z_cache/
+    Ignored:    analysis/diagnostic_plot_2_cache/
+    Ignored:    analysis/diagnostic_plot_cache/
+    Ignored:    analysis/efron_leukemia_cache/
+    Ignored:    analysis/fitting_normal_cache/
+    Ignored:    analysis/gaussian_derivatives_2_cache/
+    Ignored:    analysis/gaussian_derivatives_3_cache/
+    Ignored:    analysis/gaussian_derivatives_4_cache/
+    Ignored:    analysis/gaussian_derivatives_5_cache/
+    Ignored:    analysis/gaussian_derivatives_cache/
+    Ignored:    analysis/gd-ash_cache/
+    Ignored:    analysis/gd_delta_cache/
+    Ignored:    analysis/gd_lik_2_cache/
+    Ignored:    analysis/gd_lik_cache/
+    Ignored:    analysis/gd_w_cache/
+    Ignored:    analysis/knockoff_10_cache/
+    Ignored:    analysis/knockoff_2_cache/
+    Ignored:    analysis/knockoff_3_cache/
+    Ignored:    analysis/knockoff_4_cache/
+    Ignored:    analysis/knockoff_5_cache/
+    Ignored:    analysis/knockoff_6_cache/
+    Ignored:    analysis/knockoff_7_cache/
+    Ignored:    analysis/knockoff_8_cache/
+    Ignored:    analysis/knockoff_9_cache/
+    Ignored:    analysis/knockoff_cache/
+    Ignored:    analysis/knockoff_var_cache/
+    Ignored:    analysis/marginal_z_alternative_cache/
+    Ignored:    analysis/marginal_z_cache/
+    Ignored:    analysis/mosek_reg_2_cache/
+    Ignored:    analysis/mosek_reg_4_cache/
+    Ignored:    analysis/mosek_reg_5_cache/
+    Ignored:    analysis/mosek_reg_6_cache/
+    Ignored:    analysis/mosek_reg_cache/
+    Ignored:    analysis/pihat0_null_cache/
+    Ignored:    analysis/plot_diagnostic_cache/
+    Ignored:    analysis/poster_obayes17_cache/
+    Ignored:    analysis/real_data_simulation_2_cache/
+    Ignored:    analysis/real_data_simulation_3_cache/
+    Ignored:    analysis/real_data_simulation_4_cache/
+    Ignored:    analysis/real_data_simulation_5_cache/
+    Ignored:    analysis/real_data_simulation_cache/
+    Ignored:    analysis/rmosek_primal_dual_2_cache/
+    Ignored:    analysis/rmosek_primal_dual_cache/
+    Ignored:    analysis/seqgendiff_cache/
+    Ignored:    analysis/simulated_correlated_null_2_cache/
+    Ignored:    analysis/simulated_correlated_null_3_cache/
+    Ignored:    analysis/simulated_correlated_null_cache/
+    Ignored:    analysis/simulation_real_se_2_cache/
+    Ignored:    analysis/simulation_real_se_cache/
+    Ignored:    analysis/smemo_2_cache/
+    Ignored:    data/LSI/
+    Ignored:    docs/.DS_Store
+    Ignored:    docs/figure/.DS_Store
+    Ignored:    output/fig/
+
+Untracked files:
+    Untracked:  analysis/cash_plots_fdp_files/
+    Untracked:  docs/cash_plots_fdp_files/
+
+</code></pre>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</details>
+</li>
+</ul>
+<details>
+<summary> <small><strong>Expand here to see past versions:</strong></small> </summary>
+<ul>
+<table style="border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+File
+</th>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+<th style="text-align:left;">
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/cc0ab8379469bc3726f1508cd81e4ecd6fef1b1a/analysis/ash_gd.rmd" target="_blank">cc0ab83</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-05-11
+</td>
+<td style="text-align:left;">
+update
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/ash_gd.html" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/853a484bfacf347e109f6c8fb3ffaab5f4d6cc02/docs/ash_gd.html" target="_blank">853a484</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-07
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/043bf895b4a909cf842ddfa19a7187908f608fa8/docs/ash_gd.html" target="_blank">043bf89</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-05
+</td>
+<td style="text-align:left;">
+transfer
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/3c00d157ca8476c29ff324b50e05f1ff3809025f/analysis/ash_gd.rmd" target="_blank">3c00d15</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-04-21
+</td>
+<td style="text-align:left;">
+de bogged
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/3c00d157ca8476c29ff324b50e05f1ff3809025f/docs/ash_gd.html" target="_blank">3c00d15</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-04-21
+</td>
+<td style="text-align:left;">
+de bogged
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/239f1952ba3f76b6894649ae7cb530b2f63be4e4/analysis/ash_gd.rmd" target="_blank">239f195</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-04-21
+</td>
+<td style="text-align:left;">
+GD-ASH
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/239f1952ba3f76b6894649ae7cb530b2f63be4e4/docs/ash_gd.html" target="_blank">239f195</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-04-21
+</td>
+<td style="text-align:left;">
+GD-ASH
+</td>
+</tr>
+</tbody>
+</table>
+</ul>
+</details>
+<hr />
+<div id="problem-setting" class="section level2">
 <h2>Problem setting</h2>
 <p>We are considering the normal means problem with heteroskedastic noise. Furthermore, The noise are not independent, with unknown pairwise correlation <span class="math inline">\(\rho_{ij}\)</span>.</p>
 <p><span class="math display">\[
@@ -369,8 +652,8 @@ f_{jkl} \  .
 \max\limits_{\pi, w}\prod_j f(\hat\beta_j|\hat s_j) = \prod_j \left(\displaystyle \sum_k \sum_l \pi_k w_l
 f_{jkl}\right) \  ,
 \]</span> subject to reasonable, well designed constraints on <span class="math inline">\(\pi_k\)</span> and <a href="gaussian_derivatives_5.html">especially <span class="math inline">\(w_l\)</span></a>.</p>
-</section>
-<section id="characteristic-function-fourier-transform" class="level2">
+</div>
+<div id="characteristic-function-fourier-transform" class="section level2">
 <h2>Characteristic function / Fourier transform</h2>
 <p>The exact form of <span class="math inline">\(f_{jkl}\)</span> can be derived analytically. Below is a method using characteristic functions or Fourier transforms.</p>
 <p>Let <span class="math inline">\(\zeta_X(t) = \zeta_F(t) =\zeta_f(t) := E[e^{itX}]\)</span> be the characteristic function of the random variable <span class="math inline">\(X\sim dF = f\)</span>. Either the random variable, its distribution, or its density function can be put in the subscript, depending on the circumstances.</p>
@@ -470,7 +753,7 @@ g_k(\beta_j)d\beta_j\\
 \zeta_\varphi(\hat s_jt)dt \  .
 \end{array}
 \]</span></p>
-<section id="uniform-mixture-prior" class="level3">
+<div id="uniform-mixture-prior" class="section level3">
 <h3>Uniform mixture prior</h3>
 <p>If the prior of <span class="math inline">\(\beta\)</span> is a mixture of uniforms, <span class="math inline">\(\beta \sim g = \sum_k\pi_kg_k\)</span> where <span class="math inline">\(g_k = \text{Unif}\left[a_k, b_k\right]\)</span>,</p>
 <p><span class="math display">\[
@@ -549,8 +832,8 @@ f_{jkl} &amp;=&amp; \displaystyle
 \frac{\varphi^{(l-1)}\left(\frac{\hat\beta_j- a_k}{\hat s_j}\right) - \varphi^{(l-1)}\left(\frac{\hat\beta_j- b_k}{\hat s_j}\right)}{b_k-a_k}
 \end{array}
 \]</span></p>
-</section>
-<section id="normal-mixture-prior" class="level3">
+</div>
+<div id="normal-mixture-prior" class="section level3">
 <h3>Normal mixture prior</h3>
 <p>Likewise, if the prior of <span class="math inline">\(\beta\)</span> is a mixture of normals, <span class="math inline">\(\beta \sim g = \sum_k\pi_kg_k\)</span> where <span class="math inline">\(g_k = N(\mu_k, \sigma_k^2)\)</span>,</p>
 <p><span class="math display">\[
@@ -601,9 +884,9 @@ e^{it\mu_k - \frac12\left(\sigma_k^2+\hat s_j^2\right)t^2}
 \varphi^{(l)}\left(\frac{\hat\beta_j - \mu_k}{\sqrt{\sigma_k^2 + \hat s_j^2}}\right) \  .
 \end{array}
 \]</span> In common applications, <span class="math inline">\(\mu_k\equiv\mu\equiv0\)</span>.</p>
-</section>
-</section>
-<section id="optimization-problem" class="level2">
+</div>
+</div>
+<div id="optimization-problem" class="section level2">
 <h2>Optimization problem</h2>
 <p>The problem is now boiled down to maximize the joint likelihood</p>
 <p><span class="math display">\[
@@ -614,7 +897,7 @@ e^{it\mu_k - \frac12\left(\sigma_k^2+\hat s_j^2\right)t^2}
 \end{array}
 \]</span></p>
 <p>subject to appropriate constraints on <span class="math inline">\(\pi_k\)</span> and <a href="gaussian_derivatives_5.html">especially <span class="math inline">\(w_l\)</span></a>, where the specific form of <span class="math inline">\(f_{jkl}\)</span> depends on the mixture component of the prior <span class="math inline">\(g\)</span> of <span class="math inline">\(\beta_j\)</span>. Here we consider two cases.</p>
-<section id="uniform-mixture-prior-1" class="level3">
+<div id="uniform-mixture-prior-1" class="section level3">
 <h3>Uniform mixture prior</h3>
 <p><span class="math display">\[
 \begin{array}{rrcl}
@@ -623,8 +906,8 @@ e^{it\mu_k - \frac12\left(\sigma_k^2+\hat s_j^2\right)t^2}
 \displaystyle\frac{\varphi^{(l-1)}\left(\frac{\hat\beta_j-a_k}{\hat s_j}\right) - \varphi^{(l-1)}\left(\frac{\hat\beta_j-b_k}{\hat s_j}\right)}{b_k - a_k} \  .
 \end{array}
 \]</span></p>
-</section>
-<section id="normal-mixture-prior-1" class="level3">
+</div>
+<div id="normal-mixture-prior-1" class="section level3">
 <h3>Normal mixture prior</h3>
 <p><span class="math display">\[
 \begin{array}{rrcl}
@@ -638,8 +921,8 @@ e^{it\mu_k - \frac12\left(\sigma_k^2+\hat s_j^2\right)t^2}
 }\right) \  .
 \end{array}
 \]</span></p>
-</section>
-<section id="biconvex-optimization" class="level3">
+</div>
+<div id="biconvex-optimization" class="section level3">
 <h3>Biconvex optimization</h3>
 <p>Our goal is then to estimate <span class="math inline">\(\hat\pi\)</span> by solving the following constrained biconvex optimization problem</p>
 <p><span class="math display">\[
@@ -651,12 +934,12 @@ e^{it\mu_k - \frac12\left(\sigma_k^2+\hat s_j^2\right)t^2}
 &amp; w_l \text{ decay reasonably fast.}
 \end{array}
 \]</span></p>
-</section>
-</section>
+</div>
+</div>
 
 <hr>
 <p>
-    This <a href="http://rmarkdown.rstudio.com">R Markdown</a> site was created with <a href="https://github.com/jdblischak/workflowr">workflowr</a>
+    
 </p>
 <hr>
 
@@ -678,6 +961,25 @@ e^{it\mu_k - \frac12\left(\sigma_k^2+\hat s_j^2\right)t^2}
     <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
     <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
 -->
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+<hr>
+<p>
+  This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a>
+  analysis was created with
+  <a href="https://github.com/jdblischak/workflowr">workflowr</a> 1.0.1
+</p>
+<hr>
 
 
 </div>
