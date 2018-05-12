@@ -300,6 +300,13 @@ div.tocify {
   </div><!--/.container -->
 </div><!--/.navbar -->
 
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
 <div class="fluid-row" id="header">
 
 
@@ -311,16 +318,716 @@ div.tocify {
 </div>
 
 
-<!-- The file analysis/chunks.R contains chunks that define default settings
-shared across the workflowr files. -->
-<!-- Update knitr chunk options -->
-<!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2018-02-28</p>
-<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
- package git2r is installed -->
-<p><strong>Code version:</strong> 1d0f7e0</p>
-<!-- Add your analysis here -->
-<section id="introduction" class="level2">
+<p><strong>Last updated:</strong> 2018-05-12</p>
+<strong>workflowr checks:</strong> <small>(Click a bullet for more information)</small>
+<ul>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>R Markdown file:</strong> up-to-date </summary></p>
+<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Environment:</strong> empty </summary></p>
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Seed:</strong> <code>set.seed(12345)</code> </summary></p>
+<p>The command <code>set.seed(12345)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Session information:</strong> recorded </summary></p>
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/ddf906244e82e0675854c40da76dc16cf1a78fa4" target="_blank">ddf9062</a> </summary></p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    analysis/.DS_Store
+    Ignored:    analysis/BH_robustness_cache/
+    Ignored:    analysis/FDR_Null_cache/
+    Ignored:    analysis/FDR_null_betahat_cache/
+    Ignored:    analysis/Rmosek_cache/
+    Ignored:    analysis/StepDown_cache/
+    Ignored:    analysis/alternative2_cache/
+    Ignored:    analysis/alternative_cache/
+    Ignored:    analysis/ash_gd_cache/
+    Ignored:    analysis/average_cor_gtex_2_cache/
+    Ignored:    analysis/average_cor_gtex_cache/
+    Ignored:    analysis/brca_cache/
+    Ignored:    analysis/cash_deconv_cache/
+    Ignored:    analysis/cash_fdr_1_cache/
+    Ignored:    analysis/cash_fdr_2_cache/
+    Ignored:    analysis/cash_fdr_3_cache/
+    Ignored:    analysis/cash_fdr_4_cache/
+    Ignored:    analysis/cash_fdr_5_cache/
+    Ignored:    analysis/cash_fdr_6_cache/
+    Ignored:    analysis/cash_plots_cache/
+    Ignored:    analysis/cash_sim_1_cache/
+    Ignored:    analysis/cash_sim_2_cache/
+    Ignored:    analysis/cash_sim_3_cache/
+    Ignored:    analysis/cash_sim_4_cache/
+    Ignored:    analysis/cash_sim_5_cache/
+    Ignored:    analysis/cash_sim_6_cache/
+    Ignored:    analysis/cash_sim_7_cache/
+    Ignored:    analysis/correlated_z_2_cache/
+    Ignored:    analysis/correlated_z_3_cache/
+    Ignored:    analysis/correlated_z_cache/
+    Ignored:    analysis/create_null_cache/
+    Ignored:    analysis/cutoff_null_cache/
+    Ignored:    analysis/design_matrix_2_cache/
+    Ignored:    analysis/design_matrix_cache/
+    Ignored:    analysis/diagnostic_ash_cache/
+    Ignored:    analysis/diagnostic_correlated_z_2_cache/
+    Ignored:    analysis/diagnostic_correlated_z_3_cache/
+    Ignored:    analysis/diagnostic_correlated_z_cache/
+    Ignored:    analysis/diagnostic_plot_2_cache/
+    Ignored:    analysis/diagnostic_plot_cache/
+    Ignored:    analysis/efron_leukemia_cache/
+    Ignored:    analysis/fitting_normal_cache/
+    Ignored:    analysis/gaussian_derivatives_2_cache/
+    Ignored:    analysis/gaussian_derivatives_3_cache/
+    Ignored:    analysis/gaussian_derivatives_4_cache/
+    Ignored:    analysis/gaussian_derivatives_5_cache/
+    Ignored:    analysis/gaussian_derivatives_cache/
+    Ignored:    analysis/gd-ash_cache/
+    Ignored:    analysis/gd_delta_cache/
+    Ignored:    analysis/gd_lik_2_cache/
+    Ignored:    analysis/gd_lik_cache/
+    Ignored:    analysis/gd_w_cache/
+    Ignored:    analysis/knockoff_10_cache/
+    Ignored:    analysis/knockoff_2_cache/
+    Ignored:    analysis/knockoff_3_cache/
+    Ignored:    analysis/knockoff_4_cache/
+    Ignored:    analysis/knockoff_5_cache/
+    Ignored:    analysis/knockoff_6_cache/
+    Ignored:    analysis/knockoff_7_cache/
+    Ignored:    analysis/knockoff_8_cache/
+    Ignored:    analysis/knockoff_9_cache/
+    Ignored:    analysis/knockoff_cache/
+    Ignored:    analysis/knockoff_var_cache/
+    Ignored:    analysis/marginal_z_alternative_cache/
+    Ignored:    analysis/marginal_z_cache/
+    Ignored:    analysis/mosek_reg_2_cache/
+    Ignored:    analysis/mosek_reg_4_cache/
+    Ignored:    analysis/mosek_reg_5_cache/
+    Ignored:    analysis/mosek_reg_6_cache/
+    Ignored:    analysis/mosek_reg_cache/
+    Ignored:    analysis/pihat0_null_cache/
+    Ignored:    analysis/plot_diagnostic_cache/
+    Ignored:    analysis/poster_obayes17_cache/
+    Ignored:    analysis/real_data_simulation_2_cache/
+    Ignored:    analysis/real_data_simulation_3_cache/
+    Ignored:    analysis/real_data_simulation_4_cache/
+    Ignored:    analysis/real_data_simulation_5_cache/
+    Ignored:    analysis/real_data_simulation_cache/
+    Ignored:    analysis/rmosek_primal_dual_2_cache/
+    Ignored:    analysis/rmosek_primal_dual_cache/
+    Ignored:    analysis/seqgendiff_cache/
+    Ignored:    analysis/simulated_correlated_null_2_cache/
+    Ignored:    analysis/simulated_correlated_null_3_cache/
+    Ignored:    analysis/simulated_correlated_null_cache/
+    Ignored:    analysis/simulation_real_se_2_cache/
+    Ignored:    analysis/simulation_real_se_cache/
+    Ignored:    analysis/smemo_2_cache/
+    Ignored:    data/LSI/
+    Ignored:    docs/.DS_Store
+    Ignored:    docs/figure/.DS_Store
+    Ignored:    output/fig/
+
+Unstaged changes:
+    Deleted:    analysis/cash_plots_fdp.Rmd
+
+</code></pre>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</details>
+</li>
+</ul>
+<details>
+<summary> <small><strong>Expand here to see past versions:</strong></small> </summary>
+<ul>
+<table style="border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+File
+</th>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+<th style="text-align:left;">
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/cc0ab8379469bc3726f1508cd81e4ecd6fef1b1a/analysis/knockoff_5.rmd" target="_blank">cc0ab83</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-05-11
+</td>
+<td style="text-align:left;">
+update
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/cfa8e9d5c854e81a576aa4ebd83fcc59dc2e4432/docs/knockoff_5.html" target="_blank">cfa8e9d</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-28
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/7f0ac6b6c77f145e3516adaf7c82a63e36c2f4c9/analysis/knockoff_5.rmd" target="_blank">7f0ac6b</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-21
+</td>
+<td style="text-align:left;">
+knockoff
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/a9df8c2ac1eb35d048a4d02438e5613629a17030/analysis/knockoff_5.rmd" target="_blank">a9df8c2</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-17
+</td>
+<td style="text-align:left;">
+cor
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/606582c7a6273f89732642e362006559b2e5ba3a/analysis/knockoff_5.rmd" target="_blank">606582c</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-17
+</td>
+<td style="text-align:left;">
+centering
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/d6a6285b4334eaf8008532b1b3d5f448ade6a297/docs/knockoff_5.html" target="_blank">d6a6285</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-17
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/9c67659cc1b4c0c2e608510fba994431e85fcb9e/analysis/knockoff_5.rmd" target="_blank">9c67659</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-17
+</td>
+<td style="text-align:left;">
+wflow_publish(“analysis/knockoff_5.rmd”)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/528aaae51d1312d22fb0aab41c3c41a0c358d21f/analysis/knockoff_5.rmd" target="_blank">528aaae</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-17
+</td>
+<td style="text-align:left;">
+design matrix
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/13f72e4c6fc93a760e769c07dbc990b6d48242cd/analysis/knockoff_5.rmd" target="_blank">13f72e4</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-17
+</td>
+<td style="text-align:left;">
+error bars
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/27dd85c3528c05d8ec6d07405f6fefb822fc5cfb/docs/knockoff_5.html" target="_blank">27dd85c</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-17
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/ded21184c66075817c61a5bbc655b84391652aa4/analysis/knockoff_5.rmd" target="_blank">ded2118</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-17
+</td>
+<td style="text-align:left;">
+wflow_publish(“analysis/knockoff_5.rmd”)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/b59ca80a5b2a685ca8bf0a531141ac4c439e90b9/analysis/knockoff_5.rmd" target="_blank">b59ca80</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-08
+</td>
+<td style="text-align:left;">
+large scale
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/ab63fb3bda427e1fd44e028d5a31235dd755a413/docs/knockoff_5.html" target="_blank">ab63fb3</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-08
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1a2b7bfb05c755cfc0f3d3ad506d2f0669909528/analysis/knockoff_5.rmd" target="_blank">1a2b7bf</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-08
+</td>
+<td style="text-align:left;">
+wflow_publish(c(“analysis/knockoff_5.rmd”,
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/45f71562ffb73cf5b5d9d0d8c3559562044077c4/analysis/knockoff_5.rmd" target="_blank">45f7156</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-07
+</td>
+<td style="text-align:left;">
+design matrix
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/fe9b5dfffc83c7552a924990a56b063803443544/docs/knockoff_5.html" target="_blank">fe9b5df</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-07
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/7f18ee7e0b86cf2e44a8c5419ccecd9f88f5938c/analysis/knockoff_5.rmd" target="_blank">7f18ee7</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-07
+</td>
+<td style="text-align:left;">
+wflow_publish(c(“analysis/knockoff_5.rmd”, “analysis/knockoff_6.rmd”))
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/bf64a83f692561af6d5d1a4d47b7f5ee16f8a7d6/analysis/knockoff_5.rmd" target="_blank">bf64a83</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-06
+</td>
+<td style="text-align:left;">
+fixed x
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/82a681cc0cf0ea8c55bf76ae53e8e88c2e6cc9d9/docs/knockoff_5.html" target="_blank">82a681c</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-06
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/cacdc037c935581166d74560ffd5e731e121e840/analysis/knockoff_5.rmd" target="_blank">cacdc03</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-06
+</td>
+<td style="text-align:left;">
+wflow_publish(“analysis/knockoff_5.rmd”)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/a31a15030abb9a95eb3ceb051a6fd8b6a162cef4/docs/knockoff_5.html" target="_blank">a31a150</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-06
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1af62e73b15a19f63769f2318bb41898cfcc3d0b/analysis/knockoff_5.rmd" target="_blank">1af62e7</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-06
+</td>
+<td style="text-align:left;">
+wflow_publish(c(“knockoff_5.rmd”, “index.Rmd”))
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/0d440454746b4d41353ce970834d535ccea9009e/docs/knockoff_5.html" target="_blank">0d44045</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-06
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/ee112bcc806c5070f6ed26317499bdf5ebe31e9c/analysis/knockoff_5.rmd" target="_blank">ee112bc</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-06
+</td>
+<td style="text-align:left;">
+wflow_publish(c(“analysis/knockoff_5.rmd”, “analysis/knockoff_6.rmd”,
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/642b7624f10d11388c6c8c2cf97e0cb41b291a0c/docs/knockoff_5.html" target="_blank">642b762</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-05
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/df9a5fd008542c32cffb55d7208cef242474dc86/analysis/knockoff_5.rmd" target="_blank">df9a5fd</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-05
+</td>
+<td style="text-align:left;">
+wflow_publish(“analysis/knockoff_5.rmd”)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/b590d0b0715a2c391b5e77b95f37f93c29f5735c/analysis/knockoff_5.rmd" target="_blank">b590d0b</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-02
+</td>
+<td style="text-align:left;">
+comparison
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/b590d0b0715a2c391b5e77b95f37f93c29f5735c/docs/knockoff_5.html" target="_blank">b590d0b</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-02
+</td>
+<td style="text-align:left;">
+comparison
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f5466d58d8d818bea174d09e854e29d6b6d0b84e/analysis/knockoff_5.rmd" target="_blank">f5466d5</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-02
+</td>
+<td style="text-align:left;">
+knockoff
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/c58606a5432cc36fe7305d4b523cecf08d5244fc/analysis/knockoff_5.rmd" target="_blank">c58606a</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-01
+</td>
+<td style="text-align:left;">
+linear regression
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/c58606a5432cc36fe7305d4b523cecf08d5244fc/docs/knockoff_5.html" target="_blank">c58606a</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-01
+</td>
+<td style="text-align:left;">
+linear regression
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/b65988c0b316db2c065e721491ff2339b3b45f0f/analysis/knockoff_5.rmd" target="_blank">b65988c</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-01
+</td>
+<td style="text-align:left;">
+wflow_publish(“knockoff_5.rmd”)
+</td>
+</tr>
+</tbody>
+</table>
+</ul>
+</details>
+<hr />
+<div id="introduction" class="section level2">
 <h2>Introduction</h2>
 <p>In the <code>Knockoff</code> paper simulations, the columns of <span class="math inline">\(X\)</span> are either independent or simulated from a Toeplitz correlation where <span class="math inline">\(Cor(X_i, X_j) = \rho^{|i - j|}\)</span>. Here we are replicating the independent results, and investigating how well <code>Knockoff</code> deal with other correlation structures.</p>
 <p>In the following simulations, we always have <span class="math inline">\(n = 3000\)</span>, <span class="math inline">\(p = 1000\)</span>. Out of <span class="math inline">\(p = 1000\)</span> <span class="math inline">\(\beta_j\)</span>’s, <span class="math inline">\(950\)</span> of them are zeroes, and the rest <span class="math inline">\(k = 50\)</span> signals all have <span class="math inline">\(\beta_j = A\)</span>. For a certain <span class="math inline">\(X\)</span>, <span class="math inline">\(Y_n \sim N(X_{n\times p}\beta_p, I_n)\)</span>. Here are three scenarios to generate the columns of <span class="math inline">\(X_{n \times p}\)</span>. All simulations use <span class="math inline">\(q = 0.1\)</span> cutoff.</p>
@@ -333,8 +1040,8 @@ q &lt;- 0.1</code></pre>
 <li>Scenario 2: Each row of <span class="math inline">\(X\)</span> are independently drawn from <span class="math inline">\(N(0, \Sigma_X)\)</span>, where <span class="math inline">\(\Sigma_X = \texttt{cov2cor}(B_{p \times d}B_{d\times p}^T + I)\)</span>, <span class="math inline">\(d = 5\)</span>. All columns of <span class="math inline">\(X\)</span> are normalized such that <span class="math inline">\(\|X_j\|_2^2 = 1\)</span>. The signal magnitude <span class="math inline">\(A = 9\)</span> to make sure that the signal is significantly stronger than the noise level <span class="math inline">\(\text{SE}(\hat\beta) = \sqrt{\text{diag}[(X^TX)^{-1}]}\)</span> . <a href="design_matrix_2.html">In this case the columns of <span class="math inline">\(X\)</span> will have substantial average correlation, but not necessarily so for <span class="math inline">\(\hat\beta\)</span></a>.</li>
 <li>Scenario 3: Each row of <span class="math inline">\(X\)</span> (with normalization) are independently drawn from <span class="math inline">\(N(0, \Sigma_{\hat\beta}^{-1})\)</span>, where <span class="math inline">\(\Sigma_{\hat\beta} = \texttt{cov2cor}(B_{p \times d}B_{d\times p}^T + I)\)</span>, <span class="math inline">\(d = 5\)</span>. We’ll have <span class="math inline">\((X^TX)^{-1}\approx\Sigma_{\hat\beta}\)</span>. In this case <span class="math inline">\(\hat\beta_j\)</span>’s will have substantial average correlation. The signal magnitude <span class="math inline">\(A = 3.5\)</span>.</li>
 </ul>
-</section>
-<section id="scenario-1-independent-x-columns" class="level2">
+</div>
+<div id="scenario-1-independent-x-columns" class="section level2">
 <h2>Scenario 1: Independent <span class="math inline">\(X\)</span> columns</h2>
 <pre class="r"><code>set.seed(777)
 ## Independent columns
@@ -353,8 +1060,8 @@ A &lt;- 3.5
 beta &lt;- rep(0, p)
 nonzero &lt;- sample(p, k)
 beta[nonzero] &lt;- A</code></pre>
-</section>
-<section id="scenario-2-x-from-a-factor-model" class="level2">
+</div>
+<div id="scenario-2-x-from-a-factor-model" class="section level2">
 <h2>Scenario 2: <span class="math inline">\(X\)</span> from a factor model</h2>
 <pre class="r"><code>set.seed(777)
 ## Generate correlation matrix of X
@@ -378,8 +1085,8 @@ A &lt;- 9
 beta &lt;- rep(0, p)
 nonzero &lt;- sample(p, k)
 beta[nonzero] &lt;- A</code></pre>
-</section>
-<section id="scenario-3-hatbeta-from-a-factor-model" class="level2">
+</div>
+<div id="scenario-3-hatbeta-from-a-factor-model" class="section level2">
 <h2>Scenario 3: <span class="math inline">\(\hat\beta\)</span> from a factor model</h2>
 <pre class="r"><code>set.seed(777)
 ## Generate correlation matrix of betahat
@@ -408,66 +1115,385 @@ beta[nonzero] &lt;- A</code></pre>
 <table>
 <thead>
 <tr class="header">
-<th></th>
-<th style="text-align: right;">FDP.BH</th>
-<th style="text-align: right;">FDP.Knockoff</th>
-<th style="text-align: right;">FDP.Knockoff.Plus</th>
-<th style="text-align: right;">Power.BH</th>
-<th style="text-align: right;">Power.Knockoff</th>
-<th style="text-align: right;">Power.Knockoff.Plus</th>
+<th align="right">F</th>
+<th>DP.BH F</th>
+<th>DP.Knockoff F</th>
+<th>DP.Knockoff.Plus P</th>
+<th>ower.BH P</th>
+<th>ower.Knockoff P</th>
+<th align="left">ower.Knockoff.Plus</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>Independent Columns</td>
-<td style="text-align: right;">0.0936</td>
-<td style="text-align: right;">0.0677</td>
-<td style="text-align: right;">0.0431</td>
-<td style="text-align: right;">0.4277</td>
-<td style="text-align: right;">0.5400</td>
-<td style="text-align: right;">0.4076</td>
+<td align="right">Independent Columns</td>
+<td>0.0936</td>
+<td>0.0677</td>
+<td>0.0431</td>
+<td>0.4277</td>
+<td>0.5400</td>
+<td align="left">0.4076</td>
 </tr>
 <tr class="even">
-<td>Factor Model for X</td>
-<td style="text-align: right;">0.0956</td>
-<td style="text-align: right;">0.4223</td>
-<td style="text-align: right;">0.0000</td>
-<td style="text-align: right;">0.6241</td>
-<td style="text-align: right;">0.0066</td>
-<td style="text-align: right;">0.0000</td>
+<td align="right">Factor Model for X</td>
+<td>0.0956</td>
+<td>0.4223</td>
+<td>0.0000</td>
+<td>0.6241</td>
+<td>0.0066</td>
+<td align="left">0.0000</td>
 </tr>
 <tr class="odd">
-<td>Factor Model for betahat</td>
-<td style="text-align: right;">0.0755</td>
-<td style="text-align: right;">0.3853</td>
-<td style="text-align: right;">0.1986</td>
-<td style="text-align: right;">0.4024</td>
-<td style="text-align: right;">0.1322</td>
-<td style="text-align: right;">0.0694</td>
+<td align="right">Factor Model for betahat</td>
+<td>0.0755</td>
+<td>0.3853</td>
+<td>0.1986</td>
+<td>0.4024</td>
+<td>0.1322</td>
+<td align="left">0.0694</td>
 </tr>
 </tbody>
 </table>
 <p><img src="figure/knockoff_5.rmd/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-14-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/ab63fb3bda427e1fd44e028d5a31235dd755a413/docs/figure/knockoff_5.rmd/unnamed-chunk-14-1.png" target="_blank">ab63fb3</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-08
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <p><img src="figure/knockoff_5.rmd/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="comparison-across-correlation-levels-various-d" class="level2">
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-15-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/ab63fb3bda427e1fd44e028d5a31235dd755a413/docs/figure/knockoff_5.rmd/unnamed-chunk-15-1.png" target="_blank">ab63fb3</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-08
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+</div>
+<div id="comparison-across-correlation-levels-various-d" class="section level2">
 <h2>Comparison across correlation levels (various <span class="math inline">\(d\)</span>)</h2>
-<section id="scenario-2-x-from-a-factor-model-1" class="level3">
+<div id="scenario-2-x-from-a-factor-model-1" class="section level3">
 <h3>Scenario 2: <span class="math inline">\(X\)</span> from a factor model</h3>
-<p><img src="figure/knockoff_5.rmd/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_5.rmd/unnamed-chunk-16-2.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="scenario-3-hatbeta-from-a-factor-model-1" class="level3">
+<p><img src="figure/knockoff_5.rmd/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-16-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/cfa8e9d5c854e81a576aa4ebd83fcc59dc2e4432/docs/figure/knockoff_5.rmd/unnamed-chunk-16-1.png" target="_blank">cfa8e9d</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-28
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d6a6285b4334eaf8008532b1b3d5f448ade6a297/docs/figure/knockoff_5.rmd/unnamed-chunk-16-1.png" target="_blank">d6a6285</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-17
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/27dd85c3528c05d8ec6d07405f6fefb822fc5cfb/docs/figure/knockoff_5.rmd/unnamed-chunk-16-1.png" target="_blank">27dd85c</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-17
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/ab63fb3bda427e1fd44e028d5a31235dd755a413/docs/figure/knockoff_5.rmd/unnamed-chunk-16-1.png" target="_blank">ab63fb3</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-08
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/knockoff_5.rmd/unnamed-chunk-16-2.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-16-2.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/cfa8e9d5c854e81a576aa4ebd83fcc59dc2e4432/docs/figure/knockoff_5.rmd/unnamed-chunk-16-2.png" target="_blank">cfa8e9d</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-28
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d6a6285b4334eaf8008532b1b3d5f448ade6a297/docs/figure/knockoff_5.rmd/unnamed-chunk-16-2.png" target="_blank">d6a6285</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-17
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/27dd85c3528c05d8ec6d07405f6fefb822fc5cfb/docs/figure/knockoff_5.rmd/unnamed-chunk-16-2.png" target="_blank">27dd85c</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-17
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/ab63fb3bda427e1fd44e028d5a31235dd755a413/docs/figure/knockoff_5.rmd/unnamed-chunk-16-2.png" target="_blank">ab63fb3</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-08
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+</div>
+<div id="scenario-3-hatbeta-from-a-factor-model-1" class="section level3">
 <h3>Scenario 3: <span class="math inline">\(\hat\beta\)</span> from a factor model</h3>
-<p><img src="figure/knockoff_5.rmd/unnamed-chunk-17-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_5.rmd/unnamed-chunk-17-2.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-</section>
-<section id="session-information" class="level2">
+<p><img src="figure/knockoff_5.rmd/unnamed-chunk-17-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-17-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/cfa8e9d5c854e81a576aa4ebd83fcc59dc2e4432/docs/figure/knockoff_5.rmd/unnamed-chunk-17-1.png" target="_blank">cfa8e9d</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-28
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d6a6285b4334eaf8008532b1b3d5f448ade6a297/docs/figure/knockoff_5.rmd/unnamed-chunk-17-1.png" target="_blank">d6a6285</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-17
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/27dd85c3528c05d8ec6d07405f6fefb822fc5cfb/docs/figure/knockoff_5.rmd/unnamed-chunk-17-1.png" target="_blank">27dd85c</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-17
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/ab63fb3bda427e1fd44e028d5a31235dd755a413/docs/figure/knockoff_5.rmd/unnamed-chunk-17-1.png" target="_blank">ab63fb3</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-08
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/knockoff_5.rmd/unnamed-chunk-17-2.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-17-2.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/cfa8e9d5c854e81a576aa4ebd83fcc59dc2e4432/docs/figure/knockoff_5.rmd/unnamed-chunk-17-2.png" target="_blank">cfa8e9d</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-28
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d6a6285b4334eaf8008532b1b3d5f448ade6a297/docs/figure/knockoff_5.rmd/unnamed-chunk-17-2.png" target="_blank">d6a6285</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-17
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/27dd85c3528c05d8ec6d07405f6fefb822fc5cfb/docs/figure/knockoff_5.rmd/unnamed-chunk-17-2.png" target="_blank">27dd85c</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-17
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/ab63fb3bda427e1fd44e028d5a31235dd755a413/docs/figure/knockoff_5.rmd/unnamed-chunk-17-2.png" target="_blank">ab63fb3</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-08
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+</div>
+</div>
+<div id="session-information" class="section level2">
 <h2>Session information</h2>
-<!-- Insert the session information into the document -->
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS High Sierra 10.13.3
+Running under: macOS High Sierra 10.13.4
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -480,21 +1506,25 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] ggplot2_2.2.1  knitr_1.19     knockoff_0.3.0
+[1] ggplot2_2.2.1  knitr_1.20     knockoff_0.3.0
 
 loaded via a namespace (and not attached):
- [1] Rcpp_0.12.14     magrittr_1.5     munsell_0.4.3    colorspace_1.3-2
- [5] rlang_0.1.6      stringr_1.2.0    highr_0.6        plyr_1.8.4      
- [9] tools_3.4.3      grid_3.4.3       gtable_0.2.0     git2r_0.21.0    
-[13] htmltools_0.3.6  yaml_2.1.16      lazyeval_0.2.1   rprojroot_1.3-2 
-[17] digest_0.6.14    tibble_1.4.1     evaluate_0.10.1  rmarkdown_1.8   
-[21] labeling_0.3     stringi_1.1.6    compiler_3.4.3   pillar_1.0.1    
-[25] scales_0.5.0     backports_1.1.2 </code></pre>
-</section>
+ [1] Rcpp_0.12.16      whisker_0.3-2     magrittr_1.5     
+ [4] workflowr_1.0.1   munsell_0.4.3     colorspace_1.3-2 
+ [7] rlang_0.1.6       plyr_1.8.4        stringr_1.3.0    
+[10] highr_0.6         tools_3.4.3       grid_3.4.3       
+[13] gtable_0.2.0      R.oo_1.21.0       git2r_0.21.0     
+[16] htmltools_0.3.6   lazyeval_0.2.1    yaml_2.1.18      
+[19] rprojroot_1.3-2   digest_0.6.15     tibble_1.4.1     
+[22] R.utils_2.6.0     evaluate_0.10.1   rmarkdown_1.9    
+[25] labeling_0.3      stringi_1.1.6     pillar_1.0.1     
+[28] compiler_3.4.3    scales_0.5.0      backports_1.1.2  
+[31] R.methodsS3_1.7.1</code></pre>
+</div>
 
 <hr>
 <p>
-    This <a href="http://rmarkdown.rstudio.com">R Markdown</a> site was created with <a href="https://github.com/jdblischak/workflowr">workflowr</a>
+    
 </p>
 <hr>
 
@@ -516,6 +1546,25 @@ loaded via a namespace (and not attached):
     <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
     <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
 -->
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+<hr>
+<p>
+  This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a>
+  analysis was created with
+  <a href="https://github.com/jdblischak/workflowr">workflowr</a> 1.0.1
+</p>
+<hr>
 
 
 </div>

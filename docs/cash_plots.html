@@ -309,6 +309,13 @@ div.tocify {
   </div><!--/.container -->
 </div><!--/.navbar -->
 
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
 <div class="fluid-row" id="header">
 
 <div class="btn-group pull-right">
@@ -328,38 +335,2954 @@ div.tocify {
 </div>
 
 
-<!-- The file analysis/chunks.R contains chunks that define default settings
-shared across the workflowr files. -->
-<!-- Update knitr chunk options -->
-<!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2018-05-09</p>
-<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
- package git2r is installed -->
-<p><strong>Code version:</strong> f85ff3f</p>
-<!-- Add your analysis here -->
+<p><strong>Last updated:</strong> 2018-05-12</p>
+<strong>workflowr checks:</strong> <small>(Click a bullet for more information)</small>
+<ul>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>R Markdown file:</strong> up-to-date </summary></p>
+<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Environment:</strong> empty </summary></p>
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Seed:</strong> <code>set.seed(12345)</code> </summary></p>
+<p>The command <code>set.seed(12345)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Session information:</strong> recorded </summary></p>
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/ddf906244e82e0675854c40da76dc16cf1a78fa4" target="_blank">ddf9062</a> </summary></p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    analysis/.DS_Store
+    Ignored:    analysis/BH_robustness_cache/
+    Ignored:    analysis/FDR_Null_cache/
+    Ignored:    analysis/FDR_null_betahat_cache/
+    Ignored:    analysis/Rmosek_cache/
+    Ignored:    analysis/StepDown_cache/
+    Ignored:    analysis/alternative2_cache/
+    Ignored:    analysis/alternative_cache/
+    Ignored:    analysis/ash_gd_cache/
+    Ignored:    analysis/average_cor_gtex_2_cache/
+    Ignored:    analysis/average_cor_gtex_cache/
+    Ignored:    analysis/brca_cache/
+    Ignored:    analysis/cash_deconv_cache/
+    Ignored:    analysis/cash_fdr_1_cache/
+    Ignored:    analysis/cash_fdr_2_cache/
+    Ignored:    analysis/cash_fdr_3_cache/
+    Ignored:    analysis/cash_fdr_4_cache/
+    Ignored:    analysis/cash_fdr_5_cache/
+    Ignored:    analysis/cash_fdr_6_cache/
+    Ignored:    analysis/cash_plots_cache/
+    Ignored:    analysis/cash_sim_1_cache/
+    Ignored:    analysis/cash_sim_2_cache/
+    Ignored:    analysis/cash_sim_3_cache/
+    Ignored:    analysis/cash_sim_4_cache/
+    Ignored:    analysis/cash_sim_5_cache/
+    Ignored:    analysis/cash_sim_6_cache/
+    Ignored:    analysis/cash_sim_7_cache/
+    Ignored:    analysis/correlated_z_2_cache/
+    Ignored:    analysis/correlated_z_3_cache/
+    Ignored:    analysis/correlated_z_cache/
+    Ignored:    analysis/create_null_cache/
+    Ignored:    analysis/cutoff_null_cache/
+    Ignored:    analysis/design_matrix_2_cache/
+    Ignored:    analysis/design_matrix_cache/
+    Ignored:    analysis/diagnostic_ash_cache/
+    Ignored:    analysis/diagnostic_correlated_z_2_cache/
+    Ignored:    analysis/diagnostic_correlated_z_3_cache/
+    Ignored:    analysis/diagnostic_correlated_z_cache/
+    Ignored:    analysis/diagnostic_plot_2_cache/
+    Ignored:    analysis/diagnostic_plot_cache/
+    Ignored:    analysis/efron_leukemia_cache/
+    Ignored:    analysis/fitting_normal_cache/
+    Ignored:    analysis/gaussian_derivatives_2_cache/
+    Ignored:    analysis/gaussian_derivatives_3_cache/
+    Ignored:    analysis/gaussian_derivatives_4_cache/
+    Ignored:    analysis/gaussian_derivatives_5_cache/
+    Ignored:    analysis/gaussian_derivatives_cache/
+    Ignored:    analysis/gd-ash_cache/
+    Ignored:    analysis/gd_delta_cache/
+    Ignored:    analysis/gd_lik_2_cache/
+    Ignored:    analysis/gd_lik_cache/
+    Ignored:    analysis/gd_w_cache/
+    Ignored:    analysis/knockoff_10_cache/
+    Ignored:    analysis/knockoff_2_cache/
+    Ignored:    analysis/knockoff_3_cache/
+    Ignored:    analysis/knockoff_4_cache/
+    Ignored:    analysis/knockoff_5_cache/
+    Ignored:    analysis/knockoff_6_cache/
+    Ignored:    analysis/knockoff_7_cache/
+    Ignored:    analysis/knockoff_8_cache/
+    Ignored:    analysis/knockoff_9_cache/
+    Ignored:    analysis/knockoff_cache/
+    Ignored:    analysis/knockoff_var_cache/
+    Ignored:    analysis/marginal_z_alternative_cache/
+    Ignored:    analysis/marginal_z_cache/
+    Ignored:    analysis/mosek_reg_2_cache/
+    Ignored:    analysis/mosek_reg_4_cache/
+    Ignored:    analysis/mosek_reg_5_cache/
+    Ignored:    analysis/mosek_reg_6_cache/
+    Ignored:    analysis/mosek_reg_cache/
+    Ignored:    analysis/pihat0_null_cache/
+    Ignored:    analysis/plot_diagnostic_cache/
+    Ignored:    analysis/poster_obayes17_cache/
+    Ignored:    analysis/real_data_simulation_2_cache/
+    Ignored:    analysis/real_data_simulation_3_cache/
+    Ignored:    analysis/real_data_simulation_4_cache/
+    Ignored:    analysis/real_data_simulation_5_cache/
+    Ignored:    analysis/real_data_simulation_cache/
+    Ignored:    analysis/rmosek_primal_dual_2_cache/
+    Ignored:    analysis/rmosek_primal_dual_cache/
+    Ignored:    analysis/seqgendiff_cache/
+    Ignored:    analysis/simulated_correlated_null_2_cache/
+    Ignored:    analysis/simulated_correlated_null_3_cache/
+    Ignored:    analysis/simulated_correlated_null_cache/
+    Ignored:    analysis/simulation_real_se_2_cache/
+    Ignored:    analysis/simulation_real_se_cache/
+    Ignored:    analysis/smemo_2_cache/
+    Ignored:    data/LSI/
+    Ignored:    docs/.DS_Store
+    Ignored:    docs/figure/.DS_Store
+    Ignored:    output/fig/
+
+Unstaged changes:
+    Deleted:    analysis/cash_plots_fdp.Rmd
+
+</code></pre>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</details>
+</li>
+</ul>
+<details>
+<summary> <small><strong>Expand here to see past versions:</strong></small> </summary>
+<ul>
+<table style="border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+File
+</th>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+<th style="text-align:left;">
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/cc0ab8379469bc3726f1508cd81e4ecd6fef1b1a/analysis/cash_plots.rmd" target="_blank">cc0ab83</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-05-11
+</td>
+<td style="text-align:left;">
+update
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/566a8654839abc68c26d7eeb00980e5cd89b3ab5/docs/cash_plots.html" target="_blank">566a865</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-09
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f85ff3f95abc912244162392d4d18f73a5794c06/analysis/cash_plots.rmd" target="_blank">f85ff3f</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-09
+</td>
+<td style="text-align:left;">
+wflow_publish(“analysis/cash_plots.rmd”)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/564f9cbc4a8c3126ba03c320d03add8cc56c0aad/docs/cash_plots.html" target="_blank">564f9cb</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-06
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/797cd6939f3c430497c03ce97a2093ee9b29f32c/analysis/cash_plots.rmd" target="_blank">797cd69</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-06
+</td>
+<td style="text-align:left;">
+wflow_publish(“analysis/cash_plots.rmd”)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/4093362a962261caab72b6d8d091a8d75bf6aa57/docs/cash_plots.html" target="_blank">4093362</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-04-27
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/37ad45698441ee0ae5eb3202f95e0164d77ef5b7/docs/cash_plots.html" target="_blank">37ad456</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-04-27
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/8c99563f2eef4e5cab124d07550cdea171d4d252/analysis/cash_plots.rmd" target="_blank">8c99563</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-04-27
+</td>
+<td style="text-align:left;">
+wflow_publish(“analysis/cash_plots.rmd”)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/434b541bdc15b2dc25ba567a00b400a3adca728e/analysis/cash_plots.rmd" target="_blank">434b541</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-04-13
+</td>
+<td style="text-align:left;">
+FDP q
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/7e7b2d1056ce9271efcec0a9c683c5ead20fadcc/docs/cash_plots.html" target="_blank">7e7b2d1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-04-12
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/3a1e4cccb478491f57bfcb67c445abb3ef01b754/analysis/cash_plots.rmd" target="_blank">3a1e4cc</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-04-12
+</td>
+<td style="text-align:left;">
+wflow_publish(“analysis/cash_plots.rmd”)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/d022714b2f3ed96ed6023463e86b00853d0e4af7/docs/cash_plots.html" target="_blank">d022714</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-22
+</td>
+<td style="text-align:left;">
+cash
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/e94c1d3faaabce53937a14402cbd7a141b7eb094/analysis/cash_plots.rmd" target="_blank">e94c1d3</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-22
+</td>
+<td style="text-align:left;">
+cash plots
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/898349224d5515a514c73d486a1ec606b8ddf32e/docs/cash_plots.html" target="_blank">8983492</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-21
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/5902dc9ac06021c1fe2118b450831535b2cd9ecb/analysis/cash_plots.rmd" target="_blank">5902dc9</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-21
+</td>
+<td style="text-align:left;">
+wflow_publish(“~/GitHub/truncash/analysis/cash_plots.rmd”)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/48787a24c36b1a24e129936b2748cc52d1397d8a/analysis/cash_plots.rmd" target="_blank">48787a2</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-16
+</td>
+<td style="text-align:left;">
+cash plots
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/ff78840417d28f89acda4ced9358de7dc499bf01/analysis/cash_plots.rmd" target="_blank">ff78840</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-16
+</td>
+<td style="text-align:left;">
+cash_plots
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/e4ecc944e59aa28a6791b0064a1c4e66a539e9a6/docs/cash_plots.html" target="_blank">e4ecc94</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-16
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/2898ce9a1fd6100e144c03e810a018dcbb95a8f2/analysis/cash_plots.rmd" target="_blank">2898ce9</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-16
+</td>
+<td style="text-align:left;">
+wflow_publish(“analysis/cash_plots.rmd”)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/7c34000d9661213f6beaf89c08f5385487f40c87/docs/cash_plots.html" target="_blank">7c34000</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-15
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/cc05dc761a08501debf921040a8c82272670f4de/analysis/cash_plots.rmd" target="_blank">cc05dc7</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-15
+</td>
+<td style="text-align:left;">
+wflow_publish(“analysis/cash_plots.rmd”)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/4d857f76f9fb42a3c75dd097694e2aebcd2a36b9/analysis/cash_plots.rmd" target="_blank">4d857f7</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+<td style="text-align:left;">
+plots
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/f6f0ca05166b95be517673adcc3d213590001693/docs/cash_plots.html" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/3af89d27f95275a2cfeb3d23237e813930357c8c/analysis/cash_plots.rmd" target="_blank">3af89d2</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+<td style="text-align:left;">
+wflow_publish(“analysis/cash_plots.rmd”)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/analysis/cash_plots.rmd" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+<td style="text-align:left;">
+cash_plots
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/cash_plots.html" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+<td style="text-align:left;">
+cash_plots
+</td>
+</tr>
+</tbody>
+</table>
+</ul>
+</details>
+<hr />
 <div id="sigma_beta-2.5-4-gaussian-derivatives" class="section level2">
 <h2><span class="math inline">\(\sigma_\beta = 2.5\)</span>, 4 Gaussian derivatives</h2>
 <div id="fdr-pfdr-calibration-at-each-sparsity-level" class="section level3">
 <h3>FDR, pFDR Calibration at each sparsity level</h3>
-<p><img src="figure/cash_plots.rmd/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-2-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-2-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-2-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-2-5.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-2-6.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-2-7.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-2-8.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-2-9.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-2-10.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-2-11.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-2-12.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-2-13.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-2-14.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-2-15.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-2-16.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-2-17.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-2-18.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-2-19.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-2-20.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-2-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-2-1.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-2-1.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-2-2.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-2-2.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-2-2.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-2-2.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-2-3.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-2-3.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-2-3.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-2-3.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-2-4.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-2-4.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-2-4.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-2-4.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-2-5.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-2-5.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-2-5.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-2-5.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-2-6.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-2-6.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-2-6.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-2-6.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-2-7.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-2-7.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-2-7.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-2-7.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-2-8.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-2-8.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-2-8.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-2-8.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-2-9.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-2-9.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-2-9.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-2-9.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-2-10.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-2-10.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-2-10.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-2-10.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-2-11.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-2-11.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-2-11.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-2-11.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-2-12.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-2-12.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-2-12.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-2-12.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-2-13.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-2-13.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-2-13.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-2-13.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-2-14.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-2-14.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-2-14.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-2-14.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-2-15.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-2-15.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-2-15.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-2-15.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-2-16.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-2-16.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-2-16.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-2-16.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-2-17.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-2-17.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-2-17.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-2-17.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-2-18.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-2-18.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-2-18.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-2-18.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-2-19.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-2-19.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-2-19.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-2-19.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-2-20.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-2-20.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-2-20.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-2-20.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 </div>
 <div id="fdr-pfdr-power-at-nominal-fdr-0.1" class="section level3">
 <h3>FDR, pFDR, Power at Nominal FDR = 0.1</h3>
-<p><img src="figure/cash_plots.rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-3-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-3-3.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-3-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-3-1.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-3-1.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-3-2.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-3-2.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-3-2.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-3-2.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-3-3.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-3-3.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-3-3.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-3-3.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 </div>
 <div id="fdr-power-at-each-sparsity-level-at-nominal-fdr-0.1" class="section level3">
 <h3>FDR, Power at each sparsity level at Nominal FDR = 0.1</h3>
-<p><img src="figure/cash_plots.rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-4-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-4-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-4-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-4-5.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-4-6.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-4-7.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-4-8.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-4-9.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-4-10.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-4-11.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-4-12.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-4-13.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-4-14.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-4-15.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-4-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-4-1.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-4-1.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-4-2.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-4-2.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-4-2.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-4-2.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-4-3.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-4-3.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-4-3.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-4-3.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-4-4.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-4-4.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-4-4.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-4-4.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-4-5.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-4-5.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-4-5.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-4-5.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-4-6.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-4-6.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-4-6.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-4-6.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-4-7.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-4-7.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-4-7.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-4-7.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-4-8.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-4-8.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-4-8.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-4-8.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-4-9.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-4-9.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-4-9.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-4-9.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-4-10.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-4-10.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-4-10.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-4-10.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-4-11.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-4-11.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-4-11.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-4-11.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-4-12.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-4-12.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-4-12.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-4-12.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-4-13.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-4-13.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-4-13.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-4-13.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-4-14.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-4-14.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-4-14.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-4-14.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-4-15.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-4-15.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-4-15.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-4-15.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 </div>
 <div id="fdr-power-at-each-sparsity-level-at-nominal-fdr-0.1-separated-by-dispersion" class="section level3">
 <h3>FDR, Power at each sparsity level at Nominal FDR = 0.1, separated by dispersion</h3>
-<p><img src="figure/cash_plots.rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-5-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-5-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-5-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-5-5.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-5-6.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-5-7.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-5-8.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-5-9.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-5-10.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-5-11.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-5-12.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-5-13.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-5-14.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_plots.rmd/unnamed-chunk-5-15.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-5-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-5-1.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-5-1.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-5-2.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-5-2.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-5-2.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-5-2.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-5-3.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-5-3.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-5-3.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-5-3.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-5-4.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-5-4.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-5-4.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-5-4.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-5-5.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-5-5.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-5-5.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-5-5.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-5-6.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-5-6.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-5-6.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-5-6.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-5-7.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-5-7.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-5-7.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-5-7.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-5-8.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-5-8.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-5-8.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-5-8.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-5-9.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-5-9.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-5-9.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-5-9.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-5-10.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-5-10.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-5-10.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-5-10.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-5-11.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-5-11.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-5-11.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-5-11.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-5-12.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-5-12.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-5-12.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-5-12.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-5-13.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-5-13.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-5-13.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-5-13.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-5-14.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-5-14.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-5-14.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-5-14.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/cash_plots.rmd/unnamed-chunk-5-15.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-5-15.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f6f0ca05166b95be517673adcc3d213590001693/docs/figure/cash_plots.rmd/unnamed-chunk-5-15.png" target="_blank">f6f0ca0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d2473f1d284215968bb9e32a89c65de7a10b877f/docs/figure/cash_plots.rmd/unnamed-chunk-5-15.png" target="_blank">d2473f1</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 </div>
+</div>
+<div id="session-information" class="section level2">
+<h2>Session information</h2>
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 3.4.3 (2017-11-30)
+Platform: x86_64-apple-darwin15.6.0 (64-bit)
+Running under: macOS High Sierra 10.13.4
+
+Matrix products: default
+BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
+LAPACK: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRlapack.dylib
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+attached base packages:
+[1] grid      stats     graphics  grDevices utils     datasets  methods  
+[8] base     
+
+other attached packages:
+ [1] gridExtra_2.3     ggplot2_2.2.1     reshape2_1.4.3   
+ [4] locfdr_1.1-8      ashr_2.2-2        Rmosek_8.0.69    
+ [7] PolynomF_1.0-1    CVXR_0.95         REBayes_1.2      
+[10] Matrix_1.2-12     SQUAREM_2017.10-1 EQL_1.0-0        
+[13] ttutils_1.0-1    
+
+loaded via a namespace (and not attached):
+ [1] gmp_0.5-13.1      Rcpp_0.12.16      pillar_1.0.1     
+ [4] plyr_1.8.4        compiler_3.4.3    git2r_0.21.0     
+ [7] workflowr_1.0.1   R.methodsS3_1.7.1 R.utils_2.6.0    
+[10] iterators_1.0.9   tools_3.4.3       digest_0.6.15    
+[13] bit_1.1-12        tibble_1.4.1      gtable_0.2.0     
+[16] evaluate_0.10.1   lattice_0.20-35   rlang_0.1.6      
+[19] foreach_1.4.4     yaml_2.1.18       parallel_3.4.3   
+[22] Rmpfr_0.6-1       ECOSolveR_0.4     stringr_1.3.0    
+[25] knitr_1.20        rprojroot_1.3-2   bit64_0.9-7      
+[28] R6_2.2.2          rmarkdown_1.9     magrittr_1.5     
+[31] whisker_0.3-2     scales_0.5.0      splines_3.4.3    
+[34] MASS_7.3-47       backports_1.1.2   codetools_0.2-15 
+[37] htmltools_0.3.6   scs_1.1-1         colorspace_1.3-2 
+[40] labeling_0.3      stringi_1.1.6     lazyeval_0.2.1   
+[43] munsell_0.4.3     pscl_1.5.2        doParallel_1.0.11
+[46] truncnorm_1.0-7   R.oo_1.21.0      </code></pre>
 </div>
 
 <hr>
 <p>
-    This <a href="http://rmarkdown.rstudio.com">R Markdown</a> site was created with <a href="https://github.com/jdblischak/workflowr">workflowr</a>
+    
 </p>
 <hr>
 
@@ -381,6 +3304,25 @@ shared across the workflowr files. -->
     <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
     <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
 -->
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+<hr>
+<p>
+  This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a>
+  analysis was created with
+  <a href="https://github.com/jdblischak/workflowr">workflowr</a> 1.0.1
+</p>
+<hr>
 
 
 </div>

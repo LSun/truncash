@@ -300,6 +300,13 @@ div.tocify {
   </div><!--/.container -->
 </div><!--/.navbar -->
 
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
 <div class="fluid-row" id="header">
 
 
@@ -311,20 +318,312 @@ div.tocify {
 </div>
 
 
-<!-- The file analysis/chunks.R contains chunks that define default settings
-shared across the workflowr files. -->
-<!-- Update knitr chunk options -->
-<!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2018-01-30</p>
-<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
- package git2r is installed -->
-<p><strong>Code version:</strong> 5442ab8</p>
-<!-- Add your analysis here -->
-<section id="introduction" class="level2">
+<p><strong>Last updated:</strong> 2018-05-12</p>
+<strong>workflowr checks:</strong> <small>(Click a bullet for more information)</small>
+<ul>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>R Markdown file:</strong> up-to-date </summary></p>
+<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Environment:</strong> empty </summary></p>
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Seed:</strong> <code>set.seed(12345)</code> </summary></p>
+<p>The command <code>set.seed(12345)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Session information:</strong> recorded </summary></p>
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/ddf906244e82e0675854c40da76dc16cf1a78fa4" target="_blank">ddf9062</a> </summary></p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    analysis/.DS_Store
+    Ignored:    analysis/BH_robustness_cache/
+    Ignored:    analysis/FDR_Null_cache/
+    Ignored:    analysis/FDR_null_betahat_cache/
+    Ignored:    analysis/Rmosek_cache/
+    Ignored:    analysis/StepDown_cache/
+    Ignored:    analysis/alternative2_cache/
+    Ignored:    analysis/alternative_cache/
+    Ignored:    analysis/ash_gd_cache/
+    Ignored:    analysis/average_cor_gtex_2_cache/
+    Ignored:    analysis/average_cor_gtex_cache/
+    Ignored:    analysis/brca_cache/
+    Ignored:    analysis/cash_deconv_cache/
+    Ignored:    analysis/cash_fdr_1_cache/
+    Ignored:    analysis/cash_fdr_2_cache/
+    Ignored:    analysis/cash_fdr_3_cache/
+    Ignored:    analysis/cash_fdr_4_cache/
+    Ignored:    analysis/cash_fdr_5_cache/
+    Ignored:    analysis/cash_fdr_6_cache/
+    Ignored:    analysis/cash_plots_cache/
+    Ignored:    analysis/cash_sim_1_cache/
+    Ignored:    analysis/cash_sim_2_cache/
+    Ignored:    analysis/cash_sim_3_cache/
+    Ignored:    analysis/cash_sim_4_cache/
+    Ignored:    analysis/cash_sim_5_cache/
+    Ignored:    analysis/cash_sim_6_cache/
+    Ignored:    analysis/cash_sim_7_cache/
+    Ignored:    analysis/correlated_z_2_cache/
+    Ignored:    analysis/correlated_z_3_cache/
+    Ignored:    analysis/correlated_z_cache/
+    Ignored:    analysis/create_null_cache/
+    Ignored:    analysis/cutoff_null_cache/
+    Ignored:    analysis/design_matrix_2_cache/
+    Ignored:    analysis/design_matrix_cache/
+    Ignored:    analysis/diagnostic_ash_cache/
+    Ignored:    analysis/diagnostic_correlated_z_2_cache/
+    Ignored:    analysis/diagnostic_correlated_z_3_cache/
+    Ignored:    analysis/diagnostic_correlated_z_cache/
+    Ignored:    analysis/diagnostic_plot_2_cache/
+    Ignored:    analysis/diagnostic_plot_cache/
+    Ignored:    analysis/efron_leukemia_cache/
+    Ignored:    analysis/fitting_normal_cache/
+    Ignored:    analysis/gaussian_derivatives_2_cache/
+    Ignored:    analysis/gaussian_derivatives_3_cache/
+    Ignored:    analysis/gaussian_derivatives_4_cache/
+    Ignored:    analysis/gaussian_derivatives_5_cache/
+    Ignored:    analysis/gaussian_derivatives_cache/
+    Ignored:    analysis/gd-ash_cache/
+    Ignored:    analysis/gd_delta_cache/
+    Ignored:    analysis/gd_lik_2_cache/
+    Ignored:    analysis/gd_lik_cache/
+    Ignored:    analysis/gd_w_cache/
+    Ignored:    analysis/knockoff_10_cache/
+    Ignored:    analysis/knockoff_2_cache/
+    Ignored:    analysis/knockoff_3_cache/
+    Ignored:    analysis/knockoff_4_cache/
+    Ignored:    analysis/knockoff_5_cache/
+    Ignored:    analysis/knockoff_6_cache/
+    Ignored:    analysis/knockoff_7_cache/
+    Ignored:    analysis/knockoff_8_cache/
+    Ignored:    analysis/knockoff_9_cache/
+    Ignored:    analysis/knockoff_cache/
+    Ignored:    analysis/knockoff_var_cache/
+    Ignored:    analysis/marginal_z_alternative_cache/
+    Ignored:    analysis/marginal_z_cache/
+    Ignored:    analysis/mosek_reg_2_cache/
+    Ignored:    analysis/mosek_reg_4_cache/
+    Ignored:    analysis/mosek_reg_5_cache/
+    Ignored:    analysis/mosek_reg_6_cache/
+    Ignored:    analysis/mosek_reg_cache/
+    Ignored:    analysis/pihat0_null_cache/
+    Ignored:    analysis/plot_diagnostic_cache/
+    Ignored:    analysis/poster_obayes17_cache/
+    Ignored:    analysis/real_data_simulation_2_cache/
+    Ignored:    analysis/real_data_simulation_3_cache/
+    Ignored:    analysis/real_data_simulation_4_cache/
+    Ignored:    analysis/real_data_simulation_5_cache/
+    Ignored:    analysis/real_data_simulation_cache/
+    Ignored:    analysis/rmosek_primal_dual_2_cache/
+    Ignored:    analysis/rmosek_primal_dual_cache/
+    Ignored:    analysis/seqgendiff_cache/
+    Ignored:    analysis/simulated_correlated_null_2_cache/
+    Ignored:    analysis/simulated_correlated_null_3_cache/
+    Ignored:    analysis/simulated_correlated_null_cache/
+    Ignored:    analysis/simulation_real_se_2_cache/
+    Ignored:    analysis/simulation_real_se_cache/
+    Ignored:    analysis/smemo_2_cache/
+    Ignored:    data/LSI/
+    Ignored:    docs/.DS_Store
+    Ignored:    docs/figure/.DS_Store
+    Ignored:    output/fig/
+
+Unstaged changes:
+    Deleted:    analysis/cash_plots_fdp.Rmd
+
+</code></pre>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</details>
+</li>
+</ul>
+<details>
+<summary> <small><strong>Expand here to see past versions:</strong></small> </summary>
+<ul>
+<table style="border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+File
+</th>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+<th style="text-align:left;">
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/cc0ab8379469bc3726f1508cd81e4ecd6fef1b1a/analysis/knockoff.rmd" target="_blank">cc0ab83</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-05-11
+</td>
+<td style="text-align:left;">
+update
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/4491358b5bf7b98b57ecc50a82475599b0ee8134/docs/knockoff.html" target="_blank">4491358</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-01-30
+</td>
+<td style="text-align:left;">
+linear regression
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/cdb4153ce24225e7aa9064a9d1c557a5b545875c/analysis/knockoff.rmd" target="_blank">cdb4153</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-01-30
+</td>
+<td style="text-align:left;">
+wflow_publish(“analysis/knockoff.rmd”)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/c17f67c71a8ec6b6f49fda88fa6dceec6a11c63c/analysis/knockoff.rmd" target="_blank">c17f67c</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-01-30
+</td>
+<td style="text-align:left;">
+wflow_publish(c(“analysis/index.rmd”, “analysis/knockoff.rmd”, “analysis/knockoff_2.rmd”, “analysis/knockoff_3.rmd”))
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/1c3ccea8098787267eec0fa7585a6ae6e16487e2/docs/knockoff.html" target="_blank">1c3ccea</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-01-25
+</td>
+<td style="text-align:left;">
+knockoff
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/4bd59b5ec3453e1ab33fa322874a50ae9c562d35/analysis/knockoff.rmd" target="_blank">4bd59b5</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-01-25
+</td>
+<td style="text-align:left;">
+wflow_publish(files = c(“analysis/knockoff.rmd”, “analysis/index.Rmd”))
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/325248352e6789d3766f69f952341db2a49333c7/analysis/knockoff.rmd" target="_blank">3252483</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-01-21
+</td>
+<td style="text-align:left;">
+knockoff
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/c48f75699f03ce1cf102dd5eb443677a1370e7de/analysis/knockoff.rmd" target="_blank">c48f756</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-01-19
+</td>
+<td style="text-align:left;">
+knockoff
+</td>
+</tr>
+</tbody>
+</table>
+</ul>
+</details>
+<hr />
+<div id="introduction" class="section level2">
 <h2>Introduction</h2>
 <p>Applying CASH to linear regression variable selection, compared with other popular methods including BH, Knockoff.</p>
-</section>
-<section id="simulation-setting" class="level2">
+</div>
+<div id="simulation-setting" class="section level2">
 <h2>Simulation Setting</h2>
 <p>The simulation setting is very similar to what’s used in Knockoff’s <a href="https://cran.r-project.org/web/packages/knockoff/vignettes/fixed.html">vignette</a>. The only notable difference is that the non-zero signals are normally distributed centered at zero, rather than constant.</p>
 <p>Data are simulated by <span class="math display">\[
@@ -339,8 +638,8 @@ e_n \sim N(0, 1) \\
 \]</span> Each row of <span class="math inline">\(X\)</span> is generated independently from a <span class="math inline">\(N(0, \Sigma_\rho)\)</span> distribution, where <span class="math inline">\(\left(\Sigma_\rho\right)_{j, k} = \rho^{|j - k|}\)</span>, a Toplitz matrix.</p>
 <p>Every method selects the variables with respect to a nominal false discovery rate <span class="math inline">\(q = 0.1\)</span>.</p>
 <p>In simulations, we are changing the values of the sparsity level <span class="math inline">\(\eta\)</span>, the signal strength <span class="math inline">\(\sigma\)</span>, the feature correlation <span class="math inline">\(\rho\)</span>.</p>
-</section>
-<section id="methods" class="level2">
+</div>
+<div id="methods" class="section level2">
 <h2>Methods</h2>
 <ul>
 <li><p>BH: First run multiple linear regression, then apply BH to obtained <span class="math inline">\(p\)</span>-values.</p></li>
@@ -350,91 +649,872 @@ e_n \sim N(0, 1) \\
 <li><p>CASH: First run multiple linear regression, then apply <code>cash</code> on obtained <span class="math inline">\(\hat\beta\)</span> and <span class="math inline">\(\hat{\text{se}}\left(\hat \beta\right)\)</span>, using normal mixture and normal likelihood, with default penalty on Gaussian derivative coefficients.</p></li>
 <li><p>CASH+: CASH with perfect knowledge, using real noise level <span class="math inline">\(\text{se}\left(\hat{\beta}\right)\)</span>.</p></li>
 </ul>
-</section>
-<section id="observations" class="level2">
+</div>
+<div id="observations" class="section level2">
 <h2>Observations</h2>
 <ul>
 <li><p>BH is very robust, very fast.</p></li>
 <li><p>Knockoff is way too slow and way too conservative with signals being unimodal at zero. Perhaps it needs strong signals distinctly different from the “bulk.” Unimodal setting is really adversary to this method.</p></li>
 <li><p><code>CASH</code> works fine, but not better than the basic <code>ASH</code>.</p></li>
 </ul>
-</section>
-<section id="eta-0.9-sigma-5-rho-0.5" class="level2">
+</div>
+<div id="eta-0.9-sigma-5-rho-0.5" class="section level2">
 <h2><span class="math inline">\(\eta = 0.9\)</span>, <span class="math inline">\(\sigma = 5\)</span>, <span class="math inline">\(\rho = 0.5\)</span></h2>
 <pre><code>No id variables; using all as measure variables</code></pre>
 <p><img src="figure/knockoff.rmd/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-2-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1c3ccea8098787267eec0fa7585a6ae6e16487e2/docs/figure/knockoff.rmd/unnamed-chunk-2-1.png" target="_blank">1c3ccea</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-01-25
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre><code>No id variables; using all as measure variables</code></pre>
 <p><img src="figure/knockoff.rmd/unnamed-chunk-2-2.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-2-2.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1c3ccea8098787267eec0fa7585a6ae6e16487e2/docs/figure/knockoff.rmd/unnamed-chunk-2-2.png" target="_blank">1c3ccea</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-01-25
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre><code>Warning in bplt(at[i], wid = width[i], stats = z$stats[, i], out = z$out[z
 $group == : Outlier (-Inf) in boxplot 3 is not drawn</code></pre>
 <p><img src="figure/knockoff.rmd/unnamed-chunk-2-3.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="eta-0.8-sigma-4-rho-0.5" class="level2">
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-2-3.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1c3ccea8098787267eec0fa7585a6ae6e16487e2/docs/figure/knockoff.rmd/unnamed-chunk-2-3.png" target="_blank">1c3ccea</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-01-25
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+</div>
+<div id="eta-0.8-sigma-4-rho-0.5" class="section level2">
 <h2><span class="math inline">\(\eta = 0.8\)</span>, <span class="math inline">\(\sigma = 4\)</span>, <span class="math inline">\(\rho = 0.5\)</span></h2>
 <pre><code>No id variables; using all as measure variables</code></pre>
 <p><img src="figure/knockoff.rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-4-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1c3ccea8098787267eec0fa7585a6ae6e16487e2/docs/figure/knockoff.rmd/unnamed-chunk-4-1.png" target="_blank">1c3ccea</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-01-25
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre><code>No id variables; using all as measure variables</code></pre>
 <p><img src="figure/knockoff.rmd/unnamed-chunk-4-2.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-4-2.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1c3ccea8098787267eec0fa7585a6ae6e16487e2/docs/figure/knockoff.rmd/unnamed-chunk-4-2.png" target="_blank">1c3ccea</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-01-25
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre><code>Warning in bplt(at[i], wid = width[i], stats = z$stats[, i], out = z$out[z
 $group == : Outlier (-Inf) in boxplot 2 is not drawn</code></pre>
 <p><img src="figure/knockoff.rmd/unnamed-chunk-4-3.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="eta-0.5-sigma-4-rho-0.5" class="level2">
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-4-3.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1c3ccea8098787267eec0fa7585a6ae6e16487e2/docs/figure/knockoff.rmd/unnamed-chunk-4-3.png" target="_blank">1c3ccea</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-01-25
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+</div>
+<div id="eta-0.5-sigma-4-rho-0.5" class="section level2">
 <h2><span class="math inline">\(\eta = 0.5\)</span>, <span class="math inline">\(\sigma = 4\)</span>, <span class="math inline">\(\rho = 0.5\)</span></h2>
 <pre><code>No id variables; using all as measure variables</code></pre>
 <p><img src="figure/knockoff.rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-6-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1c3ccea8098787267eec0fa7585a6ae6e16487e2/docs/figure/knockoff.rmd/unnamed-chunk-6-1.png" target="_blank">1c3ccea</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-01-25
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre><code>No id variables; using all as measure variables</code></pre>
-<p><img src="figure/knockoff.rmd/unnamed-chunk-6-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff.rmd/unnamed-chunk-6-3.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="eta-in-left0.5-0.6-0.7-0.8-0.9right-sigma-4-rho-0.5" class="level2">
+<p><img src="figure/knockoff.rmd/unnamed-chunk-6-2.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-6-2.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1c3ccea8098787267eec0fa7585a6ae6e16487e2/docs/figure/knockoff.rmd/unnamed-chunk-6-2.png" target="_blank">1c3ccea</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-01-25
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/knockoff.rmd/unnamed-chunk-6-3.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-6-3.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1c3ccea8098787267eec0fa7585a6ae6e16487e2/docs/figure/knockoff.rmd/unnamed-chunk-6-3.png" target="_blank">1c3ccea</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-01-25
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+</div>
+<div id="eta-in-left0.5-0.6-0.7-0.8-0.9right-sigma-4-rho-0.5" class="section level2">
 <h2><span class="math inline">\(\eta \in \left\{0.5, 0.6, 0.7, 0.8, 0.9\right\}\)</span>, <span class="math inline">\(\sigma = 4\)</span>, <span class="math inline">\(\rho = 0.5\)</span></h2>
-<section id="overall-across-all-sparsity" class="level3">
+<div id="overall-across-all-sparsity" class="section level3">
 <h3>Overall across all sparsity</h3>
-<p><img src="figure/knockoff.rmd/avg-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff.rmd/avg-2.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="eta-0.5-sigma-4-rho-0.5-1" class="level3">
+<p><img src="figure/knockoff.rmd/avg-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of avg-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1c3ccea8098787267eec0fa7585a6ae6e16487e2/docs/figure/knockoff.rmd/avg-1.png" target="_blank">1c3ccea</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-01-25
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/knockoff.rmd/avg-2.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of avg-2.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1c3ccea8098787267eec0fa7585a6ae6e16487e2/docs/figure/knockoff.rmd/avg-2.png" target="_blank">1c3ccea</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-01-25
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+</div>
+<div id="eta-0.5-sigma-4-rho-0.5-1" class="section level3">
 <h3><span class="math inline">\(\eta = 0.5\)</span>, <span class="math inline">\(\sigma = 4\)</span>, <span class="math inline">\(\rho = 0.5\)</span></h3>
 <pre><code>No id variables; using all as measure variables</code></pre>
 <p><img src="figure/knockoff.rmd/500-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of 500-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1c3ccea8098787267eec0fa7585a6ae6e16487e2/docs/figure/knockoff.rmd/500-1.png" target="_blank">1c3ccea</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-01-25
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre><code>No id variables; using all as measure variables</code></pre>
-<p><img src="figure/knockoff.rmd/500-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff.rmd/500-3.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="eta-0.9-sigma-4-rho-0.5" class="level3">
+<p><img src="figure/knockoff.rmd/500-2.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of 500-2.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1c3ccea8098787267eec0fa7585a6ae6e16487e2/docs/figure/knockoff.rmd/500-2.png" target="_blank">1c3ccea</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-01-25
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/knockoff.rmd/500-3.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of 500-3.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1c3ccea8098787267eec0fa7585a6ae6e16487e2/docs/figure/knockoff.rmd/500-3.png" target="_blank">1c3ccea</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-01-25
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+</div>
+<div id="eta-0.9-sigma-4-rho-0.5" class="section level3">
 <h3><span class="math inline">\(\eta = 0.9\)</span>, <span class="math inline">\(\sigma = 4\)</span>, <span class="math inline">\(\rho = 0.5\)</span></h3>
 <pre><code>No id variables; using all as measure variables</code></pre>
 <p><img src="figure/knockoff.rmd/100-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of 100-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1c3ccea8098787267eec0fa7585a6ae6e16487e2/docs/figure/knockoff.rmd/100-1.png" target="_blank">1c3ccea</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-01-25
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre><code>No id variables; using all as measure variables</code></pre>
-<p><img src="figure/knockoff.rmd/100-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff.rmd/100-3.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-</section>
-<section id="eta-in-left0.5-0.6-0.7-0.8-0.9right-sigma-3-rho-0.7" class="level2">
+<p><img src="figure/knockoff.rmd/100-2.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of 100-2.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1c3ccea8098787267eec0fa7585a6ae6e16487e2/docs/figure/knockoff.rmd/100-2.png" target="_blank">1c3ccea</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-01-25
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/knockoff.rmd/100-3.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of 100-3.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1c3ccea8098787267eec0fa7585a6ae6e16487e2/docs/figure/knockoff.rmd/100-3.png" target="_blank">1c3ccea</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-01-25
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+</div>
+</div>
+<div id="eta-in-left0.5-0.6-0.7-0.8-0.9right-sigma-3-rho-0.7" class="section level2">
 <h2><span class="math inline">\(\eta \in \left\{0.5, 0.6, 0.7, 0.8, 0.9\right\}\)</span>, <span class="math inline">\(\sigma = 3\)</span>, <span class="math inline">\(\rho = 0.7\)</span></h2>
-<section id="overall-across-all-sparsity-1" class="level3">
+<div id="overall-across-all-sparsity-1" class="section level3">
 <h3>Overall across all sparsity</h3>
-<p><img src="figure/knockoff.rmd/avg%20weak-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff.rmd/avg%20weak-2.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="eta-0.5-sigma-3-rho-0.7" class="level3">
+<p><img src="figure/knockoff.rmd/avg%20weak-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of avg weak-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1c3ccea8098787267eec0fa7585a6ae6e16487e2/docs/figure/knockoff.rmd/avg weak-1.png" target="_blank">1c3ccea</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-01-25
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/knockoff.rmd/avg%20weak-2.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of avg weak-2.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1c3ccea8098787267eec0fa7585a6ae6e16487e2/docs/figure/knockoff.rmd/avg weak-2.png" target="_blank">1c3ccea</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-01-25
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+</div>
+<div id="eta-0.5-sigma-3-rho-0.7" class="section level3">
 <h3><span class="math inline">\(\eta = 0.5\)</span>, <span class="math inline">\(\sigma = 3\)</span>, <span class="math inline">\(\rho = 0.7\)</span></h3>
 <pre><code>No id variables; using all as measure variables</code></pre>
 <p><img src="figure/knockoff.rmd/500%20weak-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of 500 weak-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1c3ccea8098787267eec0fa7585a6ae6e16487e2/docs/figure/knockoff.rmd/500 weak-1.png" target="_blank">1c3ccea</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-01-25
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre><code>No id variables; using all as measure variables</code></pre>
-<p><img src="figure/knockoff.rmd/500%20weak-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff.rmd/500%20weak-3.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="eta-0.9-sigma-3-rho-0.7" class="level3">
+<p><img src="figure/knockoff.rmd/500%20weak-2.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of 500 weak-2.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1c3ccea8098787267eec0fa7585a6ae6e16487e2/docs/figure/knockoff.rmd/500 weak-2.png" target="_blank">1c3ccea</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-01-25
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/knockoff.rmd/500%20weak-3.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of 500 weak-3.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1c3ccea8098787267eec0fa7585a6ae6e16487e2/docs/figure/knockoff.rmd/500 weak-3.png" target="_blank">1c3ccea</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-01-25
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+</div>
+<div id="eta-0.9-sigma-3-rho-0.7" class="section level3">
 <h3><span class="math inline">\(\eta = 0.9\)</span>, <span class="math inline">\(\sigma = 3\)</span>, <span class="math inline">\(\rho = 0.7\)</span></h3>
 <pre><code>No id variables; using all as measure variables</code></pre>
 <p><img src="figure/knockoff.rmd/100%20weak-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of 100 weak-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1c3ccea8098787267eec0fa7585a6ae6e16487e2/docs/figure/knockoff.rmd/100 weak-1.png" target="_blank">1c3ccea</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-01-25
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre><code>No id variables; using all as measure variables</code></pre>
-<p><img src="figure/knockoff.rmd/100%20weak-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff.rmd/100%20weak-3.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-</section>
-<section id="session-information" class="level2">
+<p><img src="figure/knockoff.rmd/100%20weak-2.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of 100 weak-2.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1c3ccea8098787267eec0fa7585a6ae6e16487e2/docs/figure/knockoff.rmd/100 weak-2.png" target="_blank">1c3ccea</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-01-25
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/knockoff.rmd/100%20weak-3.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of 100 weak-3.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1c3ccea8098787267eec0fa7585a6ae6e16487e2/docs/figure/knockoff.rmd/100 weak-3.png" target="_blank">1c3ccea</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-01-25
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+</div>
+</div>
+<div id="session-information" class="section level2">
 <h2>Session information</h2>
-<!-- Insert the session information into the document -->
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS High Sierra 10.13.2
+Running under: macOS High Sierra 10.13.4
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -450,18 +1530,22 @@ other attached packages:
 [1] ggplot2_2.2.1  reshape2_1.4.3
 
 loaded via a namespace (and not attached):
- [1] Rcpp_0.12.14     knitr_1.18       magrittr_1.5     munsell_0.4.3   
- [5] colorspace_1.3-2 rlang_0.1.6      stringr_1.2.0    plyr_1.8.4      
- [9] tools_3.4.3      grid_3.4.3       gtable_0.2.0     git2r_0.21.0    
-[13] htmltools_0.3.6  yaml_2.1.16      lazyeval_0.2.1   rprojroot_1.3-2 
-[17] digest_0.6.14    tibble_1.4.1     evaluate_0.10.1  rmarkdown_1.8   
-[21] labeling_0.3     stringi_1.1.6    compiler_3.4.3   pillar_1.0.1    
-[25] scales_0.5.0     backports_1.1.2 </code></pre>
-</section>
+ [1] Rcpp_0.12.16      knitr_1.20        whisker_0.3-2    
+ [4] magrittr_1.5      workflowr_1.0.1   munsell_0.4.3    
+ [7] colorspace_1.3-2  rlang_0.1.6       stringr_1.3.0    
+[10] plyr_1.8.4        tools_3.4.3       grid_3.4.3       
+[13] gtable_0.2.0      R.oo_1.21.0       git2r_0.21.0     
+[16] htmltools_0.3.6   lazyeval_0.2.1    yaml_2.1.18      
+[19] rprojroot_1.3-2   digest_0.6.15     tibble_1.4.1     
+[22] R.utils_2.6.0     evaluate_0.10.1   rmarkdown_1.9    
+[25] labeling_0.3      stringi_1.1.6     pillar_1.0.1     
+[28] compiler_3.4.3    scales_0.5.0      backports_1.1.2  
+[31] R.methodsS3_1.7.1</code></pre>
+</div>
 
 <hr>
 <p>
-    This <a href="http://rmarkdown.rstudio.com">R Markdown</a> site was created with <a href="https://github.com/jdblischak/workflowr">workflowr</a>
+    
 </p>
 <hr>
 
@@ -483,6 +1567,25 @@ loaded via a namespace (and not attached):
     <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
     <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
 -->
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+<hr>
+<p>
+  This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a>
+  analysis was created with
+  <a href="https://github.com/jdblischak/workflowr">workflowr</a> 1.0.1
+</p>
+<hr>
 
 
 </div>

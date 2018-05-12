@@ -300,6 +300,13 @@ div.tocify {
   </div><!--/.container -->
 </div><!--/.navbar -->
 
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
 <div class="fluid-row" id="header">
 
 
@@ -311,16 +318,239 @@ div.tocify {
 </div>
 
 
-<!-- The file analysis/chunks.R contains chunks that define default settings
-shared across the workflowr files. -->
-<!-- Update knitr chunk options -->
-<!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2017-12-21</p>
-<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
- package git2r is installed -->
-<p><strong>Code version:</strong> 6e42447</p>
-<!-- Add your analysis here -->
-<section id="introduction" class="level2">
+<p><strong>Last updated:</strong> 2018-05-12</p>
+<strong>workflowr checks:</strong> <small>(Click a bullet for more information)</small>
+<ul>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>R Markdown file:</strong> up-to-date </summary></p>
+<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/ddf906244e82e0675854c40da76dc16cf1a78fa4" target="_blank">ddf9062</a> </summary></p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    analysis/.DS_Store
+    Ignored:    analysis/BH_robustness_cache/
+    Ignored:    analysis/FDR_Null_cache/
+    Ignored:    analysis/FDR_null_betahat_cache/
+    Ignored:    analysis/Rmosek_cache/
+    Ignored:    analysis/StepDown_cache/
+    Ignored:    analysis/alternative2_cache/
+    Ignored:    analysis/alternative_cache/
+    Ignored:    analysis/ash_gd_cache/
+    Ignored:    analysis/average_cor_gtex_2_cache/
+    Ignored:    analysis/average_cor_gtex_cache/
+    Ignored:    analysis/brca_cache/
+    Ignored:    analysis/cash_deconv_cache/
+    Ignored:    analysis/cash_fdr_1_cache/
+    Ignored:    analysis/cash_fdr_2_cache/
+    Ignored:    analysis/cash_fdr_3_cache/
+    Ignored:    analysis/cash_fdr_4_cache/
+    Ignored:    analysis/cash_fdr_5_cache/
+    Ignored:    analysis/cash_fdr_6_cache/
+    Ignored:    analysis/cash_plots_cache/
+    Ignored:    analysis/cash_sim_1_cache/
+    Ignored:    analysis/cash_sim_2_cache/
+    Ignored:    analysis/cash_sim_3_cache/
+    Ignored:    analysis/cash_sim_4_cache/
+    Ignored:    analysis/cash_sim_5_cache/
+    Ignored:    analysis/cash_sim_6_cache/
+    Ignored:    analysis/cash_sim_7_cache/
+    Ignored:    analysis/correlated_z_2_cache/
+    Ignored:    analysis/correlated_z_3_cache/
+    Ignored:    analysis/correlated_z_cache/
+    Ignored:    analysis/create_null_cache/
+    Ignored:    analysis/cutoff_null_cache/
+    Ignored:    analysis/design_matrix_2_cache/
+    Ignored:    analysis/design_matrix_cache/
+    Ignored:    analysis/diagnostic_ash_cache/
+    Ignored:    analysis/diagnostic_correlated_z_2_cache/
+    Ignored:    analysis/diagnostic_correlated_z_3_cache/
+    Ignored:    analysis/diagnostic_correlated_z_cache/
+    Ignored:    analysis/diagnostic_plot_2_cache/
+    Ignored:    analysis/diagnostic_plot_cache/
+    Ignored:    analysis/efron_leukemia_cache/
+    Ignored:    analysis/fitting_normal_cache/
+    Ignored:    analysis/gaussian_derivatives_2_cache/
+    Ignored:    analysis/gaussian_derivatives_3_cache/
+    Ignored:    analysis/gaussian_derivatives_4_cache/
+    Ignored:    analysis/gaussian_derivatives_5_cache/
+    Ignored:    analysis/gaussian_derivatives_cache/
+    Ignored:    analysis/gd-ash_cache/
+    Ignored:    analysis/gd_delta_cache/
+    Ignored:    analysis/gd_lik_2_cache/
+    Ignored:    analysis/gd_lik_cache/
+    Ignored:    analysis/gd_w_cache/
+    Ignored:    analysis/knockoff_10_cache/
+    Ignored:    analysis/knockoff_2_cache/
+    Ignored:    analysis/knockoff_3_cache/
+    Ignored:    analysis/knockoff_4_cache/
+    Ignored:    analysis/knockoff_5_cache/
+    Ignored:    analysis/knockoff_6_cache/
+    Ignored:    analysis/knockoff_7_cache/
+    Ignored:    analysis/knockoff_8_cache/
+    Ignored:    analysis/knockoff_9_cache/
+    Ignored:    analysis/knockoff_cache/
+    Ignored:    analysis/knockoff_var_cache/
+    Ignored:    analysis/marginal_z_alternative_cache/
+    Ignored:    analysis/marginal_z_cache/
+    Ignored:    analysis/mosek_reg_2_cache/
+    Ignored:    analysis/mosek_reg_4_cache/
+    Ignored:    analysis/mosek_reg_5_cache/
+    Ignored:    analysis/mosek_reg_6_cache/
+    Ignored:    analysis/mosek_reg_cache/
+    Ignored:    analysis/pihat0_null_cache/
+    Ignored:    analysis/plot_diagnostic_cache/
+    Ignored:    analysis/poster_obayes17_cache/
+    Ignored:    analysis/real_data_simulation_2_cache/
+    Ignored:    analysis/real_data_simulation_3_cache/
+    Ignored:    analysis/real_data_simulation_4_cache/
+    Ignored:    analysis/real_data_simulation_5_cache/
+    Ignored:    analysis/real_data_simulation_cache/
+    Ignored:    analysis/rmosek_primal_dual_2_cache/
+    Ignored:    analysis/rmosek_primal_dual_cache/
+    Ignored:    analysis/seqgendiff_cache/
+    Ignored:    analysis/simulated_correlated_null_2_cache/
+    Ignored:    analysis/simulated_correlated_null_3_cache/
+    Ignored:    analysis/simulated_correlated_null_cache/
+    Ignored:    analysis/simulation_real_se_2_cache/
+    Ignored:    analysis/simulation_real_se_cache/
+    Ignored:    analysis/smemo_2_cache/
+    Ignored:    data/LSI/
+    Ignored:    docs/.DS_Store
+    Ignored:    docs/figure/.DS_Store
+    Ignored:    output/fig/
+
+Unstaged changes:
+    Deleted:    analysis/cash_plots_fdp.Rmd
+
+</code></pre>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</details>
+</li>
+</ul>
+<details>
+<summary> <small><strong>Expand here to see past versions:</strong></small> </summary>
+<ul>
+<table style="border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+File
+</th>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+<th style="text-align:left;">
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/cc0ab8379469bc3726f1508cd81e4ecd6fef1b1a/analysis/mosek_reg_3.rmd" target="_blank">cc0ab83</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-05-11
+</td>
+<td style="text-align:left;">
+update
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/mosek_reg_3.html" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/853a484bfacf347e109f6c8fb3ffaab5f4d6cc02/docs/mosek_reg_3.html" target="_blank">853a484</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-07
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/4cc8ec5aac2895d5043afec62a36c063acd69d09/docs/mosek_reg_3.html" target="_blank">4cc8ec5</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-09
+</td>
+<td style="text-align:left;">
+regularization
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/b3932c75f92c779b3bc885e35d7fac2d6f7aad39/analysis/mosek_reg_3.rmd" target="_blank">b3932c7</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-09
+</td>
+<td style="text-align:left;">
+regularization
+</td>
+</tr>
+</tbody>
+</table>
+</ul>
+</details>
+<hr />
+<div id="introduction" class="section level2">
 <h2>Introduction</h2>
 <p>The <span class="math inline">\(w\)</span> optimization problem we hope to solve has two constraints. If we are not imposing these two constraints, chances are the optimization will be <a href="gaussian_derivatives_3.html">unstable</a>, especially when we don’t know <span class="math inline">\(L\)</span> for sure beforehand. However, these two constraints are hard to be converted directly and strictly to convex or even tractable forms.</p>
 <p><span class="math display">\[
@@ -338,8 +568,8 @@ shared across the workflowr files. -->
 <p>On the other hand, as indicated the <a href="gaussian_derivatives.html">theory</a> and <a href="mosek_reg.html">examples</a> of good fitting by Gaussian derivatives, <span class="math inline">\(w_l\)</span> is getting smaller as <span class="math inline">\(l\)</span> increases. Moreover, oftentimes, really small <span class="math inline">\(w_l\)</span> could still make a difference and thus indispensable. Therefore, although we need to stop <span class="math inline">\(\hat w\)</span> getting too large, we cerntainly don’t want to shrink them unnecessarily and unwarrantedly to zero.</p>
 <p>Ideally, the goal of <span class="math inline">\(\sum\limits_{l = 1}^L\lambda_l^w \phi \left(\left|w_l\right|\right)\)</span> regularizing <span class="math inline">\(w\)</span> should be to</p>
 
-</section>
-<section id="ideas-on-lambda_lw-and-phi" class="level2">
+</div>
+<div id="ideas-on-lambda_lw-and-phi" class="section level2">
 <h2>Ideas on <span class="math inline">\(\lambda_l^w\)</span> and <span class="math inline">\(\phi\)</span></h2>
 <p>Remember that in <a href="gaussian_derivatives.html">theory</a>, if we are writing the random empirical density of the correlated marginally <span class="math inline">\(N\left(0, 1\right)\)</span> random samples as</p>
 <p><span class="math display">\[
@@ -356,26 +586,26 @@ f_0\left(z\right) = \varphi\left(z\right) + \sum\limits_{l = 1}^\infty W_k\varph
 \left|w_l\right| \leadsto \sqrt{\text{var}\left(W_l\right)} =
 \frac{\sqrt{\bar{\rho_{ij}^l}}}{\sqrt{l!}} \  .
 \]</span></p>
-<section id="normalization" class="level3">
+<div id="normalization" class="section level3">
 <h3>Normalization</h3>
 <p>The order of decay suggests that we should work with <a href="mosek_reg_2.html">normalized coefficients</a>, so that</p>
 <p><span class="math display">\[
 \left|w_l^n\right| = \sqrt{l!}\left|w_l\right| \leadsto 
 \sqrt{\bar{\rho_{ij}^l}} \  .
 \]</span> This piece of information on the order of magnitude of the normalized <span class="math inline">\(w_l^n\)</span> provides a hint to determine <span class="math inline">\(\lambda_l^w\)</span>, for example,</p>
-</section>
-<section id="regularizing-even-orders-only" class="level3">
+</div>
+<div id="regularizing-even-orders-only" class="section level3">
 <h3>Regularizing even orders only</h3>
 <p>Odd orders of Gaussian derivatives are generally associated with mean shift and skewness of <span class="math inline">\(f_0\)</span>, so they are generally very small, but if they are indeed not zero, they are important however they are small.</p>
 <p>Meanwhile, when <span class="math inline">\(l\)</span> is odd, <span class="math inline">\(\bar{\rho_{ij}^l}\)</span> could be very small, and not in order of <span class="math inline">\(\bar{\rho^l}\)</span> for some <span class="math inline">\(\rho \in \left(0, 1\right)\)</span>, so it’s very difficult to come up with a good <span class="math inline">\(\lambda_l^w\)</span> when <span class="math inline">\(l\)</span> is odd.</p>
 <p>Therefore, it might be better to leave the odd orders alone and regularize the even orders only.</p>
-</section>
-<section id="penalty-l_1-and-l_2" class="level3">
+</div>
+<div id="penalty-l_1-and-l_2" class="section level3">
 <h3>Penalty: <span class="math inline">\(l_1\)</span> and <span class="math inline">\(l_2\)</span></h3>
 <p>Generally speaking, <span class="math inline">\(l_1\)</span> imposes sparsity by shrinking small estimates exactly to zero, which is both good and bad for our case, whereas <span class="math inline">\(l_2\)</span> penalizes large estimates severely but doesn’t force exact sparsity, which could also be good or bad.</p>
 <p>We’ll implement both and see what happens.</p>
-</section>
-<section id="lambda_lw" class="level3">
+</div>
+<div id="lambda_lw" class="section level3">
 <h3><span class="math inline">\(\lambda_l^w\)</span></h3>
 <p><span class="math inline">\(\lambda_l^w\)</span> is determined to help ensure</p>
 <p><span class="math display">\[
@@ -383,14 +613,14 @@ f_0\left(z\right) = \varphi\left(z\right) + \sum\limits_{l = 1}^\infty W_k\varph
 \sqrt{\bar{\rho_{ij}^l}} \  ,
 \]</span></p>
 <p>Given <span class="math inline">\(\rho \in \left(0, 1\right)\)</span>, for <span class="math inline">\(l_1\)</span> regularization, <span class="math inline">\(\lambda_l^n \sim \lambda / \sqrt{\rho^l}\)</span>; for <span class="math inline">\(l_2\)</span> regularization, <span class="math inline">\(\lambda_l^n \sim \lambda / \rho^l\)</span>.</p>
-</section>
-<section id="l" class="level3">
+</div>
+<div id="l" class="section level3">
 <h3><span class="math inline">\(L\)</span></h3>
 <p>So far, <span class="math inline">\(L = 9\)</span> has been able to handle all the example we’ve tried. Without constraints or regularization, <span class="math inline">\(L = 9\)</span> is usually too large for cases where, say, <span class="math inline">\(L = 4\)</span> is enough, and a larger than necessary <span class="math inline">\(L\)</span> could lead to numerical instability.</p>
 <p>Hence, we’ll experiment with <span class="math inline">\(L = 12\)</span>, assuming it’s enough for all the correlation induced distortions in practice, and assuming the regularization could prevent the optimization from going crazy.</p>
-</section>
-</section>
-<section id="summary" class="level2">
+</div>
+</div>
+<div id="summary" class="section level2">
 <h2>Summary</h2>
 <p>The <span class="math inline">\(w\)</span> optimization problem becomes</p>
 <p><span class="math display">\[
@@ -407,7 +637,7 @@ f_0\left(z\right) = \varphi\left(z\right) + \sum\limits_{l = 1}^\infty W_k\varph
 \end{array}
 \]</span> where <span class="math inline">\(A_{n \times L} = \left[a_1,\ldots, a_L\right]\)</span> and <span class="math inline">\(a\)</span> are computed with normalized Gaussian derivatives and Hermite polynomials.</p>
 <p>Let <span class="math inline">\(\lambda &gt; 0\)</span>, <span class="math inline">\(\rho \in \left(0, 1\right)\)</span>, the regularization term has two forms as follows.</p>
-<section id="l_1-regularization" class="level3">
+<div id="l_1-regularization" class="section level3">
 <h3><span class="math inline">\(l_1\)</span> regularization</h3>
 <p><span class="math display">\[
 \begin{array}{l}
@@ -418,8 +648,8 @@ f_0\left(z\right) = \varphi\left(z\right) + \sum\limits_{l = 1}^\infty W_k\varph
 \end{cases}
 \end{array}
 \]</span></p>
-</section>
-<section id="l_2-regularization" class="level3">
+</div>
+<div id="l_2-regularization" class="section level3">
 <h3><span class="math inline">\(l_2\)</span> regularization</h3>
 <p><span class="math display">\[
 \begin{array}{l}
@@ -430,9 +660,9 @@ f_0\left(z\right) = \varphi\left(z\right) + \sum\limits_{l = 1}^\infty W_k\varph
 \end{cases}
 \end{array}
 \]</span></p>
-</section>
-</section>
-<section id="dual-problem-for-l_1-regularization." class="level2">
+</div>
+</div>
+<div id="dual-problem-for-l_1-regularization." class="section level2">
 <h2>Dual problem for <span class="math inline">\(l_1\)</span> regularization.</h2>
 <p>The primal form is</p>
 <p><span class="math display">\[
@@ -460,8 +690,8 @@ f_0\left(z\right) = \varphi\left(z\right) + \sum\limits_{l = 1}^\infty W_k\varph
 &amp; v \geq 0\  .
 \end{array}
 \]</span></p>
-</section>
-<section id="dual-problem-for-l_2-regularization." class="level2">
+</div>
+<div id="dual-problem-for-l_2-regularization." class="section level2">
 <h2>Dual problem for <span class="math inline">\(l_2\)</span> regularization.</h2>
 <p>The primal form is</p>
 <p><span class="math display">\[
@@ -490,39 +720,15 @@ f_0\left(z\right) = \varphi\left(z\right) + \sum\limits_{l = 1}^\infty W_k\varph
 &amp; v \geq 0\  ,
 \end{array}
 \]</span> where <span class="math inline">\(\Lambda = \begin{bmatrix}\lambda_1 &amp; &amp; \\ &amp; \ddots &amp; \\ &amp; &amp; \lambda_L \end{bmatrix}\)</span>, and <span class="math inline">\({\Lambda^{-1}}_{jj} = 0\)</span> when <span class="math inline">\(\lambda_j = 0\)</span>.</p>
-</section>
-<section id="choosing-lambda-and-rho" class="level2">
+</div>
+<div id="choosing-lambda-and-rho" class="section level2">
 <h2>Choosing <span class="math inline">\(\lambda\)</span> and <span class="math inline">\(\rho\)</span></h2>
 <p>Let’s start with <span class="math inline">\(\rho = 0.9\)</span> and <span class="math inline">\(\lambda = 0.1\)</span>.</p>
-</section>
-<section id="session-information" class="level2">
-<h2>Session information</h2>
-<!-- Insert the session information into the document -->
-<pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 3.4.3 (2017-11-30)
-Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS High Sierra 10.13.2
-
-Matrix products: default
-BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
-LAPACK: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRlapack.dylib
-
-locale:
-[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
-
-attached base packages:
-[1] stats     graphics  grDevices utils     datasets  methods   base     
-
-loaded via a namespace (and not attached):
- [1] compiler_3.4.3  backports_1.1.2 magrittr_1.5    rprojroot_1.3-1
- [5] tools_3.4.3     htmltools_0.3.6 yaml_2.1.16     Rcpp_0.12.14   
- [9] stringi_1.1.6   rmarkdown_1.8   knitr_1.17      git2r_0.20.0   
-[13] stringr_1.2.0   digest_0.6.13   evaluate_0.10.1</code></pre>
-</section>
+</div>
 
 <hr>
 <p>
-    This <a href="http://rmarkdown.rstudio.com">R Markdown</a> site was created with <a href="https://github.com/jdblischak/workflowr">workflowr</a>
+    
 </p>
 <hr>
 
@@ -544,6 +750,25 @@ loaded via a namespace (and not attached):
     <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
     <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
 -->
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+<hr>
+<p>
+  This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a>
+  analysis was created with
+  <a href="https://github.com/jdblischak/workflowr">workflowr</a> 1.0.1
+</p>
+<hr>
 
 
 </div>

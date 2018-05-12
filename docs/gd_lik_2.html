@@ -300,6 +300,13 @@ div.tocify {
   </div><!--/.container -->
 </div><!--/.navbar -->
 
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
 <div class="fluid-row" id="header">
 
 
@@ -311,16 +318,444 @@ div.tocify {
 </div>
 
 
-<!-- The file analysis/chunks.R contains chunks that define default settings
-shared across the workflowr files. -->
-<!-- Update knitr chunk options -->
-<!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2017-12-21</p>
-<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
- package git2r is installed -->
-<p><strong>Code version:</strong> 6e42447</p>
-<!-- Add your analysis here -->
-<section id="gd-ash-model" class="level2">
+<p><strong>Last updated:</strong> 2018-05-12</p>
+<strong>workflowr checks:</strong> <small>(Click a bullet for more information)</small>
+<ul>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>R Markdown file:</strong> up-to-date </summary></p>
+<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Environment:</strong> empty </summary></p>
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Seed:</strong> <code>set.seed(12345)</code> </summary></p>
+<p>The command <code>set.seed(12345)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Session information:</strong> recorded </summary></p>
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/ddf906244e82e0675854c40da76dc16cf1a78fa4" target="_blank">ddf9062</a> </summary></p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    analysis/.DS_Store
+    Ignored:    analysis/BH_robustness_cache/
+    Ignored:    analysis/FDR_Null_cache/
+    Ignored:    analysis/FDR_null_betahat_cache/
+    Ignored:    analysis/Rmosek_cache/
+    Ignored:    analysis/StepDown_cache/
+    Ignored:    analysis/alternative2_cache/
+    Ignored:    analysis/alternative_cache/
+    Ignored:    analysis/ash_gd_cache/
+    Ignored:    analysis/average_cor_gtex_2_cache/
+    Ignored:    analysis/average_cor_gtex_cache/
+    Ignored:    analysis/brca_cache/
+    Ignored:    analysis/cash_deconv_cache/
+    Ignored:    analysis/cash_fdr_1_cache/
+    Ignored:    analysis/cash_fdr_2_cache/
+    Ignored:    analysis/cash_fdr_3_cache/
+    Ignored:    analysis/cash_fdr_4_cache/
+    Ignored:    analysis/cash_fdr_5_cache/
+    Ignored:    analysis/cash_fdr_6_cache/
+    Ignored:    analysis/cash_plots_cache/
+    Ignored:    analysis/cash_sim_1_cache/
+    Ignored:    analysis/cash_sim_2_cache/
+    Ignored:    analysis/cash_sim_3_cache/
+    Ignored:    analysis/cash_sim_4_cache/
+    Ignored:    analysis/cash_sim_5_cache/
+    Ignored:    analysis/cash_sim_6_cache/
+    Ignored:    analysis/cash_sim_7_cache/
+    Ignored:    analysis/correlated_z_2_cache/
+    Ignored:    analysis/correlated_z_3_cache/
+    Ignored:    analysis/correlated_z_cache/
+    Ignored:    analysis/create_null_cache/
+    Ignored:    analysis/cutoff_null_cache/
+    Ignored:    analysis/design_matrix_2_cache/
+    Ignored:    analysis/design_matrix_cache/
+    Ignored:    analysis/diagnostic_ash_cache/
+    Ignored:    analysis/diagnostic_correlated_z_2_cache/
+    Ignored:    analysis/diagnostic_correlated_z_3_cache/
+    Ignored:    analysis/diagnostic_correlated_z_cache/
+    Ignored:    analysis/diagnostic_plot_2_cache/
+    Ignored:    analysis/diagnostic_plot_cache/
+    Ignored:    analysis/efron_leukemia_cache/
+    Ignored:    analysis/fitting_normal_cache/
+    Ignored:    analysis/gaussian_derivatives_2_cache/
+    Ignored:    analysis/gaussian_derivatives_3_cache/
+    Ignored:    analysis/gaussian_derivatives_4_cache/
+    Ignored:    analysis/gaussian_derivatives_5_cache/
+    Ignored:    analysis/gaussian_derivatives_cache/
+    Ignored:    analysis/gd-ash_cache/
+    Ignored:    analysis/gd_delta_cache/
+    Ignored:    analysis/gd_lik_2_cache/
+    Ignored:    analysis/gd_lik_cache/
+    Ignored:    analysis/gd_w_cache/
+    Ignored:    analysis/knockoff_10_cache/
+    Ignored:    analysis/knockoff_2_cache/
+    Ignored:    analysis/knockoff_3_cache/
+    Ignored:    analysis/knockoff_4_cache/
+    Ignored:    analysis/knockoff_5_cache/
+    Ignored:    analysis/knockoff_6_cache/
+    Ignored:    analysis/knockoff_7_cache/
+    Ignored:    analysis/knockoff_8_cache/
+    Ignored:    analysis/knockoff_9_cache/
+    Ignored:    analysis/knockoff_cache/
+    Ignored:    analysis/knockoff_var_cache/
+    Ignored:    analysis/marginal_z_alternative_cache/
+    Ignored:    analysis/marginal_z_cache/
+    Ignored:    analysis/mosek_reg_2_cache/
+    Ignored:    analysis/mosek_reg_4_cache/
+    Ignored:    analysis/mosek_reg_5_cache/
+    Ignored:    analysis/mosek_reg_6_cache/
+    Ignored:    analysis/mosek_reg_cache/
+    Ignored:    analysis/pihat0_null_cache/
+    Ignored:    analysis/plot_diagnostic_cache/
+    Ignored:    analysis/poster_obayes17_cache/
+    Ignored:    analysis/real_data_simulation_2_cache/
+    Ignored:    analysis/real_data_simulation_3_cache/
+    Ignored:    analysis/real_data_simulation_4_cache/
+    Ignored:    analysis/real_data_simulation_5_cache/
+    Ignored:    analysis/real_data_simulation_cache/
+    Ignored:    analysis/rmosek_primal_dual_2_cache/
+    Ignored:    analysis/rmosek_primal_dual_cache/
+    Ignored:    analysis/seqgendiff_cache/
+    Ignored:    analysis/simulated_correlated_null_2_cache/
+    Ignored:    analysis/simulated_correlated_null_3_cache/
+    Ignored:    analysis/simulated_correlated_null_cache/
+    Ignored:    analysis/simulation_real_se_2_cache/
+    Ignored:    analysis/simulation_real_se_cache/
+    Ignored:    analysis/smemo_2_cache/
+    Ignored:    data/LSI/
+    Ignored:    docs/.DS_Store
+    Ignored:    docs/figure/.DS_Store
+    Ignored:    output/fig/
+
+Unstaged changes:
+    Deleted:    analysis/cash_plots_fdp.Rmd
+
+</code></pre>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</details>
+</li>
+</ul>
+<details>
+<summary> <small><strong>Expand here to see past versions:</strong></small> </summary>
+<ul>
+<table style="border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+File
+</th>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+<th style="text-align:left;">
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/cc0ab8379469bc3726f1508cd81e4ecd6fef1b1a/analysis/gd_lik_2.rmd" target="_blank">cc0ab83</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-05-11
+</td>
+<td style="text-align:left;">
+update
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/gd_lik_2.html" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/853a484bfacf347e109f6c8fb3ffaab5f4d6cc02/docs/gd_lik_2.html" target="_blank">853a484</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-07
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/4f032ada03363cc112612f17b5856e75c479feb8/docs/gd_lik_2.html" target="_blank">4f032ad</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-05
+</td>
+<td style="text-align:left;">
+transfer
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/87c16f961e270fa9688b960346a01683287bb0d3/docs/gd_lik_2.html" target="_blank">87c16f9</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-07-03
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/8556deaa38678182cc300790ab8e6a477621a7f2/analysis/gd_lik_2.rmd" target="_blank">8556dea</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-07-03
+</td>
+<td style="text-align:left;">
+wflow_publish(“analysis/gd_lik_2.rmd”)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/a2512ac60d3081797fad7bea49dc0f4e7e17837b/docs/gd_lik_2.html" target="_blank">a2512ac</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-07-03
+</td>
+<td style="text-align:left;">
+plots
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/f3fd0b889df548347892cc61058c3506375b2d88/analysis/gd_lik_2.rmd" target="_blank">f3fd0b8</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-07-03
+</td>
+<td style="text-align:left;">
+wflow_commit(“analysis/gd_lik_2.rmd”)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/921703f47c400b1d0368dcc6494fe3ad98a49894/docs/gd_lik_2.html" target="_blank">921703f</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-25
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/c9aadb6c703fbaa0d06433f5f2cb7b0a508709e4/analysis/gd_lik_2.rmd" target="_blank">c9aadb6</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-25
+</td>
+<td style="text-align:left;">
+wflow_publish(“analysis/gd_lik_2.rmd”)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/b7c3984b48103ee6d72ca9a3be90ce473cbfefa1/docs/gd_lik_2.html" target="_blank">b7c3984</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-24
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1217d1ebdaeb56081192c08fb77fa3f92ef862e8/analysis/gd_lik_2.rmd" target="_blank">1217d1e</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-24
+</td>
+<td style="text-align:left;">
+wflow_publish(“analysis/gd_lik_2.rmd”)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/e6d5a6488d6ee53e08cc396a42e9538adc087dd2/analysis/gd_lik_2.rmd" target="_blank">e6d5a64</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-17
+</td>
+<td style="text-align:left;">
+GD-Lik
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/e6d5a6488d6ee53e08cc396a42e9538adc087dd2/docs/gd_lik_2.html" target="_blank">e6d5a64</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-17
+</td>
+<td style="text-align:left;">
+GD-Lik
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/73b4bb7b980ef52f3b6c6cafb8139e33894a9dc0/analysis/gd_lik_2.rmd" target="_blank">73b4bb7</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-17
+</td>
+<td style="text-align:left;">
+GD-Lik simulations
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/73b4bb7b980ef52f3b6c6cafb8139e33894a9dc0/docs/gd_lik_2.html" target="_blank">73b4bb7</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-17
+</td>
+<td style="text-align:left;">
+GD-Lik simulations
+</td>
+</tr>
+</tbody>
+</table>
+</ul>
+</details>
+<hr />
+<div id="gd-ash-model" class="section level2">
 <h2><code>GD-ASH</code> Model</h2>
 <p>Recall the typical <code>GD-ASH</code> model is</p>
 <p><span class="math display">\[
@@ -336,8 +771,8 @@ f(z) = \sum w_l\frac{1}{\sqrt{l!}}\varphi^{(l)}(z) \  .
 <p><span class="math display">\[
 \frac{1}{\hat s_j}\sum w_l \frac{1}{\sqrt{l!}} \varphi^{(l)}\left(\frac{\hat\beta_j - \beta_j}{\hat s_j}\right) \  .
 \]</span> Note that when <span class="math inline">\(f = \varphi\)</span> it becomes the independent <span class="math inline">\(N\left(\beta_j, \hat s_j^2\right)\)</span> case.</p>
-</section>
-<section id="gd-lik-model" class="level2">
+</div>
+<div id="gd-lik-model" class="section level2">
 <h2><code>GD-Lik</code> Model</h2>
 <p>Therefore, if we use Gaussian derivatives instead of Gaussian as the likelihood, the posterior distribution of <span class="math inline">\(\beta_j | \hat s_j, \hat\beta_j\)</span> should be</p>
 <p><span class="math display">\[
@@ -381,8 +816,8 @@ d\beta_j
 \sum \pi_k \sum w_l f_{jkl}
 \  .
 \]</span></p>
-</section>
-<section id="posterior-mean" class="level2">
+</div>
+<div id="posterior-mean" class="section level2">
 <h2>Posterior mean</h2>
 <p>After algebra, the posterior mean is given by</p>
 <p><span class="math display">\[
@@ -408,8 +843,8 @@ m_{jkl} =
 \frac{1}{\sqrt{l!}}
 \varphi^{(l)}\left(\frac{\hat\beta_j - \mu_k}{\sqrt{\sigma_k^2 + \hat s_j^2}}\right) \  .
 \]</span></p>
-</section>
-<section id="local-fdr" class="level2">
+</div>
+<div id="local-fdr" class="section level2">
 <h2>Local FDR</h2>
 <p>Assuming <span class="math inline">\(\mu_k \equiv 0\)</span>, the <code>lfdr</code> is given by <span class="math display">\[
 p\left(\beta_j = 0\mid \hat s_j, \hat \beta_j\right)
@@ -426,12 +861,12 @@ p\left(\beta_j = 0\mid \hat s_j, \hat \beta_j\right)
 f_{jkl}
 } \  .
 \]</span></p>
-</section>
-<section id="local-fsr" class="level2">
+</div>
+<div id="local-fsr" class="section level2">
 <h2>Local FSR</h2>
 <p>Right now the analytic form of <code>lfsr</code> using Gaussian derivatives is unavailable.</p>
-</section>
-<section id="simulation" class="level2">
+</div>
+<div id="simulation" class="section level2">
 <h2>Simulation</h2>
 <p>The correlated <span class="math inline">\(N\left(0, 1\right)\)</span> <span class="math inline">\(z\)</span> scores are simulated from the GTEx/Liver data by the <a href="nullpipeline.html">null pipeline</a>. In order to get a better sense of the effectiveness of <code>GD-ASH</code> and <code>GD-Lik</code>, we are using data sets more distorted by correlation in the simulation. In particular, we are using an “inflation” batch, defined as the standard error of the correlated <span class="math inline">\(z\)</span> no less than <span class="math inline">\(1.2\)</span>, and a “deflation” batch, defined as that no greater than <span class="math inline">\(0.8\)</span>. Out of <span class="math inline">\(1000\)</span> simulated data sets, there are <span class="math inline">\(109\)</span> inflation ones and <span class="math inline">\(99\)</span> deflation ones.</p>
 <p>In order to create realistic heterskedastic estimated standard error, <span class="math inline">\(\hat s_j\)</span>’s are also simulated from the same <a href="nullpipeline.html">null pipeline</a>. Let <span class="math inline">\(\sigma^2 = \frac1n \sum\limits_{j = 1}^n \hat s_j^2\)</span> be the average strength of the heteroskedastic noise, and the true effects <span class="math inline">\(\beta_j\)</span>’s are simulated from <span class="math display">\[
@@ -454,32 +889,255 @@ se.deflation = se.mat[deflation.index, ]
 ## Number of deflation data sets
 nrow(z.deflation)</code></pre>
 <pre><code>[1] 99</code></pre>
-</section>
-<section id="inflation-data-sets" class="level2">
+</div>
+<div id="inflation-data-sets" class="section level2">
 <h2>Inflation data sets</h2>
-<section id="some-examples-of-inflated-correlated-null-z-scores" class="level3">
+<div id="some-examples-of-inflated-correlated-null-z-scores" class="section level3">
 <h3>Some examples of inflated correlated null <span class="math inline">\(z\)</span> scores</h3>
 <p><img src="figure/gd_lik_2.rmd/inflation%20examples-1.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="hat-pi_0" class="level3">
+<details>
+<summary><em>Expand here to see past versions of inflation examples-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/figure/gd_lik_2.rmd/inflation examples-1.png" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/853a484bfacf347e109f6c8fb3ffaab5f4d6cc02/docs/figure/gd_lik_2.rmd/inflation examples-1.png" target="_blank">853a484</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-07
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/4f032ada03363cc112612f17b5856e75c479feb8/docs/figure/gd_lik_2.rmd/inflation examples-1.png" target="_blank">4f032ad</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-05
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/a2512ac60d3081797fad7bea49dc0f4e7e17837b/docs/figure/gd_lik_2.rmd/inflation examples-1.png" target="_blank">a2512ac</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-07-03
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/b7c3984b48103ee6d72ca9a3be90ce473cbfefa1/docs/figure/gd_lik_2.rmd/inflation examples-1.png" target="_blank">b7c3984</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-24
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/e6d5a6488d6ee53e08cc396a42e9538adc087dd2/docs/figure/gd_lik_2.rmd/inflation examples-1.png" target="_blank">e6d5a64</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-17
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/73b4bb7b980ef52f3b6c6cafb8139e33894a9dc0/docs/figure/gd_lik_2.rmd/inflation examples-1.png" target="_blank">73b4bb7</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-17
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+</div>
+<div id="hat-pi_0" class="section level3">
 <h3><span class="math inline">\(\hat \pi_0\)</span></h3>
 <p><code>locfdr</code> overestimates, <code>ASH</code> underestimates, <code>GD-ASH</code> on target, <code>qvalue</code> surprisingly good.</p>
 <p><img src="figure/gd_lik_2.rmd/inflation%20pihat0-1.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="mse" class="level3">
+<details>
+<summary><em>Expand here to see past versions of inflation pihat0-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/figure/gd_lik_2.rmd/inflation pihat0-1.png" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/73b4bb7b980ef52f3b6c6cafb8139e33894a9dc0/docs/figure/gd_lik_2.rmd/inflation pihat0-1.png" target="_blank">73b4bb7</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-17
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+</div>
+<div id="mse" class="section level3">
 <h3>MSE</h3>
 <p><code>GD-Lik</code> clearly improves the posterior estimates of <code>GD-ASH</code>.</p>
 <p><img src="figure/gd_lik_2.rmd/inflation%20mse-1.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="auc" class="level3">
+<details>
+<summary><em>Expand here to see past versions of inflation mse-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/figure/gd_lik_2.rmd/inflation mse-1.png" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/73b4bb7b980ef52f3b6c6cafb8139e33894a9dc0/docs/figure/gd_lik_2.rmd/inflation mse-1.png" target="_blank">73b4bb7</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-17
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+</div>
+<div id="auc" class="section level3">
 <h3>AUC</h3>
 <p>For almost all methods, <code>.q</code> means using q values, and <code>.l</code> using local FDRs. <code>GD-Lik</code> is the best, yet even the vanilla <span class="math inline">\(p\)</span> values are not much worse. It indicates that all the methods based on summary statistics indeed make few changes to the order of original <span class="math inline">\(p\)</span> values. Worth noting is that <code>locfdr</code> doesn’t perform well, and <code>lfdr</code>’s give a drastically different result than q values do, probably due to some artifacts like <a href="auc_pvalue.html">ties</a>.</p>
 <p><img src="figure/gd_lik_2.rmd/inflation%20auc-1.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="q-values-and-positive-fdr-pfdr-calibration" class="level3">
+<details>
+<summary><em>Expand here to see past versions of inflation auc-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/figure/gd_lik_2.rmd/inflation auc-1.png" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/73b4bb7b980ef52f3b6c6cafb8139e33894a9dc0/docs/figure/gd_lik_2.rmd/inflation auc-1.png" target="_blank">73b4bb7</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-17
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+</div>
+<div id="q-values-and-positive-fdr-pfdr-calibration" class="section level3">
 <h3>q values and positive FDR (pFDR) calibration</h3>
 <p>Dashed lines are <span class="math inline">\(y = x\)</span> and <span class="math inline">\(y = 2x\)</span>. <code>ASH</code> and <code>qvalue</code> are too liberal, and <code>locfdr</code> is too conservative. <code>GD-ASH</code> and <code>BH</code> give very similar results and not far off. <code>BH</code>’s calibrates pFDR relatively well, even though it’s only guaranteed to control FDR under independence. <code>GD-Lik</code> calibrates pFDR almost precisely.</p>
-<section id="model-and-data-generation" class="level4">
+<div id="model-and-data-generation" class="section level4">
 <h4>Model and data generation</h4>
 <p><span class="math display">\[
 \begin{array}{l}
@@ -489,69 +1147,845 @@ z_j \sim N(0, 1), \text{ correlated, simulated from real data}\\
 \beta_j \sim 0.6\delta_0 + 0.3N(0, \sigma^2) + 0.1N\left(0, \left(2\sigma\right)^2\right)
 \end{array}
 \]</span></p>
-<p><img src="figure/gd_lik_2.rmd/inflation%20qvalue%20calibration%20plotting-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/gd_lik_2.rmd/inflation%20qvalue%20calibration%20plotting-2.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-</section>
-<section id="fdr-calibration" class="level3">
+<p><img src="figure/gd_lik_2.rmd/inflation%20qvalue%20calibration%20plotting-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of inflation qvalue calibration plotting-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/figure/gd_lik_2.rmd/inflation qvalue calibration plotting-1.png" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/b7c3984b48103ee6d72ca9a3be90ce473cbfefa1/docs/figure/gd_lik_2.rmd/inflation qvalue calibration plotting-1.png" target="_blank">b7c3984</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-24
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/73b4bb7b980ef52f3b6c6cafb8139e33894a9dc0/docs/figure/gd_lik_2.rmd/inflation qvalue calibration plotting-1.png" target="_blank">73b4bb7</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-17
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/gd_lik_2.rmd/inflation%20qvalue%20calibration%20plotting-2.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of inflation qvalue calibration plotting-2.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/figure/gd_lik_2.rmd/inflation qvalue calibration plotting-2.png" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/87c16f961e270fa9688b960346a01683287bb0d3/docs/figure/gd_lik_2.rmd/inflation qvalue calibration plotting-2.png" target="_blank">87c16f9</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-07-03
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/a2512ac60d3081797fad7bea49dc0f4e7e17837b/docs/figure/gd_lik_2.rmd/inflation qvalue calibration plotting-2.png" target="_blank">a2512ac</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-07-03
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/73b4bb7b980ef52f3b6c6cafb8139e33894a9dc0/docs/figure/gd_lik_2.rmd/inflation qvalue calibration plotting-2.png" target="_blank">73b4bb7</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-17
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+</div>
+</div>
+<div id="fdr-calibration" class="section level3">
 <h3>FDR calibration</h3>
-<p><img src="figure/gd_lik_2.rmd/inflation%20FDR%20calibration%20plotting-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/gd_lik_2.rmd/inflation%20FDR%20calibration%20plotting-2.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="s-values-and-positive-fsr-pfsr-calibration" class="level3">
+<p><img src="figure/gd_lik_2.rmd/inflation%20FDR%20calibration%20plotting-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of inflation FDR calibration plotting-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/figure/gd_lik_2.rmd/inflation FDR calibration plotting-1.png" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/a2512ac60d3081797fad7bea49dc0f4e7e17837b/docs/figure/gd_lik_2.rmd/inflation FDR calibration plotting-1.png" target="_blank">a2512ac</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-07-03
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/gd_lik_2.rmd/inflation%20FDR%20calibration%20plotting-2.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of inflation FDR calibration plotting-2.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/figure/gd_lik_2.rmd/inflation FDR calibration plotting-2.png" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/a2512ac60d3081797fad7bea49dc0f4e7e17837b/docs/figure/gd_lik_2.rmd/inflation FDR calibration plotting-2.png" target="_blank">a2512ac</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-07-03
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+</div>
+<div id="s-values-and-positive-fsr-pfsr-calibration" class="section level3">
 <h3>s values and positive FSR (pFSR) calibration</h3>
 <p>Both <code>ASH</code> and <code>GD-ASH</code> are too liberal, although <code>GD-ASH</code> is not too far off.</p>
-<p><img src="figure/gd_lik_2.rmd/inflation%20svalue%20calibration%20plotting-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/gd_lik_2.rmd/inflation%20svalue%20calibration%20plotting-2.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-</section>
-<section id="deflation-data-sets" class="level2">
+<p><img src="figure/gd_lik_2.rmd/inflation%20svalue%20calibration%20plotting-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of inflation svalue calibration plotting-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/figure/gd_lik_2.rmd/inflation svalue calibration plotting-1.png" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/b7c3984b48103ee6d72ca9a3be90ce473cbfefa1/docs/figure/gd_lik_2.rmd/inflation svalue calibration plotting-1.png" target="_blank">b7c3984</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-24
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/73b4bb7b980ef52f3b6c6cafb8139e33894a9dc0/docs/figure/gd_lik_2.rmd/inflation svalue calibration plotting-1.png" target="_blank">73b4bb7</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-17
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/gd_lik_2.rmd/inflation%20svalue%20calibration%20plotting-2.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of inflation svalue calibration plotting-2.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/figure/gd_lik_2.rmd/inflation svalue calibration plotting-2.png" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/73b4bb7b980ef52f3b6c6cafb8139e33894a9dc0/docs/figure/gd_lik_2.rmd/inflation svalue calibration plotting-2.png" target="_blank">73b4bb7</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-17
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+</div>
+</div>
+<div id="deflation-data-sets" class="section level2">
 <h2>Deflation data sets</h2>
-<section id="some-examples-of-deflated-correlated-null-z-scores" class="level3">
+<div id="some-examples-of-deflated-correlated-null-z-scores" class="section level3">
 <h3>Some examples of deflated correlated null <span class="math inline">\(z\)</span> scores</h3>
 <p><img src="figure/gd_lik_2.rmd/deflation%20examples-1.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="hat-pi_0-1" class="level3">
+<details>
+<summary><em>Expand here to see past versions of deflation examples-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/figure/gd_lik_2.rmd/deflation examples-1.png" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/e6d5a6488d6ee53e08cc396a42e9538adc087dd2/docs/figure/gd_lik_2.rmd/deflation examples-1.png" target="_blank">e6d5a64</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-17
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/73b4bb7b980ef52f3b6c6cafb8139e33894a9dc0/docs/figure/gd_lik_2.rmd/deflation examples-1.png" target="_blank">73b4bb7</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-17
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+</div>
+<div id="hat-pi_0-1" class="section level3">
 <h3><span class="math inline">\(\hat \pi_0\)</span></h3>
 <p>Almost all methods except <code>GD-ASH</code> overestimate as expected. <code>GD-ASH</code> occasionally severely underestimates as <a href="simulation_real_se.html#global_null">seen before</a>.</p>
 <p><img src="figure/gd_lik_2.rmd/deflation%20pihat0-1.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="mse-1" class="level3">
+<details>
+<summary><em>Expand here to see past versions of deflation pihat0-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/figure/gd_lik_2.rmd/deflation pihat0-1.png" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/73b4bb7b980ef52f3b6c6cafb8139e33894a9dc0/docs/figure/gd_lik_2.rmd/deflation pihat0-1.png" target="_blank">73b4bb7</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-17
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+</div>
+<div id="mse-1" class="section level3">
 <h3>MSE</h3>
 <p><code>GD-Lik</code> does better than <code>ASH</code> and <code>GD-ASH</code> but not as significantly as in the inflation case.</p>
 <p><img src="figure/gd_lik_2.rmd/deflation%20mse-1.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="auc-1" class="level3">
+<details>
+<summary><em>Expand here to see past versions of deflation mse-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/figure/gd_lik_2.rmd/deflation mse-1.png" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/73b4bb7b980ef52f3b6c6cafb8139e33894a9dc0/docs/figure/gd_lik_2.rmd/deflation mse-1.png" target="_blank">73b4bb7</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-17
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+</div>
+<div id="auc-1" class="section level3">
 <h3>AUC</h3>
 <p>Similar story as in the inflation case, although this time <code>qvalue</code>’s <code>lfdr</code> behaves weirdly.</p>
 <p><img src="figure/gd_lik_2.rmd/deflation%20auc-1.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="q-values-and-positive-fdr-pfdr-calibration-1" class="level3">
+<details>
+<summary><em>Expand here to see past versions of deflation auc-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/figure/gd_lik_2.rmd/deflation auc-1.png" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/73b4bb7b980ef52f3b6c6cafb8139e33894a9dc0/docs/figure/gd_lik_2.rmd/deflation auc-1.png" target="_blank">73b4bb7</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-17
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+</div>
+<div id="q-values-and-positive-fdr-pfdr-calibration-1" class="section level3">
 <h3>q values and positive FDR (pFDR) calibration</h3>
 <p>Essentially all methods successfully control pFDR. <code>GD-Lik</code> looks good although off a little. <code>qvalue</code> is the most conservative, followed by <code>ASH</code>, <code>GD-ASH</code>, and <code>locfdr</code>.</p>
-<p><img src="figure/gd_lik_2.rmd/deflation%20qvalue%20calibration%20plotting-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/gd_lik_2.rmd/deflation%20qvalue%20calibration%20plotting-2.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="fdr-calibration-1" class="level3">
+<p><img src="figure/gd_lik_2.rmd/deflation%20qvalue%20calibration%20plotting-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of deflation qvalue calibration plotting-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/figure/gd_lik_2.rmd/deflation qvalue calibration plotting-1.png" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/b7c3984b48103ee6d72ca9a3be90ce473cbfefa1/docs/figure/gd_lik_2.rmd/deflation qvalue calibration plotting-1.png" target="_blank">b7c3984</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-24
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/73b4bb7b980ef52f3b6c6cafb8139e33894a9dc0/docs/figure/gd_lik_2.rmd/deflation qvalue calibration plotting-1.png" target="_blank">73b4bb7</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-17
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/gd_lik_2.rmd/deflation%20qvalue%20calibration%20plotting-2.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of deflation qvalue calibration plotting-2.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/figure/gd_lik_2.rmd/deflation qvalue calibration plotting-2.png" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/87c16f961e270fa9688b960346a01683287bb0d3/docs/figure/gd_lik_2.rmd/deflation qvalue calibration plotting-2.png" target="_blank">87c16f9</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-07-03
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/a2512ac60d3081797fad7bea49dc0f4e7e17837b/docs/figure/gd_lik_2.rmd/deflation qvalue calibration plotting-2.png" target="_blank">a2512ac</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-07-03
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/73b4bb7b980ef52f3b6c6cafb8139e33894a9dc0/docs/figure/gd_lik_2.rmd/deflation qvalue calibration plotting-2.png" target="_blank">73b4bb7</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-17
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+</div>
+<div id="fdr-calibration-1" class="section level3">
 <h3>FDR calibration</h3>
-<p><img src="figure/gd_lik_2.rmd/deflation%20FDR%20calibration%20plotting-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/gd_lik_2.rmd/deflation%20FDR%20calibration%20plotting-2.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="s-values-and-positive-fsr-pfsr-calibration-1" class="level3">
+<p><img src="figure/gd_lik_2.rmd/deflation%20FDR%20calibration%20plotting-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of deflation FDR calibration plotting-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/figure/gd_lik_2.rmd/deflation FDR calibration plotting-1.png" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/a2512ac60d3081797fad7bea49dc0f4e7e17837b/docs/figure/gd_lik_2.rmd/deflation FDR calibration plotting-1.png" target="_blank">a2512ac</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-07-03
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/gd_lik_2.rmd/deflation%20FDR%20calibration%20plotting-2.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of deflation FDR calibration plotting-2.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/figure/gd_lik_2.rmd/deflation FDR calibration plotting-2.png" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/a2512ac60d3081797fad7bea49dc0f4e7e17837b/docs/figure/gd_lik_2.rmd/deflation FDR calibration plotting-2.png" target="_blank">a2512ac</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-07-03
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+</div>
+<div id="s-values-and-positive-fsr-pfsr-calibration-1" class="section level3">
 <h3>s values and positive FSR (pFSR) calibration</h3>
 <p>Both <code>ASH</code> and <code>GD-ASH</code> seem too conservative, although <code>GD-ASH</code> is more powerful.</p>
-<p><img src="figure/gd_lik_2.rmd/deflation%20svalue%20calibration%20plotting-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/gd_lik_2.rmd/deflation%20svalue%20calibration%20plotting-2.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-</section>
-<section id="remarks" class="level2">
+<p><img src="figure/gd_lik_2.rmd/deflation%20svalue%20calibration%20plotting-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of deflation svalue calibration plotting-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/figure/gd_lik_2.rmd/deflation svalue calibration plotting-1.png" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/b7c3984b48103ee6d72ca9a3be90ce473cbfefa1/docs/figure/gd_lik_2.rmd/deflation svalue calibration plotting-1.png" target="_blank">b7c3984</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-24
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/73b4bb7b980ef52f3b6c6cafb8139e33894a9dc0/docs/figure/gd_lik_2.rmd/deflation svalue calibration plotting-1.png" target="_blank">73b4bb7</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-17
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/gd_lik_2.rmd/deflation%20svalue%20calibration%20plotting-2.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of deflation svalue calibration plotting-2.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/figure/gd_lik_2.rmd/deflation svalue calibration plotting-2.png" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/73b4bb7b980ef52f3b6c6cafb8139e33894a9dc0/docs/figure/gd_lik_2.rmd/deflation svalue calibration plotting-2.png" target="_blank">73b4bb7</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-17
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+</div>
+</div>
+<div id="remarks" class="section level2">
 <h2>Remarks</h2>
-<ol type="1">
+<ol style="list-style-type: decimal">
 <li>Would be nice to come up with a way to calculate <code>lfsr</code> in <code>GD-Lik</code>.</li>
 <li>Many methods are too liberal for inflation cases and too conservative for deflation cases, showing a lack of robustness against correlation. Although, on average they probably seem about right.</li>
 </ol>
-</section>
-<section id="session-information" class="level2">
+</div>
+<div id="session-information" class="section level2">
 <h2>Session information</h2>
-<!-- Insert the session information into the document -->
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS High Sierra 10.13.2
+Running under: macOS High Sierra 10.13.4
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -564,28 +1998,29 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] ashr_2.2-2        Rmosek_8.0.69     PolynomF_1.0-1    CVXR_0.94-4      
+[1] ashr_2.2-2        Rmosek_8.0.69     PolynomF_1.0-1    CVXR_0.95        
 [5] REBayes_1.2       Matrix_1.2-12     SQUAREM_2017.10-1 EQL_1.0-0        
 [9] ttutils_1.0-1    
 
 loaded via a namespace (and not attached):
- [1] gmp_0.5-13.1      Rcpp_0.12.14      compiler_3.4.3   
- [4] git2r_0.20.0      R.methodsS3_1.7.1 R.utils_2.6.0    
- [7] iterators_1.0.9   tools_3.4.3       digest_0.6.13    
-[10] bit_1.1-12        evaluate_0.10.1   lattice_0.20-35  
-[13] foreach_1.4.4     yaml_2.1.16       parallel_3.4.3   
-[16] Rmpfr_0.6-1       ECOSolveR_0.3-2   stringr_1.2.0    
-[19] knitr_1.17        rprojroot_1.3-1   bit64_0.9-7      
-[22] grid_3.4.3        R6_2.2.2          rmarkdown_1.8    
-[25] magrittr_1.5      MASS_7.3-47       backports_1.1.2  
-[28] codetools_0.2-15  htmltools_0.3.6   scs_1.1-1        
-[31] stringi_1.1.6     doParallel_1.0.11 pscl_1.5.2       
-[34] truncnorm_1.0-7   R.oo_1.21.0      </code></pre>
-</section>
+ [1] gmp_0.5-13.1      Rcpp_0.12.16      compiler_3.4.3   
+ [4] git2r_0.21.0      workflowr_1.0.1   R.methodsS3_1.7.1
+ [7] R.utils_2.6.0     iterators_1.0.9   tools_3.4.3      
+[10] digest_0.6.15     bit_1.1-12        evaluate_0.10.1  
+[13] lattice_0.20-35   foreach_1.4.4     yaml_2.1.18      
+[16] parallel_3.4.3    Rmpfr_0.6-1       ECOSolveR_0.4    
+[19] stringr_1.3.0     knitr_1.20        rprojroot_1.3-2  
+[22] bit64_0.9-7       grid_3.4.3        R6_2.2.2         
+[25] rmarkdown_1.9     magrittr_1.5      whisker_0.3-2    
+[28] MASS_7.3-47       backports_1.1.2   codetools_0.2-15 
+[31] htmltools_0.3.6   scs_1.1-1         stringi_1.1.6    
+[34] pscl_1.5.2        doParallel_1.0.11 truncnorm_1.0-7  
+[37] R.oo_1.21.0      </code></pre>
+</div>
 
 <hr>
 <p>
-    This <a href="http://rmarkdown.rstudio.com">R Markdown</a> site was created with <a href="https://github.com/jdblischak/workflowr">workflowr</a>
+    
 </p>
 <hr>
 
@@ -607,6 +2042,25 @@ loaded via a namespace (and not attached):
     <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
     <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
 -->
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+<hr>
+<p>
+  This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a>
+  analysis was created with
+  <a href="https://github.com/jdblischak/workflowr">workflowr</a> 1.0.1
+</p>
+<hr>
 
 
 </div>

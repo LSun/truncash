@@ -300,6 +300,13 @@ div.tocify {
   </div><!--/.container -->
 </div><!--/.navbar -->
 
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
 <div class="fluid-row" id="header">
 
 
@@ -311,16 +318,274 @@ div.tocify {
 </div>
 
 
-<!-- The file analysis/chunks.R contains chunks that define default settings
-shared across the workflowr files. -->
-<!-- Update knitr chunk options -->
-<!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2017-12-21</p>
-<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
- package git2r is installed -->
-<p><strong>Code version:</strong> 6e42447</p>
-<!-- Add your analysis here -->
-<section id="ash-and-empirical-bayes" class="level2">
+<p><strong>Last updated:</strong> 2018-05-12</p>
+<strong>workflowr checks:</strong> <small>(Click a bullet for more information)</small>
+<ul>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>R Markdown file:</strong> up-to-date </summary></p>
+<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Environment:</strong> empty </summary></p>
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Seed:</strong> <code>set.seed(12345)</code> </summary></p>
+<p>The command <code>set.seed(12345)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Session information:</strong> recorded </summary></p>
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/ddf906244e82e0675854c40da76dc16cf1a78fa4" target="_blank">ddf9062</a> </summary></p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    analysis/.DS_Store
+    Ignored:    analysis/BH_robustness_cache/
+    Ignored:    analysis/FDR_Null_cache/
+    Ignored:    analysis/FDR_null_betahat_cache/
+    Ignored:    analysis/Rmosek_cache/
+    Ignored:    analysis/StepDown_cache/
+    Ignored:    analysis/alternative2_cache/
+    Ignored:    analysis/alternative_cache/
+    Ignored:    analysis/ash_gd_cache/
+    Ignored:    analysis/average_cor_gtex_2_cache/
+    Ignored:    analysis/average_cor_gtex_cache/
+    Ignored:    analysis/brca_cache/
+    Ignored:    analysis/cash_deconv_cache/
+    Ignored:    analysis/cash_fdr_1_cache/
+    Ignored:    analysis/cash_fdr_2_cache/
+    Ignored:    analysis/cash_fdr_3_cache/
+    Ignored:    analysis/cash_fdr_4_cache/
+    Ignored:    analysis/cash_fdr_5_cache/
+    Ignored:    analysis/cash_fdr_6_cache/
+    Ignored:    analysis/cash_plots_cache/
+    Ignored:    analysis/cash_sim_1_cache/
+    Ignored:    analysis/cash_sim_2_cache/
+    Ignored:    analysis/cash_sim_3_cache/
+    Ignored:    analysis/cash_sim_4_cache/
+    Ignored:    analysis/cash_sim_5_cache/
+    Ignored:    analysis/cash_sim_6_cache/
+    Ignored:    analysis/cash_sim_7_cache/
+    Ignored:    analysis/correlated_z_2_cache/
+    Ignored:    analysis/correlated_z_3_cache/
+    Ignored:    analysis/correlated_z_cache/
+    Ignored:    analysis/create_null_cache/
+    Ignored:    analysis/cutoff_null_cache/
+    Ignored:    analysis/design_matrix_2_cache/
+    Ignored:    analysis/design_matrix_cache/
+    Ignored:    analysis/diagnostic_ash_cache/
+    Ignored:    analysis/diagnostic_correlated_z_2_cache/
+    Ignored:    analysis/diagnostic_correlated_z_3_cache/
+    Ignored:    analysis/diagnostic_correlated_z_cache/
+    Ignored:    analysis/diagnostic_plot_2_cache/
+    Ignored:    analysis/diagnostic_plot_cache/
+    Ignored:    analysis/efron_leukemia_cache/
+    Ignored:    analysis/fitting_normal_cache/
+    Ignored:    analysis/gaussian_derivatives_2_cache/
+    Ignored:    analysis/gaussian_derivatives_3_cache/
+    Ignored:    analysis/gaussian_derivatives_4_cache/
+    Ignored:    analysis/gaussian_derivatives_5_cache/
+    Ignored:    analysis/gaussian_derivatives_cache/
+    Ignored:    analysis/gd-ash_cache/
+    Ignored:    analysis/gd_delta_cache/
+    Ignored:    analysis/gd_lik_2_cache/
+    Ignored:    analysis/gd_lik_cache/
+    Ignored:    analysis/gd_w_cache/
+    Ignored:    analysis/knockoff_10_cache/
+    Ignored:    analysis/knockoff_2_cache/
+    Ignored:    analysis/knockoff_3_cache/
+    Ignored:    analysis/knockoff_4_cache/
+    Ignored:    analysis/knockoff_5_cache/
+    Ignored:    analysis/knockoff_6_cache/
+    Ignored:    analysis/knockoff_7_cache/
+    Ignored:    analysis/knockoff_8_cache/
+    Ignored:    analysis/knockoff_9_cache/
+    Ignored:    analysis/knockoff_cache/
+    Ignored:    analysis/knockoff_var_cache/
+    Ignored:    analysis/marginal_z_alternative_cache/
+    Ignored:    analysis/marginal_z_cache/
+    Ignored:    analysis/mosek_reg_2_cache/
+    Ignored:    analysis/mosek_reg_4_cache/
+    Ignored:    analysis/mosek_reg_5_cache/
+    Ignored:    analysis/mosek_reg_6_cache/
+    Ignored:    analysis/mosek_reg_cache/
+    Ignored:    analysis/pihat0_null_cache/
+    Ignored:    analysis/plot_diagnostic_cache/
+    Ignored:    analysis/poster_obayes17_cache/
+    Ignored:    analysis/real_data_simulation_2_cache/
+    Ignored:    analysis/real_data_simulation_3_cache/
+    Ignored:    analysis/real_data_simulation_4_cache/
+    Ignored:    analysis/real_data_simulation_5_cache/
+    Ignored:    analysis/real_data_simulation_cache/
+    Ignored:    analysis/rmosek_primal_dual_2_cache/
+    Ignored:    analysis/rmosek_primal_dual_cache/
+    Ignored:    analysis/seqgendiff_cache/
+    Ignored:    analysis/simulated_correlated_null_2_cache/
+    Ignored:    analysis/simulated_correlated_null_3_cache/
+    Ignored:    analysis/simulated_correlated_null_cache/
+    Ignored:    analysis/simulation_real_se_2_cache/
+    Ignored:    analysis/simulation_real_se_cache/
+    Ignored:    analysis/smemo_2_cache/
+    Ignored:    data/LSI/
+    Ignored:    docs/.DS_Store
+    Ignored:    docs/figure/.DS_Store
+    Ignored:    output/fig/
+
+Unstaged changes:
+    Deleted:    analysis/cash_plots_fdp.Rmd
+
+</code></pre>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</details>
+</li>
+</ul>
+<details>
+<summary> <small><strong>Expand here to see past versions:</strong></small> </summary>
+<ul>
+<table style="border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+File
+</th>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+<th style="text-align:left;">
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/cc0ab8379469bc3726f1508cd81e4ecd6fef1b1a/analysis/diagnostic_plot.rmd" target="_blank">cc0ab83</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-05-11
+</td>
+<td style="text-align:left;">
+update
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/diagnostic_plot.html" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/853a484bfacf347e109f6c8fb3ffaab5f4d6cc02/docs/diagnostic_plot.html" target="_blank">853a484</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-07
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/66399687da141ce91db2cd3da67f243c80436f67/docs/diagnostic_plot.html" target="_blank">6639968</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-05
+</td>
+<td style="text-align:left;">
+transfer
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/4eb2aa0c2bac02a43fb15e66e5a3165cd056bbdf/analysis/diagnostic_plot.rmd" target="_blank">4eb2aa0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-04-19
+</td>
+<td style="text-align:left;">
+diagnostic
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/4eb2aa0c2bac02a43fb15e66e5a3165cd056bbdf/docs/diagnostic_plot.html" target="_blank">4eb2aa0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-04-19
+</td>
+<td style="text-align:left;">
+diagnostic
+</td>
+</tr>
+</tbody>
+</table>
+</ul>
+</details>
+<hr />
+<div id="ash-and-empirical-bayes" class="section level2">
 <h2><code>ASH</code> and empirical Bayes</h2>
 <p>Under <a href="https://academic.oup.com/biostatistics/article/18/2/275/2557030/False-discovery-rates-a-new-deal">ASH setting</a>, the observations <span class="math inline">\(\left\{\left(\hat\beta_j, \hat s_j\right)\right\}\)</span> come from a likelihood <span class="math inline">\(p\left(\hat\beta_j\mid\beta_j,\hat s_j\right)\)</span> which could be <span class="math inline">\(N\left(\beta_j, \hat s_j^2\right)\)</span> or <a href="t-likelihood.html">a noncentral-<span class="math inline">\(t\)</span></a>. Recently, a likelihood of <a href="ash_gd.html">Gaussian derivative composition</a> has also been proposed.</p>
 <p>Further, as essentially all empirical Bayes approaches go, a hierarchical model assumes that all <span class="math inline">\(\left\{\beta_j\right\}\)</span> come exchangeably from a prior of effect size distribution <span class="math inline">\(g\)</span>. Therefore, the likelihood of <span class="math inline">\(\hat\beta_j | \hat s_j\)</span> is given by</p>
@@ -359,8 +624,8 @@ g_k(\beta_j)d\beta_j\\
 &amp;:=&amp;\displaystyle\sum_k\pi_kf_{jk}\  \  .
 \end{array}
 \]</span></p>
-</section>
-<section id="goodness-of-fit-for-empirical-bayes" class="level2">
+</div>
+<div id="goodness-of-fit-for-empirical-bayes" class="section level2">
 <h2>Goodness of fit for empirical Bayes</h2>
 <p>In empirical Bayes, if <span class="math inline">\(g\left(\beta\right)\)</span> is the true effect size distribution, and equally important, if <span class="math inline">\(p\left(\hat\beta_j\mid\beta_j, \hat s_j\right)\)</span> is the true observation likelihood, <span class="math inline">\(f\left(\hat\beta_j\mid\hat s_j\right)\)</span> should be the true distribution of <span class="math inline">\(\hat\beta_j\)</span> given <span class="math inline">\(\hat s_j\)</span>. Thus <span class="math inline">\(\hat\beta_j\)</span> can be seen as independent samples from their perspective distribution <span class="math inline">\(f\left(\hat\beta_j\mid\hat s_j\right)\)</span>, given <span class="math inline">\(\hat s_j\)</span>. Or to write it more formally,</p>
 <p><span class="math display">\[
@@ -376,14 +641,14 @@ f_{\hat\beta_j|\hat s_j}\left(t|\hat s_j\right)dt \  ,
 <p>In other words, in empirical Bayes models, <span class="math inline">\(\left\{F_{\hat\beta_1|\hat s_1}(\hat\beta_1|\hat s_1), \ldots, F_{\hat\beta_n|\hat s_n}(\hat\beta_n|\hat s_n)\right\}\)</span> should behave like <span class="math inline">\(n\)</span> independent samples from <span class="math inline">\(\text{Unif}\left[0, 1\right]\)</span> if the hierarchical model assumption holds.</p>
 <p>In practice, a <span class="math inline">\(\hat g\)</span> is then estimated by maximizing the joint likelihood <span class="math inline">\(\displaystyle\prod_j f_{\hat\beta_j|\hat s_j}\left(\hat\beta_j\mid\hat s_j\right) = \prod_j \int p\left(\hat\beta_j\mid\beta_j,\hat s_j\right) g(\beta_j)d\beta_j\)</span>. <span class="math inline">\(\displaystyle\hat F_j := \hat F_{\hat\beta_j|\hat s_j}\left(\hat\beta_j|\hat s_j\right) = \int_{-\infty}^{\hat\beta_j}\hat f_{\hat\beta_j|\hat s_j}\left(t|\hat s_j\right)dt = \int_{-\infty}^{\hat\beta_j}\int p\left(\hat\beta_j\mid\beta_j,\hat s_j\right)\hat g(\beta_j)d\beta_jdt\)</span> can thus be calculated.</p>
 <p>If all of the following there statments hold,</p>
-<ol type="1">
+<ol style="list-style-type: decimal">
 <li>The hierarchical model assumption is sufficiently valid.</li>
 <li>The assumptions inposed on <span class="math inline">\(g\)</span> are sufficiently accurate.</li>
 <li>The estimate of <span class="math inline">\(\hat g\)</span> is sufficiently satisfactory.</li>
 </ol>
 <p>then <strong><span class="math inline">\(\left\{\hat F_{\hat\beta_1|\hat s_1}(\hat\beta_1|\hat s_1), \ldots, \hat F_{\hat\beta_n|\hat s_n}(\hat\beta_n|\hat s_n)\right\}\)</span> should look like <span class="math inline">\(n\)</span> independent random samples from <span class="math inline">\(\text{Unif }[0, 1]\)</span></strong>, and their behavior can be used to gauge the goodness of fit of an empirical Bayes model.</p>
-</section>
-<section id="goodness-of-fit-for-ash" class="level2">
+</div>
+<div id="goodness-of-fit-for-ash" class="section level2">
 <h2>Goodness of fit for <code>ASH</code></h2>
 <p>In ASH setting,</p>
 <p><span class="math display">\[
@@ -409,14 +674,14 @@ p\left(t\mid\beta_j,\hat s_j\right)
 \hat F_{jk}\  \  .
 \end{array}
 \]</span> A diagnostic procedure of <code>ASH</code> can be produced in the following steps.</p>
-<ol type="1">
+<ol style="list-style-type: decimal">
 <li>Fit <code>ASH</code>, get <span class="math inline">\(\hat g_k\)</span>, <span class="math inline">\(\hat \pi_k\)</span>.</li>
 <li>Compute <span class="math inline">\(\displaystyle\hat F_{jk} = \int_{-\infty}^{\hat\beta_j}\int p\left(t\mid\beta_j,\hat s_j\right)\hat g_k(\beta_j)d\beta_j dt\)</span>. Note the computation doesn’t have to be expensive, because as detailed below, usually intermediate results in <code>ASH</code> can be recycled.</li>
 <li>Compute <span class="math inline">\(\hat F_j = \hat F_{\hat\beta_j|\hat s_j}\left(\hat\beta_j|\hat s_j\right) = \displaystyle\sum_k\hat\pi_k\hat F_{jk}\)</span>.</li>
 <li>Compare the calculated <span class="math inline">\(\left\{\hat F_1 = \hat F_{\hat\beta_1|\hat s_1}(\hat\beta_1|\hat s_1), \ldots, \hat F_n = \hat F_{\hat\beta_n|\hat s_n}(\hat\beta_n|\hat s_n)\right\}\)</span> with <span class="math inline">\(n\)</span> random samples from <span class="math inline">\(\text{Unif}\left[0, 1\right]\)</span> by the histogram, Q-Q plot, statistical tests, etc.</li>
 </ol>
-</section>
-<section id="ash-normal-likelihood-normal-mixture-prior" class="level2">
+</div>
+<div id="ash-normal-likelihood-normal-mixture-prior" class="section level2">
 <h2><code>ASH</code>: normal likelihood, normal mixture prior</h2>
 <p><span class="math inline">\(g = \sum_k\pi_kg_k\)</span>, where <span class="math inline">\(g_k\)</span> is <span class="math inline">\(N\left(\mu_k, \sigma_k^2\right)\)</span>. Let <span class="math inline">\(\varphi_{\mu, \sigma^2}\left(\cdot\right)\)</span> be the probability density function (pdf) of <span class="math inline">\(N\left(\mu, \sigma^2\right)\)</span>.</p>
 <p><span class="math display">\[
@@ -459,7 +724,7 @@ g_k(\beta_j)d\beta_j = \varphi_{\mu_k, \sigma_k^2 + \hat s_j^2}\left(\hat\beta_j
 =
 \frac{1}{\sqrt{\sigma_k^2 + \hat s_j^2}}\varphi\left(\frac{\hat\beta_j - \mu_k}{\sqrt{\sigma_k^2 + \hat s_j^2}}\right).
 \]</span> Therefore, the matrix of <span class="math inline">\(\left[\frac{\hat\beta_j - \mu_k}{\sqrt{\sigma_k^2 + \hat s_j^2}}\right]_{jk}\)</span> should be created when fitting <code>ASH</code>. We can re-use it when calculating <span class="math inline">\(\hat F_{jk}\)</span> and <span class="math inline">\(\hat F_j = \hat F_{\hat\beta_j|\hat s_j}\left(\hat\beta_j|\hat s_j\right)\)</span>.</p>
-<section id="illustrative-example" class="level3">
+<div id="illustrative-example" class="section level3">
 <h3>Illustrative Example</h3>
 <p><span class="math inline">\(n = 1000\)</span> observations <span class="math inline">\(\left\{\left(\hat\beta_1, \hat s_1\right), \ldots, \left(\hat\beta_n, \hat s_n\right)\right\}\)</span> are generated as follows</p>
 <p><span class="math display">\[
@@ -487,9 +752,9 @@ Fjktrue = pnorm(outer(data$x, gtrue$mean, &quot;-&quot;) / sqrt(outer((data$s)^2
 Ftrue = Fjktrue %*% gtrue$pi</code></pre>
 <p>Plot the histogram of <span class="math inline">\(\left\{\hat F_j\right\}\)</span> and ordered <span class="math inline">\(\left\{\hat F_{\left(j\right)}\right\} = \left\{\hat F_{(1)}, \ldots, \hat F_{(n)}\right\}\)</span>. Under goodness of fit, the histogram of <span class="math inline">\(\left\{\hat F_j\right\}\)</span> should look like <span class="math inline">\(\text{Unif}\left[0, 1\right]\)</span> and <span class="math inline">\(\left\{\hat F_{(j)}\right\}\)</span> should look like a straight line from <span class="math inline">\(0\)</span> to <span class="math inline">\(1\)</span>. Oracle <span class="math inline">\(\left\{F_j\right\}\)</span> and <span class="math inline">\(\left\{F_{\left(j\right)}\right\}\)</span> under true <span class="math inline">\(g\)</span> are also plotted in the same way for comparison.</p>
 <p><img src="figure/diagnostic_plot.rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot.rmd/unnamed-chunk-5-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot.rmd/unnamed-chunk-5-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot.rmd/unnamed-chunk-5-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot.rmd/unnamed-chunk-5-5.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-</section>
-<section id="ash-normal-likelihood-uniform-mixture-prior" class="level2">
+</div>
+</div>
+<div id="ash-normal-likelihood-uniform-mixture-prior" class="section level2">
 <h2><code>ASH</code>: normal likelihood, uniform mixture prior</h2>
 <p><span class="math inline">\(g = \sum_k\pi_kg_k\)</span>, where <span class="math inline">\(g_k\)</span> is <span class="math inline">\(\text{Unif}\left[a_k, b_k\right]\)</span>. Let <span class="math inline">\(U_{a, b}\)</span> be the probability density function (pdf) of <span class="math inline">\(\text{Unif}\left[a, b\right]\)</span>. An important fact regarding the integral of the cumulative distribution function of the standard normal <span class="math inline">\(\Phi\)</span> is as follows,</p>
 <p><span class="math display">\[
@@ -608,7 +873,7 @@ g_k(\beta_j)d\beta_j
 \end{cases}.
 \]</span></p>
 <p>Therefore, both matrices of <span class="math inline">\(\left[\frac{\hat\beta_j - a_k}{\hat s_j}\right]_{jk}\)</span> and <span class="math inline">\(\left[\frac{\hat\beta_j - b_k}{\hat s_j}\right]_{jk}\)</span> should be created when fitting <code>ASH</code>. We can re-use them when calculating <span class="math inline">\(\hat F_{jk}\)</span> and <span class="math inline">\(\hat F_{\hat\beta_j|\hat s_j}\left(\hat\beta_j|\hat s_j\right)\)</span>.</p>
-<section id="illustrative-example-1" class="level3">
+<div id="illustrative-example-1" class="section level3">
 <h3>Illustrative Example</h3>
 <p><span class="math inline">\(n = 1000\)</span> observations <span class="math inline">\(\left\{\left(\hat\beta_1, \hat s_1\right), \ldots, \left(\hat\beta_n, \hat s_n\right)\right\}\)</span> are generated as follows</p>
 <p><span class="math display">\[
@@ -642,9 +907,9 @@ Fjktrue[a_mat == b_mat] = pnorm(a_mat[a_mat == b_mat])
 Ftrue = Fjktrue %*% gtrue$pi</code></pre>
 <p>Plot the histogram of <span class="math inline">\(\left\{\hat F_j\right\}\)</span> and ordered <span class="math inline">\(\left\{\hat F_{\left(j\right)}\right\} = \left\{\hat F_{(1)}, \ldots, \hat F_{(n)}\right\}\)</span>. Under goodness of fit, the histogram of <span class="math inline">\(\left\{\hat F_j\right\}\)</span> should look like <span class="math inline">\(\text{Unif}\left[0, 1\right]\)</span> and <span class="math inline">\(\left\{\hat F_{(j)}\right\}\)</span> should look like a straight line from <span class="math inline">\(0\)</span> to <span class="math inline">\(1\)</span>. Oracle <span class="math inline">\(\left\{F_j\right\}\)</span> and <span class="math inline">\(\left\{F_{\left(j\right)}\right\}\)</span> under true <span class="math inline">\(g\)</span> are also plotted in the same way for comparison.</p>
 <p><img src="figure/diagnostic_plot.rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot.rmd/unnamed-chunk-10-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot.rmd/unnamed-chunk-10-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot.rmd/unnamed-chunk-10-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot.rmd/unnamed-chunk-10-5.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-</section>
-<section id="ash-t-likelihood-uniform-mixture-prior" class="level2">
+</div>
+</div>
+<div id="ash-t-likelihood-uniform-mixture-prior" class="section level2">
 <h2><code>ASH</code>: <span class="math inline">\(t\)</span> likelihood, uniform mixture prior</h2>
 <p>In this case, <span class="math inline">\(\hat F_j = \hat F_{\hat\beta_j|\hat s_j}\left(\hat\beta_j|\hat s_j\right)\)</span> involves calculting an integral of the cumulative distribution function (CDF) of Student’s <span class="math inline">\(t\)</span> distribution, which does not have an analytical expression.</p>
 <p>Let <span class="math inline">\(t_{\nu}\)</span> and <span class="math inline">\(T_{\nu}\)</span> denote the pdf and cdf of Student’s <span class="math inline">\(t\)</span> distribution with <span class="math inline">\(\nu\)</span> degrees of freedom. <a href="t-likelihood.html">Current implementation when dealing with <span class="math inline">\(t\)</span> likelihood</a> assumes that</p>
@@ -693,7 +958,7 @@ a_k = b_k = \mu_k
 \end{cases}.
 \end{array}
 \]</span> Thus, in order to evaluate <span class="math inline">\(\hat F_{jk}\)</span>, we need to evaluate as many as <span class="math inline">\(n \times K\)</span> integrals of the CDF of Student’s <span class="math inline">\(t\)</span> distribution. The operation is not difficult to code but might be expensive to compute.</p>
-<section id="illustrative-example-2" class="level3">
+<div id="illustrative-example-2" class="section level3">
 <h3>Illustrative Example</h3>
 <p><span class="math inline">\(n = 1000\)</span> observations <span class="math inline">\(\left\{\left(\hat\beta_1, \hat s_1\right), \ldots, \left(\hat\beta_n, \hat s_n\right)\right\}\)</span> are generated as follows</p>
 <p><span class="math display">\[
@@ -751,24 +1016,234 @@ Ftrue = Fjktrue %*% gtrue$pi</code></pre>
 <pre class="r"><code>hist(Fhat, breaks = 20, xlab = expression(hat(&quot;F&quot;)[j]), prob = TRUE, main = expression(paste(&quot;Histogram of estimated &quot;, hat(&quot;F&quot;))))
 segments(0, 1, 1, 1, col = &quot;red&quot;, lty = 2)</code></pre>
 <p><img src="figure/diagnostic_plot.rmd/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-15-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/figure/diagnostic_plot.rmd/unnamed-chunk-15-1.png" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/4eb2aa0c2bac02a43fb15e66e5a3165cd056bbdf/docs/figure/diagnostic_plot.rmd/unnamed-chunk-15-1.png" target="_blank">4eb2aa0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-04-19
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre class="r"><code>hist(Ftrue, breaks = 20, xlab = expression(&quot;F&quot;[j]), prob = TRUE, main = expression(&quot;Histogram of true F&quot;))
 segments(0, 1, 1, 1, col = &quot;red&quot;, lty = 2)</code></pre>
 <p><img src="figure/diagnostic_plot.rmd/unnamed-chunk-15-2.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-15-2.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/figure/diagnostic_plot.rmd/unnamed-chunk-15-2.png" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/4eb2aa0c2bac02a43fb15e66e5a3165cd056bbdf/docs/figure/diagnostic_plot.rmd/unnamed-chunk-15-2.png" target="_blank">4eb2aa0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-04-19
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre class="r"><code>hist(Fhat, breaks = 20, prob = TRUE, xlab = expression(paste(&quot;True &quot;, &quot;F&quot;[j], &quot; &amp; Estimated &quot;, hat(&quot;F&quot;)[j])), main = expression(paste(&quot;Histograms of F &amp; &quot;, hat(&quot;F&quot;), &quot; put together&quot;)), density = 10, angle = 45)
 hist(Ftrue, breaks = 20, prob = TRUE, add = TRUE, density = 10, angle = 135, border = &quot;blue&quot;, col = &quot;blue&quot;)
 legend(x = 0.5, y = par(&#39;usr&#39;)[4], legend = c(&quot;F&quot;, expression(hat(&quot;F&quot;))), density = 10, angle = c(135, 45), border = c(&quot;blue&quot;, &quot;black&quot;), ncol = 2, bty = &quot;n&quot;, text.col = c(&quot;blue&quot;, &quot;black&quot;), yjust = 0.75, fill = c(&quot;blue&quot;, &quot;black&quot;), xjust = 0.5)
 segments(0, 1, 1, 1, col = &quot;red&quot;, lty = 2)</code></pre>
 <p><img src="figure/diagnostic_plot.rmd/unnamed-chunk-15-3.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-15-3.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/figure/diagnostic_plot.rmd/unnamed-chunk-15-3.png" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/4eb2aa0c2bac02a43fb15e66e5a3165cd056bbdf/docs/figure/diagnostic_plot.rmd/unnamed-chunk-15-3.png" target="_blank">4eb2aa0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-04-19
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre class="r"><code>par(mar = c(5.1, 5.1, 4.1, 2.1))
 plot(sort(Fhat), cex = 0.25, pch = 19, xlab = &quot;Order m&quot;, ylab = expression(paste(&quot;Ordered &quot;, hat(&quot;F&quot;)[&quot;(m)&quot;])), main = expression(paste(&quot;Ordered estimated &quot;, hat(&quot;F&quot;))))
 abline(-1/(n-1), 1/(n-1), col = &quot;red&quot;)</code></pre>
 <p><img src="figure/diagnostic_plot.rmd/unnamed-chunk-15-4.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-15-4.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/figure/diagnostic_plot.rmd/unnamed-chunk-15-4.png" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/4eb2aa0c2bac02a43fb15e66e5a3165cd056bbdf/docs/figure/diagnostic_plot.rmd/unnamed-chunk-15-4.png" target="_blank">4eb2aa0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-04-19
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre class="r"><code>plot(sort(Ftrue), cex = 0.25, pch = 19, xlab = &quot;Order m&quot;, ylab = expression(paste(&quot;Ordered &quot;, &quot;F&quot;[&quot;(m)&quot;])), main = expression(paste(&quot;Ordered true &quot;, &quot;F&quot;)))
 abline(-1/(n-1), 1/(n-1), col = &quot;red&quot;)</code></pre>
 <p><img src="figure/diagnostic_plot.rmd/unnamed-chunk-15-5.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-</section>
-<section id="exchangeability-assumption" class="level2">
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-15-5.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/figure/diagnostic_plot.rmd/unnamed-chunk-15-5.png" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/4eb2aa0c2bac02a43fb15e66e5a3165cd056bbdf/docs/figure/diagnostic_plot.rmd/unnamed-chunk-15-5.png" target="_blank">4eb2aa0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-04-19
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+</div>
+</div>
+<div id="exchangeability-assumption" class="section level2">
 <h2>Exchangeability assumption</h2>
 <p>Now we are discussing several occasions when the diagnostic plots may show a conspicuous deviation from <span class="math inline">\(\text{Unif}\left[0, 1\right]\)</span>.</p>
 <p>The above numerical illustrations show that when data are generated exactly as <code>ASH</code>’s assumptions, <span class="math inline">\(\hat F_{j}\)</span> don’t deviate from <span class="math inline">\(\text{Unif}\left[0, 1\right]\)</span> more so than <span class="math inline">\(F_{j}\)</span> do when we know the true exchangeable prior <span class="math inline">\(g\)</span>. This result indicates that <code>ASH</code> does a good job estimating <span class="math inline">\(\hat g\)</span>.</p>
@@ -785,8 +1260,8 @@ F_j^o = \int_{-\infty}^{\hat\beta_j}\int p\left(t\mid\beta_j, \hat s_j\right)g_j
 \end{array}
 \]</span> The histograms of <span class="math inline">\(\left\{F_j^o\right\}\)</span>, <span class="math inline">\(\left\{F_j\right\}\)</span>, and <span class="math inline">\(\left\{\hat F_j\right\}\)</span> are plotted together. In this example <span class="math inline">\(\left\{F_j^o\right\}\)</span> are hardly more uniform than <span class="math inline">\(\left\{F_j\right\}\)</span>.</p>
 <p><img src="figure/diagnostic_plot.rmd/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot.rmd/unnamed-chunk-21-2.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="unimodal-assumption" class="level2">
+</div>
+<div id="unimodal-assumption" class="section level2">
 <h2>Unimodal assumption</h2>
 <p>The <span class="math inline">\(n = 1K\)</span> observations are generated such that the unimodal assumption doesn’t hold.</p>
 <p><span class="math display">\[
@@ -797,8 +1272,8 @@ F_j^o = \int_{-\infty}^{\hat\beta_j}\int p\left(t\mid\beta_j, \hat s_j\right)g_j
 \end{array}
 \]</span> The histograms of <span class="math inline">\(\left\{F_j\right\}\)</span>, and <span class="math inline">\(\left\{\hat F_j\right\}\)</span> are plotted together, as well as the ordered <span class="math inline">\(\left\{F_{(j)}\right\}\)</span> and <span class="math inline">\(\left\{\hat F_{(j)}\right\}\)</span>. <span class="math inline">\(\left\{\hat F_j\right\}\)</span> being conspicuously not uniform provides evidence for lack of goodness of fit.</p>
 <p><img src="figure/diagnostic_plot.rmd/unnamed-chunk-26-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot.rmd/unnamed-chunk-26-2.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="mixture-misspecification" class="level2">
+</div>
+<div id="mixture-misspecification" class="section level2">
 <h2>Mixture misspecification</h2>
 <p>Even if the effect size prior <span class="math inline">\(g\)</span> is unimodal, because <code>ASH</code> implicitly makes the assumption that <span class="math inline">\(g\)</span> is sufficiently regular such that it can be approximated by a limited number of normals or uniforms, <code>ASH</code> can fail when the mixture components are not able to capture the true effect size distribution.</p>
 <p>In this example, the <span class="math inline">\(n = 1K\)</span> observations are generated, such that the true effect size distribution <span class="math inline">\(g\)</span> is uniform and thus can not be satisfactorily approximated by a mixture of normal. We’ll see what happens when the normal mixture prior is still used.</p>
@@ -812,14 +1287,13 @@ F_j^o = \int_{-\infty}^{\hat\beta_j}\int p\left(t\mid\beta_j, \hat s_j\right)g_j
 <p>Let <span class="math inline">\(\hat F_{j}^n\)</span> be the estimated <span class="math inline">\(\hat F_{\hat\beta_j|\hat s_j}\left(\hat\beta_j \mid \hat s_j\right)\)</span> by <code>ASH</code> using normal mixtures (<code>mixcompdist = &quot;normal&quot;</code>), and <span class="math inline">\(\hat F_{j}^u\)</span> be that using uniform mixtures (<code>mixcompdist = &quot;uniform&quot;</code>). Both are plotted below, compared with <span class="math inline">\(F_{j}\)</span> using true exchangeable prior <span class="math inline">\(g = \text{Unif}\left[-10, 10\right]\)</span>.</p>
 <p>It can be seen that <code>ASH</code> using normal mixtures is not able to estimate <span class="math inline">\(g\)</span> well and thus is not producing <span class="math inline">\(\text{Unif}\left[0, 1\right]\)</span> <span class="math inline">\(\left\{\hat F_j\right\}\)</span>. <code>ASH</code> using uniform mixtures, on the contrary, is doing fine.</p>
 <p><img src="figure/diagnostic_plot.rmd/unnamed-chunk-33-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot.rmd/unnamed-chunk-33-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot.rmd/unnamed-chunk-33-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot.rmd/unnamed-chunk-33-4.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="session-information" class="level2">
+</div>
+<div id="session-information" class="section level2">
 <h2>Session information</h2>
-<!-- Insert the session information into the document -->
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS High Sierra 10.13.2
+Running under: macOS High Sierra 10.13.4
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -835,20 +1309,22 @@ other attached packages:
 [1] ashr_2.2-2
 
 loaded via a namespace (and not attached):
- [1] Rcpp_0.12.14      knitr_1.17        magrittr_1.5     
- [4] MASS_7.3-47       doParallel_1.0.11 pscl_1.5.2       
- [7] SQUAREM_2017.10-1 lattice_0.20-35   foreach_1.4.4    
-[10] stringr_1.2.0     tools_3.4.3       parallel_3.4.3   
-[13] grid_3.4.3        git2r_0.20.0      htmltools_0.3.6  
-[16] iterators_1.0.9   yaml_2.1.16       rprojroot_1.3-1  
-[19] digest_0.6.13     Matrix_1.2-12     codetools_0.2-15 
-[22] evaluate_0.10.1   rmarkdown_1.8     stringi_1.1.6    
-[25] compiler_3.4.3    backports_1.1.2   truncnorm_1.0-7  </code></pre>
-</section>
+ [1] Rcpp_0.12.16      knitr_1.20        whisker_0.3-2    
+ [4] magrittr_1.5      workflowr_1.0.1   MASS_7.3-47      
+ [7] pscl_1.5.2        doParallel_1.0.11 SQUAREM_2017.10-1
+[10] lattice_0.20-35   foreach_1.4.4     stringr_1.3.0    
+[13] tools_3.4.3       parallel_3.4.3    grid_3.4.3       
+[16] R.oo_1.21.0       git2r_0.21.0      htmltools_0.3.6  
+[19] iterators_1.0.9   yaml_2.1.18       rprojroot_1.3-2  
+[22] digest_0.6.15     Matrix_1.2-12     codetools_0.2-15 
+[25] R.utils_2.6.0     evaluate_0.10.1   rmarkdown_1.9    
+[28] stringi_1.1.6     compiler_3.4.3    backports_1.1.2  
+[31] R.methodsS3_1.7.1 truncnorm_1.0-7  </code></pre>
+</div>
 
 <hr>
 <p>
-    This <a href="http://rmarkdown.rstudio.com">R Markdown</a> site was created with <a href="https://github.com/jdblischak/workflowr">workflowr</a>
+    
 </p>
 <hr>
 
@@ -870,6 +1346,25 @@ loaded via a namespace (and not attached):
     <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
     <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
 -->
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+<hr>
+<p>
+  This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a>
+  analysis was created with
+  <a href="https://github.com/jdblischak/workflowr">workflowr</a> 1.0.1
+</p>
+<hr>
 
 
 </div>

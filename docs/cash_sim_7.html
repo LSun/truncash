@@ -300,6 +300,13 @@ div.tocify {
   </div><!--/.container -->
 </div><!--/.navbar -->
 
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
 <div class="fluid-row" id="header">
 
 
@@ -311,16 +318,274 @@ div.tocify {
 </div>
 
 
-<!-- The file analysis/chunks.R contains chunks that define default settings
-shared across the workflowr files. -->
-<!-- Update knitr chunk options -->
-<!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2017-12-21</p>
-<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
- package git2r is installed -->
-<p><strong>Code version:</strong> 6e42447</p>
-<!-- Add your analysis here -->
-<section id="introduction" class="level2">
+<p><strong>Last updated:</strong> 2018-05-12</p>
+<strong>workflowr checks:</strong> <small>(Click a bullet for more information)</small>
+<ul>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>R Markdown file:</strong> up-to-date </summary></p>
+<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Environment:</strong> empty </summary></p>
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Seed:</strong> <code>set.seed(12345)</code> </summary></p>
+<p>The command <code>set.seed(12345)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Session information:</strong> recorded </summary></p>
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/ddf906244e82e0675854c40da76dc16cf1a78fa4" target="_blank">ddf9062</a> </summary></p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    analysis/.DS_Store
+    Ignored:    analysis/BH_robustness_cache/
+    Ignored:    analysis/FDR_Null_cache/
+    Ignored:    analysis/FDR_null_betahat_cache/
+    Ignored:    analysis/Rmosek_cache/
+    Ignored:    analysis/StepDown_cache/
+    Ignored:    analysis/alternative2_cache/
+    Ignored:    analysis/alternative_cache/
+    Ignored:    analysis/ash_gd_cache/
+    Ignored:    analysis/average_cor_gtex_2_cache/
+    Ignored:    analysis/average_cor_gtex_cache/
+    Ignored:    analysis/brca_cache/
+    Ignored:    analysis/cash_deconv_cache/
+    Ignored:    analysis/cash_fdr_1_cache/
+    Ignored:    analysis/cash_fdr_2_cache/
+    Ignored:    analysis/cash_fdr_3_cache/
+    Ignored:    analysis/cash_fdr_4_cache/
+    Ignored:    analysis/cash_fdr_5_cache/
+    Ignored:    analysis/cash_fdr_6_cache/
+    Ignored:    analysis/cash_plots_cache/
+    Ignored:    analysis/cash_sim_1_cache/
+    Ignored:    analysis/cash_sim_2_cache/
+    Ignored:    analysis/cash_sim_3_cache/
+    Ignored:    analysis/cash_sim_4_cache/
+    Ignored:    analysis/cash_sim_5_cache/
+    Ignored:    analysis/cash_sim_6_cache/
+    Ignored:    analysis/cash_sim_7_cache/
+    Ignored:    analysis/correlated_z_2_cache/
+    Ignored:    analysis/correlated_z_3_cache/
+    Ignored:    analysis/correlated_z_cache/
+    Ignored:    analysis/create_null_cache/
+    Ignored:    analysis/cutoff_null_cache/
+    Ignored:    analysis/design_matrix_2_cache/
+    Ignored:    analysis/design_matrix_cache/
+    Ignored:    analysis/diagnostic_ash_cache/
+    Ignored:    analysis/diagnostic_correlated_z_2_cache/
+    Ignored:    analysis/diagnostic_correlated_z_3_cache/
+    Ignored:    analysis/diagnostic_correlated_z_cache/
+    Ignored:    analysis/diagnostic_plot_2_cache/
+    Ignored:    analysis/diagnostic_plot_cache/
+    Ignored:    analysis/efron_leukemia_cache/
+    Ignored:    analysis/fitting_normal_cache/
+    Ignored:    analysis/gaussian_derivatives_2_cache/
+    Ignored:    analysis/gaussian_derivatives_3_cache/
+    Ignored:    analysis/gaussian_derivatives_4_cache/
+    Ignored:    analysis/gaussian_derivatives_5_cache/
+    Ignored:    analysis/gaussian_derivatives_cache/
+    Ignored:    analysis/gd-ash_cache/
+    Ignored:    analysis/gd_delta_cache/
+    Ignored:    analysis/gd_lik_2_cache/
+    Ignored:    analysis/gd_lik_cache/
+    Ignored:    analysis/gd_w_cache/
+    Ignored:    analysis/knockoff_10_cache/
+    Ignored:    analysis/knockoff_2_cache/
+    Ignored:    analysis/knockoff_3_cache/
+    Ignored:    analysis/knockoff_4_cache/
+    Ignored:    analysis/knockoff_5_cache/
+    Ignored:    analysis/knockoff_6_cache/
+    Ignored:    analysis/knockoff_7_cache/
+    Ignored:    analysis/knockoff_8_cache/
+    Ignored:    analysis/knockoff_9_cache/
+    Ignored:    analysis/knockoff_cache/
+    Ignored:    analysis/knockoff_var_cache/
+    Ignored:    analysis/marginal_z_alternative_cache/
+    Ignored:    analysis/marginal_z_cache/
+    Ignored:    analysis/mosek_reg_2_cache/
+    Ignored:    analysis/mosek_reg_4_cache/
+    Ignored:    analysis/mosek_reg_5_cache/
+    Ignored:    analysis/mosek_reg_6_cache/
+    Ignored:    analysis/mosek_reg_cache/
+    Ignored:    analysis/pihat0_null_cache/
+    Ignored:    analysis/plot_diagnostic_cache/
+    Ignored:    analysis/poster_obayes17_cache/
+    Ignored:    analysis/real_data_simulation_2_cache/
+    Ignored:    analysis/real_data_simulation_3_cache/
+    Ignored:    analysis/real_data_simulation_4_cache/
+    Ignored:    analysis/real_data_simulation_5_cache/
+    Ignored:    analysis/real_data_simulation_cache/
+    Ignored:    analysis/rmosek_primal_dual_2_cache/
+    Ignored:    analysis/rmosek_primal_dual_cache/
+    Ignored:    analysis/seqgendiff_cache/
+    Ignored:    analysis/simulated_correlated_null_2_cache/
+    Ignored:    analysis/simulated_correlated_null_3_cache/
+    Ignored:    analysis/simulated_correlated_null_cache/
+    Ignored:    analysis/simulation_real_se_2_cache/
+    Ignored:    analysis/simulation_real_se_cache/
+    Ignored:    analysis/smemo_2_cache/
+    Ignored:    data/LSI/
+    Ignored:    docs/.DS_Store
+    Ignored:    docs/figure/.DS_Store
+    Ignored:    output/fig/
+
+Unstaged changes:
+    Deleted:    analysis/cash_plots_fdp.Rmd
+
+</code></pre>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</details>
+</li>
+</ul>
+<details>
+<summary> <small><strong>Expand here to see past versions:</strong></small> </summary>
+<ul>
+<table style="border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+File
+</th>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+<th style="text-align:left;">
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/cc0ab8379469bc3726f1508cd81e4ecd6fef1b1a/analysis/cash_sim_7.rmd" target="_blank">cc0ab83</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-05-11
+</td>
+<td style="text-align:left;">
+update
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/cash_sim_7.html" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/6c9268e33292cc2a4bdbb0970fe1b7d78e3f3cc8/docs/cash_sim_7.html" target="_blank">6c9268e</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-22
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1a77d561cd41f9568eba84319bfda561317447c2/analysis/cash_sim_7.rmd" target="_blank">1a77d56</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-22
+</td>
+<td style="text-align:left;">
+wflow_publish(c(“analysis/cash_sim_1.rmd”, “analysis/cash_sim_2.rmd”, “analysis/cash_sim_3.rmd”,
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/cd38d36c1383e22d950b1f8b987dc4ba163475ed/docs/cash_sim_7.html" target="_blank">cd38d36</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-17
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/b452d8a54297f934ae273783a3298ebf45f599c1/analysis/cash_sim_7.rmd" target="_blank">b452d8a</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-17
+</td>
+<td style="text-align:left;">
+more simulations
+</td>
+</tr>
+</tbody>
+</table>
+</ul>
+</details>
+<hr />
+<div id="introduction" class="section level2">
 <h2>Introduction</h2>
 <p>We are using purely simulated correlated data, rather than data generated from real data. Purely simulated data do appear cleaner, but probably less convincing to the research community.</p>
 <pre class="r"><code>set.seed(777)
@@ -331,50 +596,50 @@ for (j in 1 : nrow(z.mat)) {
 }
 se.mat &lt;- matrix(sqrt(rchisq(ncol(z.mat) * nrow(z.mat), 1)), ncol = ncol(z.mat))</code></pre>
 <pre class="r"><code>source(&quot;../code/gdash_lik.R&quot;)</code></pre>
-</section>
-<section id="simulation" class="level2">
+</div>
+<div id="simulation" class="section level2">
 <h2>Simulation</h2>
 <pre class="r"><code>cashSim(z.mat, se.mat,
         nsim = 100, ngene = 5000,
         g.pi = c(0.9, 0.1), g.sd = c(0, 1), relative_to_noise = FALSE)</code></pre>
 <p><img src="figure/cash_sim_7.rmd/unnamed-chunk-1-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_sim_7.rmd/unnamed-chunk-1-2.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="simulation-1" class="level2">
+</div>
+<div id="simulation-1" class="section level2">
 <h2>Simulation</h2>
 <pre class="r"><code>cashSim(z.mat, se.mat,
         nsim = 100, ngene = 5000,
         g.pi = c(0.9, 0.05, 0.05), g.sd = c(0, 1, 2), relative_to_noise = FALSE)</code></pre>
 <p><img src="figure/cash_sim_7.rmd/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_sim_7.rmd/unnamed-chunk-2-2.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="simulation-2" class="level2">
+</div>
+<div id="simulation-2" class="section level2">
 <h2>Simulation</h2>
 <pre class="r"><code>cashSim(z.mat, se.mat,
         nsim = 100, ngene = 5000,
         g.pi = c(0.9, 0.1), g.sd = c(0, 2), relative_to_noise = FALSE)</code></pre>
 <p><img src="figure/cash_sim_7.rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_sim_7.rmd/unnamed-chunk-3-2.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="simulation-3" class="level2">
+</div>
+<div id="simulation-3" class="section level2">
 <h2>Simulation</h2>
 <pre class="r"><code>cashSim(z.mat, se.mat,
         nsim = 100, ngene = 5000,
         g.pi = c(0.8, 0.2), g.sd = c(0, 1), relative_to_noise = FALSE)</code></pre>
 <p><img src="figure/cash_sim_7.rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_sim_7.rmd/unnamed-chunk-4-2.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="simulation-4" class="level2">
+</div>
+<div id="simulation-4" class="section level2">
 <h2>Simulation</h2>
 <pre class="r"><code>cashSim(z.mat, se.mat,
         nsim = 100, ngene = 5000,
         g.pi = c(0.8, 0.1, 0.1), g.sd = c(0, 1, 2), relative_to_noise = FALSE)</code></pre>
 <p><img src="figure/cash_sim_7.rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_sim_7.rmd/unnamed-chunk-5-2.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="simulation-5" class="level2">
+</div>
+<div id="simulation-5" class="section level2">
 <h2>Simulation</h2>
 <pre class="r"><code>cashSim(z.mat, se.mat,
         nsim = 100, ngene = 5000,
         g.pi = c(0.8, 0.2), g.sd = c(0, 2), relative_to_noise = FALSE)</code></pre>
 <p><img src="figure/cash_sim_7.rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_sim_7.rmd/unnamed-chunk-6-2.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="simulation-6" class="level2">
+</div>
+<div id="simulation-6" class="section level2">
 <h2>Simulation</h2>
 <pre class="r"><code>cashSim(z.mat, se.mat,
         nsim = 100, ngene = 5000,
@@ -448,8 +713,8 @@ Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estim
 Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
                consider reducing rtol</code></pre>
 <p><img src="figure/cash_sim_7.rmd/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_sim_7.rmd/unnamed-chunk-7-2.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="simulation-7" class="level2">
+</div>
+<div id="simulation-7" class="section level2">
 <h2>Simulation</h2>
 <pre class="r"><code>cashSim(z.mat, se.mat,
         nsim = 100, ngene = 5000,
@@ -463,8 +728,8 @@ Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estim
 Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
                consider reducing rtol</code></pre>
 <p><img src="figure/cash_sim_7.rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_sim_7.rmd/unnamed-chunk-8-2.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="simulation-8" class="level2">
+</div>
+<div id="simulation-8" class="section level2">
 <h2>Simulation</h2>
 <pre class="r"><code>cashSim(z.mat, se.mat,
         nsim = 100, ngene = 5000,
@@ -481,12 +746,12 @@ Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estim
 Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
                consider reducing rtol</code></pre>
 <p><img src="figure/cash_sim_7.rmd/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_sim_7.rmd/unnamed-chunk-9-2.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="change-to-homoscedasticity" class="level2">
+</div>
+<div id="change-to-homoscedasticity" class="section level2">
 <h2>Change to homoscedasticity</h2>
 <pre class="r"><code>se.mat &lt;- matrix(1, ncol = ncol(z.mat), nrow = nrow(z.mat))</code></pre>
-</section>
-<section id="simulation-9" class="level2">
+</div>
+<div id="simulation-9" class="section level2">
 <h2>Simulation</h2>
 <pre class="r"><code>cashSim(z.mat, se.mat,
         nsim = 100, ngene = 5000,
@@ -1178,8 +1443,8 @@ Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estim
 Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
                consider reducing rtol</code></pre>
 <p><img src="figure/cash_sim_7.rmd/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_sim_7.rmd/unnamed-chunk-11-2.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="simulation-10" class="level2">
+</div>
+<div id="simulation-10" class="section level2">
 <h2>Simulation</h2>
 <pre class="r"><code>cashSim(z.mat, se.mat,
         nsim = 100, ngene = 5000,
@@ -1568,8 +1833,8 @@ Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estim
 Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
                consider reducing rtol</code></pre>
 <p><img src="figure/cash_sim_7.rmd/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_sim_7.rmd/unnamed-chunk-12-2.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="simulation-11" class="level2">
+</div>
+<div id="simulation-11" class="section level2">
 <h2>Simulation</h2>
 <pre class="r"><code>cashSim(z.mat, se.mat,
         nsim = 100, ngene = 5000,
@@ -2132,8 +2397,8 @@ Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estim
 Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
                consider reducing rtol</code></pre>
 <p><img src="figure/cash_sim_7.rmd/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_sim_7.rmd/unnamed-chunk-13-2.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="simulation-12" class="level2">
+</div>
+<div id="simulation-12" class="section level2">
 <h2>Simulation</h2>
 <pre class="r"><code>cashSim(z.mat, se.mat,
         nsim = 100, ngene = 5000,
@@ -3005,8 +3270,8 @@ Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estim
 Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
                consider reducing rtol</code></pre>
 <p><img src="figure/cash_sim_7.rmd/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_sim_7.rmd/unnamed-chunk-14-2.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="simulation-13" class="level2">
+</div>
+<div id="simulation-13" class="section level2">
 <h2>Simulation</h2>
 <pre class="r"><code>cashSim(z.mat, se.mat,
         nsim = 100, ngene = 5000,
@@ -3686,8 +3951,8 @@ Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estim
 Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
                consider reducing rtol</code></pre>
 <p><img src="figure/cash_sim_7.rmd/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_sim_7.rmd/unnamed-chunk-15-2.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="simulation-14" class="level2">
+</div>
+<div id="simulation-14" class="section level2">
 <h2>Simulation</h2>
 <pre class="r"><code>cashSim(z.mat, se.mat,
         nsim = 100, ngene = 5000,
@@ -4565,8 +4830,8 @@ Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estim
 Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
                consider reducing rtol</code></pre>
 <p><img src="figure/cash_sim_7.rmd/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_sim_7.rmd/unnamed-chunk-16-2.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="simulation-15" class="level2">
+</div>
+<div id="simulation-15" class="section level2">
 <h2>Simulation</h2>
 <pre class="r"><code>cashSim(z.mat, se.mat,
         nsim = 100, ngene = 5000,
@@ -6242,8 +6507,8 @@ Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estim
 Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
                consider reducing rtol</code></pre>
 <p><img src="figure/cash_sim_7.rmd/unnamed-chunk-17-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_sim_7.rmd/unnamed-chunk-17-2.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="simulation-16" class="level2">
+</div>
+<div id="simulation-16" class="section level2">
 <h2>Simulation</h2>
 <pre class="r"><code>cashSim(z.mat, se.mat,
         nsim = 100, ngene = 5000,
@@ -7889,8 +8154,8 @@ Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estim
 Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
                consider reducing rtol</code></pre>
 <p><img src="figure/cash_sim_7.rmd/unnamed-chunk-18-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_sim_7.rmd/unnamed-chunk-18-2.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="simulation-17" class="level2">
+</div>
+<div id="simulation-17" class="section level2">
 <h2>Simulation</h2>
 <pre class="r"><code>cashSim(z.mat, se.mat,
         nsim = 100, ngene = 5000,
@@ -8735,14 +9000,13 @@ Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estim
 Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
                consider reducing rtol</code></pre>
 <p><img src="figure/cash_sim_7.rmd/unnamed-chunk-19-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_sim_7.rmd/unnamed-chunk-19-2.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="session-information" class="level2">
+</div>
+<div id="session-information" class="section level2">
 <h2>Session information</h2>
-<!-- Insert the session information into the document -->
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS High Sierra 10.13.2
+Running under: macOS High Sierra 10.13.4
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -8755,28 +9019,29 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] ashr_2.2-2        Rmosek_8.0.69     PolynomF_1.0-1    CVXR_0.94-4      
+[1] ashr_2.2-2        Rmosek_8.0.69     PolynomF_1.0-1    CVXR_0.95        
 [5] REBayes_1.2       Matrix_1.2-12     SQUAREM_2017.10-1 EQL_1.0-0        
 [9] ttutils_1.0-1    
 
 loaded via a namespace (and not attached):
- [1] gmp_0.5-13.1      Rcpp_0.12.14      compiler_3.4.3   
- [4] git2r_0.20.0      R.methodsS3_1.7.1 R.utils_2.6.0    
- [7] iterators_1.0.9   tools_3.4.3       digest_0.6.13    
-[10] bit_1.1-12        evaluate_0.10.1   lattice_0.20-35  
-[13] foreach_1.4.4     yaml_2.1.16       parallel_3.4.3   
-[16] Rmpfr_0.6-1       ECOSolveR_0.3-2   stringr_1.2.0    
-[19] knitr_1.17        rprojroot_1.3-1   bit64_0.9-7      
-[22] grid_3.4.3        R6_2.2.2          rmarkdown_1.8    
-[25] magrittr_1.5      MASS_7.3-47       backports_1.1.2  
-[28] codetools_0.2-15  htmltools_0.3.6   scs_1.1-1        
-[31] stringi_1.1.6     doParallel_1.0.11 pscl_1.5.2       
-[34] truncnorm_1.0-7   R.oo_1.21.0      </code></pre>
-</section>
+ [1] gmp_0.5-13.1      Rcpp_0.12.16      compiler_3.4.3   
+ [4] git2r_0.21.0      workflowr_1.0.1   R.methodsS3_1.7.1
+ [7] R.utils_2.6.0     iterators_1.0.9   tools_3.4.3      
+[10] digest_0.6.15     bit_1.1-12        evaluate_0.10.1  
+[13] lattice_0.20-35   foreach_1.4.4     yaml_2.1.18      
+[16] parallel_3.4.3    Rmpfr_0.6-1       ECOSolveR_0.4    
+[19] stringr_1.3.0     knitr_1.20        rprojroot_1.3-2  
+[22] bit64_0.9-7       grid_3.4.3        R6_2.2.2         
+[25] rmarkdown_1.9     magrittr_1.5      whisker_0.3-2    
+[28] MASS_7.3-47       backports_1.1.2   codetools_0.2-15 
+[31] htmltools_0.3.6   scs_1.1-1         stringi_1.1.6    
+[34] pscl_1.5.2        doParallel_1.0.11 truncnorm_1.0-7  
+[37] R.oo_1.21.0      </code></pre>
+</div>
 
 <hr>
 <p>
-    This <a href="http://rmarkdown.rstudio.com">R Markdown</a> site was created with <a href="https://github.com/jdblischak/workflowr">workflowr</a>
+    
 </p>
 <hr>
 
@@ -8798,6 +9063,25 @@ loaded via a namespace (and not attached):
     <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
     <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
 -->
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+<hr>
+<p>
+  This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a>
+  analysis was created with
+  <a href="https://github.com/jdblischak/workflowr">workflowr</a> 1.0.1
+</p>
+<hr>
 
 
 </div>

@@ -300,6 +300,13 @@ div.tocify {
   </div><!--/.container -->
 </div><!--/.navbar -->
 
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
 <div class="fluid-row" id="header">
 
 
@@ -311,20 +318,355 @@ div.tocify {
 </div>
 
 
-<p><strong>Last updated:</strong> 2017-12-21</p>
-<p><strong>Code version:</strong> 6e42447</p>
-<section id="introduction" class="level2">
+<p><strong>Last updated:</strong> 2018-05-12</p>
+<strong>workflowr checks:</strong> <small>(Click a bullet for more information)</small>
+<ul>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>R Markdown file:</strong> up-to-date </summary></p>
+<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Environment:</strong> empty </summary></p>
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Seed:</strong> <code>set.seed(12345)</code> </summary></p>
+<p>The command <code>set.seed(12345)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Session information:</strong> recorded </summary></p>
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/ddf906244e82e0675854c40da76dc16cf1a78fa4" target="_blank">ddf9062</a> </summary></p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    analysis/.DS_Store
+    Ignored:    analysis/BH_robustness_cache/
+    Ignored:    analysis/FDR_Null_cache/
+    Ignored:    analysis/FDR_null_betahat_cache/
+    Ignored:    analysis/Rmosek_cache/
+    Ignored:    analysis/StepDown_cache/
+    Ignored:    analysis/alternative2_cache/
+    Ignored:    analysis/alternative_cache/
+    Ignored:    analysis/ash_gd_cache/
+    Ignored:    analysis/average_cor_gtex_2_cache/
+    Ignored:    analysis/average_cor_gtex_cache/
+    Ignored:    analysis/brca_cache/
+    Ignored:    analysis/cash_deconv_cache/
+    Ignored:    analysis/cash_fdr_1_cache/
+    Ignored:    analysis/cash_fdr_2_cache/
+    Ignored:    analysis/cash_fdr_3_cache/
+    Ignored:    analysis/cash_fdr_4_cache/
+    Ignored:    analysis/cash_fdr_5_cache/
+    Ignored:    analysis/cash_fdr_6_cache/
+    Ignored:    analysis/cash_plots_cache/
+    Ignored:    analysis/cash_sim_1_cache/
+    Ignored:    analysis/cash_sim_2_cache/
+    Ignored:    analysis/cash_sim_3_cache/
+    Ignored:    analysis/cash_sim_4_cache/
+    Ignored:    analysis/cash_sim_5_cache/
+    Ignored:    analysis/cash_sim_6_cache/
+    Ignored:    analysis/cash_sim_7_cache/
+    Ignored:    analysis/correlated_z_2_cache/
+    Ignored:    analysis/correlated_z_3_cache/
+    Ignored:    analysis/correlated_z_cache/
+    Ignored:    analysis/create_null_cache/
+    Ignored:    analysis/cutoff_null_cache/
+    Ignored:    analysis/design_matrix_2_cache/
+    Ignored:    analysis/design_matrix_cache/
+    Ignored:    analysis/diagnostic_ash_cache/
+    Ignored:    analysis/diagnostic_correlated_z_2_cache/
+    Ignored:    analysis/diagnostic_correlated_z_3_cache/
+    Ignored:    analysis/diagnostic_correlated_z_cache/
+    Ignored:    analysis/diagnostic_plot_2_cache/
+    Ignored:    analysis/diagnostic_plot_cache/
+    Ignored:    analysis/efron_leukemia_cache/
+    Ignored:    analysis/fitting_normal_cache/
+    Ignored:    analysis/gaussian_derivatives_2_cache/
+    Ignored:    analysis/gaussian_derivatives_3_cache/
+    Ignored:    analysis/gaussian_derivatives_4_cache/
+    Ignored:    analysis/gaussian_derivatives_5_cache/
+    Ignored:    analysis/gaussian_derivatives_cache/
+    Ignored:    analysis/gd-ash_cache/
+    Ignored:    analysis/gd_delta_cache/
+    Ignored:    analysis/gd_lik_2_cache/
+    Ignored:    analysis/gd_lik_cache/
+    Ignored:    analysis/gd_w_cache/
+    Ignored:    analysis/knockoff_10_cache/
+    Ignored:    analysis/knockoff_2_cache/
+    Ignored:    analysis/knockoff_3_cache/
+    Ignored:    analysis/knockoff_4_cache/
+    Ignored:    analysis/knockoff_5_cache/
+    Ignored:    analysis/knockoff_6_cache/
+    Ignored:    analysis/knockoff_7_cache/
+    Ignored:    analysis/knockoff_8_cache/
+    Ignored:    analysis/knockoff_9_cache/
+    Ignored:    analysis/knockoff_cache/
+    Ignored:    analysis/knockoff_var_cache/
+    Ignored:    analysis/marginal_z_alternative_cache/
+    Ignored:    analysis/marginal_z_cache/
+    Ignored:    analysis/mosek_reg_2_cache/
+    Ignored:    analysis/mosek_reg_4_cache/
+    Ignored:    analysis/mosek_reg_5_cache/
+    Ignored:    analysis/mosek_reg_6_cache/
+    Ignored:    analysis/mosek_reg_cache/
+    Ignored:    analysis/pihat0_null_cache/
+    Ignored:    analysis/plot_diagnostic_cache/
+    Ignored:    analysis/poster_obayes17_cache/
+    Ignored:    analysis/real_data_simulation_2_cache/
+    Ignored:    analysis/real_data_simulation_3_cache/
+    Ignored:    analysis/real_data_simulation_4_cache/
+    Ignored:    analysis/real_data_simulation_5_cache/
+    Ignored:    analysis/real_data_simulation_cache/
+    Ignored:    analysis/rmosek_primal_dual_2_cache/
+    Ignored:    analysis/rmosek_primal_dual_cache/
+    Ignored:    analysis/seqgendiff_cache/
+    Ignored:    analysis/simulated_correlated_null_2_cache/
+    Ignored:    analysis/simulated_correlated_null_3_cache/
+    Ignored:    analysis/simulated_correlated_null_cache/
+    Ignored:    analysis/simulation_real_se_2_cache/
+    Ignored:    analysis/simulation_real_se_cache/
+    Ignored:    analysis/smemo_2_cache/
+    Ignored:    data/LSI/
+    Ignored:    docs/.DS_Store
+    Ignored:    docs/figure/.DS_Store
+    Ignored:    output/fig/
+
+Unstaged changes:
+    Deleted:    analysis/cash_plots_fdp.Rmd
+
+</code></pre>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</details>
+</li>
+</ul>
+<details>
+<summary> <small><strong>Expand here to see past versions:</strong></small> </summary>
+<ul>
+<table style="border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+File
+</th>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+<th style="text-align:left;">
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/cc0ab8379469bc3726f1508cd81e4ecd6fef1b1a/analysis/nullpipeline.Rmd" target="_blank">cc0ab83</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-05-11
+</td>
+<td style="text-align:left;">
+update
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/nullpipeline.html" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/853a484bfacf347e109f6c8fb3ffaab5f4d6cc02/docs/nullpipeline.html" target="_blank">853a484</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-07
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/7db293de450c37c876711ea346e6a67ffb76b0f9/analysis/nullpipeline.Rmd" target="_blank">7db293d</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-02-14
+</td>
+<td style="text-align:left;">
+index
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/7db293de450c37c876711ea346e6a67ffb76b0f9/docs/nullpipeline.html" target="_blank">7db293d</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-02-14
+</td>
+<td style="text-align:left;">
+index
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/7693edf481bbc1680fad3a7e401259b57979806f/docs/nullpipeline.html" target="_blank">7693edf</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-02-14
+</td>
+<td style="text-align:left;">
+pipeline
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/ab7e0851e70e7cb174500c9adb0804f086a11758/analysis/nullpipeline.Rmd" target="_blank">ab7e085</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-02-14
+</td>
+<td style="text-align:left;">
+Files commited by wflow_commit.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/3a12124c5fe872061be50ccf15ec7fa5c4c453be/docs/nullpipeline.html" target="_blank">3a12124</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-02-14
+</td>
+<td style="text-align:left;">
+pipeline
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/b68f251e41c935c37d7cd8dc85fbed335f1c580a/analysis/nullpipeline.Rmd" target="_blank">b68f251</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-02-14
+</td>
+<td style="text-align:left;">
+Files commited by wflow_commit.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d623e66298e6a4b6595bbab18676b8843f59b7b0/analysis/nullpipeline.Rmd" target="_blank">d623e66</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-02-13
+</td>
+<td style="text-align:left;">
+pipeline
+</td>
+</tr>
+</tbody>
+</table>
+</ul>
+</details>
+<hr />
+<p><strong>Last updated:</strong> 2018-05-12</p>
+<p><strong>Code version:</strong> ddf9062</p>
+<div id="introduction" class="section level2">
 <h2>Introduction</h2>
 <p>Up until now, we are using simulated correlated null data for exploration, and it would be helpful to examine and document the pipeline for generating these summary statistics, including <span class="math inline">\(\hat\beta\)</span>, <span class="math inline">\(\hat s\)</span>, <span class="math inline">\(z\)</span> score, <span class="math inline">\(t\)</span> statistics, <span class="math inline">\(p\)</span> value.</p>
-</section>
-<section id="pipeline" class="level2">
+</div>
+<div id="pipeline" class="section level2">
 <h2>Pipeline</h2>
 <p>An expression matrix <span class="math inline">\(X_{G \times N}\)</span> will go through the following steps to get measurements of length <span class="math inline">\(g\)</span>: Choose the top <span class="math inline">\(g\)</span> expressed genes; randomly sample <span class="math inline">\(n\)</span> cases vs <span class="math inline">\(n\)</span> controls; calculate normalizing factor by <code>edgeR::calcNormFactors</code>; turn counts to <span class="math inline">\(\log_2\)</span>; calculate variance weight by <code>limma::voom</code>. We’ll go through this pipeline with a toy data set.</p>
 <p><strong>Sometimes it’s very helpful to read the source code of these different functions.</strong></p>
 <pre class="r"><code>library(edgeR)</code></pre>
 <pre><code>Loading required package: limma</code></pre>
 <pre class="r"><code>library(limma)</code></pre>
-<section id="readgenerate-raw-counts" class="level3">
+<div id="readgenerate-raw-counts" class="section level3">
 <h3>read/generate raw counts</h3>
 <p>Suppose the raw counts are stored in a <span class="math inline">\(10 \times 8\)</span> matrix with <span class="math inline">\(10\)</span> genes and <span class="math inline">\(8\)</span> samples, counts simulated from Possion.</p>
 <pre class="r"><code>set.seed(777)
@@ -341,10 +683,10 @@ r</code></pre>
  [8,]    3    8    5    4    8    9    3    6
  [9,]    9    4   11    6    8    4    9    5
 [10,]    3    4    6    6    3    1    5    4</code></pre>
-</section>
-<section id="select-top-expressed-genes" class="level3">
+</div>
+<div id="select-top-expressed-genes" class="section level3">
 <h3>Select top expressed genes:</h3>
-<ol type="1">
+<ol style="list-style-type: decimal">
 <li>convert each count to its lcpm.</li>
 <li>select top expressed genes according their sum of lcpm.</li>
 </ol>
@@ -362,8 +704,8 @@ r</code></pre>
 [4,]    5    6    6    6    4    4    3    7
 [5,]    6    7    1    4    3    5    8    4
 [6,]    6    6    4    7    1    6    6    2</code></pre>
-</section>
-<section id="randomly-sample-cases-and-controls" class="level3">
+</div>
+<div id="randomly-sample-cases-and-controls" class="section level3">
 <h3>randomly sample cases and controls</h3>
 <p>In this example we use 2 cases vs 2 controls, and put labes on them by <code>condition</code>, based on which a design matrix is generated.</p>
 <pre class="r"><code>counts = r[,sample(1:ncol(r),2*2)]
@@ -387,8 +729,8 @@ design</code></pre>
 4           1         1
 attr(,&quot;assign&quot;)
 [1] 0 1</code></pre>
-</section>
-<section id="calculate-normalizing-factors-for-each-sample-using-edgercalcnormfactors" class="level3">
+</div>
+<div id="calculate-normalizing-factors-for-each-sample-using-edgercalcnormfactors" class="section level3">
 <h3>calculate normalizing factors for each sample using <code>edgeR::calcNormFactors</code></h3>
 <p><span style="color:red">This might be potentially a problem, because the normalizing factors are only calculated based on top <span class="math inline">\(g\)</span> genes.</span> 1. A <code>DGEList</code> object is generated by <code>counts</code> and <code>condition</code>, using <code>edgeR::DGEList</code> 2. The normalizing factors are calculated by <code>edgeR::calcNormFactors</code>.</p>
 <pre class="r"><code>DGEList_obj = edgeR::DGEList(counts=counts,group=condition)
@@ -427,8 +769,8 @@ Sample1     0       34    1.1201997
 Sample2     0       33    0.9397760
 Sample3     1       32    0.9051827
 Sample4     1       30    1.0494070</code></pre>
-</section>
-<section id="calculate-weight-for-each-log_2-expression-using-limmavoom" class="level3">
+</div>
+<div id="calculate-weight-for-each-log_2-expression-using-limmavoom" class="section level3">
 <h3>Calculate weight for each <span class="math inline">\(\log_2\)</span> expression using <code>limma::voom</code></h3>
 <p><code>limma::voom</code> takes in counts and normalizing factors, and gives, among other things, modified library sizes, <span class="math inline">\(\log_2\)</span> expression, weights for each expression, all for Gaussian-based linear modeling.</p>
 <p><span style="color:red">The peculiarity of <code>limma::voom</code> lies in the way it calculates the “average” log2-count for each gene.</span>: <code>sx &lt;- fit$Amean + mean(log2(lib.size + 1)) - log2(1e+06)</code>. Note that for each gene, the count as well as log2-count could vary wildly from sample to sample due to library size, sequencing depth, and / or experimental design, so the way to find an “average” is not self-evident.</p>
@@ -476,8 +818,8 @@ attr(,&quot;assign&quot;)
 <p>The algorithm proceeds as follows. First, gene-wise linear models are fitted to the normalized log-cpm values, taking into account the experimental design, treatment conditions, replicates and so on. This generates a residual standard deviation for each gene. A robust trend is then fitted to the residual standard deviations as a function of the average log-count for each gene.</p>
 <p>Also available from the linear models is a fitted value for each log-cpm observation. Taking the library sizes into account, the fitted log-cpm for each observation is converted into a predicted count. The standard deviation trend is then interpolated to predict the standard deviation of each individual observation based on its predicted count size. Finally, the inverse squared predicted standard deviation for each observation becomes the weight for that observation.</p>
 <p>The log-cpm values and associated weights are then input into limma’s standard differential expression pipeline. Most limma functions are designed to accept quantitative weights, providing the ability to perform microarray-like analyses while taking account of the mean-variance relationship of the log-cpm values at the observation level.</p>
-</section>
-<section id="perform-weighted-t-test-for-each-gene-and-obtain-primary-hatbeta-hat-s-t-d.f.-p-using-limmalmfit" class="level3">
+</div>
+<div id="perform-weighted-t-test-for-each-gene-and-obtain-primary-hatbeta-hat-s-t-d.f.-p-using-limmalmfit" class="section level3">
 <h3>Perform weighted <span class="math inline">\(t\)</span>-test for each gene and obtain primary <span class="math inline">\(\hat\beta\)</span>, <span class="math inline">\(\hat s\)</span>, <span class="math inline">\(t\)</span>, d.f., <span class="math inline">\(p\)</span> using <code>limma::lmFit</code></h3>
 <p>Taking in the <code>EList</code> from <code>limma::voom</code>, <code>limma::lmFit</code> produces <span class="math inline">\(g\)</span> <span class="math inline">\(t\)</span>-tests, giving vectors of <span class="math inline">\(\hat\beta\)</span>, <span class="math inline">\(\hat s\)</span>, degree of freedom.</p>
 <p>Note that <code>$stdev.unscaled</code><span class="math inline">\(= (X^TWX)^{-1}\)</span>, <span class="math inline">\(W\)</span> being the weights calculated by <code>limma::voom</code>.</p>
@@ -546,8 +888,8 @@ sebetahat.lim</code></pre>
 df.lim = lim$df.residual
 df.lim</code></pre>
 <pre><code>[1] 2 2 2 2 2 2</code></pre>
-</section>
-<section id="do-variance-shrinkage-on-hat-s-and-obtain-moderated-t-d.f.-p-by-empirical-bayes-using-limmaebayes" class="level3">
+</div>
+<div id="do-variance-shrinkage-on-hat-s-and-obtain-moderated-t-d.f.-p-by-empirical-bayes-using-limmaebayes" class="section level3">
 <h3>Do variance shrinkage on <span class="math inline">\(\hat s\)</span> and obtain moderated <span class="math inline">\(t\)</span>, d.f., <span class="math inline">\(p\)</span> by empirical Bayes using <code>limma::eBayes</code></h3>
 <p><span style="color:red">Is it a variance shrinkage procedure?</span></p>
 <p>Taking in summary statistics (<span class="math inline">\(\hat \beta\)</span>, <span class="math inline">\(\hat s\)</span>, d.f.) for each gene, <code>limma::eBayes</code> produces shrunk standard deviation for each gene, and thus, moderated <span class="math inline">\(t\)</span>-statistics and <span class="math inline">\(p\)</span>-values.</p>
@@ -615,21 +957,24 @@ p.ebayes</code></pre>
 <pre class="r"><code>lim.ebayes$p.value[, 2]</code></pre>
 <pre><code>        1         2         3         4         5         6 
 0.4955946 0.2246354 0.1631317 0.5989240 0.5462455 0.5486090 </code></pre>
-</section>
-<section id="obtain-z-scores-from-moderated-p-values-and-t-statistics" class="level3">
+</div>
+<div id="obtain-z-scores-from-moderated-p-values-and-t-statistics" class="section level3">
 <h3>obtain <span class="math inline">\(z\)</span> scores from moderated <span class="math inline">\(p\)</span>-values and <span class="math inline">\(t\)</span>-statistics</h3>
 <pre class="r"><code>z = qnorm(1 - lim.ebayes$p[, 2] / 2) * sign(lim.ebayes$t[, 2])
 z</code></pre>
 <pre><code>         1          2          3          4          5          6 
  0.6814377  1.2142943 -1.3946160 -0.5259485 -0.6033956  0.5998458 </code></pre>
-</section>
-</section>
-<section id="session-information" class="level2">
+</div>
+</div>
+<div id="session-information" class="section level2">
 <h2>Session Information</h2>
+</div>
+<div id="session-information-1" class="section level2">
+<h2>Session information</h2>
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS High Sierra 10.13.2
+Running under: macOS High Sierra 10.13.4
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -645,16 +990,19 @@ other attached packages:
 [1] edgeR_3.20.2 limma_3.34.4
 
 loaded via a namespace (and not attached):
- [1] locfit_1.5-9.1  workflowr_0.8.0 Rcpp_0.12.14    lattice_0.20-35
- [5] digest_0.6.13   rprojroot_1.3-1 grid_3.4.3      backports_1.1.2
- [9] git2r_0.20.0    magrittr_1.5    evaluate_0.10.1 stringi_1.1.6  
-[13] rmarkdown_1.8   tools_3.4.3     stringr_1.2.0   yaml_2.1.16    
-[17] compiler_3.4.3  htmltools_0.3.6 knitr_1.17     </code></pre>
-</section>
+ [1] locfit_1.5-9.1    workflowr_1.0.1   Rcpp_0.12.16     
+ [4] lattice_0.20-35   digest_0.6.15     rprojroot_1.3-2  
+ [7] R.methodsS3_1.7.1 grid_3.4.3        backports_1.1.2  
+[10] git2r_0.21.0      magrittr_1.5      evaluate_0.10.1  
+[13] stringi_1.1.6     whisker_0.3-2     R.oo_1.21.0      
+[16] R.utils_2.6.0     rmarkdown_1.9     tools_3.4.3      
+[19] stringr_1.3.0     yaml_2.1.18       compiler_3.4.3   
+[22] htmltools_0.3.6   knitr_1.20       </code></pre>
+</div>
 
 <hr>
 <p>
-    This <a href="http://rmarkdown.rstudio.com">R Markdown</a> site was created with <a href="https://github.com/jdblischak/workflowr">workflowr</a>
+    
 </p>
 <hr>
 
@@ -676,6 +1024,25 @@ loaded via a namespace (and not attached):
     <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
     <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
 -->
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+<hr>
+<p>
+  This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a>
+  analysis was created with
+  <a href="https://github.com/jdblischak/workflowr">workflowr</a> 1.0.1
+</p>
+<hr>
 
 
 </div>

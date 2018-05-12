@@ -300,6 +300,13 @@ div.tocify {
   </div><!--/.container -->
 </div><!--/.navbar -->
 
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
 <div class="fluid-row" id="header">
 
 
@@ -311,21 +318,313 @@ div.tocify {
 </div>
 
 
-<!-- The file analysis/chunks.R contains chunks that define default settings
-shared across the workflowr files. -->
-<!-- Update knitr chunk options -->
-<!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2017-12-21</p>
-<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
- package git2r is installed -->
-<p><strong>Code version:</strong> 6e42447</p>
-<!-- Add your analysis here -->
-<section id="introduction" class="level2">
+<p><strong>Last updated:</strong> 2018-05-12</p>
+<strong>workflowr checks:</strong> <small>(Click a bullet for more information)</small>
+<ul>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>R Markdown file:</strong> up-to-date </summary></p>
+<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Environment:</strong> empty </summary></p>
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Seed:</strong> <code>set.seed(12345)</code> </summary></p>
+<p>The command <code>set.seed(12345)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Session information:</strong> recorded </summary></p>
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/ddf906244e82e0675854c40da76dc16cf1a78fa4" target="_blank">ddf9062</a> </summary></p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    analysis/.DS_Store
+    Ignored:    analysis/BH_robustness_cache/
+    Ignored:    analysis/FDR_Null_cache/
+    Ignored:    analysis/FDR_null_betahat_cache/
+    Ignored:    analysis/Rmosek_cache/
+    Ignored:    analysis/StepDown_cache/
+    Ignored:    analysis/alternative2_cache/
+    Ignored:    analysis/alternative_cache/
+    Ignored:    analysis/ash_gd_cache/
+    Ignored:    analysis/average_cor_gtex_2_cache/
+    Ignored:    analysis/average_cor_gtex_cache/
+    Ignored:    analysis/brca_cache/
+    Ignored:    analysis/cash_deconv_cache/
+    Ignored:    analysis/cash_fdr_1_cache/
+    Ignored:    analysis/cash_fdr_2_cache/
+    Ignored:    analysis/cash_fdr_3_cache/
+    Ignored:    analysis/cash_fdr_4_cache/
+    Ignored:    analysis/cash_fdr_5_cache/
+    Ignored:    analysis/cash_fdr_6_cache/
+    Ignored:    analysis/cash_plots_cache/
+    Ignored:    analysis/cash_sim_1_cache/
+    Ignored:    analysis/cash_sim_2_cache/
+    Ignored:    analysis/cash_sim_3_cache/
+    Ignored:    analysis/cash_sim_4_cache/
+    Ignored:    analysis/cash_sim_5_cache/
+    Ignored:    analysis/cash_sim_6_cache/
+    Ignored:    analysis/cash_sim_7_cache/
+    Ignored:    analysis/correlated_z_2_cache/
+    Ignored:    analysis/correlated_z_3_cache/
+    Ignored:    analysis/correlated_z_cache/
+    Ignored:    analysis/create_null_cache/
+    Ignored:    analysis/cutoff_null_cache/
+    Ignored:    analysis/design_matrix_2_cache/
+    Ignored:    analysis/design_matrix_cache/
+    Ignored:    analysis/diagnostic_ash_cache/
+    Ignored:    analysis/diagnostic_correlated_z_2_cache/
+    Ignored:    analysis/diagnostic_correlated_z_3_cache/
+    Ignored:    analysis/diagnostic_correlated_z_cache/
+    Ignored:    analysis/diagnostic_plot_2_cache/
+    Ignored:    analysis/diagnostic_plot_cache/
+    Ignored:    analysis/efron_leukemia_cache/
+    Ignored:    analysis/fitting_normal_cache/
+    Ignored:    analysis/gaussian_derivatives_2_cache/
+    Ignored:    analysis/gaussian_derivatives_3_cache/
+    Ignored:    analysis/gaussian_derivatives_4_cache/
+    Ignored:    analysis/gaussian_derivatives_5_cache/
+    Ignored:    analysis/gaussian_derivatives_cache/
+    Ignored:    analysis/gd-ash_cache/
+    Ignored:    analysis/gd_delta_cache/
+    Ignored:    analysis/gd_lik_2_cache/
+    Ignored:    analysis/gd_lik_cache/
+    Ignored:    analysis/gd_w_cache/
+    Ignored:    analysis/knockoff_10_cache/
+    Ignored:    analysis/knockoff_2_cache/
+    Ignored:    analysis/knockoff_3_cache/
+    Ignored:    analysis/knockoff_4_cache/
+    Ignored:    analysis/knockoff_5_cache/
+    Ignored:    analysis/knockoff_6_cache/
+    Ignored:    analysis/knockoff_7_cache/
+    Ignored:    analysis/knockoff_8_cache/
+    Ignored:    analysis/knockoff_9_cache/
+    Ignored:    analysis/knockoff_cache/
+    Ignored:    analysis/knockoff_var_cache/
+    Ignored:    analysis/marginal_z_alternative_cache/
+    Ignored:    analysis/marginal_z_cache/
+    Ignored:    analysis/mosek_reg_2_cache/
+    Ignored:    analysis/mosek_reg_4_cache/
+    Ignored:    analysis/mosek_reg_5_cache/
+    Ignored:    analysis/mosek_reg_6_cache/
+    Ignored:    analysis/mosek_reg_cache/
+    Ignored:    analysis/pihat0_null_cache/
+    Ignored:    analysis/plot_diagnostic_cache/
+    Ignored:    analysis/poster_obayes17_cache/
+    Ignored:    analysis/real_data_simulation_2_cache/
+    Ignored:    analysis/real_data_simulation_3_cache/
+    Ignored:    analysis/real_data_simulation_4_cache/
+    Ignored:    analysis/real_data_simulation_5_cache/
+    Ignored:    analysis/real_data_simulation_cache/
+    Ignored:    analysis/rmosek_primal_dual_2_cache/
+    Ignored:    analysis/rmosek_primal_dual_cache/
+    Ignored:    analysis/seqgendiff_cache/
+    Ignored:    analysis/simulated_correlated_null_2_cache/
+    Ignored:    analysis/simulated_correlated_null_3_cache/
+    Ignored:    analysis/simulated_correlated_null_cache/
+    Ignored:    analysis/simulation_real_se_2_cache/
+    Ignored:    analysis/simulation_real_se_cache/
+    Ignored:    analysis/smemo_2_cache/
+    Ignored:    data/LSI/
+    Ignored:    docs/.DS_Store
+    Ignored:    docs/figure/.DS_Store
+    Ignored:    output/fig/
+
+Unstaged changes:
+    Deleted:    analysis/cash_plots_fdp.Rmd
+
+</code></pre>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</details>
+</li>
+</ul>
+<details>
+<summary> <small><strong>Expand here to see past versions:</strong></small> </summary>
+<ul>
+<table style="border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+File
+</th>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+<th style="text-align:left;">
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/cc0ab8379469bc3726f1508cd81e4ecd6fef1b1a/analysis/fitting_normal.rmd" target="_blank">cc0ab83</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-05-11
+</td>
+<td style="text-align:left;">
+update
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/fitting_normal.html" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/853a484bfacf347e109f6c8fb3ffaab5f4d6cc02/docs/fitting_normal.html" target="_blank">853a484</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-07
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/fa2c24ead93d0109e943745c837976a7b163d97c/docs/fitting_normal.html" target="_blank">fa2c24e</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-06
+</td>
+<td style="text-align:left;">
+transfer
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/87193bad023b2f8facb2b6f6ac5f06330bfe83d5/docs/fitting_normal.html" target="_blank">87193ba</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-17
+</td>
+<td style="text-align:left;">
+fitting normal
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/055f9f0516cae31b3e345f95c18561c9ab952486/analysis/fitting_normal.rmd" target="_blank">055f9f0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-17
+</td>
+<td style="text-align:left;">
+websites
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/a5300252ff521211d8a6c6a80a7cbb58b4d89438/docs/fitting_normal.html" target="_blank">a530025</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-17
+</td>
+<td style="text-align:left;">
+mean 0 normal
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/4dab9a497efbd26184ea6fbde4b0fdf684486086/analysis/fitting_normal.rmd" target="_blank">4dab9a4</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-17
+</td>
+<td style="text-align:left;">
+mean 0 normal
+</td>
+</tr>
+</tbody>
+</table>
+</ul>
+</details>
+<hr />
+<div id="introduction" class="section level2">
 <h2>Introduction</h2>
 <p>We know the empirical distribution of a number of correlated null <span class="math inline">\(N\left(0, 1\right)\)</span> <span class="math inline">\(z\)</span> scores can be approximated by Gaussian derivatives at least theoretically. Now we want to know if the <span class="math inline">\(N\left(0, \sigma^2\right)\)</span> density can also be approximated by Gaussian derivatives. The question is important because it is related to the identifiability between the correlated null and true signals using the tool of Gaussian derivatives.</p>
 <p>The same question was investigated for <a href="alternative.html">small <span class="math inline">\(\sigma^2\)</span></a> and <a href="alternative2.html">large <span class="math inline">\(\sigma^2\)</span></a>. But these investigations was <em>empirical</em>, in the sense that we are fitting the Gaussian derivatives to a large number of independent samples simulated from <span class="math inline">\(N\left(0, \sigma^2\right)\)</span>. Now we are doing that <strong>theoretically</strong>.</p>
-</section>
-<section id="hermite-moments" class="level2">
+</div>
+<div id="hermite-moments" class="section level2">
 <h2>Hermite moments</h2>
 <p>If a probability density function (pdf) <span class="math inline">\(f\left(x\right)\)</span> can be approximated by normalized Gaussian derivatives, we should have</p>
 <p><span class="math display">\[
@@ -350,8 +649,8 @@ E_f\left[h_5\left(x\right)\right] &amp;=&amp; E_f\left[x^5 - 10x^3 + 15x\right] 
 E_f\left[h_6\left(x\right)\right] &amp;=&amp; E_f\left[x^6 - 15x^4 + 45x^2 - 15\right] &amp;=&amp; E\left[x^6\right] - 15 E\left[x^4\right] + 45E\left[x^2\right] - 15\\
 \end{array}
 \]</span> Some call these “Hermite moments.”</p>
-</section>
-<section id="when-f-nleft0-sigma2right-general-results" class="level2">
+</div>
+<div id="when-f-nleft0-sigma2right-general-results" class="section level2">
 <h2>When <span class="math inline">\(f = N\left(0, \sigma^2\right)\)</span>: General results</h2>
 <p>When <span class="math inline">\(f = N\left(0, \sigma^2\right)\)</span>, we can write all Hermite moments out analytically. After algebra, it turns out they can be written as</p>
 <p><span class="math display">\[
@@ -374,7 +673,92 @@ w_n =
 <p><span class="math display">\[
 \int_{0}^{\frac\pi2} \sin^nx dx = \int_{0}^{\frac\pi2} \cos^nx dx  = \frac\pi2U_n^2 \  .
 \]</span> However, this sequence decays slowly. In particular, it doesn’t decay exponentially, as seen in the following plots.</p>
-<p><img src="figure/fitting_normal.rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/fitting_normal.rmd/unnamed-chunk-3-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/fitting_normal.rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-3-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/figure/fitting_normal.rmd/unnamed-chunk-3-1.png" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/a5300252ff521211d8a6c6a80a7cbb58b4d89438/docs/figure/fitting_normal.rmd/unnamed-chunk-3-1.png" target="_blank">a530025</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-17
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/fitting_normal.rmd/unnamed-chunk-3-2.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-3-2.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/figure/fitting_normal.rmd/unnamed-chunk-3-2.png" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/a5300252ff521211d8a6c6a80a7cbb58b4d89438/docs/figure/fitting_normal.rmd/unnamed-chunk-3-2.png" target="_blank">a530025</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-17
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <p><strong>Therefore, when <span class="math inline">\(\sigma^2 &gt; 2\)</span>, <span class="math inline">\(w_n\)</span> is exploding!</strong> It means theoretially we cannot actually fit <span class="math inline">\(N\left(0, \sigma^2\right)\)</span> with Gaussian derivatives when <span class="math inline">\(\sigma^2 &gt; 2\)</span>.</p>
 <p>It has multiple implications. First, it shows why people usually say Gaussian derivatives can only fit a density that’s close enough to Gaussian, especially, a density whose variance is too “inflated” compared with the standard normal. Therefore, the fact that in many case, the correlated null can be satisfactorily fitted by Gaussian derivatives tells us the inflation caused by correlation is indeed peculiar.</p>
 <p>On the other hand, when <span class="math inline">\(0 &lt; \sigma^2 &lt; 2\)</span>, that is, <span class="math inline">\(\left|\sigma^2 - 1\right| &lt; 1\)</span>, <span class="math inline">\(w_n\)</span> decays exponentially. It means that we are able to satisfactorily fit <span class="math inline">\(N\left(0, \sigma^2\right)\)</span> with a limited number of Gaussian derivatives such that</p>
@@ -382,8 +766,8 @@ w_n =
 f_N\left(x\right) = \varphi\left(x\right) + \sum\limits_{n = 1}^N w_n\frac{1}{\sqrt{n!}}\varphi^{(n)}\left(x\right) \approx N\left(0, \sigma^2\right) = \frac{1}{\sigma}\varphi\left(\frac{x}{\sigma}\right)  \  .
 \]</span></p>
 <p>It also means that when the correlated null looks like <span class="math inline">\(N\left(0, \sigma^2\right)\)</span> with <span class="math inline">\(\sigma^2\in\left(1, 2\right]\)</span> (small inflation) or <span class="math inline">\(\sigma^2\in\left(0, 1\right)\)</span> (deflation), it’s hard to identify whether the inflation or deflation is caused by correlation or true effects.</p>
-</section>
-<section id="when-f-nleft0-sqrt22right-in-particular" class="level2">
+</div>
+<div id="when-f-nleft0-sqrt22right-in-particular" class="section level2">
 <h2>When <span class="math inline">\(f = N\left(0, \sqrt{2}^2\right)\)</span> in particular</h2>
 <p>That’s why in previous empirical investigations, we found that we <a href="alternative.html">could fit <span class="math inline">\(N\left(0, \sqrt{2}^2\right)\)</span> relatively well</a>, but <a href="alternative2.html">could not fit when <span class="math inline">\(\sigma^2 &gt; 2\)</span></a>.</p>
 <p>Actually, <strong><span class="math inline">\(N\left(0, \sqrt{2}^2\right)\)</span> is a singularly interesting case</strong>. This case corresponds to when we have <span class="math inline">\(N\left(0, 1\right)\)</span> signal and <span class="math inline">\(N\left(0, 1\right)\)</span> independent noise, hence <span class="math inline">\(SNR = 0\)</span>. Theoretically the density curve can be fitted when the odd-order coefficients are <span class="math inline">\(0\)</span> and the even-order ones are <span class="math inline">\(U_n = \sqrt{\frac{\left(n - 1\right)!!}{n!!}}\)</span>.</p>
@@ -392,41 +776,83 @@ f_N\left(x\right) = \varphi\left(x\right) + \sum\limits_{n = 1}^N w_n\frac{1}{\s
 <pre><code>Estimated Normalized w:  0 ~ 1 ; 1 ~ -0.0126 ; 2 ~ 0.72013 ; 3 ~ -0.01709 ; 4 ~ 0.6782 ; 5 ~ 0.01241 ; 6 ~ 0.62481 ; 7 ~ 0.03822 ; 8 ~ 0.4004 ; 9 ~ 0.00207 ; 10 ~ 0.11385 ; </code></pre>
 <pre><code>Theoretical Normalized w:  0 ~ 1 ; 1 ~ 0 ; 2 ~ 0.70711 ; 3 ~ 0 ; 4 ~ 0.61237 ; 5 ~ 0 ; 6 ~ 0.55902 ; 7 ~ 0 ; 8 ~ 0.52291 ; 9 ~ 0 ; 10 ~ 0.49608 ; ...</code></pre>
 <p><img src="figure/fitting_normal.rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="sigma2-2-multiple-examples" class="level2">
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-4-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/figure/fitting_normal.rmd/unnamed-chunk-4-1.png" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/a5300252ff521211d8a6c6a80a7cbb58b4d89438/docs/figure/fitting_normal.rmd/unnamed-chunk-4-1.png" target="_blank">a530025</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-17
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+</div>
+<div id="sigma2-2-multiple-examples" class="section level2">
 <h2><span class="math inline">\(0 &lt; \sigma^2 &lt; 2\)</span>: Multiple examples</h2>
-<section id="sigma2-0.2-n-40" class="level3">
+<div id="sigma2-0.2-n-40" class="section level3">
 <h3><span class="math inline">\(\sigma^2 = 0.2\)</span>, <span class="math inline">\(N = 40\)</span></h3>
 <pre><code>Normalized w:  0 ~ 1 ; 1 ~ 0 ; 2 ~ -0.56569 ; 3 ~ 0 ; 4 ~ 0.39192 ; 5 ~ 0 ; 6 ~ -0.28622 ; 7 ~ 0 ; 8 ~ 0.21418 ; 9 ~ 0 ; 10 ~ -0.16255 ; 11 ~ 0 ; 12 ~ 0.12451 ; 13 ~ 0 ; 14 ~ -0.09598 ; 15 ~ 0 ; 16 ~ 0.07435 ; 17 ~ 0 ; 18 ~ -0.0578 ; 19 ~ 0 ; 20 ~ 0.04507 ; 21 ~ 0 ; 22 ~ -0.03523 ; 23 ~ 0 ; 24 ~ 0.02759 ; 25 ~ 0 ; 26 ~ -0.02164 ; 27 ~ 0 ; 28 ~ 0.017 ; 29 ~ 0 ; 30 ~ -0.01337 ; 31 ~ 0 ; 32 ~ 0.01053 ; 33 ~ 0 ; 34 ~ -0.0083 ; 35 ~ 0 ; 36 ~ 0.00655 ; 37 ~ 0 ; 38 ~ -0.00517 ; 39 ~ 0 ; 40 ~ 0.00408 ; </code></pre>
 <p><img src="figure/fitting_normal.rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="sigma2-0.5-n-14" class="level3">
+</div>
+<div id="sigma2-0.5-n-14" class="section level3">
 <h3><span class="math inline">\(\sigma^2 = 0.5\)</span>, <span class="math inline">\(N = 14\)</span></h3>
 <pre><code>Normalized w:  0 ~ 1 ; 1 ~ 0 ; 2 ~ -0.35355 ; 3 ~ 0 ; 4 ~ 0.15309 ; 5 ~ 0 ; 6 ~ -0.06988 ; 7 ~ 0 ; 8 ~ 0.03268 ; 9 ~ 0 ; 10 ~ -0.0155 ; 11 ~ 0 ; 12 ~ 0.00742 ; 13 ~ 0 ; 14 ~ -0.00358 ; </code></pre>
 <p><img src="figure/fitting_normal.rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="sigma2-0.8-n-6" class="level3">
+</div>
+<div id="sigma2-0.8-n-6" class="section level3">
 <h3><span class="math inline">\(\sigma^2 = 0.8\)</span>, <span class="math inline">\(N = 6\)</span></h3>
 <pre><code>Normalized w:  0 ~ 1 ; 1 ~ 0 ; 2 ~ -0.14142 ; 3 ~ 0 ; 4 ~ 0.02449 ; 5 ~ 0 ; 6 ~ -0.00447 ; </code></pre>
 <p><img src="figure/fitting_normal.rmd/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="sigma2-1.2-n-6" class="level3">
+</div>
+<div id="sigma2-1.2-n-6" class="section level3">
 <h3><span class="math inline">\(\sigma^2 = 1.2\)</span>, <span class="math inline">\(N = 6\)</span></h3>
 <pre><code>Normalized w:  0 ~ 1 ; 1 ~ 0 ; 2 ~ 0.14142 ; 3 ~ 0 ; 4 ~ 0.02449 ; 5 ~ 0 ; 6 ~ 0.00447 ; </code></pre>
 <p><img src="figure/fitting_normal.rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="sigma2-1.5-n-14" class="level3">
+</div>
+<div id="sigma2-1.5-n-14" class="section level3">
 <h3><span class="math inline">\(\sigma^2 = 1.5\)</span>, <span class="math inline">\(N = 14\)</span></h3>
 <pre><code>Normalized w:  0 ~ 1 ; 1 ~ 0 ; 2 ~ 0.35355 ; 3 ~ 0 ; 4 ~ 0.15309 ; 5 ~ 0 ; 6 ~ 0.06988 ; 7 ~ 0 ; 8 ~ 0.03268 ; 9 ~ 0 ; 10 ~ 0.0155 ; 11 ~ 0 ; 12 ~ 0.00742 ; 13 ~ 0 ; 14 ~ 0.00358 ; </code></pre>
 <p><img src="figure/fitting_normal.rmd/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="sigma2-1.8-n-40" class="level3">
+</div>
+<div id="sigma2-1.8-n-40" class="section level3">
 <h3><span class="math inline">\(\sigma^2 = 1.8\)</span>, <span class="math inline">\(N = 40\)</span></h3>
 <pre><code>Normalized w:  0 ~ 1 ; 1 ~ 0 ; 2 ~ 0.56569 ; 3 ~ 0 ; 4 ~ 0.39192 ; 5 ~ 0 ; 6 ~ 0.28622 ; 7 ~ 0 ; 8 ~ 0.21418 ; 9 ~ 0 ; 10 ~ 0.16255 ; 11 ~ 0 ; 12 ~ 0.12451 ; 13 ~ 0 ; 14 ~ 0.09598 ; 15 ~ 0 ; 16 ~ 0.07435 ; 17 ~ 0 ; 18 ~ 0.0578 ; 19 ~ 0 ; 20 ~ 0.04507 ; 21 ~ 0 ; 22 ~ 0.03523 ; 23 ~ 0 ; 24 ~ 0.02759 ; 25 ~ 0 ; 26 ~ 0.02164 ; 27 ~ 0 ; 28 ~ 0.017 ; 29 ~ 0 ; 30 ~ 0.01337 ; 31 ~ 0 ; 32 ~ 0.01053 ; 33 ~ 0 ; 34 ~ 0.0083 ; 35 ~ 0 ; 36 ~ 0.00655 ; 37 ~ 0 ; 38 ~ 0.00517 ; 39 ~ 0 ; 40 ~ 0.00408 ; </code></pre>
 <p><img src="figure/fitting_normal.rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-</section>
-<section id="another-special-case-sigma2-0" class="level2">
+</div>
+</div>
+<div id="another-special-case-sigma2-0" class="section level2">
 <h2>Another special case: <span class="math inline">\(\sigma^2 = 0\)</span></h2>
 <p>When <span class="math inline">\(\sigma^2 = 0\)</span>, <span class="math inline">\(f = N\left(0, 0\right) = \delta_0\)</span>. In this case,</p>
 <p><span class="math display">\[
@@ -440,14 +866,13 @@ w_n =
 <p><span class="math display">\[
 w_n = \frac{1}{\sqrt{n!}}h_n\left(0\right) \  .
 \]</span> The performance can be seen <a href="gd_delta.html#(z_=_0)">here</a>.</p>
-</section>
-<section id="session-information" class="level2">
+</div>
+<div id="session-information" class="section level2">
 <h2>Session information</h2>
-<!-- Insert the session information into the document -->
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS High Sierra 10.13.2
+Running under: macOS High Sierra 10.13.4
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -460,24 +885,25 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] Rmosek_8.0.69     CVXR_0.94-4       REBayes_1.2       Matrix_1.2-12    
+[1] Rmosek_8.0.69     CVXR_0.95         REBayes_1.2       Matrix_1.2-12    
 [5] SQUAREM_2017.10-1 EQL_1.0-0         ttutils_1.0-1     PolynomF_1.0-1   
 
 loaded via a namespace (and not attached):
- [1] Rcpp_0.12.14      knitr_1.17        magrittr_1.5     
- [4] bit_1.1-12        lattice_0.20-35   R6_2.2.2         
- [7] stringr_1.2.0     tools_3.4.3       grid_3.4.3       
-[10] R.oo_1.21.0       git2r_0.20.0      scs_1.1-1        
-[13] htmltools_0.3.6   bit64_0.9-7       yaml_2.1.16      
-[16] rprojroot_1.3-1   digest_0.6.13     gmp_0.5-13.1     
-[19] ECOSolveR_0.3-2   R.utils_2.6.0     evaluate_0.10.1  
-[22] rmarkdown_1.8     stringi_1.1.6     Rmpfr_0.6-1      
-[25] compiler_3.4.3    backports_1.1.2   R.methodsS3_1.7.1</code></pre>
-</section>
+ [1] Rcpp_0.12.16      knitr_1.20        whisker_0.3-2    
+ [4] magrittr_1.5      workflowr_1.0.1   bit_1.1-12       
+ [7] lattice_0.20-35   R6_2.2.2          stringr_1.3.0    
+[10] tools_3.4.3       grid_3.4.3        R.oo_1.21.0      
+[13] git2r_0.21.0      scs_1.1-1         htmltools_0.3.6  
+[16] bit64_0.9-7       yaml_2.1.18       rprojroot_1.3-2  
+[19] digest_0.6.15     gmp_0.5-13.1      ECOSolveR_0.4    
+[22] R.utils_2.6.0     evaluate_0.10.1   rmarkdown_1.9    
+[25] stringi_1.1.6     Rmpfr_0.6-1       compiler_3.4.3   
+[28] backports_1.1.2   R.methodsS3_1.7.1</code></pre>
+</div>
 
 <hr>
 <p>
-    This <a href="http://rmarkdown.rstudio.com">R Markdown</a> site was created with <a href="https://github.com/jdblischak/workflowr">workflowr</a>
+    
 </p>
 <hr>
 
@@ -499,6 +925,25 @@ loaded via a namespace (and not attached):
     <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
     <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
 -->
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+<hr>
+<p>
+  This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a>
+  analysis was created with
+  <a href="https://github.com/jdblischak/workflowr">workflowr</a> 1.0.1
+</p>
+<hr>
 
 
 </div>

@@ -300,6 +300,13 @@ div.tocify {
   </div><!--/.container -->
 </div><!--/.navbar -->
 
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
 <div class="fluid-row" id="header">
 
 
@@ -311,9 +318,361 @@ div.tocify {
 </div>
 
 
-<p><strong>Last updated:</strong> 2017-12-21</p>
-<p><strong>Code version:</strong> 6e42447</p>
-<section id="empirical-null" class="level2">
+<p><strong>Last updated:</strong> 2018-05-12</p>
+<strong>workflowr checks:</strong> <small>(Click a bullet for more information)</small>
+<ul>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>R Markdown file:</strong> up-to-date </summary></p>
+<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Environment:</strong> empty </summary></p>
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Seed:</strong> <code>set.seed(12345)</code> </summary></p>
+<p>The command <code>set.seed(12345)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Session information:</strong> recorded </summary></p>
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/ddf906244e82e0675854c40da76dc16cf1a78fa4" target="_blank">ddf9062</a> </summary></p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    analysis/.DS_Store
+    Ignored:    analysis/BH_robustness_cache/
+    Ignored:    analysis/FDR_Null_cache/
+    Ignored:    analysis/FDR_null_betahat_cache/
+    Ignored:    analysis/Rmosek_cache/
+    Ignored:    analysis/StepDown_cache/
+    Ignored:    analysis/alternative2_cache/
+    Ignored:    analysis/alternative_cache/
+    Ignored:    analysis/ash_gd_cache/
+    Ignored:    analysis/average_cor_gtex_2_cache/
+    Ignored:    analysis/average_cor_gtex_cache/
+    Ignored:    analysis/brca_cache/
+    Ignored:    analysis/cash_deconv_cache/
+    Ignored:    analysis/cash_fdr_1_cache/
+    Ignored:    analysis/cash_fdr_2_cache/
+    Ignored:    analysis/cash_fdr_3_cache/
+    Ignored:    analysis/cash_fdr_4_cache/
+    Ignored:    analysis/cash_fdr_5_cache/
+    Ignored:    analysis/cash_fdr_6_cache/
+    Ignored:    analysis/cash_plots_cache/
+    Ignored:    analysis/cash_sim_1_cache/
+    Ignored:    analysis/cash_sim_2_cache/
+    Ignored:    analysis/cash_sim_3_cache/
+    Ignored:    analysis/cash_sim_4_cache/
+    Ignored:    analysis/cash_sim_5_cache/
+    Ignored:    analysis/cash_sim_6_cache/
+    Ignored:    analysis/cash_sim_7_cache/
+    Ignored:    analysis/correlated_z_2_cache/
+    Ignored:    analysis/correlated_z_3_cache/
+    Ignored:    analysis/correlated_z_cache/
+    Ignored:    analysis/create_null_cache/
+    Ignored:    analysis/cutoff_null_cache/
+    Ignored:    analysis/design_matrix_2_cache/
+    Ignored:    analysis/design_matrix_cache/
+    Ignored:    analysis/diagnostic_ash_cache/
+    Ignored:    analysis/diagnostic_correlated_z_2_cache/
+    Ignored:    analysis/diagnostic_correlated_z_3_cache/
+    Ignored:    analysis/diagnostic_correlated_z_cache/
+    Ignored:    analysis/diagnostic_plot_2_cache/
+    Ignored:    analysis/diagnostic_plot_cache/
+    Ignored:    analysis/efron_leukemia_cache/
+    Ignored:    analysis/fitting_normal_cache/
+    Ignored:    analysis/gaussian_derivatives_2_cache/
+    Ignored:    analysis/gaussian_derivatives_3_cache/
+    Ignored:    analysis/gaussian_derivatives_4_cache/
+    Ignored:    analysis/gaussian_derivatives_5_cache/
+    Ignored:    analysis/gaussian_derivatives_cache/
+    Ignored:    analysis/gd-ash_cache/
+    Ignored:    analysis/gd_delta_cache/
+    Ignored:    analysis/gd_lik_2_cache/
+    Ignored:    analysis/gd_lik_cache/
+    Ignored:    analysis/gd_w_cache/
+    Ignored:    analysis/knockoff_10_cache/
+    Ignored:    analysis/knockoff_2_cache/
+    Ignored:    analysis/knockoff_3_cache/
+    Ignored:    analysis/knockoff_4_cache/
+    Ignored:    analysis/knockoff_5_cache/
+    Ignored:    analysis/knockoff_6_cache/
+    Ignored:    analysis/knockoff_7_cache/
+    Ignored:    analysis/knockoff_8_cache/
+    Ignored:    analysis/knockoff_9_cache/
+    Ignored:    analysis/knockoff_cache/
+    Ignored:    analysis/knockoff_var_cache/
+    Ignored:    analysis/marginal_z_alternative_cache/
+    Ignored:    analysis/marginal_z_cache/
+    Ignored:    analysis/mosek_reg_2_cache/
+    Ignored:    analysis/mosek_reg_4_cache/
+    Ignored:    analysis/mosek_reg_5_cache/
+    Ignored:    analysis/mosek_reg_6_cache/
+    Ignored:    analysis/mosek_reg_cache/
+    Ignored:    analysis/pihat0_null_cache/
+    Ignored:    analysis/plot_diagnostic_cache/
+    Ignored:    analysis/poster_obayes17_cache/
+    Ignored:    analysis/real_data_simulation_2_cache/
+    Ignored:    analysis/real_data_simulation_3_cache/
+    Ignored:    analysis/real_data_simulation_4_cache/
+    Ignored:    analysis/real_data_simulation_5_cache/
+    Ignored:    analysis/real_data_simulation_cache/
+    Ignored:    analysis/rmosek_primal_dual_2_cache/
+    Ignored:    analysis/rmosek_primal_dual_cache/
+    Ignored:    analysis/seqgendiff_cache/
+    Ignored:    analysis/simulated_correlated_null_2_cache/
+    Ignored:    analysis/simulated_correlated_null_3_cache/
+    Ignored:    analysis/simulated_correlated_null_cache/
+    Ignored:    analysis/simulation_real_se_2_cache/
+    Ignored:    analysis/simulation_real_se_cache/
+    Ignored:    analysis/smemo_2_cache/
+    Ignored:    data/LSI/
+    Ignored:    docs/.DS_Store
+    Ignored:    docs/figure/.DS_Store
+    Ignored:    output/fig/
+
+Unstaged changes:
+    Deleted:    analysis/cash_plots_fdp.Rmd
+
+</code></pre>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</details>
+</li>
+</ul>
+<details>
+<summary> <small><strong>Expand here to see past versions:</strong></small> </summary>
+<ul>
+<table style="border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+File
+</th>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+<th style="text-align:left;">
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/cc0ab8379469bc3726f1508cd81e4ecd6fef1b1a/analysis/gaussian_derivatives.Rmd" target="_blank">cc0ab83</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-05-11
+</td>
+<td style="text-align:left;">
+update
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/gaussian_derivatives.html" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/853a484bfacf347e109f6c8fb3ffaab5f4d6cc02/docs/gaussian_derivatives.html" target="_blank">853a484</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-07
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/66399687da141ce91db2cd3da67f243c80436f67/docs/gaussian_derivatives.html" target="_blank">6639968</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-05
+</td>
+<td style="text-align:left;">
+transfer
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/7344c2d6c85eeaa4a51e948f9177261ba4c502b5/analysis/gaussian_derivatives.Rmd" target="_blank">7344c2d</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-03-30
+</td>
+<td style="text-align:left;">
+constraints
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/7344c2d6c85eeaa4a51e948f9177261ba4c502b5/docs/gaussian_derivatives.html" target="_blank">7344c2d</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-03-30
+</td>
+<td style="text-align:left;">
+constraints
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/b7aaa285c57af1e077f525eac13814a2a83637e8/analysis/gaussian_derivatives.Rmd" target="_blank">b7aaa28</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-03-29
+</td>
+<td style="text-align:left;">
+debug
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/b7aaa285c57af1e077f525eac13814a2a83637e8/docs/gaussian_derivatives.html" target="_blank">b7aaa28</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-03-29
+</td>
+<td style="text-align:left;">
+debug
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/c803b43a9255f39ecac06315f7e88db746dddfdf/analysis/gaussian_derivatives.Rmd" target="_blank">c803b43</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-03-27
+</td>
+<td style="text-align:left;">
+fitting and write-up
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/c803b43a9255f39ecac06315f7e88db746dddfdf/docs/gaussian_derivatives.html" target="_blank">c803b43</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-03-27
+</td>
+<td style="text-align:left;">
+fitting and write-up
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/3adfbeef3487b3372abcf45675147fd9ce06c837/analysis/gaussian_derivatives.Rmd" target="_blank">3adfbee</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-03-23
+</td>
+<td style="text-align:left;">
+fit
+</td>
+</tr>
+</tbody>
+</table>
+</ul>
+</details>
+<hr />
+<p><strong>Last updated:</strong> 2018-05-12</p>
+<p><strong>Code version:</strong> ddf9062</p>
+<div id="empirical-null" class="section level2">
 <h2>Empirical null</h2>
 <p>Correlation among summary statistics can distort hypothesis testing and signal estimation by making the observed statistics deviate from their theoretical distribution. See previous simulations (<a href="correlated_z.html">here</a>, <a href="correlated_z_2.html">here</a>, and <a href="correlated_z_3.html">here</a>) for illustration.</p>
 <p>Efron is his series of publications proposed an “empirical null” idea to tackle the correlation among <span class="math inline">\(z\)</span> scores in the simultaneous inference setting. Essentially, he assumed that <span class="math inline">\(z\)</span> scores from those null hypotheses among all hypotheses simultaneously considered should follow an “empirical null” distribution that’s different from their marginal <span class="math inline">\(N(0, 1)\)</span>, but still a normal with estimated mean and standard deviation, thus to produce what Efron terms as the “correlation induced inflation.”</p>
@@ -330,8 +689,8 @@ F_0(x) = \Phi^+(x) + \sum\limits_{k = 1}^\infty W_k\varphi^{(k - 1)}(x)
 <p><span class="math display">\[
 f_0(x) = \varphi(x) + \sum\limits_{k = 1}^\infty W_k\varphi^{(k)}(x)
 \]</span> which can be seen as approximating the density of the <em>observed</em> distribution of correlated <span class="math inline">\(z\)</span> scores when the number of them <span class="math inline">\(n\)</span> is large. <strong>Or in other words, <span class="math inline">\(f_0(x)\)</span> can be seen as to describe the histogram of those <span class="math inline">\(z\)</span> scores.</strong></p>
-</section>
-<section id="gaussian-derivatives-and-hermite-polynomials" class="level2">
+</div>
+<div id="gaussian-derivatives-and-hermite-polynomials" class="section level2">
 <h2>Gaussian derivatives and Hermite polynomials</h2>
 <p><span class="math inline">\(f_0(x)\)</span> involves Gaussian derivatives <span class="math inline">\(\varphi^{(k)}\)</span>, and many properties of them have been thoroughly studied. For starters, they are closely related to the <em>probabilists’ Hermite polynomials</em> <span class="math inline">\(h_k\)</span> in that</p>
 <p><span class="math display">\[
@@ -388,14 +747,14 @@ h_{k-1}(x)\varphi(x)\\
 \displaystyle\Phi(x) - \sum\limits_{k = 1}^\infty W_kh_{k-1}(x)\varphi(x)
 \end{array}
 \]</span></p>
-</section>
-<section id="illustration" class="level2">
+</div>
+<div id="illustration" class="section level2">
 <h2>Illustration</h2>
-<section id="first-orders-of-gaussian-derivatives-and-hermite-polynomials" class="level3">
+<div id="first-orders-of-gaussian-derivatives-and-hermite-polynomials" class="section level3">
 <h3>First orders of Gaussian derivatives and Hermite polynomials</h3>
 <p><img src="figure/gaussian_derivatives.Rmd/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/gaussian_derivatives.Rmd/unnamed-chunk-2-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/gaussian_derivatives.Rmd/unnamed-chunk-2-3.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="scaled-and-unscaled-gaussian-derivatives" class="level3">
+</div>
+<div id="scaled-and-unscaled-gaussian-derivatives" class="section level3">
 <h3>Scaled and unscaled Gaussian derivatives</h3>
 <p>The expectation of <span class="math inline">\(W_k^2\)</span> vanishes in the order of <span class="math inline">\(k!\)</span>, and the average <span class="math inline">\(h_k^2\)</span> also scales in the order of <span class="math inline">\(k!\)</span>, and we can define “scaled” version of these functions and quantities:</p>
 <p><span class="math display">\[
@@ -415,9 +774,9 @@ f_0(x) &amp;=&amp;
 \end{array}
 \]</span></p>
 <p><img src="figure/gaussian_derivatives.Rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/gaussian_derivatives.Rmd/unnamed-chunk-3-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/gaussian_derivatives.Rmd/unnamed-chunk-3-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/gaussian_derivatives.Rmd/unnamed-chunk-3-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/gaussian_derivatives.Rmd/unnamed-chunk-3-5.png" width="672" style="display: block; margin: auto;" /><img src="figure/gaussian_derivatives.Rmd/unnamed-chunk-3-6.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-</section>
-<section id="fitting-the-empirical-null" class="level2">
+</div>
+</div>
+<div id="fitting-the-empirical-null" class="section level2">
 <h2>Fitting the empirical null</h2>
 <p>Given <span class="math inline">\(z\)</span> scores <span class="math inline">\(z_1, \ldots, z_n\)</span> with known marginal distribution <span class="math inline">\(N(0, 1)\)</span> but unknown correlation, their (right-sided) empirical cdf <span class="math inline">\(\hat F(x)\)</span> can be observed. Then these <span class="math inline">\(z\)</span> scores can be seen as if they are independently and identically sampled from this observed empirical cdf.</p>
 <p>Furthermore, when <span class="math inline">\(n\)</span> is sufficiently large, this observed empirical cdf approximates a cdf <span class="math inline">\(F_0(x)\)</span> which has a density</p>
@@ -438,7 +797,7 @@ f_0(x) = \varphi(x)\left(1 + \sum\limits_{k = 1}^\infty W_kh_k(x)\right)
 \end{array}
 \]</span> The first constraint is self-satisfied for all <span class="math inline">\(w\)</span>: <span class="math inline">\(\int_{-\infty}^\infty h_k(x)\varphi(x)dx = 0\)</span> for any <span class="math inline">\(k\geq1\)</span> since <span class="math inline">\(h_k\)</span> and <span class="math inline">\(h_0 \equiv1\)</span> are orthogonal with respect to <span class="math inline">\(\varphi\)</span>.</p>
 <p>The second constraint and the objective are intractable in the present form because of the involvement of <span class="math inline">\(\infty\)</span>. Therefore we need to make another two key assumptions as follows.</p>
-<section id="assumption-1-the-pairwise-correlation-rho_ij-are-on-average-moderate-enough-such-that-the-influence-of-w_kh_k-will-vanish-for-sufficiently-large-k." class="level3">
+<div id="assumption-1-the-pairwise-correlation-rho_ij-are-on-average-moderate-enough-such-that-the-influence-of-w_kh_k-will-vanish-for-sufficiently-large-k." class="section level3">
 <h3>Assumption 1: the pairwise correlation <span class="math inline">\(\rho_{ij}\)</span> are on average moderate enough, such that the influence of <span class="math inline">\(W_kh_k\)</span> will vanish for sufficiently large <span class="math inline">\(k\)</span>.</h3>
 <p>We assume that the pairwise correlation <span class="math inline">\(\rho_{ij}\)</span> are on average moderate enough, such that the influence of <span class="math inline">\(W_kh_k\)</span> will vanish for sufficiently large <span class="math inline">\(k\)</span>. Note that it doesn’t hold true in general. Recall that</p>
 <p><span class="math display">\[
@@ -450,13 +809,13 @@ f_0(x) = \varphi(x)\left(1 + \sum\limits_{k = 1}^\infty W_kh_k(x)\right)
 <p>so <strong><span class="math inline">\(h_k^2\)</span> also scales in factorial order</strong>. Therefore, it’s not at all clear that the influence of <span class="math inline">\(W_kh_k\)</span> will decay in the most general case. So the decay of higher orders largely rely on the decay of higher order empirical moments of pairwise correlation <span class="math inline">\(\alpha_k\)</span>, which characterizes <span class="math inline">\(\rho_{ij}^k\)</span>.</p>
 <p>As a result, we here assume that <span class="math inline">\(\rho_{ij}\)</span>’s are on average moderate, so <span class="math inline">\(\alpha_k\)</span> decays faster, leading to faster decaying of <span class="math inline">\(W_k\)</span>, probably as well as that of <span class="math inline">\(W_kh_k\)</span>. <em>Ignoring this assumption would cause problem at least theoretically, as detailed later.</em></p>
 <p>With this assumption, we can stop at a large <span class="math inline">\(K\)</span>; that is, <span class="math inline">\(f_0(x) = \varphi(x)\left(1 + \sum\limits_{k = 1}^K W_kh_k(x)\right)\)</span>. <em>We also need to specify a method to choose <span class="math inline">\(K\)</span> in a systematic way.</em></p>
-</section>
-<section id="assumption-2-we-further-assume-that-the-number-of-observations-n-is-sufficiently-large-so-that-we-can-use-the-n-observed-z-scores-in-place-of-the-intractable-all-xinmathbbr-in-the-second-constraint." class="level3">
+</div>
+<div id="assumption-2-we-further-assume-that-the-number-of-observations-n-is-sufficiently-large-so-that-we-can-use-the-n-observed-z-scores-in-place-of-the-intractable-all-xinmathbbr-in-the-second-constraint." class="section level3">
 <h3>Assumption 2: we further assume that the number of observations <span class="math inline">\(n\)</span> is sufficiently large, so that we can use the <span class="math inline">\(n\)</span> observed <span class="math inline">\(z\)</span> scores in place of the intractable all <span class="math inline">\(x\in\mathbb{R}\)</span> in the second constraint.</h3>
 <p>We further assume that the number of observations <span class="math inline">\(n\)</span> is sufficiently large, so that we can use the <span class="math inline">\(n\)</span> observed <span class="math inline">\(z\)</span> scores in place of the intractable all <span class="math inline">\(x\in\mathbb{R}\)</span> in the second constraint.</p>
 <p>That is, <span class="math inline">\(1 + \sum\limits_{k = 1}^K w_kh_k(z_i) \geq0\)</span>. <em>Ignoring this assumption would also lead to numerical instability, as detailed later.</em></p>
-</section>
-<section id="convex-optimization" class="level3">
+</div>
+<div id="convex-optimization" class="section level3">
 <h3>Convex optimization</h3>
 <p>With these assumptions, the problem is now a convex optimization.</p>
 <p><span class="math display">\[
@@ -474,14 +833,17 @@ f_0(x) = \varphi(x)\left(1 + \sum\limits_{k = 1}^\infty W_kh_k(x)\right)
 \end{array}
 \]</span></p>
 <p>where <span class="math inline">\(H_{ik} = h_k(z_i)\)</span>.</p>
-</section>
-</section>
-<section id="session-information" class="level2">
+</div>
+</div>
+<div id="session-information" class="section level2">
 <h2>Session Information</h2>
+</div>
+<div id="session-information-1" class="section level2">
+<h2>Session information</h2>
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS High Sierra 10.13.2
+Running under: macOS High Sierra 10.13.4
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -494,15 +856,18 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 loaded via a namespace (and not attached):
- [1] compiler_3.4.3  backports_1.1.2 magrittr_1.5    rprojroot_1.3-1
- [5] tools_3.4.3     htmltools_0.3.6 yaml_2.1.16     Rcpp_0.12.14   
- [9] stringi_1.1.6   rmarkdown_1.8   knitr_1.17      git2r_0.20.0   
-[13] stringr_1.2.0   digest_0.6.13   workflowr_0.8.0 evaluate_0.10.1</code></pre>
-</section>
+ [1] workflowr_1.0.1   Rcpp_0.12.16      digest_0.6.15    
+ [4] rprojroot_1.3-2   R.methodsS3_1.7.1 backports_1.1.2  
+ [7] git2r_0.21.0      magrittr_1.5      evaluate_0.10.1  
+[10] stringi_1.1.6     whisker_0.3-2     R.oo_1.21.0      
+[13] R.utils_2.6.0     rmarkdown_1.9     tools_3.4.3      
+[16] stringr_1.3.0     yaml_2.1.18       compiler_3.4.3   
+[19] htmltools_0.3.6   knitr_1.20       </code></pre>
+</div>
 
 <hr>
 <p>
-    This <a href="http://rmarkdown.rstudio.com">R Markdown</a> site was created with <a href="https://github.com/jdblischak/workflowr">workflowr</a>
+    
 </p>
 <hr>
 
@@ -524,6 +889,25 @@ loaded via a namespace (and not attached):
     <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
     <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
 -->
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+<hr>
+<p>
+  This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a>
+  analysis was created with
+  <a href="https://github.com/jdblischak/workflowr">workflowr</a> 1.0.1
+</p>
+<hr>
 
 
 </div>

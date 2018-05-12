@@ -200,6 +200,13 @@ $(document).ready(function () {
   </div><!--/.container -->
 </div><!--/.navbar -->
 
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
 <div class="fluid-row" id="header">
 
 
@@ -209,6 +216,2533 @@ $(document).ready(function () {
 </div>
 
 
+<p><strong>Last updated:</strong> 2018-05-12</p>
+<strong>workflowr checks:</strong> <small>(Click a bullet for more information)</small>
+<ul>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>R Markdown file:</strong> up-to-date </summary></p>
+<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/ddf906244e82e0675854c40da76dc16cf1a78fa4" target="_blank">ddf9062</a> </summary></p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    analysis/.DS_Store
+    Ignored:    analysis/BH_robustness_cache/
+    Ignored:    analysis/FDR_Null_cache/
+    Ignored:    analysis/FDR_null_betahat_cache/
+    Ignored:    analysis/Rmosek_cache/
+    Ignored:    analysis/StepDown_cache/
+    Ignored:    analysis/alternative2_cache/
+    Ignored:    analysis/alternative_cache/
+    Ignored:    analysis/ash_gd_cache/
+    Ignored:    analysis/average_cor_gtex_2_cache/
+    Ignored:    analysis/average_cor_gtex_cache/
+    Ignored:    analysis/brca_cache/
+    Ignored:    analysis/cash_deconv_cache/
+    Ignored:    analysis/cash_fdr_1_cache/
+    Ignored:    analysis/cash_fdr_2_cache/
+    Ignored:    analysis/cash_fdr_3_cache/
+    Ignored:    analysis/cash_fdr_4_cache/
+    Ignored:    analysis/cash_fdr_5_cache/
+    Ignored:    analysis/cash_fdr_6_cache/
+    Ignored:    analysis/cash_plots_cache/
+    Ignored:    analysis/cash_sim_1_cache/
+    Ignored:    analysis/cash_sim_2_cache/
+    Ignored:    analysis/cash_sim_3_cache/
+    Ignored:    analysis/cash_sim_4_cache/
+    Ignored:    analysis/cash_sim_5_cache/
+    Ignored:    analysis/cash_sim_6_cache/
+    Ignored:    analysis/cash_sim_7_cache/
+    Ignored:    analysis/correlated_z_2_cache/
+    Ignored:    analysis/correlated_z_3_cache/
+    Ignored:    analysis/correlated_z_cache/
+    Ignored:    analysis/create_null_cache/
+    Ignored:    analysis/cutoff_null_cache/
+    Ignored:    analysis/design_matrix_2_cache/
+    Ignored:    analysis/design_matrix_cache/
+    Ignored:    analysis/diagnostic_ash_cache/
+    Ignored:    analysis/diagnostic_correlated_z_2_cache/
+    Ignored:    analysis/diagnostic_correlated_z_3_cache/
+    Ignored:    analysis/diagnostic_correlated_z_cache/
+    Ignored:    analysis/diagnostic_plot_2_cache/
+    Ignored:    analysis/diagnostic_plot_cache/
+    Ignored:    analysis/efron_leukemia_cache/
+    Ignored:    analysis/fitting_normal_cache/
+    Ignored:    analysis/gaussian_derivatives_2_cache/
+    Ignored:    analysis/gaussian_derivatives_3_cache/
+    Ignored:    analysis/gaussian_derivatives_4_cache/
+    Ignored:    analysis/gaussian_derivatives_5_cache/
+    Ignored:    analysis/gaussian_derivatives_cache/
+    Ignored:    analysis/gd-ash_cache/
+    Ignored:    analysis/gd_delta_cache/
+    Ignored:    analysis/gd_lik_2_cache/
+    Ignored:    analysis/gd_lik_cache/
+    Ignored:    analysis/gd_w_cache/
+    Ignored:    analysis/knockoff_10_cache/
+    Ignored:    analysis/knockoff_2_cache/
+    Ignored:    analysis/knockoff_3_cache/
+    Ignored:    analysis/knockoff_4_cache/
+    Ignored:    analysis/knockoff_5_cache/
+    Ignored:    analysis/knockoff_6_cache/
+    Ignored:    analysis/knockoff_7_cache/
+    Ignored:    analysis/knockoff_8_cache/
+    Ignored:    analysis/knockoff_9_cache/
+    Ignored:    analysis/knockoff_cache/
+    Ignored:    analysis/knockoff_var_cache/
+    Ignored:    analysis/marginal_z_alternative_cache/
+    Ignored:    analysis/marginal_z_cache/
+    Ignored:    analysis/mosek_reg_2_cache/
+    Ignored:    analysis/mosek_reg_4_cache/
+    Ignored:    analysis/mosek_reg_5_cache/
+    Ignored:    analysis/mosek_reg_6_cache/
+    Ignored:    analysis/mosek_reg_cache/
+    Ignored:    analysis/pihat0_null_cache/
+    Ignored:    analysis/plot_diagnostic_cache/
+    Ignored:    analysis/poster_obayes17_cache/
+    Ignored:    analysis/real_data_simulation_2_cache/
+    Ignored:    analysis/real_data_simulation_3_cache/
+    Ignored:    analysis/real_data_simulation_4_cache/
+    Ignored:    analysis/real_data_simulation_5_cache/
+    Ignored:    analysis/real_data_simulation_cache/
+    Ignored:    analysis/rmosek_primal_dual_2_cache/
+    Ignored:    analysis/rmosek_primal_dual_cache/
+    Ignored:    analysis/seqgendiff_cache/
+    Ignored:    analysis/simulated_correlated_null_2_cache/
+    Ignored:    analysis/simulated_correlated_null_3_cache/
+    Ignored:    analysis/simulated_correlated_null_cache/
+    Ignored:    analysis/simulation_real_se_2_cache/
+    Ignored:    analysis/simulation_real_se_cache/
+    Ignored:    analysis/smemo_2_cache/
+    Ignored:    data/LSI/
+    Ignored:    docs/.DS_Store
+    Ignored:    docs/figure/.DS_Store
+    Ignored:    output/fig/
+
+Unstaged changes:
+    Deleted:    analysis/cash_plots_fdp.Rmd
+
+</code></pre>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</details>
+</li>
+</ul>
+<details>
+<summary> <small><strong>Expand here to see past versions:</strong></small> </summary>
+<ul>
+<table style="border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+File
+</th>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+<th style="text-align:left;">
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/cc0ab8379469bc3726f1508cd81e4ecd6fef1b1a/analysis/index.Rmd" target="_blank">cc0ab83</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-05-11
+</td>
+<td style="text-align:left;">
+update
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/720d17933c2b646477da82f5d1d8b4ea720bfc15/docs/index.html" target="_blank">720d179</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-04-18
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/b82e2bc13e3a982ca2d6c31e9893377a920d667b/analysis/index.Rmd" target="_blank">b82e2bc</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-04-18
+</td>
+<td style="text-align:left;">
+wflow_publish(c(“analysis/gd_w.rmd”, “analysis/index.Rmd”))
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/38dd7e1b76e88d1d31ce04fecaf127e299d60581/docs/index.html" target="_blank">38dd7e1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-04-14
+</td>
+<td style="text-align:left;">
+index
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/ac4d19c8fd191b5dad1b4c5ae4ab2e79376b3219/analysis/index.Rmd" target="_blank">ac4d19c</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-04-14
+</td>
+<td style="text-align:left;">
+index
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/4b179a9a6cf4c151548b34b5645c84c8cd9f9fab/docs/index.html" target="_blank">4b179a9</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-04-05
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/20ea3282c955d1f6567d779bfdbd48609335a567/analysis/index.Rmd" target="_blank">20ea328</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-04-05
+</td>
+<td style="text-align:left;">
+wflow_publish(c(“analysis/knockoff_7.rmd”, “analysis/knockoff_8.rmd”,
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/cb9d445aea3ce2807101f42401ec6daa4d9041a0/docs/index.html" target="_blank">cb9d445</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-03-11
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/2c9cf265d2897f14cec3e56170b07f310cdaa7d4/analysis/index.Rmd" target="_blank">2c9cf26</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-03-11
+</td>
+<td style="text-align:left;">
+obser
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/c9714a86c7a07ee770512f22401eaa7bbb10bdf4/docs/index.html" target="_blank">c9714a8</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-23
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/4b4505a09524708367efb3a81a44ed8f2bde5093/analysis/index.Rmd" target="_blank">4b4505a</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-23
+</td>
+<td style="text-align:left;">
+wflow_publish(c(“knockoff_7.rmd”, “index.rmd”))
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/85b6c521f5879d0df05b8e47ed80c28966189db8/docs/index.html" target="_blank">85b6c52</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-16
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/72353002bf987bbb968286ea5093e151559e90a7/analysis/index.Rmd" target="_blank">7235300</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-16
+</td>
+<td style="text-align:left;">
+wflow_publish(“analysis/index.Rmd”)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/016ccb2e1023b8032c0005d19328b338f9c2ff2e/analysis/index.Rmd" target="_blank">016ccb2</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-09
+</td>
+<td style="text-align:left;">
+plots added
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/016ccb2e1023b8032c0005d19328b338f9c2ff2e/docs/index.html" target="_blank">016ccb2</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-09
+</td>
+<td style="text-align:left;">
+plots added
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/34434cf53871140d7453c8134926586ce5d176a2/analysis/index.Rmd" target="_blank">34434cf</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-06
+</td>
+<td style="text-align:left;">
+index
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/34434cf53871140d7453c8134926586ce5d176a2/docs/index.html" target="_blank">34434cf</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-06
+</td>
+<td style="text-align:left;">
+index
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/3e6f3ab932b1fb3d6edb8500e571ba2f4284d57b/docs/index.html" target="_blank">3e6f3ab</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-01-30
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/c17f67c71a8ec6b6f49fda88fa6dceec6a11c63c/analysis/index.Rmd" target="_blank">c17f67c</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-01-30
+</td>
+<td style="text-align:left;">
+wflow_publish(c(“analysis/index.rmd”, “analysis/knockoff.rmd”, “analysis/knockoff_2.rmd”, “analysis/knockoff_3.rmd”))
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/b831895ff3e30d4bfcb59dbe0001716479c18900/docs/index.html" target="_blank">b831895</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-01-25
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/4bd59b5ec3453e1ab33fa322874a50ae9c562d35/analysis/index.Rmd" target="_blank">4bd59b5</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-01-25
+</td>
+<td style="text-align:left;">
+wflow_publish(files = c(“analysis/knockoff.rmd”, “analysis/index.Rmd”))
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/2a15a320947e96d62f881f3ee0d4ae1e8c97f2b1/docs/index.html" target="_blank">2a15a32</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/e3b0d2c171668dfb74c260d47edf452f69c098b4/analysis/index.Rmd" target="_blank">e3b0d2c</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+<td style="text-align:left;">
+wflow_publish(all = TRUE)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/8ae6c11dd6597cbc9e4a930b1e411aa84c961ed9/docs/index.html" target="_blank">8ae6c11</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-08
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/547ac2c24206e6706dc3b92cb7f7ffebb404fa82/analysis/index.Rmd" target="_blank">547ac2c</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-08
+</td>
+<td style="text-align:left;">
+analysis/poster_obayes17.rmd
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/fb76f412865a1be76a38632ecc7c1a48d3cbca39/docs/index.html" target="_blank">fb76f41</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-29
+</td>
+<td style="text-align:left;">
+webpages
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/32adf960fd5d0e4d3285ff202f34d2049b5d1dd1/analysis/index.Rmd" target="_blank">32adf96</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-29
+</td>
+<td style="text-align:left;">
+index
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/8de223971ad3ea617dabc683d48c24cc87f4b3a5/docs/index.html" target="_blank">8de2239</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-28
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/10a25250ac2ed7ecb15ec06dfc1e9d3232f3ff92/analysis/index.Rmd" target="_blank">10a2525</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-28
+</td>
+<td style="text-align:left;">
+wflow_publish(“analysis/index.Rmd”)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/8e5c59f9bd66fcbe0ed27cf3d85a6af30d37413c/docs/index.html" target="_blank">8e5c59f</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-28
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0cc70b9c9376624a6f2b8cd1bbcb6c6e9447c633/analysis/index.Rmd" target="_blank">0cc70b9</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-28
+</td>
+<td style="text-align:left;">
+wflow_publish(c(“analysis/cash_deconv.rmd”, “analysis/index.Rmd”))
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/92244e417c57d2a86d681e51dd01f51e6f7e11d1/docs/index.html" target="_blank">92244e4</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-28
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/b8bcdda84824e5e827de5bd1588a8db70f7b5cd7/analysis/index.Rmd" target="_blank">b8bcdda</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-28
+</td>
+<td style="text-align:left;">
+wflow_publish(c(“analysis/index.Rmd”, “analysis/cash_fdr_1.rmd”,
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/1f91ef0d9ec104e91187f12bba074a162ca2135e/docs/index.html" target="_blank">1f91ef0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-22
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/b64bef2eaa63d410ff44b0d8b3675e72cb9a96aa/analysis/index.Rmd" target="_blank">b64bef2</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-22
+</td>
+<td style="text-align:left;">
+wflow_publish(“analysis/index.Rmd”)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/501bd28608c0050bf14bfa7a4d98e84c18ee7732/docs/index.html" target="_blank">501bd28</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-10
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d337287197acd27bb790a5614ded57e0e7404028/analysis/index.Rmd" target="_blank">d337287</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-10
+</td>
+<td style="text-align:left;">
+wflow_publish(c(“cash_sim_1.rmd”, “cash_sim_2.rmd”, “index.Rmd”))
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/4b385a12ba90ac2bb34f7b138e443f12ab689df7/analysis/index.Rmd" target="_blank">4b385a1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-07-21
+</td>
+<td style="text-align:left;">
+brca analysis
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/4b385a12ba90ac2bb34f7b138e443f12ab689df7/docs/index.html" target="_blank">4b385a1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-07-21
+</td>
+<td style="text-align:left;">
+brca analysis
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/76a05c2c827f4476640f73d40c28900b613e0116/docs/index.html" target="_blank">76a05c2</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-23
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/4fb0ff11340cc193c473125f6f2df7371411632f/analysis/index.Rmd" target="_blank">4fb0ff1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-23
+</td>
+<td style="text-align:left;">
+wflow_publish(“index.rmd”)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/b9706c575629e342371c1363d05b1e86124e53f2/docs/index.html" target="_blank">b9706c5</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-23
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/15420610556d3521da70b7d56bdab82675d23095/analysis/index.Rmd" target="_blank">1542061</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-23
+</td>
+<td style="text-align:left;">
+wflow_publish(“index.rmd”)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/a1e16acf79527d33cb9009c883bed69b742e84b7/analysis/index.Rmd" target="_blank">a1e16ac</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-18
+</td>
+<td style="text-align:left;">
+smemo
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/a1e16acf79527d33cb9009c883bed69b742e84b7/docs/index.html" target="_blank">a1e16ac</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-18
+</td>
+<td style="text-align:left;">
+smemo
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/e6d5a6488d6ee53e08cc396a42e9538adc087dd2/analysis/index.Rmd" target="_blank">e6d5a64</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-17
+</td>
+<td style="text-align:left;">
+GD-Lik
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/e6d5a6488d6ee53e08cc396a42e9538adc087dd2/docs/index.html" target="_blank">e6d5a64</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-17
+</td>
+<td style="text-align:left;">
+GD-Lik
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/73b4bb7b980ef52f3b6c6cafb8139e33894a9dc0/analysis/index.Rmd" target="_blank">73b4bb7</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-17
+</td>
+<td style="text-align:left;">
+GD-Lik simulations
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/73b4bb7b980ef52f3b6c6cafb8139e33894a9dc0/docs/index.html" target="_blank">73b4bb7</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-17
+</td>
+<td style="text-align:left;">
+GD-Lik simulations
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/40fc7d98ec0584643d7f3758e42619ffd6186169/analysis/index.Rmd" target="_blank">40fc7d9</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-02
+</td>
+<td style="text-align:left;">
+index
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/a930ad933cb0d8d98975d630e2d11c40b3d1d4af/docs/index.html" target="_blank">a930ad9</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-02
+</td>
+<td style="text-align:left;">
+BH
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/a40ffffe4a823fee355abdb0cab698321444194f/analysis/index.Rmd" target="_blank">a40ffff</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-01
+</td>
+<td style="text-align:left;">
+webpage
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/a40ffffe4a823fee355abdb0cab698321444194f/docs/index.html" target="_blank">a40ffff</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-01
+</td>
+<td style="text-align:left;">
+webpage
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/c4782cc49c985c66cf390ec4e2c7e46e3105a8f3/analysis/index.Rmd" target="_blank">c4782cc</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-30
+</td>
+<td style="text-align:left;">
+index
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/c4782cc49c985c66cf390ec4e2c7e46e3105a8f3/docs/index.html" target="_blank">c4782cc</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-30
+</td>
+<td style="text-align:left;">
+index
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/9f7dd01525d5c9d3405fa386e08f553a6a5e2f1c/analysis/index.Rmd" target="_blank">9f7dd01</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-21
+</td>
+<td style="text-align:left;">
+website
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/9f7dd01525d5c9d3405fa386e08f553a6a5e2f1c/docs/index.html" target="_blank">9f7dd01</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-21
+</td>
+<td style="text-align:left;">
+website
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/055f9f0516cae31b3e345f95c18561c9ab952486/analysis/index.Rmd" target="_blank">055f9f0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-17
+</td>
+<td style="text-align:left;">
+websites
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/055f9f0516cae31b3e345f95c18561c9ab952486/docs/index.html" target="_blank">055f9f0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-17
+</td>
+<td style="text-align:left;">
+websites
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/7b4811c5f89efab4da2e26bc19514b8cad345999/analysis/index.Rmd" target="_blank">7b4811c</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-17
+</td>
+<td style="text-align:left;">
+index
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/7b4811c5f89efab4da2e26bc19514b8cad345999/docs/index.html" target="_blank">7b4811c</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-17
+</td>
+<td style="text-align:left;">
+index
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/e7d9466f0fb3e9f7cafeb07c0bf94c62eafd2140/analysis/index.Rmd" target="_blank">e7d9466</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-16
+</td>
+<td style="text-align:left;">
+index
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/e7d9466f0fb3e9f7cafeb07c0bf94c62eafd2140/docs/index.html" target="_blank">e7d9466</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-16
+</td>
+<td style="text-align:left;">
+index
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/807eb7183ee081f4169fc77d9228c2dc7fa710ef/analysis/index.Rmd" target="_blank">807eb71</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-14
+</td>
+<td style="text-align:left;">
+index
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/807eb7183ee081f4169fc77d9228c2dc7fa710ef/docs/index.html" target="_blank">807eb71</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-14
+</td>
+<td style="text-align:left;">
+index
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/603b826484567c644686dac0daf5b02b31c0d66a/docs/index.html" target="_blank">603b826</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-11
+</td>
+<td style="text-align:left;">
+writeups
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/3501eca6ed4f812820a6cdceea2038b2f6ddaa8b/analysis/index.Rmd" target="_blank">3501eca</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-11
+</td>
+<td style="text-align:left;">
+index
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/8dcfa2f22e96c107a76fbc42ee93b8db500d6e35/analysis/index.Rmd" target="_blank">8dcfa2f</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-09
+</td>
+<td style="text-align:left;">
+index
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/8dcfa2f22e96c107a76fbc42ee93b8db500d6e35/docs/index.html" target="_blank">8dcfa2f</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-09
+</td>
+<td style="text-align:left;">
+index
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/b8649754af6cead94ab3a7b57f2360361dc5c760/analysis/index.Rmd" target="_blank">b864975</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-09
+</td>
+<td style="text-align:left;">
+revision
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/b8649754af6cead94ab3a7b57f2360361dc5c760/docs/index.html" target="_blank">b864975</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-09
+</td>
+<td style="text-align:left;">
+revision
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/b1410203d4d98ed9676334a7c3f32f8349fb9923/docs/index.html" target="_blank">b141020</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-09
+</td>
+<td style="text-align:left;">
+writeups
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/c0c29a2183be2e6275b5d2974f689b278266073b/analysis/index.Rmd" target="_blank">c0c29a2</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-09
+</td>
+<td style="text-align:left;">
+index
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/27bcaf9682ee32f9f548c6e5516f0c8ef684663c/docs/index.html" target="_blank">27bcaf9</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-08
+</td>
+<td style="text-align:left;">
+writeups
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/6bac69e4ab027a161595872353a444b19769c794/analysis/index.Rmd" target="_blank">6bac69e</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-08
+</td>
+<td style="text-align:left;">
+writeups
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/e368074e0ff3ac1b583d005f4738c914a0309377/docs/index.html" target="_blank">e368074</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-06
+</td>
+<td style="text-align:left;">
+Rmosek
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/06eff07cc014e8e4564aaf06d1d7f18199e583a6/analysis/index.Rmd" target="_blank">06eff07</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-06
+</td>
+<td style="text-align:left;">
+Rmosek
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/87514940674fda75ae234d89a9799aac4860abf5/analysis/index.Rmd" target="_blank">8751494</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-05
+</td>
+<td style="text-align:left;">
+diagnostic
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/87514940674fda75ae234d89a9799aac4860abf5/docs/index.html" target="_blank">8751494</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-05
+</td>
+<td style="text-align:left;">
+diagnostic
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/5a3f36c6ae1cd6036be4f01e829441d783f267e9/analysis/index.Rmd" target="_blank">5a3f36c</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-05
+</td>
+<td style="text-align:left;">
+index
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/7425db5464b532cade4ee935a42a0de26f073903/docs/index.html" target="_blank">7425db5</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-05
+</td>
+<td style="text-align:left;">
+index
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/98a94d199c58cd763cab2915b367658516ba90db/analysis/index.Rmd" target="_blank">98a94d1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-03
+</td>
+<td style="text-align:left;">
+uniformity diagnostic
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/98a94d199c58cd763cab2915b367658516ba90db/docs/index.html" target="_blank">98a94d1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-03
+</td>
+<td style="text-align:left;">
+uniformity diagnostic
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/84a84cab783179a596b8b9c795acbacbec225583/analysis/index.Rmd" target="_blank">84a84ca</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-04-23
+</td>
+<td style="text-align:left;">
+diagnostic plots
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/84a84cab783179a596b8b9c795acbacbec225583/docs/index.html" target="_blank">84a84ca</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-04-23
+</td>
+<td style="text-align:left;">
+diagnostic plots
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/3c00d157ca8476c29ff324b50e05f1ff3809025f/analysis/index.Rmd" target="_blank">3c00d15</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-04-21
+</td>
+<td style="text-align:left;">
+de bogged
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/3c00d157ca8476c29ff324b50e05f1ff3809025f/docs/index.html" target="_blank">3c00d15</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-04-21
+</td>
+<td style="text-align:left;">
+de bogged
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/239f1952ba3f76b6894649ae7cb530b2f63be4e4/analysis/index.Rmd" target="_blank">239f195</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-04-21
+</td>
+<td style="text-align:left;">
+GD-ASH
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/239f1952ba3f76b6894649ae7cb530b2f63be4e4/docs/index.html" target="_blank">239f195</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-04-21
+</td>
+<td style="text-align:left;">
+GD-ASH
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/4eb2aa0c2bac02a43fb15e66e5a3165cd056bbdf/analysis/index.Rmd" target="_blank">4eb2aa0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-04-19
+</td>
+<td style="text-align:left;">
+diagnostic
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/4eb2aa0c2bac02a43fb15e66e5a3165cd056bbdf/docs/index.html" target="_blank">4eb2aa0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-04-19
+</td>
+<td style="text-align:left;">
+diagnostic
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/020da627ed57be9d60f74e45597268aee714e18e/analysis/index.Rmd" target="_blank">020da62</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-04-06
+</td>
+<td style="text-align:left;">
+SNR
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/020da627ed57be9d60f74e45597268aee714e18e/docs/index.html" target="_blank">020da62</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-04-06
+</td>
+<td style="text-align:left;">
+SNR
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0f49e8acfa54a62535e4c5d346cd89cdc4826731/analysis/index.Rmd" target="_blank">0f49e8a</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-03-31
+</td>
+<td style="text-align:left;">
+alternative simulation
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/0f49e8acfa54a62535e4c5d346cd89cdc4826731/docs/index.html" target="_blank">0f49e8a</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-03-31
+</td>
+<td style="text-align:left;">
+alternative simulation
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d914e1411ce9a230878c6098a9423fbc91256728/analysis/index.Rmd" target="_blank">d914e14</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-03-30
+</td>
+<td style="text-align:left;">
+weights
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/d914e1411ce9a230878c6098a9423fbc91256728/docs/index.html" target="_blank">d914e14</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-03-30
+</td>
+<td style="text-align:left;">
+weights
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/2a9b0b7220e4b3802de7bc196687fbd3b2b80baf/analysis/index.Rmd" target="_blank">2a9b0b7</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-03-30
+</td>
+<td style="text-align:left;">
+weights
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/2a9b0b7220e4b3802de7bc196687fbd3b2b80baf/docs/index.html" target="_blank">2a9b0b7</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-03-30
+</td>
+<td style="text-align:left;">
+weights
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/c472cb31aaef6987dea256a249b819b229f78b2c/analysis/index.Rmd" target="_blank">c472cb3</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-03-29
+</td>
+<td style="text-align:left;">
+n(0,2)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/c472cb31aaef6987dea256a249b819b229f78b2c/docs/index.html" target="_blank">c472cb3</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-03-29
+</td>
+<td style="text-align:left;">
+n(0,2)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/5bd5d70c2467c0ebba78974f24b8603e18800886/analysis/index.Rmd" target="_blank">5bd5d70</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-03-28
+</td>
+<td style="text-align:left;">
+revision
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/5bd5d70c2467c0ebba78974f24b8603e18800886/docs/index.html" target="_blank">5bd5d70</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-03-28
+</td>
+<td style="text-align:left;">
+revision
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/c803b43a9255f39ecac06315f7e88db746dddfdf/analysis/index.Rmd" target="_blank">c803b43</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-03-27
+</td>
+<td style="text-align:left;">
+fitting and write-up
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/c803b43a9255f39ecac06315f7e88db746dddfdf/docs/index.html" target="_blank">c803b43</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-03-27
+</td>
+<td style="text-align:left;">
+fitting and write-up
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/bfde8e59932665262acac4c968f21876e672d884/analysis/index.Rmd" target="_blank">bfde8e5</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-03-10
+</td>
+<td style="text-align:left;">
+theoretical
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/bfde8e59932665262acac4c968f21876e672d884/docs/index.html" target="_blank">bfde8e5</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-03-10
+</td>
+<td style="text-align:left;">
+theoretical
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/894c395163d10f1934dd6a2f77afc1c5b478e5e4/analysis/index.Rmd" target="_blank">894c395</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-03-07
+</td>
+<td style="text-align:left;">
+histogram
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/894c395163d10f1934dd6a2f77afc1c5b478e5e4/docs/index.html" target="_blank">894c395</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-03-07
+</td>
+<td style="text-align:left;">
+histogram
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/03366d9cdbb6e40adbb2aab97a28bbeb538cf29b/analysis/index.Rmd" target="_blank">03366d9</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-03-06
+</td>
+<td style="text-align:left;">
+correlated_z
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/03366d9cdbb6e40adbb2aab97a28bbeb538cf29b/docs/index.html" target="_blank">03366d9</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-03-06
+</td>
+<td style="text-align:left;">
+correlated_z
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1c0be20bff17a40e48cd61bb56c0548053696b7f/analysis/index.Rmd" target="_blank">1c0be20</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-03-06
+</td>
+<td style="text-align:left;">
+write-ups
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/1c0be20bff17a40e48cd61bb56c0548053696b7f/docs/index.html" target="_blank">1c0be20</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-03-06
+</td>
+<td style="text-align:left;">
+write-ups
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/be223d31608b02fa777cfa4ee9593985519a79dd/analysis/index.Rmd" target="_blank">be223d3</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-03-04
+</td>
+<td style="text-align:left;">
+t
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/be223d31608b02fa777cfa4ee9593985519a79dd/docs/index.html" target="_blank">be223d3</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-03-04
+</td>
+<td style="text-align:left;">
+t
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0a13d527472fb988daab636b3cbc6406bb84045d/analysis/index.Rmd" target="_blank">0a13d52</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-02-23
+</td>
+<td style="text-align:left;">
+index
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/0a13d527472fb988daab636b3cbc6406bb84045d/docs/index.html" target="_blank">0a13d52</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-02-23
+</td>
+<td style="text-align:left;">
+index
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/dc6ad763c0d47dae3bce46fc35f2a865d956f330/analysis/index.Rmd" target="_blank">dc6ad76</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-02-23
+</td>
+<td style="text-align:left;">
+truncash
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/dc6ad763c0d47dae3bce46fc35f2a865d956f330/docs/index.html" target="_blank">dc6ad76</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-02-23
+</td>
+<td style="text-align:left;">
+truncash
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/242b1224ca13258b899a5856b42cb87b68d254b2/analysis/index.Rmd" target="_blank">242b122</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-02-22
+</td>
+<td style="text-align:left;">
+pihat0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/242b1224ca13258b899a5856b42cb87b68d254b2/docs/index.html" target="_blank">242b122</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-02-22
+</td>
+<td style="text-align:left;">
+pihat0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/2dbb6bb76031ac7be3771f63e882d47cb8c20611/analysis/index.Rmd" target="_blank">2dbb6bb</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-02-16
+</td>
+<td style="text-align:left;">
+index
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/2dbb6bb76031ac7be3771f63e882d47cb8c20611/docs/index.html" target="_blank">2dbb6bb</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-02-16
+</td>
+<td style="text-align:left;">
+index
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/7db293de450c37c876711ea346e6a67ffb76b0f9/analysis/index.Rmd" target="_blank">7db293d</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-02-14
+</td>
+<td style="text-align:left;">
+index
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/7db293de450c37c876711ea346e6a67ffb76b0f9/docs/index.html" target="_blank">7db293d</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-02-14
+</td>
+<td style="text-align:left;">
+index
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/81d84f5f3a8d9a4df9edbfb4b7cd26016833d951/docs/index.html" target="_blank">81d84f5</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-02-10
+</td>
+<td style="text-align:left;">
+FDR
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/2696cb2bfc4ec049384ec72d180c5c79e2e08066/analysis/index.Rmd" target="_blank">2696cb2</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-02-10
+</td>
+<td style="text-align:left;">
+fwer
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/313897fb1fec208b282d427cd58d15c250033902/analysis/index.Rmd" target="_blank">313897f</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-02-03
+</td>
+<td style="text-align:left;">
+details
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/313897fb1fec208b282d427cd58d15c250033902/docs/index.html" target="_blank">313897f</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-02-03
+</td>
+<td style="text-align:left;">
+details
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/36c1e4cfb5d8c615603778be7183ef369848cdca/docs/index.html" target="_blank">36c1e4c</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-02-03
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d25a6e33d640cc22c808adc8d4ad715a14e538c5/analysis/index.Rmd" target="_blank">d25a6e3</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-02-03
+</td>
+<td style="text-align:left;">
+step-down
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d616c3d70d87cad4126878ebf12001386fda1668/analysis/index.Rmd" target="_blank">d616c3d</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-02-03
+</td>
+<td style="text-align:left;">
+occurrence
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/d616c3d70d87cad4126878ebf12001386fda1668/docs/index.html" target="_blank">d616c3d</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-02-03
+</td>
+<td style="text-align:left;">
+occurrence
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/858f0e45c2e4fd91c36b4a01ecff242b9c8a8fcc/analysis/index.Rmd" target="_blank">858f0e4</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-02-01
+</td>
+<td style="text-align:left;">
+background
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/858f0e45c2e4fd91c36b4a01ecff242b9c8a8fcc/docs/index.html" target="_blank">858f0e4</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-02-01
+</td>
+<td style="text-align:left;">
+background
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/d575294b2b025aac67c0d0e42044e34f95c0cc01/docs/index.html" target="_blank">d575294</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-01-31
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/58b04b8410c9b70ffd19d11b653ccdda8018dd83/analysis/index.Rmd" target="_blank">58b04b8</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-01-29
+</td>
+<td style="text-align:left;">
+intro
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/58b04b8410c9b70ffd19d11b653ccdda8018dd83/docs/index.html" target="_blank">58b04b8</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-01-29
+</td>
+<td style="text-align:left;">
+intro
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1d187aa01f1f69a5fc0b9fa144cb0edce4b51e99/analysis/index.Rmd" target="_blank">1d187aa</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-01-29
+</td>
+<td style="text-align:left;">
+First Commit
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/1d187aa01f1f69a5fc0b9fa144cb0edce4b51e99/docs/index.html" target="_blank">1d187aa</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-01-29
+</td>
+<td style="text-align:left;">
+First Commit
+</td>
+</tr>
+</tbody>
+</table>
+</ul>
+</details>
+<hr />
 <p><code>truncash</code> (Truncated ASH) is an exploratory project with Matthew, built on <a href="https://github.com/stephens999/ashr"><code>ashr</code></a>.</p>
 <ul>
 <li><a href="voom_null.html">Matthew’s initial observation on null, correlated data</a></li>
@@ -439,16 +2973,10 @@ $(document).ready(function () {
 <li><a href="knockoff_10.html"><code>Knockoff</code> vs Bayesian: Large signals</a></li>
 <li><a href="knockoff_var.html">The variability of FDP by <code>Knockoff</code></a></li>
 </ul>
-<!-- The goal of this new template is to simplify the setup and maintenance of a research website. -->
-<!-- Specifically, -->
-<!-- *  Easier to build and extend the website using the new tools in the [rmarkdown][] package and [latest RStudio release][rstudio] -->
-<!-- *  Easier to deploy the website with Git and GitHub by only using one branch -->
-<!-- [rmarkdown]: http://rmarkdown.rstudio.com/rmarkdown_websites.htm -->
-<!-- [rstudio]: https://www.rstudio.com/products/rstudio/download/preview/ -->
 
 <hr>
 <p>
-    This <a href="http://rmarkdown.rstudio.com">R Markdown</a> site was created with <a href="https://github.com/jdblischak/workflowr">workflowr</a>
+    
 </p>
 <hr>
 
@@ -470,6 +2998,25 @@ $(document).ready(function () {
     <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
     <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
 -->
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+<hr>
+<p>
+  This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a>
+  analysis was created with
+  <a href="https://github.com/jdblischak/workflowr">workflowr</a> 1.0.1
+</p>
+<hr>
 
 
 

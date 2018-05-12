@@ -300,6 +300,13 @@ div.tocify {
   </div><!--/.container -->
 </div><!--/.navbar -->
 
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
 <div class="fluid-row" id="header">
 
 
@@ -311,15 +318,528 @@ div.tocify {
 </div>
 
 
-<!-- The file analysis/chunks.R contains chunks that define default settings
-shared across the workflowr files. -->
-<!-- Update knitr chunk options -->
-<!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2018-04-03</p>
-<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
- package git2r is installed -->
-<p><strong>Code version:</strong> 5bce84a</p>
-<!-- Add your analysis here -->
+<p><strong>Last updated:</strong> 2018-05-12</p>
+<strong>workflowr checks:</strong> <small>(Click a bullet for more information)</small>
+<ul>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>R Markdown file:</strong> up-to-date </summary></p>
+<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Environment:</strong> empty </summary></p>
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Seed:</strong> <code>set.seed(12345)</code> </summary></p>
+<p>The command <code>set.seed(12345)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Session information:</strong> recorded </summary></p>
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/ddf906244e82e0675854c40da76dc16cf1a78fa4" target="_blank">ddf9062</a> </summary></p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    analysis/.DS_Store
+    Ignored:    analysis/BH_robustness_cache/
+    Ignored:    analysis/FDR_Null_cache/
+    Ignored:    analysis/FDR_null_betahat_cache/
+    Ignored:    analysis/Rmosek_cache/
+    Ignored:    analysis/StepDown_cache/
+    Ignored:    analysis/alternative2_cache/
+    Ignored:    analysis/alternative_cache/
+    Ignored:    analysis/ash_gd_cache/
+    Ignored:    analysis/average_cor_gtex_2_cache/
+    Ignored:    analysis/average_cor_gtex_cache/
+    Ignored:    analysis/brca_cache/
+    Ignored:    analysis/cash_deconv_cache/
+    Ignored:    analysis/cash_fdr_1_cache/
+    Ignored:    analysis/cash_fdr_2_cache/
+    Ignored:    analysis/cash_fdr_3_cache/
+    Ignored:    analysis/cash_fdr_4_cache/
+    Ignored:    analysis/cash_fdr_5_cache/
+    Ignored:    analysis/cash_fdr_6_cache/
+    Ignored:    analysis/cash_plots_cache/
+    Ignored:    analysis/cash_sim_1_cache/
+    Ignored:    analysis/cash_sim_2_cache/
+    Ignored:    analysis/cash_sim_3_cache/
+    Ignored:    analysis/cash_sim_4_cache/
+    Ignored:    analysis/cash_sim_5_cache/
+    Ignored:    analysis/cash_sim_6_cache/
+    Ignored:    analysis/cash_sim_7_cache/
+    Ignored:    analysis/correlated_z_2_cache/
+    Ignored:    analysis/correlated_z_3_cache/
+    Ignored:    analysis/correlated_z_cache/
+    Ignored:    analysis/create_null_cache/
+    Ignored:    analysis/cutoff_null_cache/
+    Ignored:    analysis/design_matrix_2_cache/
+    Ignored:    analysis/design_matrix_cache/
+    Ignored:    analysis/diagnostic_ash_cache/
+    Ignored:    analysis/diagnostic_correlated_z_2_cache/
+    Ignored:    analysis/diagnostic_correlated_z_3_cache/
+    Ignored:    analysis/diagnostic_correlated_z_cache/
+    Ignored:    analysis/diagnostic_plot_2_cache/
+    Ignored:    analysis/diagnostic_plot_cache/
+    Ignored:    analysis/efron_leukemia_cache/
+    Ignored:    analysis/fitting_normal_cache/
+    Ignored:    analysis/gaussian_derivatives_2_cache/
+    Ignored:    analysis/gaussian_derivatives_3_cache/
+    Ignored:    analysis/gaussian_derivatives_4_cache/
+    Ignored:    analysis/gaussian_derivatives_5_cache/
+    Ignored:    analysis/gaussian_derivatives_cache/
+    Ignored:    analysis/gd-ash_cache/
+    Ignored:    analysis/gd_delta_cache/
+    Ignored:    analysis/gd_lik_2_cache/
+    Ignored:    analysis/gd_lik_cache/
+    Ignored:    analysis/gd_w_cache/
+    Ignored:    analysis/knockoff_10_cache/
+    Ignored:    analysis/knockoff_2_cache/
+    Ignored:    analysis/knockoff_3_cache/
+    Ignored:    analysis/knockoff_4_cache/
+    Ignored:    analysis/knockoff_5_cache/
+    Ignored:    analysis/knockoff_6_cache/
+    Ignored:    analysis/knockoff_7_cache/
+    Ignored:    analysis/knockoff_8_cache/
+    Ignored:    analysis/knockoff_9_cache/
+    Ignored:    analysis/knockoff_cache/
+    Ignored:    analysis/knockoff_var_cache/
+    Ignored:    analysis/marginal_z_alternative_cache/
+    Ignored:    analysis/marginal_z_cache/
+    Ignored:    analysis/mosek_reg_2_cache/
+    Ignored:    analysis/mosek_reg_4_cache/
+    Ignored:    analysis/mosek_reg_5_cache/
+    Ignored:    analysis/mosek_reg_6_cache/
+    Ignored:    analysis/mosek_reg_cache/
+    Ignored:    analysis/pihat0_null_cache/
+    Ignored:    analysis/plot_diagnostic_cache/
+    Ignored:    analysis/poster_obayes17_cache/
+    Ignored:    analysis/real_data_simulation_2_cache/
+    Ignored:    analysis/real_data_simulation_3_cache/
+    Ignored:    analysis/real_data_simulation_4_cache/
+    Ignored:    analysis/real_data_simulation_5_cache/
+    Ignored:    analysis/real_data_simulation_cache/
+    Ignored:    analysis/rmosek_primal_dual_2_cache/
+    Ignored:    analysis/rmosek_primal_dual_cache/
+    Ignored:    analysis/seqgendiff_cache/
+    Ignored:    analysis/simulated_correlated_null_2_cache/
+    Ignored:    analysis/simulated_correlated_null_3_cache/
+    Ignored:    analysis/simulated_correlated_null_cache/
+    Ignored:    analysis/simulation_real_se_2_cache/
+    Ignored:    analysis/simulation_real_se_cache/
+    Ignored:    analysis/smemo_2_cache/
+    Ignored:    data/LSI/
+    Ignored:    docs/.DS_Store
+    Ignored:    docs/figure/.DS_Store
+    Ignored:    output/fig/
+
+Unstaged changes:
+    Deleted:    analysis/cash_plots_fdp.Rmd
+
+</code></pre>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</details>
+</li>
+</ul>
+<details>
+<summary> <small><strong>Expand here to see past versions:</strong></small> </summary>
+<ul>
+<table style="border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+File
+</th>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+<th style="text-align:left;">
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/cc0ab8379469bc3726f1508cd81e4ecd6fef1b1a/analysis/knockoff_6.rmd" target="_blank">cc0ab83</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-05-11
+</td>
+<td style="text-align:left;">
+update
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/6af9b53bf86bc43dabecc0173cbb79c2b98626a4/docs/knockoff_6.html" target="_blank">6af9b53</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-04-03
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/5bce84a27c3f19aeac398409c9a2ed86ff8c0033/analysis/knockoff_6.rmd" target="_blank">5bce84a</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-04-03
+</td>
+<td style="text-align:left;">
+wflow_publish(c(“knockoff_6.rmd”, “knockoff_var.rmd”))
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/389feabc9a858976f6cb1c5dbce1b9b6d4d2d0e2/docs/knockoff_6.html" target="_blank">389feab</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-16
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/43d68f5c580c2283ff1c294a2a20d4fd3c08107f/analysis/knockoff_6.rmd" target="_blank">43d68f5</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-16
+</td>
+<td style="text-align:left;">
+small signal plots
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/af9e532f3921ec9190df2c512a78853c91994cdc/docs/knockoff_6.html" target="_blank">af9e532</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-16
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/9c5dc8fcfe53e6061a1ecdef70b0392b5f3c3e4f/analysis/knockoff_6.rmd" target="_blank">9c5dc8f</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-16
+</td>
+<td style="text-align:left;">
+small signals
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/e6884e4df7ce894d425790de9548881914f2ef11/analysis/knockoff_6.rmd" target="_blank">e6884e4</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-16
+</td>
+<td style="text-align:left;">
+small signals
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/c1d4306929908eb76f946bd0d921f2971a0ce292/analysis/knockoff_6.rmd" target="_blank">c1d4306</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-16
+</td>
+<td style="text-align:left;">
+better plots
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/3151e073df933fa60d1978d1a9ab776178202301/docs/knockoff_6.html" target="_blank">3151e07</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-15
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/c586cb3e54e9b3669e22d025cd9c26d7fa63058c/analysis/knockoff_6.rmd" target="_blank">c586cb3</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-15
+</td>
+<td style="text-align:left;">
+wflow_publish(“analysis/knockoff_6.rmd”)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/c926d348ffdad200b84aced9cd410087d6f73d39/analysis/knockoff_6.rmd" target="_blank">c926d34</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+<td style="text-align:left;">
+small signals
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/0033db5d63ebfb36ae8705a785b1112c46d8c7af/docs/knockoff_6.html" target="_blank">0033db5</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/c9c60cc99c8bafbd9fe48aacdaa7ee7446d35a7c/analysis/knockoff_6.rmd" target="_blank">c9c60cc</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+<td style="text-align:left;">
+wflow_publish(“analysis/knockoff_6.rmd”)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/ab63fb3bda427e1fd44e028d5a31235dd755a413/docs/knockoff_6.html" target="_blank">ab63fb3</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-08
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1a2b7bfb05c755cfc0f3d3ad506d2f0669909528/analysis/knockoff_6.rmd" target="_blank">1a2b7bf</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-08
+</td>
+<td style="text-align:left;">
+wflow_publish(c(“analysis/knockoff_5.rmd”,
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/a17136eba2b1940a4dc37fbcea30773551fbae62/analysis/knockoff_6.rmd" target="_blank">a17136e</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-02-07
+</td>
+<td style="text-align:left;">
+small signals
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/fe9b5dfffc83c7552a924990a56b063803443544/docs/knockoff_6.html" target="_blank">fe9b5df</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-07
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/7f18ee7e0b86cf2e44a8c5419ccecd9f88f5938c/analysis/knockoff_6.rmd" target="_blank">7f18ee7</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-07
+</td>
+<td style="text-align:left;">
+wflow_publish(c(“analysis/knockoff_5.rmd”, “analysis/knockoff_6.rmd”))
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/0d440454746b4d41353ce970834d535ccea9009e/docs/knockoff_6.html" target="_blank">0d44045</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-06
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/ee112bcc806c5070f6ed26317499bdf5ebe31e9c/analysis/knockoff_6.rmd" target="_blank">ee112bc</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-06
+</td>
+<td style="text-align:left;">
+wflow_publish(c(“analysis/knockoff_5.rmd”, “analysis/knockoff_6.rmd”,
+</td>
+</tr>
+</tbody>
+</table>
+</ul>
+</details>
+<hr />
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
 <p>In the <code>Knockoff</code> paper simulations, <span class="math inline">\(\beta\)</span>’s are either <span class="math inline">\(0\)</span> or <span class="math inline">\(A\)</span>. Here we are replicating the results, and investigating how well <code>Knockoff</code> deal with small signals.</p>
@@ -344,6 +864,37 @@ X &lt;- svd(X)$u
 Xk &lt;- knockoff::create.fixed(X)
 Xk &lt;- Xk$Xk</code></pre>
 <p><img src="figure/knockoff_6.rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-5-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/ab63fb3bda427e1fd44e028d5a31235dd755a413/docs/figure/knockoff_6.rmd/unnamed-chunk-5-1.png" target="_blank">ab63fb3</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-08
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 </div>
 <div id="scenario-2-50-large-signals-100-small-signals-850-zeroes." class="section level3">
 <h3>Scenario 2: 50 large signals, 100 small signals, 850 zeroes.</h3>
@@ -352,6 +903,48 @@ X &lt;- svd(X)$u
 Xk &lt;- knockoff::create.fixed(X)
 Xk &lt;- Xk$Xk</code></pre>
 <p><img src="figure/knockoff_6.rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-10-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0033db5d63ebfb36ae8705a785b1112c46d8c7af/docs/figure/knockoff_6.rmd/unnamed-chunk-10-1.png" target="_blank">0033db5</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/ab63fb3bda427e1fd44e028d5a31235dd755a413/docs/figure/knockoff_6.rmd/unnamed-chunk-10-1.png" target="_blank">ab63fb3</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-08
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 </div>
 <div id="scenario-3-50-large-signals-200-small-signals-750-zeroes." class="section level3">
 <h3>Scenario 3: 50 large signals, 200 small signals, 750 zeroes.</h3>
@@ -360,6 +953,48 @@ X &lt;- svd(X)$u
 Xk &lt;- knockoff::create.fixed(X)
 Xk &lt;- Xk$Xk</code></pre>
 <p><img src="figure/knockoff_6.rmd/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-15-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0033db5d63ebfb36ae8705a785b1112c46d8c7af/docs/figure/knockoff_6.rmd/unnamed-chunk-15-1.png" target="_blank">0033db5</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/ab63fb3bda427e1fd44e028d5a31235dd755a413/docs/figure/knockoff_6.rmd/unnamed-chunk-15-1.png" target="_blank">ab63fb3</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-08
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 </div>
 </div>
 <div id="fix-x-knockoffs" class="section level2">
@@ -370,70 +1005,420 @@ Xk &lt;- Xk$Xk</code></pre>
 <table>
 <thead>
 <tr class="header">
-<th align="right">FDP.BH</th>
-<th align="right">FDP.Knockoff</th>
-<th align="right">FDP.Knockoff.Plus</th>
-<th align="right">Power.BH</th>
-<th align="right">Power.Knockoff</th>
-<th align="right">Power.Knockoff.Plus</th>
-<th align="right">Power.Large.BH</th>
-<th align="right">Power.Large.Knockoff</th>
-<th align="right">Power.Large.Knockoff.Plus</th>
-<th align="right">Power.Small.BH</th>
-<th align="right">Power.Small.Knockoff</th>
-<th align="right">Power.Small.Knockoff.Plus</th>
+<th align="left">FDP.BH</th>
+<th align="left">FDP.Knockoff</th>
+<th align="left">FDP.Knockoff.Plus</th>
+<th align="left">Power.BH</th>
+<th align="left">Power.Knockoff</th>
+<th align="left">Power.Knockoff.Plus</th>
+<th align="left">Power.Large.BH</th>
+<th align="left">Power.Large.Knockoff</th>
+<th align="left">Power.Large.Knockoff.Plus</th>
+<th align="left">Power.Small.BH</th>
+<th align="left">Power.Small.Knockoff</th>
+<th align="left">Power.Small.Knockoff.Plus</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="right">0.0979</td>
-<td align="right">0.1082</td>
-<td align="right">0.0863</td>
-<td align="right">0.7339</td>
-<td align="right">0.7329</td>
-<td align="right">0.6939</td>
-<td align="right">0.7339</td>
-<td align="right">0.7329</td>
-<td align="right">0.6939</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
+<td align="left">0.0979</td>
+<td align="left">0.1082</td>
+<td align="left">0.0863</td>
+<td align="left">0.7339</td>
+<td align="left">0.7329</td>
+<td align="left">0.6939</td>
+<td align="left">0.7339</td>
+<td align="left">0.7329</td>
+<td align="left">0.6939</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="right">0.0847</td>
-<td align="right">0.0921</td>
-<td align="right">0.0795</td>
-<td align="right">0.3836</td>
-<td align="right">0.3867</td>
-<td align="right">0.3691</td>
-<td align="right">0.7791</td>
-<td align="right">0.7799</td>
-<td align="right">0.7555</td>
-<td align="right">0.1858</td>
-<td align="right">0.1901</td>
-<td align="right">0.176</td>
+<td align="left">0.0847</td>
+<td align="left">0.0921</td>
+<td align="left">0.0795</td>
+<td align="left">0.3836</td>
+<td align="left">0.3867</td>
+<td align="left">0.3691</td>
+<td align="left">0.7791</td>
+<td align="left">0.7799</td>
+<td align="left">0.7555</td>
+<td align="left">0.1858</td>
+<td align="left">0.1901</td>
+<td align="left">0.176</td>
 </tr>
 <tr class="odd">
-<td align="right">0.0756</td>
-<td align="right">0.0817</td>
-<td align="right">0.0727</td>
-<td align="right">0.3294</td>
-<td align="right">0.3340</td>
-<td align="right">0.3195</td>
-<td align="right">0.8116</td>
-<td align="right">0.8122</td>
-<td align="right">0.7932</td>
-<td align="right">0.2088</td>
-<td align="right">0.2145</td>
-<td align="right">0.201</td>
+<td align="left">0.0756</td>
+<td align="left">0.0817</td>
+<td align="left">0.0727</td>
+<td align="left">0.3294</td>
+<td align="left">0.3340</td>
+<td align="left">0.3195</td>
+<td align="left">0.8116</td>
+<td align="left">0.8122</td>
+<td align="left">0.7932</td>
+<td align="left">0.2088</td>
+<td align="left">0.2145</td>
+<td align="left">0.201</td>
 </tr>
 </tbody>
 </table>
-<p><img src="figure/knockoff_6.rmd/unnamed-chunk-18-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_6.rmd/unnamed-chunk-18-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_6.rmd/unnamed-chunk-18-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_6.rmd/unnamed-chunk-18-4.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/knockoff_6.rmd/unnamed-chunk-18-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-18-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/af9e532f3921ec9190df2c512a78853c91994cdc/docs/figure/knockoff_6.rmd/unnamed-chunk-18-1.png" target="_blank">af9e532</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-16
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/fe9b5dfffc83c7552a924990a56b063803443544/docs/figure/knockoff_6.rmd/unnamed-chunk-18-1.png" target="_blank">fe9b5df</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-07
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/knockoff_6.rmd/unnamed-chunk-18-2.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-18-2.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/af9e532f3921ec9190df2c512a78853c91994cdc/docs/figure/knockoff_6.rmd/unnamed-chunk-18-2.png" target="_blank">af9e532</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-16
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/knockoff_6.rmd/unnamed-chunk-18-3.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-18-3.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/af9e532f3921ec9190df2c512a78853c91994cdc/docs/figure/knockoff_6.rmd/unnamed-chunk-18-3.png" target="_blank">af9e532</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-16
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/knockoff_6.rmd/unnamed-chunk-18-4.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-18-4.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/389feabc9a858976f6cb1c5dbce1b9b6d4d2d0e2/docs/figure/knockoff_6.rmd/unnamed-chunk-18-4.png" target="_blank">389feab</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-16
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/af9e532f3921ec9190df2c512a78853c91994cdc/docs/figure/knockoff_6.rmd/unnamed-chunk-18-4.png" target="_blank">af9e532</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-16
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <p><img src="figure/knockoff_6.rmd/unnamed-chunk-19-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-19-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/3151e073df933fa60d1978d1a9ab776178202301/docs/figure/knockoff_6.rmd/unnamed-chunk-19-1.png" target="_blank">3151e07</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-15
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <p><img src="figure/knockoff_6.rmd/unnamed-chunk-20-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-20-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/3151e073df933fa60d1978d1a9ab776178202301/docs/figure/knockoff_6.rmd/unnamed-chunk-20-1.png" target="_blank">3151e07</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-15
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0033db5d63ebfb36ae8705a785b1112c46d8c7af/docs/figure/knockoff_6.rmd/unnamed-chunk-20-1.png" target="_blank">0033db5</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/ab63fb3bda427e1fd44e028d5a31235dd755a413/docs/figure/knockoff_6.rmd/unnamed-chunk-20-1.png" target="_blank">ab63fb3</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-08
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <p><img src="figure/knockoff_6.rmd/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-21-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/3151e073df933fa60d1978d1a9ab776178202301/docs/figure/knockoff_6.rmd/unnamed-chunk-21-1.png" target="_blank">3151e07</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-15
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0033db5d63ebfb36ae8705a785b1112c46d8c7af/docs/figure/knockoff_6.rmd/unnamed-chunk-21-1.png" target="_blank">0033db5</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/ab63fb3bda427e1fd44e028d5a31235dd755a413/docs/figure/knockoff_6.rmd/unnamed-chunk-21-1.png" target="_blank">ab63fb3</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-08
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <p><img src="figure/knockoff_6.rmd/unnamed-chunk-22-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-22-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/3151e073df933fa60d1978d1a9ab776178202301/docs/figure/knockoff_6.rmd/unnamed-chunk-22-1.png" target="_blank">3151e07</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-15
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0033db5d63ebfb36ae8705a785b1112c46d8c7af/docs/figure/knockoff_6.rmd/unnamed-chunk-22-1.png" target="_blank">0033db5</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/ab63fb3bda427e1fd44e028d5a31235dd755a413/docs/figure/knockoff_6.rmd/unnamed-chunk-22-1.png" target="_blank">ab63fb3</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-08
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/fe9b5dfffc83c7552a924990a56b063803443544/docs/figure/knockoff_6.rmd/unnamed-chunk-22-1.png" target="_blank">fe9b5df</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-07
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 </div>
 <div id="independent-design" class="section level3">
 <h3>Independent design</h3>
@@ -453,70 +1438,332 @@ Xk &lt;- Xk$Xk</code></pre>
 <table>
 <thead>
 <tr class="header">
-<th align="right">FDP.BH</th>
-<th align="right">FDP.Knockoff</th>
-<th align="right">FDP.Knockoff.Plus</th>
-<th align="right">Power.BH</th>
-<th align="right">Power.Knockoff</th>
-<th align="right">Power.Knockoff.Plus</th>
-<th align="right">Power.Large.BH</th>
-<th align="right">Power.Large.Knockoff</th>
-<th align="right">Power.Large.Knockoff.Plus</th>
-<th align="right">Power.Small.BH</th>
-<th align="right">Power.Small.Knockoff</th>
-<th align="right">Power.Small.Knockoff.Plus</th>
+<th align="left">FDP.BH</th>
+<th align="left">FDP.Knockoff</th>
+<th align="left">FDP.Knockoff.Plus</th>
+<th align="left">Power.BH</th>
+<th align="left">Power.Knockoff</th>
+<th align="left">Power.Knockoff.Plus</th>
+<th align="left">Power.Large.BH</th>
+<th align="left">Power.Large.Knockoff</th>
+<th align="left">Power.Large.Knockoff.Plus</th>
+<th align="left">Power.Small.BH</th>
+<th align="left">Power.Small.Knockoff</th>
+<th align="left">Power.Small.Knockoff.Plus</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="right">0.0950</td>
-<td align="right">0.0713</td>
-<td align="right">0.0483</td>
-<td align="right">0.4344</td>
-<td align="right">0.5399</td>
-<td align="right">0.4135</td>
-<td align="right">0.4344</td>
-<td align="right">0.5399</td>
-<td align="right">0.4135</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
+<td align="left">0.0950</td>
+<td align="left">0.0713</td>
+<td align="left">0.0483</td>
+<td align="left">0.4344</td>
+<td align="left">0.5399</td>
+<td align="left">0.4135</td>
+<td align="left">0.4344</td>
+<td align="left">0.5399</td>
+<td align="left">0.4135</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="right">0.0828</td>
-<td align="right">0.0587</td>
-<td align="right">0.0397</td>
-<td align="right">0.2180</td>
-<td align="right">0.2106</td>
-<td align="right">0.1584</td>
-<td align="right">0.4789</td>
-<td align="right">0.4820</td>
-<td align="right">0.3699</td>
-<td align="right">0.0876</td>
-<td align="right">0.0749</td>
-<td align="right">0.0527</td>
+<td align="left">0.0828</td>
+<td align="left">0.0587</td>
+<td align="left">0.0397</td>
+<td align="left">0.2180</td>
+<td align="left">0.2106</td>
+<td align="left">0.1584</td>
+<td align="left">0.4789</td>
+<td align="left">0.4820</td>
+<td align="left">0.3699</td>
+<td align="left">0.0876</td>
+<td align="left">0.0749</td>
+<td align="left">0.0527</td>
 </tr>
 <tr class="odd">
-<td align="right">0.0747</td>
-<td align="right">0.0456</td>
-<td align="right">0.0325</td>
-<td align="right">0.1838</td>
-<td align="right">0.1613</td>
-<td align="right">0.1243</td>
-<td align="right">0.5135</td>
-<td align="right">0.4372</td>
-<td align="right">0.3432</td>
-<td align="right">0.1013</td>
-<td align="right">0.0923</td>
-<td align="right">0.0696</td>
+<td align="left">0.0747</td>
+<td align="left">0.0456</td>
+<td align="left">0.0325</td>
+<td align="left">0.1838</td>
+<td align="left">0.1613</td>
+<td align="left">0.1243</td>
+<td align="left">0.5135</td>
+<td align="left">0.4372</td>
+<td align="left">0.3432</td>
+<td align="left">0.1013</td>
+<td align="left">0.0923</td>
+<td align="left">0.0696</td>
 </tr>
 </tbody>
 </table>
-<p><img src="figure/knockoff_6.rmd/unnamed-chunk-35-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_6.rmd/unnamed-chunk-35-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_6.rmd/unnamed-chunk-35-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_6.rmd/unnamed-chunk-35-4.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/knockoff_6.rmd/unnamed-chunk-35-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-35-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/af9e532f3921ec9190df2c512a78853c91994cdc/docs/figure/knockoff_6.rmd/unnamed-chunk-35-1.png" target="_blank">af9e532</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-16
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/knockoff_6.rmd/unnamed-chunk-35-2.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-35-2.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/af9e532f3921ec9190df2c512a78853c91994cdc/docs/figure/knockoff_6.rmd/unnamed-chunk-35-2.png" target="_blank">af9e532</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-16
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/knockoff_6.rmd/unnamed-chunk-35-3.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-35-3.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/af9e532f3921ec9190df2c512a78853c91994cdc/docs/figure/knockoff_6.rmd/unnamed-chunk-35-3.png" target="_blank">af9e532</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-16
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/knockoff_6.rmd/unnamed-chunk-35-4.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-35-4.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/389feabc9a858976f6cb1c5dbce1b9b6d4d2d0e2/docs/figure/knockoff_6.rmd/unnamed-chunk-35-4.png" target="_blank">389feab</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-16
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/af9e532f3921ec9190df2c512a78853c91994cdc/docs/figure/knockoff_6.rmd/unnamed-chunk-35-4.png" target="_blank">af9e532</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-16
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <p><img src="figure/knockoff_6.rmd/unnamed-chunk-36-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-36-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/3151e073df933fa60d1978d1a9ab776178202301/docs/figure/knockoff_6.rmd/unnamed-chunk-36-1.png" target="_blank">3151e07</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-15
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <p><img src="figure/knockoff_6.rmd/unnamed-chunk-37-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-37-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/3151e073df933fa60d1978d1a9ab776178202301/docs/figure/knockoff_6.rmd/unnamed-chunk-37-1.png" target="_blank">3151e07</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-15
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <p><img src="figure/knockoff_6.rmd/unnamed-chunk-38-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-38-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/3151e073df933fa60d1978d1a9ab776178202301/docs/figure/knockoff_6.rmd/unnamed-chunk-38-1.png" target="_blank">3151e07</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-15
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <p><img src="figure/knockoff_6.rmd/unnamed-chunk-39-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-39-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/3151e073df933fa60d1978d1a9ab776178202301/docs/figure/knockoff_6.rmd/unnamed-chunk-39-1.png" target="_blank">3151e07</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-15
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 </div>
 <div id="local-correlation-design" class="section level3">
 <h3>Local correlation design</h3>
@@ -541,70 +1788,332 @@ Xk &lt;- Xk$Xk</code></pre>
 <table>
 <thead>
 <tr class="header">
-<th align="right">FDP.BH</th>
-<th align="right">FDP.Knockoff</th>
-<th align="right">FDP.Knockoff.Plus</th>
-<th align="right">Power.BH</th>
-<th align="right">Power.Knockoff</th>
-<th align="right">Power.Knockoff.Plus</th>
-<th align="right">Power.Large.BH</th>
-<th align="right">Power.Large.Knockoff</th>
-<th align="right">Power.Large.Knockoff.Plus</th>
-<th align="right">Power.Small.BH</th>
-<th align="right">Power.Small.Knockoff</th>
-<th align="right">Power.Small.Knockoff.Plus</th>
+<th align="left">FDP.BH</th>
+<th align="left">FDP.Knockoff</th>
+<th align="left">FDP.Knockoff.Plus</th>
+<th align="left">Power.BH</th>
+<th align="left">Power.Knockoff</th>
+<th align="left">Power.Knockoff.Plus</th>
+<th align="left">Power.Large.BH</th>
+<th align="left">Power.Large.Knockoff</th>
+<th align="left">Power.Large.Knockoff.Plus</th>
+<th align="left">Power.Small.BH</th>
+<th align="left">Power.Small.Knockoff</th>
+<th align="left">Power.Small.Knockoff.Plus</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="right">0.0957</td>
-<td align="right">0.0563</td>
-<td align="right">0.0344</td>
-<td align="right">0.3367</td>
-<td align="right">0.4985</td>
-<td align="right">0.3484</td>
-<td align="right">0.3367</td>
-<td align="right">0.4985</td>
-<td align="right">0.3484</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
+<td align="left">0.0957</td>
+<td align="left">0.0563</td>
+<td align="left">0.0344</td>
+<td align="left">0.3367</td>
+<td align="left">0.4985</td>
+<td align="left">0.3484</td>
+<td align="left">0.3367</td>
+<td align="left">0.4985</td>
+<td align="left">0.3484</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="right">0.0824</td>
-<td align="right">0.0407</td>
-<td align="right">0.0249</td>
-<td align="right">0.1710</td>
-<td align="right">0.1656</td>
-<td align="right">0.1070</td>
-<td align="right">0.3820</td>
-<td align="right">0.3620</td>
-<td align="right">0.2348</td>
-<td align="right">0.0655</td>
-<td align="right">0.0673</td>
-<td align="right">0.0431</td>
+<td align="left">0.0824</td>
+<td align="left">0.0407</td>
+<td align="left">0.0249</td>
+<td align="left">0.1710</td>
+<td align="left">0.1656</td>
+<td align="left">0.1070</td>
+<td align="left">0.3820</td>
+<td align="left">0.3620</td>
+<td align="left">0.2348</td>
+<td align="left">0.0655</td>
+<td align="left">0.0673</td>
+<td align="left">0.0431</td>
 </tr>
 <tr class="odd">
-<td align="right">0.0738</td>
-<td align="right">0.0258</td>
-<td align="right">0.0170</td>
-<td align="right">0.1441</td>
-<td align="right">0.1393</td>
-<td align="right">0.0988</td>
-<td align="right">0.4137</td>
-<td align="right">0.4040</td>
-<td align="right">0.2893</td>
-<td align="right">0.0767</td>
-<td align="right">0.0731</td>
-<td align="right">0.0511</td>
+<td align="left">0.0738</td>
+<td align="left">0.0258</td>
+<td align="left">0.0170</td>
+<td align="left">0.1441</td>
+<td align="left">0.1393</td>
+<td align="left">0.0988</td>
+<td align="left">0.4137</td>
+<td align="left">0.4040</td>
+<td align="left">0.2893</td>
+<td align="left">0.0767</td>
+<td align="left">0.0731</td>
+<td align="left">0.0511</td>
 </tr>
 </tbody>
 </table>
-<p><img src="figure/knockoff_6.rmd/unnamed-chunk-52-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_6.rmd/unnamed-chunk-52-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_6.rmd/unnamed-chunk-52-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_6.rmd/unnamed-chunk-52-4.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/knockoff_6.rmd/unnamed-chunk-52-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-52-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/af9e532f3921ec9190df2c512a78853c91994cdc/docs/figure/knockoff_6.rmd/unnamed-chunk-52-1.png" target="_blank">af9e532</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-16
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/knockoff_6.rmd/unnamed-chunk-52-2.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-52-2.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/af9e532f3921ec9190df2c512a78853c91994cdc/docs/figure/knockoff_6.rmd/unnamed-chunk-52-2.png" target="_blank">af9e532</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-16
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/knockoff_6.rmd/unnamed-chunk-52-3.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-52-3.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/af9e532f3921ec9190df2c512a78853c91994cdc/docs/figure/knockoff_6.rmd/unnamed-chunk-52-3.png" target="_blank">af9e532</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-16
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/knockoff_6.rmd/unnamed-chunk-52-4.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-52-4.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/389feabc9a858976f6cb1c5dbce1b9b6d4d2d0e2/docs/figure/knockoff_6.rmd/unnamed-chunk-52-4.png" target="_blank">389feab</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-16
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/af9e532f3921ec9190df2c512a78853c91994cdc/docs/figure/knockoff_6.rmd/unnamed-chunk-52-4.png" target="_blank">af9e532</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-16
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <p><img src="figure/knockoff_6.rmd/unnamed-chunk-53-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-53-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/3151e073df933fa60d1978d1a9ab776178202301/docs/figure/knockoff_6.rmd/unnamed-chunk-53-1.png" target="_blank">3151e07</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-15
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <p><img src="figure/knockoff_6.rmd/unnamed-chunk-54-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-54-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/3151e073df933fa60d1978d1a9ab776178202301/docs/figure/knockoff_6.rmd/unnamed-chunk-54-1.png" target="_blank">3151e07</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-15
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <p><img src="figure/knockoff_6.rmd/unnamed-chunk-55-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-55-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/3151e073df933fa60d1978d1a9ab776178202301/docs/figure/knockoff_6.rmd/unnamed-chunk-55-1.png" target="_blank">3151e07</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-15
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <p><img src="figure/knockoff_6.rmd/unnamed-chunk-56-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-56-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/3151e073df933fa60d1978d1a9ab776178202301/docs/figure/knockoff_6.rmd/unnamed-chunk-56-1.png" target="_blank">3151e07</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-02-15
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 </div>
 </div>
 <div id="model-x-knockoffs" class="section level2">
@@ -616,70 +2125,321 @@ Xk &lt;- Xk$Xk</code></pre>
 <table>
 <thead>
 <tr class="header">
-<th align="right">FDP.BH</th>
-<th align="right">FDP.Knockoff</th>
-<th align="right">FDP.Knockoff.Plus</th>
-<th align="right">Power.BH</th>
-<th align="right">Power.Knockoff</th>
-<th align="right">Power.Knockoff.Plus</th>
-<th align="right">Power.Large.BH</th>
-<th align="right">Power.Large.Knockoff</th>
-<th align="right">Power.Large.Knockoff.Plus</th>
-<th align="right">Power.Small.BH</th>
-<th align="right">Power.Small.Knockoff</th>
-<th align="right">Power.Small.Knockoff.Plus</th>
+<th align="left">FDP.BH</th>
+<th align="left">FDP.Knockoff</th>
+<th align="left">FDP.Knockoff.Plus</th>
+<th align="left">Power.BH</th>
+<th align="left">Power.Knockoff</th>
+<th align="left">Power.Knockoff.Plus</th>
+<th align="left">Power.Large.BH</th>
+<th align="left">Power.Large.Knockoff</th>
+<th align="left">Power.Large.Knockoff.Plus</th>
+<th align="left">Power.Small.BH</th>
+<th align="left">Power.Small.Knockoff</th>
+<th align="left">Power.Small.Knockoff.Plus</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="right">0.0903</td>
-<td align="right">0.1164</td>
-<td align="right">0.0935</td>
-<td align="right">0.4312</td>
-<td align="right">0.6632</td>
-<td align="right">0.6124</td>
-<td align="right">0.4312</td>
-<td align="right">0.6632</td>
-<td align="right">0.6124</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
+<td align="left">0.0903</td>
+<td align="left">0.1164</td>
+<td align="left">0.0935</td>
+<td align="left">0.4312</td>
+<td align="left">0.6632</td>
+<td align="left">0.6124</td>
+<td align="left">0.4312</td>
+<td align="left">0.6632</td>
+<td align="left">0.6124</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="right">0.0782</td>
-<td align="right">0.1150</td>
-<td align="right">0.0929</td>
-<td align="right">0.2213</td>
-<td align="right">0.3417</td>
-<td align="right">0.3161</td>
-<td align="right">0.4808</td>
-<td align="right">0.6924</td>
-<td align="right">0.6526</td>
-<td align="right">0.0916</td>
-<td align="right">0.1664</td>
-<td align="right">0.1478</td>
+<td align="left">0.0782</td>
+<td align="left">0.1150</td>
+<td align="left">0.0929</td>
+<td align="left">0.2213</td>
+<td align="left">0.3417</td>
+<td align="left">0.3161</td>
+<td align="left">0.4808</td>
+<td align="left">0.6924</td>
+<td align="left">0.6526</td>
+<td align="left">0.0916</td>
+<td align="left">0.1664</td>
+<td align="left">0.1478</td>
 </tr>
 <tr class="odd">
-<td align="right">0.0693</td>
-<td align="right">0.0923</td>
-<td align="right">0.0806</td>
-<td align="right">0.1803</td>
-<td align="right">0.2731</td>
-<td align="right">0.2573</td>
-<td align="right">0.5156</td>
-<td align="right">0.6962</td>
-<td align="right">0.6718</td>
-<td align="right">0.0965</td>
-<td align="right">0.1674</td>
-<td align="right">0.1536</td>
+<td align="left">0.0693</td>
+<td align="left">0.0923</td>
+<td align="left">0.0806</td>
+<td align="left">0.1803</td>
+<td align="left">0.2731</td>
+<td align="left">0.2573</td>
+<td align="left">0.5156</td>
+<td align="left">0.6962</td>
+<td align="left">0.6718</td>
+<td align="left">0.0965</td>
+<td align="left">0.1674</td>
+<td align="left">0.1536</td>
 </tr>
 </tbody>
 </table>
-<p><img src="figure/knockoff_6.rmd/unnamed-chunk-66-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_6.rmd/unnamed-chunk-66-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_6.rmd/unnamed-chunk-66-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_6.rmd/unnamed-chunk-66-4.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/knockoff_6.rmd/unnamed-chunk-66-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-66-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/6af9b53bf86bc43dabecc0173cbb79c2b98626a4/docs/figure/knockoff_6.rmd/unnamed-chunk-66-1.png" target="_blank">6af9b53</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-04-03
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/knockoff_6.rmd/unnamed-chunk-66-2.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-66-2.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/6af9b53bf86bc43dabecc0173cbb79c2b98626a4/docs/figure/knockoff_6.rmd/unnamed-chunk-66-2.png" target="_blank">6af9b53</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-04-03
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/knockoff_6.rmd/unnamed-chunk-66-3.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-66-3.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/6af9b53bf86bc43dabecc0173cbb79c2b98626a4/docs/figure/knockoff_6.rmd/unnamed-chunk-66-3.png" target="_blank">6af9b53</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-04-03
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/knockoff_6.rmd/unnamed-chunk-66-4.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-66-4.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/6af9b53bf86bc43dabecc0173cbb79c2b98626a4/docs/figure/knockoff_6.rmd/unnamed-chunk-66-4.png" target="_blank">6af9b53</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-04-03
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <p><img src="figure/knockoff_6.rmd/unnamed-chunk-67-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-67-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/6af9b53bf86bc43dabecc0173cbb79c2b98626a4/docs/figure/knockoff_6.rmd/unnamed-chunk-67-1.png" target="_blank">6af9b53</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-04-03
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <p><img src="figure/knockoff_6.rmd/unnamed-chunk-68-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-68-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/6af9b53bf86bc43dabecc0173cbb79c2b98626a4/docs/figure/knockoff_6.rmd/unnamed-chunk-68-1.png" target="_blank">6af9b53</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-04-03
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <p><img src="figure/knockoff_6.rmd/unnamed-chunk-69-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-69-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/6af9b53bf86bc43dabecc0173cbb79c2b98626a4/docs/figure/knockoff_6.rmd/unnamed-chunk-69-1.png" target="_blank">6af9b53</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-04-03
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <p><img src="figure/knockoff_6.rmd/unnamed-chunk-70-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-70-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/6af9b53bf86bc43dabecc0173cbb79c2b98626a4/docs/figure/knockoff_6.rmd/unnamed-chunk-70-1.png" target="_blank">6af9b53</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-04-03
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 </div>
 <div id="local-correlation-design-1" class="section level3">
 <h3>Local correlation design</h3>
@@ -691,75 +2451,325 @@ Cov.X &lt;- Sigma / n</code></pre>
 <table>
 <thead>
 <tr class="header">
-<th align="right">FDP.BH</th>
-<th align="right">FDP.Knockoff</th>
-<th align="right">FDP.Knockoff.Plus</th>
-<th align="right">Power.BH</th>
-<th align="right">Power.Knockoff</th>
-<th align="right">Power.Knockoff.Plus</th>
-<th align="right">Power.Large.BH</th>
-<th align="right">Power.Large.Knockoff</th>
-<th align="right">Power.Large.Knockoff.Plus</th>
-<th align="right">Power.Small.BH</th>
-<th align="right">Power.Small.Knockoff</th>
-<th align="right">Power.Small.Knockoff.Plus</th>
+<th align="left">FDP.BH</th>
+<th align="left">FDP.Knockoff</th>
+<th align="left">FDP.Knockoff.Plus</th>
+<th align="left">Power.BH</th>
+<th align="left">Power.Knockoff</th>
+<th align="left">Power.Knockoff.Plus</th>
+<th align="left">Power.Large.BH</th>
+<th align="left">Power.Large.Knockoff</th>
+<th align="left">Power.Large.Knockoff.Plus</th>
+<th align="left">Power.Small.BH</th>
+<th align="left">Power.Small.Knockoff</th>
+<th align="left">Power.Small.Knockoff.Plus</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="right">0.1199</td>
-<td align="right">0.1230</td>
-<td align="right">0.0946</td>
-<td align="right">0.1268</td>
-<td align="right">0.6036</td>
-<td align="right">0.5196</td>
-<td align="right">0.1268</td>
-<td align="right">0.6036</td>
-<td align="right">0.5196</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
+<td align="left">0.1199</td>
+<td align="left">0.1230</td>
+<td align="left">0.0946</td>
+<td align="left">0.1268</td>
+<td align="left">0.6036</td>
+<td align="left">0.5196</td>
+<td align="left">0.1268</td>
+<td align="left">0.6036</td>
+<td align="left">0.5196</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="right">0.0840</td>
-<td align="right">0.0971</td>
-<td align="right">0.0800</td>
-<td align="right">0.0635</td>
-<td align="right">0.2759</td>
-<td align="right">0.2469</td>
-<td align="right">0.1504</td>
-<td align="right">0.5784</td>
-<td align="right">0.5246</td>
-<td align="right">0.0200</td>
-<td align="right">0.1246</td>
-<td align="right">0.1081</td>
+<td align="left">0.0840</td>
+<td align="left">0.0971</td>
+<td align="left">0.0800</td>
+<td align="left">0.0635</td>
+<td align="left">0.2759</td>
+<td align="left">0.2469</td>
+<td align="left">0.1504</td>
+<td align="left">0.5784</td>
+<td align="left">0.5246</td>
+<td align="left">0.0200</td>
+<td align="left">0.1246</td>
+<td align="left">0.1081</td>
 </tr>
 <tr class="odd">
-<td align="right">0.1562</td>
-<td align="right">0.0671</td>
-<td align="right">0.0467</td>
-<td align="right">0.0944</td>
-<td align="right">0.1253</td>
-<td align="right">0.0953</td>
-<td align="right">0.2850</td>
-<td align="right">0.3564</td>
-<td align="right">0.2782</td>
-<td align="right">0.0467</td>
-<td align="right">0.0676</td>
-<td align="right">0.0496</td>
+<td align="left">0.1562</td>
+<td align="left">0.0671</td>
+<td align="left">0.0467</td>
+<td align="left">0.0944</td>
+<td align="left">0.1253</td>
+<td align="left">0.0953</td>
+<td align="left">0.2850</td>
+<td align="left">0.3564</td>
+<td align="left">0.2782</td>
+<td align="left">0.0467</td>
+<td align="left">0.0676</td>
+<td align="left">0.0496</td>
 </tr>
 </tbody>
 </table>
-<p><img src="figure/knockoff_6.rmd/unnamed-chunk-80-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_6.rmd/unnamed-chunk-80-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_6.rmd/unnamed-chunk-80-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/knockoff_6.rmd/unnamed-chunk-80-4.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/knockoff_6.rmd/unnamed-chunk-80-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-80-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/6af9b53bf86bc43dabecc0173cbb79c2b98626a4/docs/figure/knockoff_6.rmd/unnamed-chunk-80-1.png" target="_blank">6af9b53</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-04-03
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/knockoff_6.rmd/unnamed-chunk-80-2.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-80-2.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/6af9b53bf86bc43dabecc0173cbb79c2b98626a4/docs/figure/knockoff_6.rmd/unnamed-chunk-80-2.png" target="_blank">6af9b53</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-04-03
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/knockoff_6.rmd/unnamed-chunk-80-3.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-80-3.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/6af9b53bf86bc43dabecc0173cbb79c2b98626a4/docs/figure/knockoff_6.rmd/unnamed-chunk-80-3.png" target="_blank">6af9b53</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-04-03
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<p><img src="figure/knockoff_6.rmd/unnamed-chunk-80-4.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-80-4.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/6af9b53bf86bc43dabecc0173cbb79c2b98626a4/docs/figure/knockoff_6.rmd/unnamed-chunk-80-4.png" target="_blank">6af9b53</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-04-03
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <p><img src="figure/knockoff_6.rmd/unnamed-chunk-81-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-81-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/6af9b53bf86bc43dabecc0173cbb79c2b98626a4/docs/figure/knockoff_6.rmd/unnamed-chunk-81-1.png" target="_blank">6af9b53</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-04-03
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <p><img src="figure/knockoff_6.rmd/unnamed-chunk-82-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-82-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/6af9b53bf86bc43dabecc0173cbb79c2b98626a4/docs/figure/knockoff_6.rmd/unnamed-chunk-82-1.png" target="_blank">6af9b53</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-04-03
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <p><img src="figure/knockoff_6.rmd/unnamed-chunk-83-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-83-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/6af9b53bf86bc43dabecc0173cbb79c2b98626a4/docs/figure/knockoff_6.rmd/unnamed-chunk-83-1.png" target="_blank">6af9b53</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-04-03
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <p><img src="figure/knockoff_6.rmd/unnamed-chunk-84-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-84-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/6af9b53bf86bc43dabecc0173cbb79c2b98626a4/docs/figure/knockoff_6.rmd/unnamed-chunk-84-1.png" target="_blank">6af9b53</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-04-03
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 </div>
 </div>
 <div id="session-information" class="section level2">
 <h2>Session information</h2>
-<!-- Insert the session information into the document -->
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
@@ -782,18 +2792,22 @@ other attached packages:
 [9] knockoff_0.3.0 
 
 loaded via a namespace (and not attached):
- [1] Rcpp_0.12.14     magrittr_1.5     munsell_0.4.3    colorspace_1.3-2
- [5] rlang_0.1.6      highr_0.6        stringr_1.3.0    plyr_1.8.4      
- [9] tools_3.4.3      grid_3.4.3       gtable_0.2.0     git2r_0.21.0    
-[13] htmltools_0.3.6  yaml_2.1.18      lazyeval_0.2.1   rprojroot_1.3-2 
-[17] digest_0.6.15    tibble_1.4.1     codetools_0.2-15 evaluate_0.10.1 
-[21] rmarkdown_1.9    labeling_0.3     stringi_1.1.6    pillar_1.0.1    
-[25] compiler_3.4.3   scales_0.5.0     backports_1.1.2 </code></pre>
+ [1] Rcpp_0.12.16      compiler_3.4.3    pillar_1.0.1     
+ [4] git2r_0.21.0      plyr_1.8.4        highr_0.6        
+ [7] workflowr_1.0.1   R.methodsS3_1.7.1 R.utils_2.6.0    
+[10] tools_3.4.3       digest_0.6.15     evaluate_0.10.1  
+[13] tibble_1.4.1      gtable_0.2.0      rlang_0.1.6      
+[16] yaml_2.1.18       stringr_1.3.0     rprojroot_1.3-2  
+[19] grid_3.4.3        rmarkdown_1.9     magrittr_1.5     
+[22] whisker_0.3-2     backports_1.1.2   scales_0.5.0     
+[25] codetools_0.2-15  htmltools_0.3.6   colorspace_1.3-2 
+[28] labeling_0.3      stringi_1.1.6     lazyeval_0.2.1   
+[31] munsell_0.4.3     R.oo_1.21.0      </code></pre>
 </div>
 
 <hr>
 <p>
-    This <a href="http://rmarkdown.rstudio.com">R Markdown</a> site was created with <a href="https://github.com/jdblischak/workflowr">workflowr</a>
+    
 </p>
 <hr>
 
@@ -815,6 +2829,25 @@ loaded via a namespace (and not attached):
     <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
     <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
 -->
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+<hr>
+<p>
+  This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a>
+  analysis was created with
+  <a href="https://github.com/jdblischak/workflowr">workflowr</a> 1.0.1
+</p>
+<hr>
 
 
 </div>

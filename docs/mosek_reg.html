@@ -300,6 +300,13 @@ div.tocify {
   </div><!--/.container -->
 </div><!--/.navbar -->
 
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
 <div class="fluid-row" id="header">
 
 
@@ -311,24 +318,316 @@ div.tocify {
 </div>
 
 
-<!-- The file analysis/chunks.R contains chunks that define default settings
-shared across the workflowr files. -->
-<!-- Update knitr chunk options -->
-<!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2017-12-21</p>
-<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
- package git2r is installed -->
-<p><strong>Code version:</strong> 6e42447</p>
-<!-- Add your analysis here -->
-<section id="introduction" class="level2">
+<p><strong>Last updated:</strong> 2018-05-12</p>
+<strong>workflowr checks:</strong> <small>(Click a bullet for more information)</small>
+<ul>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>R Markdown file:</strong> up-to-date </summary></p>
+<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Environment:</strong> empty </summary></p>
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Seed:</strong> <code>set.seed(12345)</code> </summary></p>
+<p>The command <code>set.seed(12345)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Session information:</strong> recorded </summary></p>
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/ddf906244e82e0675854c40da76dc16cf1a78fa4" target="_blank">ddf9062</a> </summary></p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    analysis/.DS_Store
+    Ignored:    analysis/BH_robustness_cache/
+    Ignored:    analysis/FDR_Null_cache/
+    Ignored:    analysis/FDR_null_betahat_cache/
+    Ignored:    analysis/Rmosek_cache/
+    Ignored:    analysis/StepDown_cache/
+    Ignored:    analysis/alternative2_cache/
+    Ignored:    analysis/alternative_cache/
+    Ignored:    analysis/ash_gd_cache/
+    Ignored:    analysis/average_cor_gtex_2_cache/
+    Ignored:    analysis/average_cor_gtex_cache/
+    Ignored:    analysis/brca_cache/
+    Ignored:    analysis/cash_deconv_cache/
+    Ignored:    analysis/cash_fdr_1_cache/
+    Ignored:    analysis/cash_fdr_2_cache/
+    Ignored:    analysis/cash_fdr_3_cache/
+    Ignored:    analysis/cash_fdr_4_cache/
+    Ignored:    analysis/cash_fdr_5_cache/
+    Ignored:    analysis/cash_fdr_6_cache/
+    Ignored:    analysis/cash_plots_cache/
+    Ignored:    analysis/cash_sim_1_cache/
+    Ignored:    analysis/cash_sim_2_cache/
+    Ignored:    analysis/cash_sim_3_cache/
+    Ignored:    analysis/cash_sim_4_cache/
+    Ignored:    analysis/cash_sim_5_cache/
+    Ignored:    analysis/cash_sim_6_cache/
+    Ignored:    analysis/cash_sim_7_cache/
+    Ignored:    analysis/correlated_z_2_cache/
+    Ignored:    analysis/correlated_z_3_cache/
+    Ignored:    analysis/correlated_z_cache/
+    Ignored:    analysis/create_null_cache/
+    Ignored:    analysis/cutoff_null_cache/
+    Ignored:    analysis/design_matrix_2_cache/
+    Ignored:    analysis/design_matrix_cache/
+    Ignored:    analysis/diagnostic_ash_cache/
+    Ignored:    analysis/diagnostic_correlated_z_2_cache/
+    Ignored:    analysis/diagnostic_correlated_z_3_cache/
+    Ignored:    analysis/diagnostic_correlated_z_cache/
+    Ignored:    analysis/diagnostic_plot_2_cache/
+    Ignored:    analysis/diagnostic_plot_cache/
+    Ignored:    analysis/efron_leukemia_cache/
+    Ignored:    analysis/fitting_normal_cache/
+    Ignored:    analysis/gaussian_derivatives_2_cache/
+    Ignored:    analysis/gaussian_derivatives_3_cache/
+    Ignored:    analysis/gaussian_derivatives_4_cache/
+    Ignored:    analysis/gaussian_derivatives_5_cache/
+    Ignored:    analysis/gaussian_derivatives_cache/
+    Ignored:    analysis/gd-ash_cache/
+    Ignored:    analysis/gd_delta_cache/
+    Ignored:    analysis/gd_lik_2_cache/
+    Ignored:    analysis/gd_lik_cache/
+    Ignored:    analysis/gd_w_cache/
+    Ignored:    analysis/knockoff_10_cache/
+    Ignored:    analysis/knockoff_2_cache/
+    Ignored:    analysis/knockoff_3_cache/
+    Ignored:    analysis/knockoff_4_cache/
+    Ignored:    analysis/knockoff_5_cache/
+    Ignored:    analysis/knockoff_6_cache/
+    Ignored:    analysis/knockoff_7_cache/
+    Ignored:    analysis/knockoff_8_cache/
+    Ignored:    analysis/knockoff_9_cache/
+    Ignored:    analysis/knockoff_cache/
+    Ignored:    analysis/knockoff_var_cache/
+    Ignored:    analysis/marginal_z_alternative_cache/
+    Ignored:    analysis/marginal_z_cache/
+    Ignored:    analysis/mosek_reg_2_cache/
+    Ignored:    analysis/mosek_reg_4_cache/
+    Ignored:    analysis/mosek_reg_5_cache/
+    Ignored:    analysis/mosek_reg_6_cache/
+    Ignored:    analysis/mosek_reg_cache/
+    Ignored:    analysis/pihat0_null_cache/
+    Ignored:    analysis/plot_diagnostic_cache/
+    Ignored:    analysis/poster_obayes17_cache/
+    Ignored:    analysis/real_data_simulation_2_cache/
+    Ignored:    analysis/real_data_simulation_3_cache/
+    Ignored:    analysis/real_data_simulation_4_cache/
+    Ignored:    analysis/real_data_simulation_5_cache/
+    Ignored:    analysis/real_data_simulation_cache/
+    Ignored:    analysis/rmosek_primal_dual_2_cache/
+    Ignored:    analysis/rmosek_primal_dual_cache/
+    Ignored:    analysis/seqgendiff_cache/
+    Ignored:    analysis/simulated_correlated_null_2_cache/
+    Ignored:    analysis/simulated_correlated_null_3_cache/
+    Ignored:    analysis/simulated_correlated_null_cache/
+    Ignored:    analysis/simulation_real_se_2_cache/
+    Ignored:    analysis/simulation_real_se_cache/
+    Ignored:    analysis/smemo_2_cache/
+    Ignored:    data/LSI/
+    Ignored:    docs/.DS_Store
+    Ignored:    docs/figure/.DS_Store
+    Ignored:    output/fig/
+
+Unstaged changes:
+    Deleted:    analysis/cash_plots_fdp.Rmd
+
+</code></pre>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</details>
+</li>
+</ul>
+<details>
+<summary> <small><strong>Expand here to see past versions:</strong></small> </summary>
+<ul>
+<table style="border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+File
+</th>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+<th style="text-align:left;">
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/cc0ab8379469bc3726f1508cd81e4ecd6fef1b1a/analysis/mosek_reg.rmd" target="_blank">cc0ab83</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-05-11
+</td>
+<td style="text-align:left;">
+update
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/mosek_reg.html" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/853a484bfacf347e109f6c8fb3ffaab5f4d6cc02/docs/mosek_reg.html" target="_blank">853a484</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-07
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/1ea081a9eeb7fd3101271eeefe10ef8be9993622/docs/mosek_reg.html" target="_blank">1ea081a</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-07-03
+</td>
+<td style="text-align:left;">
+sites
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/899a5f8715e62e7f00fb6b334e5159c90ff672b4/docs/mosek_reg.html" target="_blank">899a5f8</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-09
+</td>
+<td style="text-align:left;">
+mosek improvements
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1df916a921abfc4bf3504fdee5bc849e78b5b0d6/analysis/mosek_reg.rmd" target="_blank">1df916a</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-09
+</td>
+<td style="text-align:left;">
+mosek improvement
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/27bcaf9682ee32f9f548c6e5516f0c8ef684663c/docs/mosek_reg.html" target="_blank">27bcaf9</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-08
+</td>
+<td style="text-align:left;">
+writeups
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/6bac69e4ab027a161595872353a444b19769c794/analysis/mosek_reg.rmd" target="_blank">6bac69e</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-08
+</td>
+<td style="text-align:left;">
+writeups
+</td>
+</tr>
+</tbody>
+</table>
+</ul>
+</details>
+<hr />
+<div id="introduction" class="section level2">
 <h2>Introduction</h2>
 <p>We are experimenting different ways to improve the performance of <code>Rmosek</code>, using typical data sets of correlated <span class="math inline">\(z\)</span> scores.</p>
 <pre class="r"><code>z &lt;- read.table(&quot;../output/z_null_liver_777.txt&quot;)</code></pre>
 <pre class="r"><code>sel &lt;- c(32, 327, 355, 483, 778)
 ord &lt;- c(4, 9, 9, 4, 4)</code></pre>
 <pre class="r"><code>source(&quot;../code/gdash.R&quot;)</code></pre>
-</section>
-<section id="algorithm-and-variations" class="level2">
+</div>
+<div id="algorithm-and-variations" class="section level2">
 <h2>Algorithm and variations</h2>
 <p>Recall that our <a href="ash_gd.html#optimization_problem">biconvex optimization problem</a> is as follows.</p>
 <p><span class="math display">\[
@@ -363,8 +662,8 @@ ord &lt;- c(4, 9, 9, 4, 4)</code></pre>
 \]</span> The two constraints are important to prevent <a href="gaussian_derivatives_3.html">numerical instability</a>. Yet they are not readily manifested as convex. Ideally, the regularization <span class="math inline">\(\sum\limits_{l = 1}^L\lambda_l^w\phi\left(\left|w_l\right|\right)\)</span> would be able to capture the essence of these two constaints, and at the same time maintain the convexity. Different ideas will be explored.</p>
 <p>In this part, we’ll mainly work on the “basic form” of the <span class="math inline">\(w\)</span> optimization problem; that is, the optimization problem without regularization <span class="math inline">\(\sum\limits_{l = 1}^L\lambda_l^w\phi\left(\left|w_l\right|\right)\)</span>.</p>
 <p>In the following, we’ll take a look at the basic form in its primal and dual formulations, optimized by <code>w.mosek()</code> and <code>w.mosek.primal</code> functions. First, they are applied to the correlated null, and their performance can be compared with <a href="gaussian_derivatives_2.html">the previous implementation</a> by <code>cvxr</code>. Then, they are applied to the simulated non-null data sets, and the results are compared with those obtained by <code>ASH</code>, as well as the truth.</p>
-</section>
-<section id="basic-form-primal" class="level2">
+</div>
+<div id="basic-form-primal" class="section level2">
 <h2>Basic form: primal</h2>
 <p>In its most basic form, the <span class="math inline">\(w\)</span> estimation problem is as follows.</p>
 <p><span class="math display">\[
@@ -388,7 +687,7 @@ ord &lt;- c(4, 9, 9, 4, 4)</code></pre>
 \end{array}
 \]</span></p>
 <p>This problem can be coded by <code>Rmosek</code> as a “separable convex optimization” (SCOPT) problem.</p>
-<section id="correlated-null" class="level3">
+<div id="correlated-null" class="section level3">
 <h3>Correlated null</h3>
 <pre><code>Fitted w: -0.03653526 0.1999284 0.01047094 -0.02012681 
 Time Cost in Seconds: 7.945 2.884 13.152 </code></pre>
@@ -405,8 +704,8 @@ Time Cost in Seconds: 19.294 2.066 14.959 </code></pre>
 <pre><code>Fitted w: 0.005943196 0.3980709 -0.009222458 0.02630697 
 Time Cost in Seconds: 6.636 1.954 6.815 </code></pre>
 <p><img src="figure/mosek_reg.rmd/Rmosek primal fitting plotting-5.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="signal-correlated-error" class="level3">
+</div>
+<div id="signal-correlated-error" class="section level3">
 <h3>Signal <span class="math inline">\(+\)</span> correlated error</h3>
 <pre><code>Converged: FALSE 
 Number of Iteration: 101 
@@ -428,9 +727,9 @@ Time Cost in Seconds: 781.062 126.839 622.938 </code></pre>
 Number of Iteration: 101 
 Time Cost in Seconds: 2161.426 247.628 1565.216 </code></pre>
 <p><img src="figure/mosek_reg.rmd/gdash primal signal plotting-5.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-</section>
-<section id="basic-form-dual" class="level2">
+</div>
+</div>
+<div id="basic-form-dual" class="section level2">
 <h2>Basic form: dual</h2>
 <p>The primal <span class="math inline">\(w\)</span> optimization problem has <span class="math inline">\(n + L\)</span> variables and <span class="math inline">\(n\)</span> constraints. When <span class="math inline">\(n\)</span> is large, such as <span class="math inline">\(n = 10K\)</span> in our simulations, the time cost is usually substantial. As the authors of <code>REBayes</code> pointed out, it’s better to work on the dual form, which is</p>
 <p><span class="math display">\[
@@ -445,7 +744,7 @@ Time Cost in Seconds: 2161.426 247.628 1565.216 </code></pre>
 \end{array}
 \]</span> The dual form has <span class="math inline">\(n\)</span> variables and more importantly, only <span class="math inline">\(L\)</span> constraints. As <span class="math inline">\(L \ll n\)</span>, the dual form is far more computationally efficient.</p>
 <p><code>Rmosek</code> provides optimal solutions to both primal and dual variables, so <span class="math inline">\(\hat w\)</span> is readily available when working on <span class="math inline">\(v\)</span> optimization. But we need to be careful on which dual variables to use, such as <code>$sol$itr$suc</code>, <code>$sol$itr$slc</code>, or others.</p>
-<section id="correlated-null-1" class="level3">
+<div id="correlated-null-1" class="section level3">
 <h3>Correlated null</h3>
 <pre><code>Fitted w: -0.03642797 0.1971637 0.01074601 -0.02181494 
 Time Cost in Seconds: 0.485 0.049 0.388 </code></pre>
@@ -462,8 +761,8 @@ Time Cost in Seconds: 0.448 0.006 0.322 </code></pre>
 <pre><code>Fitted w: 0.006084177 0.3976595 -0.009103231 0.02610567 
 Time Cost in Seconds: 0.489 0.005 0.313 </code></pre>
 <p><img src="figure/mosek_reg.rmd/Rmosek dual fitting plotting-5.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="signal-correlated-error-1" class="level3">
+</div>
+<div id="signal-correlated-error-1" class="section level3">
 <h3>Signal <span class="math inline">\(+\)</span> correlated error</h3>
 <pre><code>Converged: TRUE 
 Number of Iteration: 21 
@@ -485,20 +784,19 @@ Time Cost in Seconds: 64.198 3.902 39.897 </code></pre>
 Number of Iteration: 12 
 Time Cost in Seconds: 27.247 1.446 15.392 </code></pre>
 <p><img src="figure/mosek_reg.rmd/gdash dual signal plotting-5.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-</section>
-<section id="conclusion" class="level2">
+</div>
+</div>
+<div id="conclusion" class="section level2">
 <h2>Conclusion</h2>
 <p>Implementation by <code>Rmosek</code> can fully reproduce the results obtained by <code>cvxr</code>. Moreover, the dual form gives the same results as the primal dorm does, with only a fraction of time.</p>
 <p>It seems hopeful that we’ll find a key to successfully tackle correlation in simultaneous inference, which has eluded Prof. Brad Efron for more than a decade.</p>
-</section>
-<section id="session-information" class="level2">
+</div>
+<div id="session-information" class="section level2">
 <h2>Session information</h2>
-<!-- Insert the session information into the document -->
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS High Sierra 10.13.2
+Running under: macOS High Sierra 10.13.4
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -511,24 +809,25 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] Rmosek_8.0.69     PolynomF_1.0-1    CVXR_0.94-4       REBayes_1.2      
+[1] Rmosek_8.0.69     PolynomF_1.0-1    CVXR_0.95         REBayes_1.2      
 [5] Matrix_1.2-12     SQUAREM_2017.10-1 EQL_1.0-0         ttutils_1.0-1    
 
 loaded via a namespace (and not attached):
- [1] Rcpp_0.12.14      knitr_1.17        magrittr_1.5     
- [4] bit_1.1-12        lattice_0.20-35   R6_2.2.2         
- [7] stringr_1.2.0     tools_3.4.3       grid_3.4.3       
-[10] R.oo_1.21.0       git2r_0.20.0      scs_1.1-1        
-[13] htmltools_0.3.6   bit64_0.9-7       yaml_2.1.16      
-[16] rprojroot_1.3-1   digest_0.6.13     gmp_0.5-13.1     
-[19] ECOSolveR_0.3-2   R.utils_2.6.0     evaluate_0.10.1  
-[22] rmarkdown_1.8     stringi_1.1.6     compiler_3.4.3   
-[25] Rmpfr_0.6-1       backports_1.1.2   R.methodsS3_1.7.1</code></pre>
-</section>
+ [1] Rcpp_0.12.16      knitr_1.20        whisker_0.3-2    
+ [4] magrittr_1.5      workflowr_1.0.1   bit_1.1-12       
+ [7] lattice_0.20-35   R6_2.2.2          stringr_1.3.0    
+[10] tools_3.4.3       grid_3.4.3        R.oo_1.21.0      
+[13] git2r_0.21.0      scs_1.1-1         htmltools_0.3.6  
+[16] bit64_0.9-7       yaml_2.1.18       rprojroot_1.3-2  
+[19] digest_0.6.15     gmp_0.5-13.1      ECOSolveR_0.4    
+[22] R.utils_2.6.0     evaluate_0.10.1   rmarkdown_1.9    
+[25] stringi_1.1.6     Rmpfr_0.6-1       compiler_3.4.3   
+[28] backports_1.1.2   R.methodsS3_1.7.1</code></pre>
+</div>
 
 <hr>
 <p>
-    This <a href="http://rmarkdown.rstudio.com">R Markdown</a> site was created with <a href="https://github.com/jdblischak/workflowr">workflowr</a>
+    
 </p>
 <hr>
 
@@ -550,6 +849,25 @@ loaded via a namespace (and not attached):
     <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
     <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
 -->
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+<hr>
+<p>
+  This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a>
+  analysis was created with
+  <a href="https://github.com/jdblischak/workflowr">workflowr</a> 1.0.1
+</p>
+<hr>
 
 
 </div>

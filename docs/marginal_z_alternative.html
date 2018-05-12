@@ -300,6 +300,13 @@ div.tocify {
   </div><!--/.container -->
 </div><!--/.navbar -->
 
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
 <div class="fluid-row" id="header">
 
 
@@ -311,16 +318,274 @@ div.tocify {
 </div>
 
 
-<!-- The file analysis/chunks.R contains chunks that define default settings
-shared across the workflowr files. -->
-<!-- Update knitr chunk options -->
-<!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2017-12-21</p>
-<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
- package git2r is installed -->
-<p><strong>Code version:</strong> 6e42447</p>
-<!-- Add your analysis here -->
-<section id="introduction" class="level2">
+<p><strong>Last updated:</strong> 2018-05-12</p>
+<strong>workflowr checks:</strong> <small>(Click a bullet for more information)</small>
+<ul>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>R Markdown file:</strong> up-to-date </summary></p>
+<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Environment:</strong> empty </summary></p>
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Seed:</strong> <code>set.seed(12345)</code> </summary></p>
+<p>The command <code>set.seed(12345)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Session information:</strong> recorded </summary></p>
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/ddf906244e82e0675854c40da76dc16cf1a78fa4" target="_blank">ddf9062</a> </summary></p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    analysis/.DS_Store
+    Ignored:    analysis/BH_robustness_cache/
+    Ignored:    analysis/FDR_Null_cache/
+    Ignored:    analysis/FDR_null_betahat_cache/
+    Ignored:    analysis/Rmosek_cache/
+    Ignored:    analysis/StepDown_cache/
+    Ignored:    analysis/alternative2_cache/
+    Ignored:    analysis/alternative_cache/
+    Ignored:    analysis/ash_gd_cache/
+    Ignored:    analysis/average_cor_gtex_2_cache/
+    Ignored:    analysis/average_cor_gtex_cache/
+    Ignored:    analysis/brca_cache/
+    Ignored:    analysis/cash_deconv_cache/
+    Ignored:    analysis/cash_fdr_1_cache/
+    Ignored:    analysis/cash_fdr_2_cache/
+    Ignored:    analysis/cash_fdr_3_cache/
+    Ignored:    analysis/cash_fdr_4_cache/
+    Ignored:    analysis/cash_fdr_5_cache/
+    Ignored:    analysis/cash_fdr_6_cache/
+    Ignored:    analysis/cash_plots_cache/
+    Ignored:    analysis/cash_sim_1_cache/
+    Ignored:    analysis/cash_sim_2_cache/
+    Ignored:    analysis/cash_sim_3_cache/
+    Ignored:    analysis/cash_sim_4_cache/
+    Ignored:    analysis/cash_sim_5_cache/
+    Ignored:    analysis/cash_sim_6_cache/
+    Ignored:    analysis/cash_sim_7_cache/
+    Ignored:    analysis/correlated_z_2_cache/
+    Ignored:    analysis/correlated_z_3_cache/
+    Ignored:    analysis/correlated_z_cache/
+    Ignored:    analysis/create_null_cache/
+    Ignored:    analysis/cutoff_null_cache/
+    Ignored:    analysis/design_matrix_2_cache/
+    Ignored:    analysis/design_matrix_cache/
+    Ignored:    analysis/diagnostic_ash_cache/
+    Ignored:    analysis/diagnostic_correlated_z_2_cache/
+    Ignored:    analysis/diagnostic_correlated_z_3_cache/
+    Ignored:    analysis/diagnostic_correlated_z_cache/
+    Ignored:    analysis/diagnostic_plot_2_cache/
+    Ignored:    analysis/diagnostic_plot_cache/
+    Ignored:    analysis/efron_leukemia_cache/
+    Ignored:    analysis/fitting_normal_cache/
+    Ignored:    analysis/gaussian_derivatives_2_cache/
+    Ignored:    analysis/gaussian_derivatives_3_cache/
+    Ignored:    analysis/gaussian_derivatives_4_cache/
+    Ignored:    analysis/gaussian_derivatives_5_cache/
+    Ignored:    analysis/gaussian_derivatives_cache/
+    Ignored:    analysis/gd-ash_cache/
+    Ignored:    analysis/gd_delta_cache/
+    Ignored:    analysis/gd_lik_2_cache/
+    Ignored:    analysis/gd_lik_cache/
+    Ignored:    analysis/gd_w_cache/
+    Ignored:    analysis/knockoff_10_cache/
+    Ignored:    analysis/knockoff_2_cache/
+    Ignored:    analysis/knockoff_3_cache/
+    Ignored:    analysis/knockoff_4_cache/
+    Ignored:    analysis/knockoff_5_cache/
+    Ignored:    analysis/knockoff_6_cache/
+    Ignored:    analysis/knockoff_7_cache/
+    Ignored:    analysis/knockoff_8_cache/
+    Ignored:    analysis/knockoff_9_cache/
+    Ignored:    analysis/knockoff_cache/
+    Ignored:    analysis/knockoff_var_cache/
+    Ignored:    analysis/marginal_z_alternative_cache/
+    Ignored:    analysis/marginal_z_cache/
+    Ignored:    analysis/mosek_reg_2_cache/
+    Ignored:    analysis/mosek_reg_4_cache/
+    Ignored:    analysis/mosek_reg_5_cache/
+    Ignored:    analysis/mosek_reg_6_cache/
+    Ignored:    analysis/mosek_reg_cache/
+    Ignored:    analysis/pihat0_null_cache/
+    Ignored:    analysis/plot_diagnostic_cache/
+    Ignored:    analysis/poster_obayes17_cache/
+    Ignored:    analysis/real_data_simulation_2_cache/
+    Ignored:    analysis/real_data_simulation_3_cache/
+    Ignored:    analysis/real_data_simulation_4_cache/
+    Ignored:    analysis/real_data_simulation_5_cache/
+    Ignored:    analysis/real_data_simulation_cache/
+    Ignored:    analysis/rmosek_primal_dual_2_cache/
+    Ignored:    analysis/rmosek_primal_dual_cache/
+    Ignored:    analysis/seqgendiff_cache/
+    Ignored:    analysis/simulated_correlated_null_2_cache/
+    Ignored:    analysis/simulated_correlated_null_3_cache/
+    Ignored:    analysis/simulated_correlated_null_cache/
+    Ignored:    analysis/simulation_real_se_2_cache/
+    Ignored:    analysis/simulation_real_se_cache/
+    Ignored:    analysis/smemo_2_cache/
+    Ignored:    data/LSI/
+    Ignored:    docs/.DS_Store
+    Ignored:    docs/figure/.DS_Store
+    Ignored:    output/fig/
+
+Unstaged changes:
+    Deleted:    analysis/cash_plots_fdp.Rmd
+
+</code></pre>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</details>
+</li>
+</ul>
+<details>
+<summary> <small><strong>Expand here to see past versions:</strong></small> </summary>
+<ul>
+<table style="border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+File
+</th>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+<th style="text-align:left;">
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/cc0ab8379469bc3726f1508cd81e4ecd6fef1b1a/analysis/marginal_z_alternative.rmd" target="_blank">cc0ab83</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-05-11
+</td>
+<td style="text-align:left;">
+update
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/marginal_z_alternative.html" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/853a484bfacf347e109f6c8fb3ffaab5f4d6cc02/docs/marginal_z_alternative.html" target="_blank">853a484</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-07
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/0214a4b808301c89ec506f185ddd789719125fcc/docs/marginal_z_alternative.html" target="_blank">0214a4b</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-06-16
+</td>
+<td style="text-align:left;">
+data transfer
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/b1410203d4d98ed9676334a7c3f32f8349fb9923/docs/marginal_z_alternative.html" target="_blank">b141020</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-09
+</td>
+<td style="text-align:left;">
+writeups
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/615c3174f867070d89f0fe5ad660fd3b4df97361/analysis/marginal_z_alternative.rmd" target="_blank">615c317</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-09
+</td>
+<td style="text-align:left;">
+marginal non-null
+</td>
+</tr>
+</tbody>
+</table>
+</ul>
+</details>
+<hr />
+<div id="introduction" class="section level2">
 <h2>Introduction</h2>
 <p><a href="marginal_z.html">We’ve seen</a> that when generated from the global null, that is, when the cases and controls have no difference, the <span class="math inline">\(z\)</span> scores’ behavior are what one would expect if simulated from correlated marginally <span class="math inline">\(N\left(0, 1\right)\)</span> random variables.</p>
 <p>But what if the <span class="math inline">\(z\)</span> scores are not simulated from the global null? Are these <span class="math inline">\(z\)</span> scores going to behave significantly different from correlated marginally <span class="math inline">\(N\left(0, 1\right)\)</span> random samples? Let’s take a look at the real data containing true effects.</p>
@@ -354,8 +619,8 @@ counts_to_z = function (counts, condition) {
   z = sign(t) * qnorm(1 - p/2)
   return (z)
 }</code></pre>
-</section>
-<section id="generating-non-null-z-scores-from-real-data" class="level2">
+</div>
+<div id="generating-non-null-z-scores-from-real-data" class="section level2">
 <h2>Generating non-null <span class="math inline">\(z\)</span> scores from real data</h2>
 <p>For convenience and without loss of generality, we are using the liver tissue as an anchor in the simulation, and always choose top expressed genes in livers.</p>
 <pre class="r"><code>r.liver = read.csv(&quot;../data/liver.csv&quot;)
@@ -364,7 +629,7 @@ Y = lcpm(r.liver)
 G = 1e4
 subset = top_genes_index(G, Y)
 r.liver = r.liver[subset, ]</code></pre>
-<section id="liver-vs-heart" class="level3">
+<div id="liver-vs-heart" class="section level3">
 <h3>Liver vs Heart</h3>
 <pre class="r"><code>tissue = &quot;heart&quot;
 r = read.csv(paste0(&quot;../data/&quot;, tissue, &quot;.csv&quot;))
@@ -383,8 +648,8 @@ for (i in 1 : m) {
 }</code></pre>
 <pre class="r"><code>z.mat = matrix(unlist(z.list), nrow = m, byrow = TRUE)
 saveRDS(z.mat, &quot;../output/z_5liver_5heart_777.rds&quot;)</code></pre>
-</section>
-<section id="liver-vs-muscle" class="level3">
+</div>
+<div id="liver-vs-muscle" class="section level3">
 <h3>Liver vs Muscle</h3>
 <pre class="r"><code>tissue = &quot;muscle&quot;
 r = read.csv(paste0(&quot;../data/&quot;, tissue, &quot;.csv&quot;))
@@ -403,52 +668,51 @@ for (i in 1 : m) {
 }</code></pre>
 <pre class="r"><code>z.mat = matrix(unlist(z.list), nrow = m, byrow = TRUE)
 saveRDS(z.mat, &quot;../output/z_5liver_5muscle_777.rds&quot;)</code></pre>
-</section>
-</section>
-<section id="marginal-distributions-of-correlated-non-null-z-scores" class="level2">
+</div>
+</div>
+<div id="marginal-distributions-of-correlated-non-null-z-scores" class="section level2">
 <h2>Marginal distributions of correlated non-null <span class="math inline">\(z\)</span> scores</h2>
 <p>Now following the simulations to explore <a href="marginal_z.html">the marginal distributions of the correlated null <span class="math inline">\(z\)</span> scores</a>, we are taking a look at the marginal distributions of the correlated non-null <span class="math inline">\(z\)</span> scores. The main focus is still the number of tail observations.</p>
-</section>
-<section id="liver-vs-heart-1" class="level2">
+</div>
+<div id="liver-vs-heart-1" class="section level2">
 <h2>Liver vs Heart</h2>
 <pre class="r"><code>z.heart = readRDS(&quot;../output/z_5liver_5heart_777.rds&quot;)
 n = ncol(z.heart)
 m = nrow(z.heart)</code></pre>
-<section id="row-wise" class="level3">
+<div id="row-wise" class="section level3">
 <h3>Row-wise</h3>
 <p><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v heart-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v heart-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v heart-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v heart-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v heart-5.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v heart-6.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v heart-7.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v heart-8.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v heart-9.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v heart-10.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v heart-11.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v heart-12.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v heart-13.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v heart-14.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v heart-15.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v heart-16.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v heart-17.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v heart-18.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v heart-19.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v heart-20.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v heart-21.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="column-wise" class="level3">
+</div>
+<div id="column-wise" class="section level3">
 <h3>Column-wise</h3>
 <p><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v heart-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v heart-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v heart-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v heart-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v heart-5.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v heart-6.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v heart-7.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v heart-8.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v heart-9.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v heart-10.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v heart-11.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v heart-12.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v heart-13.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v heart-14.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v heart-15.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v heart-16.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v heart-17.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-</section>
-<section id="liver-vs-muscle-1" class="level2">
+</div>
+</div>
+<div id="liver-vs-muscle-1" class="section level2">
 <h2>Liver vs Muscle</h2>
 <pre class="r"><code>z.muscle = readRDS(&quot;../output/z_5liver_5muscle_777.rds&quot;)
 n = ncol(z.muscle)
 m = nrow(z.muscle)</code></pre>
-<section id="row-wise-1" class="level3">
+<div id="row-wise-1" class="section level3">
 <h3>Row-wise</h3>
 <p><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v muscle-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v muscle-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v muscle-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v muscle-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v muscle-5.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v muscle-6.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v muscle-7.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v muscle-8.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v muscle-9.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v muscle-10.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v muscle-11.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v muscle-12.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v muscle-13.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v muscle-14.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v muscle-15.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v muscle-16.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v muscle-17.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v muscle-18.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v muscle-19.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v muscle-20.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot row wise tail liver v muscle-21.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="column-wise-1" class="level3">
+</div>
+<div id="column-wise-1" class="section level3">
 <h3>Column-wise</h3>
 <p><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v muscle-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v muscle-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v muscle-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v muscle-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v muscle-5.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v muscle-6.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v muscle-7.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v muscle-8.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v muscle-9.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v muscle-10.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v muscle-11.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v muscle-12.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v muscle-13.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v muscle-14.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v muscle-15.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v muscle-16.png" width="672" style="display: block; margin: auto;" /><img src="figure/marginal_z_alternative.rmd/plot column wise tail liver v muscle-17.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-</section>
-<section id="conclusion" class="level2">
+</div>
+</div>
+<div id="conclusion" class="section level2">
 <h2>Conclusion</h2>
 <p>As expected, the empirical distribution and the indicated marginal distribution of the correlated non-null <span class="math inline">\(z\)</span> scores are starkly different from <a href="marginal_z.html">those of the correlated null ones</a>.</p>
 <p>Particular interesting are the column-wise plots. The distribution of the number of tail observations is not only not close to normal, not close to what would be expected under correlated marginally <span class="math inline">\(N\left(0, 1\right)\)</span>, but also not even unimodal, not even peaked at <span class="math inline">\(m\alpha\)</span> when <span class="math inline">\(\alpha \leq0.5\)</span> or <span class="math inline">\(m\left(1-\alpha\right)\)</span> when <span class="math inline">\(\alpha\geq0.5\)</span>. It suggests that there are indeed plenty of true signals, which make the marginal distribution of the <span class="math inline">\(z\)</span> scores for a certain gene often not centered at <span class="math inline">\(0\)</span>.</p>
-</section>
-<section id="session-information" class="level2">
+</div>
+<div id="session-information" class="section level2">
 <h2>Session information</h2>
-<!-- Insert the session information into the document -->
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS High Sierra 10.13.2
+Running under: macOS High Sierra 10.13.4
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -464,24 +728,26 @@ other attached packages:
 [1] ashr_2.2-2    qvalue_2.10.0 edgeR_3.20.2  limma_3.34.4 
 
 loaded via a namespace (and not attached):
- [1] Rcpp_0.12.14      compiler_3.4.3    git2r_0.20.0     
- [4] plyr_1.8.4        iterators_1.0.9   tools_3.4.3      
- [7] digest_0.6.13     evaluate_0.10.1   tibble_1.3.4     
-[10] gtable_0.2.0      lattice_0.20-35   rlang_0.1.4      
-[13] Matrix_1.2-12     foreach_1.4.4     yaml_2.1.16      
-[16] parallel_3.4.3    stringr_1.2.0     knitr_1.17       
-[19] locfit_1.5-9.1    rprojroot_1.3-1   grid_3.4.3       
-[22] rmarkdown_1.8     ggplot2_2.2.1     reshape2_1.4.3   
-[25] magrittr_1.5      backports_1.1.2   scales_0.5.0     
-[28] codetools_0.2-15  htmltools_0.3.6   splines_3.4.3    
-[31] MASS_7.3-47       colorspace_1.3-2  stringi_1.1.6    
-[34] lazyeval_0.2.1    munsell_0.4.3     doParallel_1.0.11
-[37] pscl_1.5.2        truncnorm_1.0-7   SQUAREM_2017.10-1</code></pre>
-</section>
+ [1] Rcpp_0.12.16      compiler_3.4.3    pillar_1.0.1     
+ [4] git2r_0.21.0      plyr_1.8.4        workflowr_1.0.1  
+ [7] iterators_1.0.9   R.methodsS3_1.7.1 R.utils_2.6.0    
+[10] tools_3.4.3       digest_0.6.15     evaluate_0.10.1  
+[13] tibble_1.4.1      gtable_0.2.0      lattice_0.20-35  
+[16] rlang_0.1.6       foreach_1.4.4     Matrix_1.2-12    
+[19] parallel_3.4.3    yaml_2.1.18       stringr_1.3.0    
+[22] knitr_1.20        locfit_1.5-9.1    rprojroot_1.3-2  
+[25] grid_3.4.3        rmarkdown_1.9     ggplot2_2.2.1    
+[28] reshape2_1.4.3    magrittr_1.5      whisker_0.3-2    
+[31] MASS_7.3-47       codetools_0.2-15  backports_1.1.2  
+[34] scales_0.5.0      htmltools_0.3.6   splines_3.4.3    
+[37] colorspace_1.3-2  stringi_1.1.6     pscl_1.5.2       
+[40] lazyeval_0.2.1    munsell_0.4.3     doParallel_1.0.11
+[43] truncnorm_1.0-7   SQUAREM_2017.10-1 R.oo_1.21.0      </code></pre>
+</div>
 
 <hr>
 <p>
-    This <a href="http://rmarkdown.rstudio.com">R Markdown</a> site was created with <a href="https://github.com/jdblischak/workflowr">workflowr</a>
+    
 </p>
 <hr>
 
@@ -503,6 +769,25 @@ loaded via a namespace (and not attached):
     <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
     <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
 -->
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+<hr>
+<p>
+  This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a>
+  analysis was created with
+  <a href="https://github.com/jdblischak/workflowr">workflowr</a> 1.0.1
+</p>
+<hr>
 
 
 </div>

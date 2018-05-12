@@ -300,6 +300,13 @@ div.tocify {
   </div><!--/.container -->
 </div><!--/.navbar -->
 
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
 <div class="fluid-row" id="header">
 
 
@@ -311,20 +318,312 @@ div.tocify {
 </div>
 
 
-<!-- The file analysis/chunks.R contains chunks that define default settings
-shared across the workflowr files. -->
-<!-- Update knitr chunk options -->
-<!-- Insert the date the file was last updated -->
-<p><strong>Last updated:</strong> 2017-12-21</p>
-<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
- package git2r is installed -->
-<p><strong>Code version:</strong> 6e42447</p>
-<!-- Add your analysis here -->
-<section id="introduction" class="level2">
+<p><strong>Last updated:</strong> 2018-05-12</p>
+<strong>workflowr checks:</strong> <small>(Click a bullet for more information)</small>
+<ul>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>R Markdown file:</strong> up-to-date </summary></p>
+<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Environment:</strong> empty </summary></p>
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Seed:</strong> <code>set.seed(12345)</code> </summary></p>
+<p>The command <code>set.seed(12345)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Session information:</strong> recorded </summary></p>
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/ddf906244e82e0675854c40da76dc16cf1a78fa4" target="_blank">ddf9062</a> </summary></p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    analysis/.DS_Store
+    Ignored:    analysis/BH_robustness_cache/
+    Ignored:    analysis/FDR_Null_cache/
+    Ignored:    analysis/FDR_null_betahat_cache/
+    Ignored:    analysis/Rmosek_cache/
+    Ignored:    analysis/StepDown_cache/
+    Ignored:    analysis/alternative2_cache/
+    Ignored:    analysis/alternative_cache/
+    Ignored:    analysis/ash_gd_cache/
+    Ignored:    analysis/average_cor_gtex_2_cache/
+    Ignored:    analysis/average_cor_gtex_cache/
+    Ignored:    analysis/brca_cache/
+    Ignored:    analysis/cash_deconv_cache/
+    Ignored:    analysis/cash_fdr_1_cache/
+    Ignored:    analysis/cash_fdr_2_cache/
+    Ignored:    analysis/cash_fdr_3_cache/
+    Ignored:    analysis/cash_fdr_4_cache/
+    Ignored:    analysis/cash_fdr_5_cache/
+    Ignored:    analysis/cash_fdr_6_cache/
+    Ignored:    analysis/cash_plots_cache/
+    Ignored:    analysis/cash_sim_1_cache/
+    Ignored:    analysis/cash_sim_2_cache/
+    Ignored:    analysis/cash_sim_3_cache/
+    Ignored:    analysis/cash_sim_4_cache/
+    Ignored:    analysis/cash_sim_5_cache/
+    Ignored:    analysis/cash_sim_6_cache/
+    Ignored:    analysis/cash_sim_7_cache/
+    Ignored:    analysis/correlated_z_2_cache/
+    Ignored:    analysis/correlated_z_3_cache/
+    Ignored:    analysis/correlated_z_cache/
+    Ignored:    analysis/create_null_cache/
+    Ignored:    analysis/cutoff_null_cache/
+    Ignored:    analysis/design_matrix_2_cache/
+    Ignored:    analysis/design_matrix_cache/
+    Ignored:    analysis/diagnostic_ash_cache/
+    Ignored:    analysis/diagnostic_correlated_z_2_cache/
+    Ignored:    analysis/diagnostic_correlated_z_3_cache/
+    Ignored:    analysis/diagnostic_correlated_z_cache/
+    Ignored:    analysis/diagnostic_plot_2_cache/
+    Ignored:    analysis/diagnostic_plot_cache/
+    Ignored:    analysis/efron_leukemia_cache/
+    Ignored:    analysis/fitting_normal_cache/
+    Ignored:    analysis/gaussian_derivatives_2_cache/
+    Ignored:    analysis/gaussian_derivatives_3_cache/
+    Ignored:    analysis/gaussian_derivatives_4_cache/
+    Ignored:    analysis/gaussian_derivatives_5_cache/
+    Ignored:    analysis/gaussian_derivatives_cache/
+    Ignored:    analysis/gd-ash_cache/
+    Ignored:    analysis/gd_delta_cache/
+    Ignored:    analysis/gd_lik_2_cache/
+    Ignored:    analysis/gd_lik_cache/
+    Ignored:    analysis/gd_w_cache/
+    Ignored:    analysis/knockoff_10_cache/
+    Ignored:    analysis/knockoff_2_cache/
+    Ignored:    analysis/knockoff_3_cache/
+    Ignored:    analysis/knockoff_4_cache/
+    Ignored:    analysis/knockoff_5_cache/
+    Ignored:    analysis/knockoff_6_cache/
+    Ignored:    analysis/knockoff_7_cache/
+    Ignored:    analysis/knockoff_8_cache/
+    Ignored:    analysis/knockoff_9_cache/
+    Ignored:    analysis/knockoff_cache/
+    Ignored:    analysis/knockoff_var_cache/
+    Ignored:    analysis/marginal_z_alternative_cache/
+    Ignored:    analysis/marginal_z_cache/
+    Ignored:    analysis/mosek_reg_2_cache/
+    Ignored:    analysis/mosek_reg_4_cache/
+    Ignored:    analysis/mosek_reg_5_cache/
+    Ignored:    analysis/mosek_reg_6_cache/
+    Ignored:    analysis/mosek_reg_cache/
+    Ignored:    analysis/pihat0_null_cache/
+    Ignored:    analysis/plot_diagnostic_cache/
+    Ignored:    analysis/poster_obayes17_cache/
+    Ignored:    analysis/real_data_simulation_2_cache/
+    Ignored:    analysis/real_data_simulation_3_cache/
+    Ignored:    analysis/real_data_simulation_4_cache/
+    Ignored:    analysis/real_data_simulation_5_cache/
+    Ignored:    analysis/real_data_simulation_cache/
+    Ignored:    analysis/rmosek_primal_dual_2_cache/
+    Ignored:    analysis/rmosek_primal_dual_cache/
+    Ignored:    analysis/seqgendiff_cache/
+    Ignored:    analysis/simulated_correlated_null_2_cache/
+    Ignored:    analysis/simulated_correlated_null_3_cache/
+    Ignored:    analysis/simulated_correlated_null_cache/
+    Ignored:    analysis/simulation_real_se_2_cache/
+    Ignored:    analysis/simulation_real_se_cache/
+    Ignored:    analysis/smemo_2_cache/
+    Ignored:    data/LSI/
+    Ignored:    docs/.DS_Store
+    Ignored:    docs/figure/.DS_Store
+    Ignored:    output/fig/
+
+Unstaged changes:
+    Deleted:    analysis/cash_plots_fdp.Rmd
+
+</code></pre>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</details>
+</li>
+</ul>
+<details>
+<summary> <small><strong>Expand here to see past versions:</strong></small> </summary>
+<ul>
+<table style="border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+File
+</th>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+<th style="text-align:left;">
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/cc0ab8379469bc3726f1508cd81e4ecd6fef1b1a/analysis/diagnostic_plot_2.rmd" target="_blank">cc0ab83</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-05-11
+</td>
+<td style="text-align:left;">
+update
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/diagnostic_plot_2.html" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/853a484bfacf347e109f6c8fb3ffaab5f4d6cc02/docs/diagnostic_plot_2.html" target="_blank">853a484</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-07
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/66399687da141ce91db2cd3da67f243c80436f67/docs/diagnostic_plot_2.html" target="_blank">6639968</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-05
+</td>
+<td style="text-align:left;">
+transfer
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/39efc830468d7cc14699592b70aed4597afe1982/analysis/diagnostic_plot_2.rmd" target="_blank">39efc83</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-03
+</td>
+<td style="text-align:left;">
+uniform diagnostic
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/39efc830468d7cc14699592b70aed4597afe1982/docs/diagnostic_plot_2.html" target="_blank">39efc83</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-03
+</td>
+<td style="text-align:left;">
+uniform diagnostic
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/98a94d199c58cd763cab2915b367658516ba90db/analysis/diagnostic_plot_2.rmd" target="_blank">98a94d1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-03
+</td>
+<td style="text-align:left;">
+uniformity diagnostic
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/98a94d199c58cd763cab2915b367658516ba90db/docs/diagnostic_plot_2.html" target="_blank">98a94d1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-05-03
+</td>
+<td style="text-align:left;">
+uniformity diagnostic
+</td>
+</tr>
+</tbody>
+</table>
+</ul>
+</details>
+<hr />
+<div id="introduction" class="section level2">
 <h2>Introduction</h2>
 <p>Suppose we have <span class="math inline">\(n\)</span> iid samples presumably from <span class="math inline">\(\text{Uniform}\left[0, 1\right]\)</span>. Our goal is to make a diagnostic plot to check if they are truly coming from <span class="math inline">\(\text{Uniform}\left[0, 1\right]\)</span>.</p>
-</section>
-<section id="plotting-positions" class="level2">
+</div>
+<div id="plotting-positions" class="section level2">
 <h2>Plotting positions</h2>
 <p>The basic tool is the <a href="https://en.wikipedia.org/wiki/Q%E2%80%93Q_plot">Q-Q plot</a>. Basically, we are ploting the sample quantiles against their theoretical quantiles, also called “plotting positions.” But it turns out it’s more complicated than what it appears, because it’s not clear what are the best “theoretical quantiles” or plotting positions. For example, <span class="math inline">\(\left\{1/n, 2/n, \ldots, n/n\right\}\)</span> appears an obvious option, but if the distribution is normal, the quantile of <span class="math inline">\(n/n = 1\)</span> is <span class="math inline">\(\infty\)</span>. Even if the distribution is compactly supported, like <span class="math inline">\(\text{Uniform}\left[0, 1\right]\)</span>, the quantile of <span class="math inline">\(1\)</span> is <span class="math inline">\(1\)</span>, yet the largest sample will always be strictly less than <span class="math inline">\(1\)</span>.</p>
 <p>This is called the “plotting positions problem.” It has a long history and a rich literature. <a href="http://www.tandfonline.com/doi/abs/10.1080/03610928408828781">Harter 1984</a> and <a href="http://www.tandfonline.com/doi/abs/10.1080/03610920701653094">Makkonen 2008</a> seem to be two good reviews. Popular choices include <span class="math inline">\(\left\{\frac{k-0.5}{n}\right\}\)</span>, <span class="math inline">\(\left\{\frac{k}{n+1}\right\}\)</span>, <span class="math inline">\(\left\{\frac{k - 0.3}{n+0.4}\right\}\)</span>, or in general, <span class="math inline">\(\left\{\frac{k-\alpha}{n+1-2\alpha}\right\}\)</span>, <span class="math inline">\(\alpha\in\left[0, 1\right]\)</span>, which approximates <span class="math inline">\(F\left(E\left[X_{(k)}\right]\right)\)</span> for certain <span class="math inline">\(\alpha\)</span>, and includes all above as special cases.</p>
@@ -335,8 +634,8 @@ F\left(E\left[X_{(k)}\right]\right)
 = E\left[F\left(X_{(k)}\right)\right]
 = \frac{k}{n + 1} \  ,
 \]</span> where <span class="math inline">\(X_{(k)}\)</span> is the order statistic.</p>
-</section>
-<section id="de-trending-the-0-1-line" class="level2">
+</div>
+<div id="de-trending-the-0-1-line" class="section level2">
 <h2>De-trending the <span class="math inline">\(0\)</span>-<span class="math inline">\(1\)</span> line</h2>
 <p>Another problem is also related to Q-Q plots in general, and especially to the problem we have right now. In uniform Q-Q plots, in Matthew’s words, “current plots are dominated by the trend from 0 to 1,” so it’ would be better to “remove that trend to better highlight the deviations from the expectation.”</p>
 <p>The order statistics <span class="math inline">\(X_{(k)}\)</span> for <span class="math inline">\(\text{Uniform}\left[0, 1\right]\)</span> <a href="https://en.wikipedia.org/wiki/Order_statistic#Order_statistics_sampled_from_a_uniform_distribution">follows a beta distribution</a>,</p>
@@ -370,39 +669,39 @@ cdfhat = plot_diagnostic(fit, plot.it = FALSE)</code></pre>
 <p><img src="figure/diagnostic_plot_2.rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>The predictive CDF of this data set should be far from <span class="math inline">\(\text{Uniform}\left[0, 1\right]\)</span>, so the diagnostic Q-Q plot should be conspicuously deviating from the <span class="math inline">\(0\)</span>-<span class="math inline">\(1\)</span> straight line. And we’ve also seen many points outside of the error bounds in the de-trended plot. We can also see that the two choices of error bounds don’t make too much difference.</p>
 <p><img src="figure/diagnostic_plot_2.rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/unnamed-chunk-6-2.png" width="672" style="display: block; margin: auto;" /></p>
-<section id="correlated-multiple-comparison" class="level3">
+<div id="correlated-multiple-comparison" class="section level3">
 <h3>Correlated multiple comparison</h3>
 <p>However, this simple de-trended plot has drawbacks. Suppose we apply <code>ASH</code> to independent <span class="math inline">\(z\)</span> scores. <code>ASH</code> should correctly estimate <span class="math inline">\(\hat g\)</span> to be a point mass at <span class="math inline">\(0\)</span> or something very close to it. Then the predictive cdf should be approximately uniformly distributed, which means we shouldn’t observe too many points outside the error bounds. However, here we do this simulation <span class="math inline">\(10\)</span> times, and it’s more common than expected to observe points outside the bounds.</p>
 <p><img src="figure/diagnostic_plot_2.rmd/multiple-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/multiple-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/multiple-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/multiple-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/multiple-5.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/multiple-6.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/multiple-7.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/multiple-8.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/multiple-9.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/multiple-10.png" width="672" style="display: block; margin: auto;" /></p>
 <p>It happens because the de-trended plot has an inherent <em>multiple testing under correlation</em> issue. First we are comparing <span class="math inline">\(n\)</span> sample quantiles, and then these quantiles are correlated. It may have connection with multiple testing in time series. Like in all multiple testing problems, we need to obtain a better error bound.</p>
 <p>Here are some ideas.</p>
-</section>
-</section>
-<section id="idea-1-ignore-it" class="level2">
+</div>
+</div>
+<div id="idea-1-ignore-it" class="section level2">
 <h2>Idea 1: Ignore it</h2>
 <p>Take a look at the non-uniform plot and the ten uniform plots. It’s true that the uniform ones are not-uncommonly outside the error bounds, but they are not going too far, compared with that non-uniform one. So maybe we can just ignore the “casual” bound-crossings and accept them as uniform. Of course this will generate a lot of ambiguity for borderline cases, but borderline cases are difficult any way.</p>
-</section>
-<section id="idea-2-bonferroni-correction" class="level2">
+</div>
+<div id="idea-2-bonferroni-correction" class="section level2">
 <h2>Idea 2: Bonferroni correction</h2>
 <p>Instead of using an error bound that’s at <span class="math inline">\(\alpha\)</span> level for each order statistic, we can use Bonferroni correction at <span class="math inline">\(\alpha / n\)</span> level. Hopefully it will control false positives whereas still be powerful. Let’s take a look at the previously run examples.</p>
-<section id="non-uniform" class="level3">
+<div id="non-uniform" class="section level3">
 <h3>Non-uniform</h3>
 <p>In the presence of strong non-uniformity, the de-trended plot is still well outside the Bonferroni-corrected error bounds.</p>
 <p><img src="figure/diagnostic_plot_2.rmd/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/unnamed-chunk-7-2.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="uniform" class="level3">
+</div>
+<div id="uniform" class="section level3">
 <h3>Uniform</h3>
 <p>As always with Bonferroni correction, it could seem under-powered, or over-controlling the type I error.</p>
 <p><img src="figure/diagnostic_plot_2.rmd/multiple bonferroni-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/multiple bonferroni-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/multiple bonferroni-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/multiple bonferroni-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/multiple bonferroni-5.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/multiple bonferroni-6.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/multiple bonferroni-7.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/multiple bonferroni-8.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/multiple bonferroni-9.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/multiple bonferroni-10.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-</section>
-<section id="idea-3-predictive-density-on-top-of-histogram" class="level2">
+</div>
+</div>
+<div id="idea-3-predictive-density-on-top-of-histogram" class="section level2">
 <h2>Idea 3: Predictive density on top of histogram</h2>
 <p>As discussed above, when we have constant <span class="math inline">\(\hat s_j\equiv s\)</span>, the estimated predictive density <span class="math inline">\(\hat f = \hat g * N\left(0, s^2\right)\)</span> is the same for all observations. Therefore, we could plot <span class="math inline">\(\hat f\left(\hat \beta_j\right)\)</span> on top of the histogram of all <span class="math inline">\(\hat \beta_j\)</span> to see if <code>ASH</code> fits the data and estimates the prior <span class="math inline">\(g\)</span> well.</p>
 <p>We are selecting four data sets with <span class="math inline">\(N(0, 1)\)</span> <span class="math inline">\(z\)</span> scores distorted by correlation. The first two are inflated, and the latter two mildly deflated. <code>ASH</code> has a hard time handling both cases, and the fitted predictive density curves can show that.</p>
 <p><img src="figure/diagnostic_plot_2.rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/unnamed-chunk-8-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/unnamed-chunk-8-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/diagnostic_plot_2.rmd/unnamed-chunk-8-4.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="idea-4-kolmogorov-smirnov-k-s-test" class="level2">
+</div>
+<div id="idea-4-kolmogorov-smirnov-k-s-test" class="section level2">
 <h2>Idea 4: Kolmogorov-Smirnov (K-S) test</h2>
 <p>As explained in <a href="https://en.wikipedia.org/wiki/Kolmogorov%E2%80%93Smirnov_test">Wikipedia</a>,</p>
 <blockquote>
@@ -411,8 +710,8 @@ cdfhat = plot_diagnostic(fit, plot.it = FALSE)</code></pre>
 <p>The K-S test gives a <span class="math inline">\(p\)</span>-value, which can be displayed alongside all kinds of diagnostic plots mentioned above, as below.</p>
 <p><img src="figure/diagnostic_plot_2.rmd/KS-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p><img src="figure/diagnostic_plot_2.rmd/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="idea-5-empirical-cdf-and-dkw-inequality" class="level2">
+</div>
+<div id="idea-5-empirical-cdf-and-dkw-inequality" class="section level2">
 <h2>Idea 5: Empirical CDF and DKW inequality</h2>
 <p>The K-S test is related to <a href="https://en.wikipedia.org/wiki/Dvoretzky%E2%80%93Kiefer%E2%80%93Wolfowitz_inequality">the DKW inequality</a> for the empirical CDF. Let <span class="math inline">\(X_1, \ldots, X_n\)</span> be <span class="math inline">\(n\)</span> iid samples from <span class="math inline">\(F\)</span>. Let <span class="math inline">\(F_n\)</span> denote the empirical cumulative distribution function estimated from them. Then</p>
 <p><span class="math display">\[
@@ -421,14 +720,13 @@ cdfhat = plot_diagnostic(fit, plot.it = FALSE)</code></pre>
 <p>Therefore, we can set <span class="math inline">\(\epsilon\)</span> so that <span class="math inline">\(\alpha = 2e^{-2n\epsilon^2}\)</span>, and plot <span class="math inline">\(F_n\left(X_{(k)}\right) - F\left(X_{(k)}\right) = \frac kn - X_{(k)}\)</span> against <span class="math inline">\(\pm\epsilon\)</span>. Note that in this case we are plotting <span class="math inline">\(F_n\left(X_{(k)}\right) - F\left(X_{(k)}\right)\)</span>, not <span class="math inline">\(X_{(k)} - E\left[X_{(k)}\right]\)</span>, but under uniform they are very close, with no practical difference.</p>
 <p><img src="figure/diagnostic_plot_2.rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p><img src="figure/diagnostic_plot_2.rmd/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-<section id="session-information" class="level2">
+</div>
+<div id="session-information" class="section level2">
 <h2>Session information</h2>
-<!-- Insert the session information into the document -->
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS High Sierra 10.13.2
+Running under: macOS High Sierra 10.13.4
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -441,15 +739,18 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 loaded via a namespace (and not attached):
- [1] compiler_3.4.3  backports_1.1.2 magrittr_1.5    rprojroot_1.3-1
- [5] tools_3.4.3     htmltools_0.3.6 yaml_2.1.16     Rcpp_0.12.14   
- [9] stringi_1.1.6   rmarkdown_1.8   knitr_1.17      git2r_0.20.0   
-[13] stringr_1.2.0   digest_0.6.13   evaluate_0.10.1</code></pre>
-</section>
+ [1] workflowr_1.0.1   Rcpp_0.12.16      digest_0.6.15    
+ [4] rprojroot_1.3-2   R.methodsS3_1.7.1 backports_1.1.2  
+ [7] git2r_0.21.0      magrittr_1.5      evaluate_0.10.1  
+[10] stringi_1.1.6     whisker_0.3-2     R.oo_1.21.0      
+[13] R.utils_2.6.0     rmarkdown_1.9     tools_3.4.3      
+[16] stringr_1.3.0     yaml_2.1.18       compiler_3.4.3   
+[19] htmltools_0.3.6   knitr_1.20       </code></pre>
+</div>
 
 <hr>
 <p>
-    This <a href="http://rmarkdown.rstudio.com">R Markdown</a> site was created with <a href="https://github.com/jdblischak/workflowr">workflowr</a>
+    
 </p>
 <hr>
 
@@ -471,6 +772,25 @@ loaded via a namespace (and not attached):
     <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
     <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
 -->
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+<hr>
+<p>
+  This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a>
+  analysis was created with
+  <a href="https://github.com/jdblischak/workflowr">workflowr</a> 1.0.1
+</p>
+<hr>
 
 
 </div>
