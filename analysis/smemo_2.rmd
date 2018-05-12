@@ -48,13 +48,13 @@ With stretch GD can fit $z$ scores, but it seems there should be signals.
 ```{r fitting gaussian derivatives, message = FALSE, warning = FALSE, echo = FALSE}
 source("../code/gdash_lik.R")
 source("../code/gdfit.R")
-w.fit = gdfit(z, gd.ord = 10)
+w.fit = gdfit(z, L = 10)
 cat("GD Coefficients:\n")
 cat(rbind(paste(1 : length(w.fit$w) - 1, ":"),
           paste(w.fit$w, ";")
           ))
-plot.gdfit(z, w.fit$w, w.fit$gd.ord, breaks = 100)
-plot.gdfit(z, w.fit$w, w.fit$gd.ord, std.norm = FALSE, breaks = 100)
+plot.gdfit(z, w.fit$w, w.fit$L, breaks = 100)
+plot.gdfit(z, w.fit$w, w.fit$L, std.norm = FALSE, breaks = 100)
 ```
 
 ## Discovered by `BH` and `ASH`
