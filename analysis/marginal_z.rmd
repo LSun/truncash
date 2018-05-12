@@ -2,29 +2,12 @@
 title: "Marginal Distribution of $z$ Scores: Null"
 author: "Lei Sun"
 date: 2017-04-25
-output: html_document
+output: workflowr::wflow_html
 ---
 
-<!-- The file analysis/chunks.R contains chunks that define default settings
-shared across the workflowr files. -->
-```{r read-chunk, include=FALSE, cache=FALSE}
-knitr::read_chunk("chunks.R")
-```
 
-<!-- Update knitr chunk options -->
-```{r knitr-opts-chunk, include=FALSE}
-```
 
-<!-- Insert the date the file was last updated -->
-```{r last-updated, echo=FALSE, results='asis'}
-```
 
-<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
- package git2r is installed -->
-```{r code-version, echo=FALSE, results='asis'}
-```
-
-<!-- Add your analysis here -->
 
 **This simulation can be seen as an enhanced version of [a previous simulation](ExtremeOccurrence.html).**
 
@@ -216,8 +199,4 @@ Row-wise, the number of tail observations averages to what would be expected fro
 
 Column-wise, the distribution of the number of tail observations is closer to normal, closer to what would be expected under corelated marginally $N\left(0, 1\right)$.  Moreover, the distribution seems unimodal, and peaked at $m\alpha$ when $\alpha \leq0.5$ or $m\left(1-\alpha\right)$ when $\alpha\geq0.5$.  It suggests that the marginal distribution of the null $z$ scores for a certain gene is usually centered at $0$, and more often than not, close to $N\left(0, 1\right)$.
 
-## Session information
 
-<!-- Insert the session information into the document -->
-```{r session-info}
-```

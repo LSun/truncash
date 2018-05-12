@@ -2,15 +2,9 @@
 title: "When only the most extreme observation is known"
 author: "Lei Sun"
 date: 2017-02-27
-output: html_document
+output: workflowr::wflow_html
 ---
 
-```{r read-chunk, include=FALSE, cache=FALSE}
-knitr::read_chunk("chunks.R")
-```
-
-```{r knitr-opts-chunk, include=FALSE}
-```
 
 **Last updated:** `r Sys.Date()`
 
@@ -87,5 +81,3 @@ then we'll arrive at the result that $\hat\beta_j / \hat s_j$ has the same margi
 
 ## Session Information
 
-```{r session-info}
-```

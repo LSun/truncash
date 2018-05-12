@@ -2,15 +2,9 @@
 title: "Occurrence of Extreme Observations in Simulated Correlated Null Data"
 author: "Lei Sun"
 date: 2016-11-24
-output: html_document
+output: workflowr::wflow_html
 ---
 
-```{r read-chunk, include=FALSE, cache=FALSE}
-knitr::read_chunk("chunks.R")
-```
-
-```{r knitr-opts-chunk, include=FALSE}
-```
 
 **Last updated:** `r Sys.Date()`
 
@@ -63,5 +57,3 @@ The `R` code to generate both $p$-value tables is in [`p_null_liver.R`](https://
 
 ## Session Information
 
-```{r session-info}
-```

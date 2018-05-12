@@ -2,29 +2,12 @@
 title: "Posterior Inference with Gaussian Derivative Likelihood: Model and Result"
 author: "Lei Sun"
 date: 2017-06-14
-output: html_document
+output: workflowr::wflow_html
 ---
 
-<!-- The file analysis/chunks.R contains chunks that define default settings
-shared across the workflowr files. -->
-```{r read-chunk, include=FALSE, cache=FALSE}
-knitr::read_chunk("chunks.R")
-```
 
-<!-- Update knitr chunk options -->
-```{r knitr-opts-chunk, include=FALSE}
-```
 
-<!-- Insert the date the file was last updated -->
-```{r last-updated, echo=FALSE, results='asis'}
-```
 
-<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
- package git2r is installed -->
-```{r code-version, echo=FALSE, results='asis'}
-```
-
-<!-- Add your analysis here -->
 
 ## `GD-ASH` Model
 
@@ -755,8 +738,4 @@ lines(c(0, pFSR.nominal), 2 * c(0, pFSR.nominal), cex = 3, lty = 4)
 1. Would be nice to come up with a way to calculate `lfsr` in `GD-Lik`.
 2. Many methods are too liberal for inflation cases and too conservative for deflation cases, showing a lack of robustness against correlation.  Although, on average they probably seem about right.
 
-## Session information
 
-<!-- Insert the session information into the document -->
-```{r session-info}
-```

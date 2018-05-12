@@ -2,15 +2,9 @@
 title: "Ordered $p$ values vs critical values"
 author: "Lei Sun"
 date: 2017-02-22
-output: html_document
+output: workflowr::wflow_html
 ---
 
-```{r read-chunk, include=FALSE, cache=FALSE}
-knitr::read_chunk("chunks.R")
-```
-
-```{r knitr-opts-chunk, include=FALSE}
-```
 
 **Last updated:** `r Sys.Date()`
 
@@ -55,5 +49,3 @@ for (i in sel) {
 
 ## Session Information
 
-```{r session-info}
-```

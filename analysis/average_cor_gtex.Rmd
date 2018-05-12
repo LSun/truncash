@@ -2,29 +2,12 @@
 title: "Average Correlation in GTEx: 5 vs 5"
 author: "Lei Sun"
 date: 2018-02-03
-output: html_document
+output: workflowr::wflow_html
 ---
 
-<!-- The file analysis/chunks.R contains chunks that define default settings
-shared across the workflowr files. -->
-```{r read-chunk, include=FALSE, cache=FALSE}
-knitr::read_chunk("chunks.R")
-```
 
-<!-- Update knitr chunk options -->
-```{r knitr-opts-chunk, include=FALSE}
-```
 
-<!-- Insert the date the file was last updated -->
-```{r last-updated, echo=FALSE, results='asis'}
-```
 
-<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
- package git2r is installed -->
-```{r code-version, echo=FALSE, results='asis'}
-```
-
-<!-- Add your analysis here -->
 
 ## Introduction
 
@@ -106,8 +89,4 @@ par(mar = c(4.5, 5, 2.5, 0.5))
 plot(w2.sd, xlab = "d", ylab = expression(sigma(W[2]) == sqrt(bar(rho[ij]^2))), main = expression(paste("Square root of the average squared correlation among ", hat(beta)[i], " and ", hat(beta)[j])))
 ```
 
-## Session information
 
-<!-- Insert the session information into the document -->
-```{r session-info}
-```

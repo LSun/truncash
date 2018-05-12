@@ -84,7 +84,6 @@ for(i in 1:10){
 ```
 
 
-## Session information
 
 ```{r info}
 sessionInfo()

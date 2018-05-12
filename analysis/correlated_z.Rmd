@@ -2,15 +2,9 @@
 title: "Histogram of correlated $z$ scores, Part 1"
 author: "Lei Sun"
 date: 2017-03-06
-output: html_document
+output: workflowr::wflow_html
 ---
 
-```{r read-chunk, include=FALSE, cache=FALSE}
-knitr::read_chunk("chunks.R")
-```
-
-```{r knitr-opts-chunk, include=FALSE}
-```
 
 **Last updated:** `r Sys.Date()`
 
@@ -49,5 +43,3 @@ for (i in sample_z) {
 
 ## Session Information
 
-```{r session-info}
-```

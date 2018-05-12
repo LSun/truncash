@@ -2,15 +2,9 @@
 title: "Histogram of correlated $z$ scores, Part 2"
 author: "Lei Sun"
 date: 2017-03-06
-output: html_document
+output: workflowr::wflow_html
 ---
 
-```{r read-chunk, include=FALSE, cache=FALSE}
-knitr::read_chunk("chunks.R")
-```
-
-```{r knitr-opts-chunk, include=FALSE}
-```
 
 **Last updated:** `r Sys.Date()`
 
@@ -120,5 +114,3 @@ write.table(pihat0, file = "../output/pihat0_z_null_liver_777.txt", quote = FALS
 
 ## Session Information
 
-```{r session-info}
-```

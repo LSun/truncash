@@ -2,15 +2,9 @@
 title: "$\\hat\\pi_0$ on correlated global null estimated by `ashr` and `truncash`"
 author: "Lei Sun"
 date: 2017-02-21
-output: html_document
+output: workflowr::wflow_html
 ---
 
-```{r read-chunk, include=FALSE, cache=FALSE}
-knitr::read_chunk("chunks.R")
-```
-
-```{r knitr-opts-chunk, include=FALSE}
-```
 
 **Last updated:** `r Sys.Date()`
 
@@ -73,5 +67,3 @@ abline(h = 1, lty = 2, col = "red")
 
 ## Session Information
 
-```{r session-info}
-```

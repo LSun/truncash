@@ -2,29 +2,12 @@
 title: "Empirical Null with Gaussian Derivatives: Numerical Issues"
 author: "Lei Sun"
 date: 2017-03-26
-output: html_document
+output: workflowr::wflow_html
 ---
 
-<!-- The file analysis/chunks.R contains chunks that define default settings
-shared across the workflowr files. -->
-```{r read-chunk, include=FALSE, cache=FALSE}
-knitr::read_chunk("chunks.R")
-```
 
-<!-- Update knitr chunk options -->
-```{r knitr-opts-chunk, include=FALSE}
-```
 
-<!-- Insert the date the file was last updated -->
-```{r last-updated, echo=FALSE, results='asis'}
-```
 
-<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
- package git2r is installed -->
-```{r code-version, echo=FALSE, results='asis'}
-```
-
-<!-- Add your analysis here -->
 
 ## Introduction: instability and overfitting -- $K$ can be too large
 
@@ -121,8 +104,4 @@ In this example [the automated rule](gaussian_derivatives_2.html) is able to fin
 
 Things can go very wrong when the number of fitted Gaussian derivatives $K$ is too large, and it implies that we cannot blindly fit ever growing $K$ and hope the fitted log-likelihood converges.  On the other hand, the good news is oftentimes we can still reach a pattern of increasing log-likelihoods, which gives a reasonable $K$, before the optimization becomes unstable, although it might be not the optimal $K$ we would find by the current log-likelihood ratio test motivated rule.
 
-## Session information
 
-<!-- Insert the session information into the document -->
-```{r session-info}
-```

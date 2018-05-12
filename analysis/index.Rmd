@@ -1,7 +1,8 @@
 ---
+site: workflowr::wflow_site
 title: "Truncated Adaptive Shrinkage (`truncash`)"
 output:
-  html_document:
+  workflowr::wflow_html:
     toc: false
 ---
 
@@ -241,11 +242,5 @@ Next it's a series of investigation of a number of variable selection and false 
 [`ashr`]: https://github.com/stephens999/ashr
 
 
-<!-- The goal of this new template is to simplify the setup and maintenance of a research website. -->
-<!-- Specifically, -->
 
-<!-- *  Easier to build and extend the website using the new tools in the [rmarkdown][] package and [latest RStudio release][rstudio] -->
-<!-- *  Easier to deploy the website with Git and GitHub by only using one branch -->
 
-<!-- [rmarkdown]: http://rmarkdown.rstudio.com/rmarkdown_websites.htm -->
-<!-- [rstudio]: https://www.rstudio.com/products/rstudio/download/preview/ -->

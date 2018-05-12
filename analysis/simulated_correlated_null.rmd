@@ -2,29 +2,12 @@
 title: "Simulating Correlated $N(0, 1)$ $Z$ Scores"
 author: "Lei Sun"
 date: 2017-05-18
-output: html_document
+output: workflowr::wflow_html
 ---
 
-<!-- The file analysis/chunks.R contains chunks that define default settings
-shared across the workflowr files. -->
-```{r read-chunk, include=FALSE, cache=FALSE}
-knitr::read_chunk("chunks.R")
-```
 
-<!-- Update knitr chunk options -->
-```{r knitr-opts-chunk, include=FALSE}
-```
 
-<!-- Insert the date the file was last updated -->
-```{r last-updated, echo=FALSE, results='asis'}
-```
 
-<!-- Insert the code version (Git commit SHA1) if Git repository exists and R
- package git2r is installed -->
-```{r code-version, echo=FALSE, results='asis'}
-```
-
-<!-- Add your analysis here -->
 
 ## Introduction
 
@@ -110,8 +93,4 @@ legend("topright", lty = 1, col = "blue", "50 Gaussian\nDerivatives", yjust = 1,
 
 The coefficients $\hat w_l$ estimated by the method of moments are not very satisfying even with $50$ Gaussian derivatives.  The reason might be that **completely synthetic correlated data are less likely to have samples on the extreme tails**, as observed in the histograms, yet these extreme samples are supposed to have disproportional influence on the method of moments estimates.  We also tried to estimate $\hat w_l$ by the convex optimization approach, but the results were even worse, probably due to the same reason.  The results might indicate **an interesting but often neglected difference between real data and synthetic ones**.
 
-## Session information
 
-<!-- Insert the session information into the document -->
-```{r session-info}
-```

@@ -2,15 +2,9 @@
 title: "Creating Null"
 author: "Lei Sun"
 date: 2017-05-08
-output: html_document
+output: workflowr::wflow_html
 ---
 
-```{r read-chunk, include=FALSE, cache=FALSE}
-knitr::read_chunk("chunks.R")
-```
-
-```{r knitr-opts-chunk, include=FALSE}
-```
 
 **Last updated:** `r Sys.Date()`
 
@@ -169,5 +163,3 @@ Therefore, creating null through various resampling schemes is basically impossi
 
 ## Session Information
 
-```{r session-info}
-```

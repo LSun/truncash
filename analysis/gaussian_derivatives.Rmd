@@ -2,15 +2,9 @@
 title: "Empirical Null with Gaussian Derivatives: Theory"
 author: "Lei Sun"
 date: 2017-03-22
-output: html_document
+output: workflowr::wflow_html
 ---
 
-```{r read-chunk, include=FALSE, cache=FALSE}
-knitr::read_chunk("chunks.R")
-```
-
-```{r knitr-opts-chunk, include=FALSE}
-```
 
 **Last updated:** `r Sys.Date()`
 
@@ -329,5 +323,3 @@ where $H_{ik} = h_k(z_i)$.
 
 ## Session Information
 
-```{r session-info}
-```

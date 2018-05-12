@@ -3,7 +3,7 @@ title: "`CASH` Plot: Large-scale FDP TPP comparison"
 author: "Lei Sun"
 date: 2018-05-07
 output:
-  html_document:
+  workflowr::wflow_html:
     code_folding: hide
 ---
 
