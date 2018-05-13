@@ -17,7 +17,7 @@ It seems likely this can be exploited to help avoid false positives under positi
 
 
 ```{r chunk-options, include=FALSE}
-source("chunks.R")
+# source("chunks.R")
 ```
 
 Load in the gtex liver data 
