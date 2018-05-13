@@ -71,7 +71,7 @@ r = r[subset,]
 ```{r gtex_z_1, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
 set.seed(777)
 
-nsim <- 500
+nsim <- 200
 
 qvalue.pi0.list <- qvalue.list <- pi0.list <- pi0.pi0.list <- list()
 z.pi0.list <- z.list <- list()
@@ -278,8 +278,11 @@ for (j in seq(length(pi0.vec))) {
   labs(x = "", y = "TPP") +
   theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 15), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 15, angle = 45, hjust = 1), axis.text.y = element_text(size = 15), strip.text = element_text(size = 15))
 
-  grid.arrange(pi0.plot, FDR.calib.plot, FDR.plot, power.plot, top = textGrob(bquote(paste(pi[0] == .(pi0.vec[j]), "\n")), gp = gpar(fontsize = 15, font = 3)))
-  g <- arrangeGrob(pi0.plot, FDR.calib.plot, FDR.plot, power.plot, top = textGrob(bquote(paste(pi[0] == .(pi0.vec[j]), "\n")), gp = gpar(fontsize = 15, font = 3)))
-  ggsave(paste0("../output/fig/pi0_", pi0.vec[j], ".eps"), g)
+  grid.arrange(FDR.calib.plot, pi0.plot, FDR.plot, power.plot,
+               nrow = 4, ncol = 1,
+               top = textGrob(bquote(paste(pi[0] == .(pi0.vec[j]), "\n")), gp = gpar(fontsize = 15, font = 3)))
+  ggsave(paste0("../output/fig/pi0_", pi0.vec[j], ".eps"))
+# g <- arrangeGrob(FDR.calib.plot, pi0.plot, FDR.plot, power.plot, nrow = 4, ncol = 1, top = textGrob(bquote(paste(pi[0] == .(pi0.vec[j]), "\n")), gp = gpar(fontsize = 15, font = 3)))
+# ggsave(paste0("../output/fig/pi0_", pi0.vec[j], ".eps"), g)
 }
 ```
