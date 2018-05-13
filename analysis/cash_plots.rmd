@@ -21,6 +21,7 @@ library(gridExtra)
 library(RColorBrewer)
 library(scales)
 library(cowplot)
+library(ggpubr)
 ```
 
 ```{r functions}
@@ -137,7 +138,7 @@ q.vec <- seq(0.001, 0.20, by = 0.001)
 method.name <- c("BHq", "qvalue", "locfdr", "ASH", "CASH")
 ```
 
-```{r}
+```{r, cache = TRUE}
 FDP.array <- pFDP.array <- power.array <- array(0, dim = c(nsim, length(q.vec), length(method.name), length(pi0.vec)))
 FDP.summary <- array(0, dim = c(7, length(q.vec), length(method.name), length(pi0.vec)))
 pFDP.summary <- power.summary <- array(0, dim = c(5, length(q.vec), length(method.name), length(pi0.vec)))
@@ -279,16 +280,17 @@ for (j in seq(length(pi0.vec))) {
   labs(x = "", y = "TPP") +
   theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 15), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 15, angle = 45, hjust = 1), axis.text.y = element_text(size = 15), strip.text = element_text(size = 15))
   
-  joint <- plot_grid(FDR.calib.plot,
+  joint <- ggarrange(FDR.calib.plot,
             pi0.plot + rremove("x.text"),
             FDR.plot + rremove("x.text"),
             power.plot,
             align = "v", ncol = 1, nrow = 4,
-            rel_heights = c(1.5, 1, 1, 1.2)
+            heights = c(1.5, 1, 1, 1.2)
   )
-  annotate_figure(joint,
-    top = bquote(pi[0] == .(pi0.vec[j]))
+  joint <- annotate_figure(joint,
+    top = text_grob(bquote(pi[0] == .(pi0.vec[j])), size = 15)
   )
-  ggsave(paste0("../output/fig/pi0_", pi0.vec[j], ".eps"), height = 10, width = 8)
+  print(joint)
+  ggsave(paste0("../output/fig/pi0_", pi0.vec[j], ".pdf"), joint, height = 10, width = 8)
 }
 ```
