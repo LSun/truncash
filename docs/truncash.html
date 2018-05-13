@@ -300,6 +300,13 @@ div.tocify {
   </div><!--/.container -->
 </div><!--/.navbar -->
 
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
 <div class="fluid-row" id="header">
 
 
@@ -311,9 +318,483 @@ div.tocify {
 </div>
 
 
-<p><strong>Last updated:</strong> 2017-12-21</p>
-<p><strong>Code version:</strong> 6e42447</p>
-<section id="introduction" class="level2">
+<p><strong>Last updated:</strong> 2018-05-12</p>
+<strong>workflowr checks:</strong> <small>(Click a bullet for more information)</small>
+<ul>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>R Markdown file:</strong> up-to-date </summary></p>
+<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Environment:</strong> empty </summary></p>
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Seed:</strong> <code>set.seed(12345)</code> </summary></p>
+<p>The command <code>set.seed(12345)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Session information:</strong> recorded </summary></p>
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/140be7fbea9ced9a42fd8bdd03b7254989ca4938" target="_blank">140be7f</a> </summary></p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    analysis/.DS_Store
+    Ignored:    analysis/BH_robustness_cache/
+    Ignored:    analysis/FDR_Null_cache/
+    Ignored:    analysis/FDR_null_betahat_cache/
+    Ignored:    analysis/Rmosek_cache/
+    Ignored:    analysis/StepDown_cache/
+    Ignored:    analysis/alternative2_cache/
+    Ignored:    analysis/alternative_cache/
+    Ignored:    analysis/ash_gd_cache/
+    Ignored:    analysis/average_cor_gtex_2_cache/
+    Ignored:    analysis/average_cor_gtex_cache/
+    Ignored:    analysis/brca_cache/
+    Ignored:    analysis/cash_deconv_cache/
+    Ignored:    analysis/cash_fdr_1_cache/
+    Ignored:    analysis/cash_fdr_2_cache/
+    Ignored:    analysis/cash_fdr_3_cache/
+    Ignored:    analysis/cash_fdr_4_cache/
+    Ignored:    analysis/cash_fdr_5_cache/
+    Ignored:    analysis/cash_fdr_6_cache/
+    Ignored:    analysis/cash_plots_cache/
+    Ignored:    analysis/cash_sim_1_cache/
+    Ignored:    analysis/cash_sim_2_cache/
+    Ignored:    analysis/cash_sim_3_cache/
+    Ignored:    analysis/cash_sim_4_cache/
+    Ignored:    analysis/cash_sim_5_cache/
+    Ignored:    analysis/cash_sim_6_cache/
+    Ignored:    analysis/cash_sim_7_cache/
+    Ignored:    analysis/correlated_z_2_cache/
+    Ignored:    analysis/correlated_z_3_cache/
+    Ignored:    analysis/correlated_z_cache/
+    Ignored:    analysis/create_null_cache/
+    Ignored:    analysis/cutoff_null_cache/
+    Ignored:    analysis/design_matrix_2_cache/
+    Ignored:    analysis/design_matrix_cache/
+    Ignored:    analysis/diagnostic_ash_cache/
+    Ignored:    analysis/diagnostic_correlated_z_2_cache/
+    Ignored:    analysis/diagnostic_correlated_z_3_cache/
+    Ignored:    analysis/diagnostic_correlated_z_cache/
+    Ignored:    analysis/diagnostic_plot_2_cache/
+    Ignored:    analysis/diagnostic_plot_cache/
+    Ignored:    analysis/efron_leukemia_cache/
+    Ignored:    analysis/fitting_normal_cache/
+    Ignored:    analysis/gaussian_derivatives_2_cache/
+    Ignored:    analysis/gaussian_derivatives_3_cache/
+    Ignored:    analysis/gaussian_derivatives_4_cache/
+    Ignored:    analysis/gaussian_derivatives_5_cache/
+    Ignored:    analysis/gaussian_derivatives_cache/
+    Ignored:    analysis/gd-ash_cache/
+    Ignored:    analysis/gd_delta_cache/
+    Ignored:    analysis/gd_lik_2_cache/
+    Ignored:    analysis/gd_lik_cache/
+    Ignored:    analysis/gd_w_cache/
+    Ignored:    analysis/knockoff_10_cache/
+    Ignored:    analysis/knockoff_2_cache/
+    Ignored:    analysis/knockoff_3_cache/
+    Ignored:    analysis/knockoff_4_cache/
+    Ignored:    analysis/knockoff_5_cache/
+    Ignored:    analysis/knockoff_6_cache/
+    Ignored:    analysis/knockoff_7_cache/
+    Ignored:    analysis/knockoff_8_cache/
+    Ignored:    analysis/knockoff_9_cache/
+    Ignored:    analysis/knockoff_cache/
+    Ignored:    analysis/knockoff_var_cache/
+    Ignored:    analysis/marginal_z_alternative_cache/
+    Ignored:    analysis/marginal_z_cache/
+    Ignored:    analysis/mosek_reg_2_cache/
+    Ignored:    analysis/mosek_reg_4_cache/
+    Ignored:    analysis/mosek_reg_5_cache/
+    Ignored:    analysis/mosek_reg_6_cache/
+    Ignored:    analysis/mosek_reg_cache/
+    Ignored:    analysis/pihat0_null_cache/
+    Ignored:    analysis/plot_diagnostic_cache/
+    Ignored:    analysis/poster_obayes17_cache/
+    Ignored:    analysis/real_data_simulation_2_cache/
+    Ignored:    analysis/real_data_simulation_3_cache/
+    Ignored:    analysis/real_data_simulation_4_cache/
+    Ignored:    analysis/real_data_simulation_5_cache/
+    Ignored:    analysis/real_data_simulation_cache/
+    Ignored:    analysis/rmosek_primal_dual_2_cache/
+    Ignored:    analysis/rmosek_primal_dual_cache/
+    Ignored:    analysis/seqgendiff_cache/
+    Ignored:    analysis/simulated_correlated_null_2_cache/
+    Ignored:    analysis/simulated_correlated_null_3_cache/
+    Ignored:    analysis/simulated_correlated_null_cache/
+    Ignored:    analysis/simulation_real_se_2_cache/
+    Ignored:    analysis/simulation_real_se_cache/
+    Ignored:    analysis/smemo_2_cache/
+    Ignored:    data/LSI/
+    Ignored:    docs/.DS_Store
+    Ignored:    docs/figure/.DS_Store
+    Ignored:    output/fig/
+
+Untracked files:
+    Untracked:  docs/figure/smemo.rmd/
+
+Unstaged changes:
+    Modified:   analysis/smemo.rmd
+
+</code></pre>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</details>
+</li>
+</ul>
+<details>
+<summary> <small><strong>Expand here to see past versions:</strong></small> </summary>
+<ul>
+<table style="border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+File
+</th>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+<th style="text-align:left;">
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/cc0ab8379469bc3726f1508cd81e4ecd6fef1b1a/analysis/truncash.Rmd" target="_blank">cc0ab83</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-05-11
+</td>
+<td style="text-align:left;">
+update
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/truncash.html" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/853a484bfacf347e109f6c8fb3ffaab5f4d6cc02/docs/truncash.html" target="_blank">853a484</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-07
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/59fd661303a2e0431ef58004e4c3758806b69a97/docs/truncash.html" target="_blank">59fd661</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-02-03
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/36c1e4cfb5d8c615603778be7183ef369848cdca/docs/truncash.html" target="_blank">36c1e4c</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-02-03
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d25a6e33d640cc22c808adc8d4ad715a14e538c5/analysis/truncash.Rmd" target="_blank">d25a6e3</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-02-03
+</td>
+<td style="text-align:left;">
+step-down
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/d25a6e33d640cc22c808adc8d4ad715a14e538c5/docs/truncash.html" target="_blank">d25a6e3</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-02-03
+</td>
+<td style="text-align:left;">
+step-down
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/c21d8081ba9e82b8a7b58a485766e85b7c06c51a/docs/truncash.html" target="_blank">c21d808</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-02-02
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/502f9e501c478e27f6190d45823579aa02b18ed5/analysis/truncash.Rmd" target="_blank">502f9e5</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-02-02
+</td>
+<td style="text-align:left;">
+Files commited by wflow_commit.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/d575294b2b025aac67c0d0e42044e34f95c0cc01/docs/truncash.html" target="_blank">d575294</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-01-31
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/226434ed7aaba6fe759ce95fdc65ea46cb2789e0/analysis/truncash.Rmd" target="_blank">226434e</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-01-29
+</td>
+<td style="text-align:left;">
+code
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/226434ed7aaba6fe759ce95fdc65ea46cb2789e0/docs/truncash.html" target="_blank">226434e</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-01-29
+</td>
+<td style="text-align:left;">
+code
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/6b6245e2fac867bbef22b56fc73b244e45cdb827/analysis/truncash.Rmd" target="_blank">6b6245e</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-01-29
+</td>
+<td style="text-align:left;">
+url
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/6b6245e2fac867bbef22b56fc73b244e45cdb827/docs/truncash.html" target="_blank">6b6245e</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-01-29
+</td>
+<td style="text-align:left;">
+url
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/ab2c030f8f8828f8ad6390dba6e9d0a039952346/analysis/truncash.Rmd" target="_blank">ab2c030</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-01-29
+</td>
+<td style="text-align:left;">
+modify url
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/ab2c030f8f8828f8ad6390dba6e9d0a039952346/docs/truncash.html" target="_blank">ab2c030</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-01-29
+</td>
+<td style="text-align:left;">
+modify url
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1d187aa01f1f69a5fc0b9fa144cb0edce4b51e99/analysis/truncash.Rmd" target="_blank">1d187aa</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-01-29
+</td>
+<td style="text-align:left;">
+First Commit
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/1d187aa01f1f69a5fc0b9fa144cb0edce4b51e99/docs/truncash.html" target="_blank">1d187aa</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-01-29
+</td>
+<td style="text-align:left;">
+First Commit
+</td>
+</tr>
+</tbody>
+</table>
+</ul>
+</details>
+<hr />
+<p><strong>Last updated:</strong> 2018-05-12</p>
+<p><strong>Code version:</strong> 140be7f</p>
+<div id="introduction" class="section level2">
 <h2>Introduction</h2>
 <p>Suppose we have <span class="math inline">\(m + n\)</span> observations of <span class="math inline">\((\hat\beta_j, \hat s_j)\)</span> in two groups such that, with a pre-specified <span class="math inline">\(t\)</span>.</p>
 <p><span class="math display">\[
@@ -338,7 +819,7 @@ div.tocify {
 \]</span></p>
 <p>where <span class="math inline">\(\Phi(\cdot)\)</span> is the cdf of <span class="math inline">\(N(0, 1)\)</span>, and <span class="math inline">\(N(\cdot; 0, \sigma_k^2 + \hat s_{m + l}^2)\)</span> is the pdf of <span class="math inline">\(N(0, \sigma_k^2+\hat s_j^2)\)</span>.</p>
 <p>Note that</p>
-<ol type="1">
+<ol style="list-style-type: decimal">
 <li><p>The second part of the objective function is the standard objective function for the regular ASH. The first part of the objective function is new, but it would be as if we are using a different likelihood, so it wouldn’t make any difference numerically.</p></li>
 <li><p>The first part of the objective,</p></li>
 </ol>
@@ -350,15 +831,15 @@ div.tocify {
 m\log(\sum_k\pi_k(2\Phi(\frac{t}{\sqrt{\sigma_k^2+1}}) - 1))
 \]</span></p>
 <p>will move more weight to <span class="math inline">\(\hat\pi_1\)</span>. Customarily, we assume <span class="math inline">\(\sigma_1 \leq \cdots \leq \sigma_K\)</span>, so to maximize this first part alone will be essentially to maximize <span class="math inline">\(\hat\pi_1\)</span>. In other words, if we only have Group 1 and no “extreme” observations in Group 2, the estimated prior of <span class="math inline">\(\beta\)</span> will be a point mass at <span class="math inline">\(0\)</span>. This is true no matter whether we are using <span class="math inline">\(z\)</span>-scores (thus making <span class="math inline">\(\hat s_j \equiv 1\)</span> effectively) or not, although using <span class="math inline">\(z\)</span>-scores will make the case more obviously.</p>
-</section>
-<section id="implementation" class="level2">
+</div>
+<div id="implementation" class="section level2">
 <h2>Implementation</h2>
 <p>Here is the main <code>truncash</code> function, utilizing <code>autoselect.mixsd</code>, <code>mixIP</code>, <code>normalmix</code> from <code>ashr</code>.</p>
 <p><a href="https://github.com/LSun/truncash/tree/master/code/truncash.R"><code>truncash</code></a></p>
-</section>
-<section id="simulation" class="level2">
+</div>
+<div id="simulation" class="section level2">
 <h2>Simulation</h2>
-<section id="the-simplest-case-g-0.9delta_0-0.1n0-1-independent-observations" class="level4">
+<div id="the-simplest-case-g-0.9delta_0-0.1n0-1-independent-observations" class="section level4">
 <h4>The simplest case: <span class="math inline">\(g = 0.9\delta_0 + 0.1N(0, 1)\)</span>, independent observations</h4>
 <p><span class="math inline">\(1000\)</span> pairs of <span class="math inline">\((\hat\beta, \hat s \equiv 1)\)</span> are simulated, so that <span class="math inline">\(900\)</span> of them come from <span class="math inline">\(N(0, 1)\)</span> and another 100 from <span class="math inline">\(N(\beta, 1)\)</span> with <span class="math inline">\(\beta \sim N(0, 1)\)</span>. The <span class="math inline">\(1000\)</span> pairs of observations are fed to both <code>ash</code> and <code>truncash</code>; <span class="math inline">\(\hat\pi_0\)</span> and MSE are obtained. Results from 100 runs are plotted below.</p>
 <pre class="r"><code>source(&quot;../code/truncash.R&quot;)
@@ -402,6 +883,59 @@ abline(v = 0.9, lty = 3, col = &quot;blue&quot;)
 abline(h = 0.9, lty = 3, col = &quot;blue&quot;)
 points(0.9, 0.9, col = &quot;red&quot;, cex = 1.5, pch = 19)</code></pre>
 <p><img src="figure/truncash.Rmd/unnamed-chunk-1-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-1-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/figure/truncash.Rmd/unnamed-chunk-1-1.png" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/853a484bfacf347e109f6c8fb3ffaab5f4d6cc02/docs/figure/truncash.Rmd/unnamed-chunk-1-1.png" target="_blank">853a484</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-07
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d25a6e33d640cc22c808adc8d4ad715a14e538c5/docs/figure/truncash.Rmd/unnamed-chunk-1-1.png" target="_blank">d25a6e3</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-02-03
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre class="r"><code>plot(abs(pihat0_ash - 0.9), abs(pihat0_truncash - 0.9), xlab = &quot;ash&quot;, ylab = &quot;truncash&quot;,
      main = expression(paste(&quot;|&quot;, hat(pi)[0] - 0.9, &quot;|&quot;)), 
      xlim = c(0, max(c(abs(pihat0_ash - 0.9), abs(pihat0_truncash - 0.9)))),
@@ -410,20 +944,129 @@ points(0.9, 0.9, col = &quot;red&quot;, cex = 1.5, pch = 19)</code></pre>
 abline(0, 1, lty = 3, col = &quot;blue&quot;)
 points(0.9, 0.9, col = &quot;red&quot;, cex = 1.5, pch = 19)</code></pre>
 <p><img src="figure/truncash.Rmd/unnamed-chunk-1-2.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-1-2.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/figure/truncash.Rmd/unnamed-chunk-1-2.png" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/853a484bfacf347e109f6c8fb3ffaab5f4d6cc02/docs/figure/truncash.Rmd/unnamed-chunk-1-2.png" target="_blank">853a484</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-07
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d25a6e33d640cc22c808adc8d4ad715a14e538c5/docs/figure/truncash.Rmd/unnamed-chunk-1-2.png" target="_blank">d25a6e3</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-02-03
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre class="r"><code>plot(mse_ash, mse_truncash, xlab = &quot;ash&quot;, ylab = &quot;truncash&quot;, main = &quot;MSE&quot;,
      xlim = c(min(c(mse_ash, mse_truncash)), max(c(mse_ash, mse_truncash))),
      ylim = c(min(c(mse_ash, mse_truncash)), max(c(mse_ash, mse_truncash)))
      )
 abline(0, 1, lty = 3, col = &quot;blue&quot;)</code></pre>
 <p><img src="figure/truncash.Rmd/unnamed-chunk-1-3.png" width="672" style="display: block; margin: auto;" /></p>
-</section>
-</section>
-<section id="session-information" class="level2">
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-1-3.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0f36d998db26444c5dd01502ea1af7fbd1129b22/docs/figure/truncash.Rmd/unnamed-chunk-1-3.png" target="_blank">0f36d99</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-12-21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/853a484bfacf347e109f6c8fb3ffaab5f4d6cc02/docs/figure/truncash.Rmd/unnamed-chunk-1-3.png" target="_blank">853a484</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-11-07
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d25a6e33d640cc22c808adc8d4ad715a14e538c5/docs/figure/truncash.Rmd/unnamed-chunk-1-3.png" target="_blank">d25a6e3</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2017-02-03
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+</div>
+</div>
+<div id="session-information" class="section level2">
 <h2>Session Information</h2>
+</div>
+<div id="session-information-1" class="section level2">
+<h2>Session information</h2>
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS High Sierra 10.13.2
+Running under: macOS High Sierra 10.13.4
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -439,21 +1082,23 @@ other attached packages:
 [1] SQUAREM_2017.10-1 ashr_2.2-2       
 
 loaded via a namespace (and not attached):
- [1] Rcpp_0.12.14      knitr_1.17        magrittr_1.5     
- [4] workflowr_0.8.0   REBayes_1.2       MASS_7.3-47      
- [7] doParallel_1.0.11 pscl_1.5.2        lattice_0.20-35  
-[10] foreach_1.4.4     stringr_1.2.0     tools_3.4.3      
-[13] parallel_3.4.3    grid_3.4.3        git2r_0.20.0     
-[16] htmltools_0.3.6   iterators_1.0.9   assertthat_0.2.0 
-[19] yaml_2.1.16       rprojroot_1.3-1   digest_0.6.13    
-[22] Matrix_1.2-12     codetools_0.2-15  evaluate_0.10.1  
-[25] rmarkdown_1.8     stringi_1.1.6     compiler_3.4.3   
-[28] Rmosek_8.0.69     backports_1.1.2   truncnorm_1.0-7  </code></pre>
-</section>
+ [1] Rcpp_0.12.16      knitr_1.20        whisker_0.3-2    
+ [4] magrittr_1.5      workflowr_1.0.1   REBayes_1.2      
+ [7] MASS_7.3-47       pscl_1.5.2        doParallel_1.0.11
+[10] lattice_0.20-35   foreach_1.4.4     stringr_1.3.0    
+[13] tools_3.4.3       parallel_3.4.3    grid_3.4.3       
+[16] R.oo_1.21.0       git2r_0.21.0      htmltools_0.3.6  
+[19] iterators_1.0.9   assertthat_0.2.0  yaml_2.1.18      
+[22] rprojroot_1.3-2   digest_0.6.15     Matrix_1.2-12    
+[25] codetools_0.2-15  R.utils_2.6.0     evaluate_0.10.1  
+[28] rmarkdown_1.9     stringi_1.1.6     compiler_3.4.3   
+[31] Rmosek_8.0.69     backports_1.1.2   R.methodsS3_1.7.1
+[34] truncnorm_1.0-7  </code></pre>
+</div>
 
 <hr>
 <p>
-    This <a href="http://rmarkdown.rstudio.com">R Markdown</a> site was created with <a href="https://github.com/jdblischak/workflowr">workflowr</a>
+    
 </p>
 <hr>
 
@@ -475,6 +1120,25 @@ loaded via a namespace (and not attached):
     <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
     <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
 -->
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+<hr>
+<p>
+  This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a>
+  analysis was created with
+  <a href="https://github.com/jdblischak/workflowr">workflowr</a> 1.0.1
+</p>
+<hr>
 
 
 </div>

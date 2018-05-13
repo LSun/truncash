@@ -69,14 +69,14 @@ z <- summary$z
 Suppose $z$ are correlated null, will they be well fitted by 10 Gaussian derivatives?
 
 ```{r nonzero fitting and plotting, message = FALSE}
-source("../code/gdash.R")
+source("../code/gdash_lik.R")
 source("../code/gdfit.R")
-w.fit = gdfit(z, gd.ord = 10)
-plot.gdfit(z, w.fit$w, w.fit$gd.ord, breaks = 100)
-plot.gdfit(z, w.fit$w, w.fit$gd.ord, std.norm = FALSE, breaks = 100)
+w.fit = gdfit(z, L = 10)
+plot.gdfit(z, w.fit$w, w.fit$L, breaks = 100)
+plot.gdfit(z, w.fit$w, w.fit$L, std.norm = FALSE, breaks = 100)
 plot(ecdf(z))
-plot.gdfit(z, w.fit$w, w.fit$gd.ord, breaks = "Sturges")
-plot.gdfit(z, w.fit$w, w.fit$gd.ord, std.norm = FALSE, breaks = "Sturges")
+plot.gdfit(z, w.fit$w, w.fit$L, breaks = "Sturges")
+plot.gdfit(z, w.fit$w, w.fit$L, std.norm = FALSE, breaks = "Sturges")
 ```
 
 ## Remove two peaks
@@ -96,9 +96,9 @@ z <- summary$z
 ```
 
 ```{r non-singleton fitting and plotting}
-w.fit = gdfit(z, gd.ord = 10)
-plot.gdfit(z, w.fit$w, w.fit$gd.ord, breaks = 100)
-plot.gdfit(z, w.fit$w, w.fit$gd.ord, std.norm = FALSE, breaks = 100)
+w.fit = gdfit(z, L = 10)
+plot.gdfit(z, w.fit$w, w.fit$L, breaks = 100)
+plot.gdfit(z, w.fit$w, w.fit$L, std.norm = FALSE, breaks = 100)
 plot(ecdf(z))
 ```
 
@@ -119,10 +119,10 @@ z <- summary$z
 ```
 
 ```{r positive fitting and plotting}
-w.fit = gdfit(z, gd.ord = 10)
-cat(rbind(paste(0 : w.fit$gd.ord, ":"), paste(w.fit$w, ";")))
-plot.gdfit(z, w.fit$w, w.fit$gd.ord, breaks = 100)
-plot.gdfit(z, w.fit$w, w.fit$gd.ord, std.norm = FALSE, breaks = 100)
+w.fit = gdfit(z, L = 10)
+cat(rbind(paste(0 : w.fit$L, ":"), paste(w.fit$w, ";")))
+plot.gdfit(z, w.fit$w, w.fit$L, breaks = 100)
+plot.gdfit(z, w.fit$w, w.fit$L, std.norm = FALSE, breaks = 100)
 plot(ecdf(z))
 ```
 
