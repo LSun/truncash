@@ -20,6 +20,8 @@ library(grid)
 library(gridExtra)
 library(RColorBrewer)
 library(scales)
+library(ggpubr)
+library(cowplot)
 ```
 
 ```{r functions}
@@ -277,12 +279,20 @@ for (j in seq(length(pi0.vec))) {
   scale_x_discrete(labels = method.name) +
   labs(x = "", y = "TPP") +
   theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 15), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 15, angle = 45, hjust = 1), axis.text.y = element_text(size = 15), strip.text = element_text(size = 15))
-
-  grid.arrange(FDR.calib.plot, pi0.plot, FDR.plot, power.plot,
-               nrow = 4, ncol = 1,
-               top = textGrob(bquote(paste(pi[0] == .(pi0.vec[j]), "\n")), gp = gpar(fontsize = 15, font = 3)))
-  ggsave(paste0("../output/fig/pi0_", pi0.vec[j], ".eps"))
-# g <- arrangeGrob(FDR.calib.plot, pi0.plot, FDR.plot, power.plot, nrow = 4, ncol = 1, top = textGrob(bquote(paste(pi[0] == .(pi0.vec[j]), "\n")), gp = gpar(fontsize = 15, font = 3)))
-# ggsave(paste0("../output/fig/pi0_", pi0.vec[j], ".eps"), g)
+  
+  grid.arrange(FDR.calib.plot, pi0.plot,
+               top = textGrob(bquote(paste(pi[0] == .(pi0.vec[j]), "\n")), gp = gpar(fontsize = 15, font = 3))
+               )
+  grid.arrange(FDR.plot, power.plot,
+               top = textGrob(bquote(paste("At Nominal FDR = ", .(q), "\n")), gp = gpar(fontsize = 15, font = 3))
+               )
+  g <- arrangeGrob(FDR.calib.plot, pi0.plot,
+          arrangeGrob(FDR.plot, power.plot,
+            nrow = 2, ncol = 1,
+            top = textGrob(bquote(paste("At Nominal FDR = ", .(q), "\n")), gp = gpar(fontsize = 15, font = 3))
+          ), ncol = 1, heights = c(1, 1, 2),
+          top = textGrob(bquote(paste(pi[0] == .(pi0.vec[j]), "\n")), gp = gpar(fontsize = 15, font = 3))
+      )
+  ggsave(paste0("../output/fig/pi0_", pi0.vec[j], ".eps"), g, height = 10, width = 8)
 }
 ```
