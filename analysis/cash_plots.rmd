@@ -299,7 +299,7 @@ for (j in seq(length(pi0.vec))) {
 
 ## Bimodal: $g_2 = 0.5 N\left(-2, 1\right) + 0.5 N\left(2, 1\right)$
 
-```{r gtex_z_1, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
+```{r gtex_z_2, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
 set.seed(777)
 
 nsim <- 200
