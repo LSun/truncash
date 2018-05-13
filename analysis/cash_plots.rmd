@@ -20,6 +20,7 @@ library(grid)
 library(gridExtra)
 library(RColorBrewer)
 library(scales)
+library(cowplot)
 ```
 
 ```{r functions}
@@ -182,7 +183,7 @@ method.col <- scales::hue_pal()(5)
 # method.col <- c("#377eb8", "#984ea3", "#4daf4a", "#ff7f00", "#e41a1c")
 ```
 
-```{r, message = FALSE, warning = FALSE}
+```{r, message = FALSE, warning = FALSE, fig.asp = 1.5}
 for (j in seq(length(pi0.vec))) {
   sd.z <- sapply(z.pi0.list[[j]], sd)
   Noise <- cut(sd.z, breaks = c(0, quantile(sd.z, probs = 1 : 2 / 3), Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
@@ -278,19 +279,16 @@ for (j in seq(length(pi0.vec))) {
   labs(x = "", y = "TPP") +
   theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 15), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 15, angle = 45, hjust = 1), axis.text.y = element_text(size = 15), strip.text = element_text(size = 15))
   
-  grid.arrange(FDR.calib.plot, pi0.plot,
-               top = textGrob(bquote(paste(pi[0] == .(pi0.vec[j]), "\n")), gp = gpar(fontsize = 15, font = 3))
-               )
-  grid.arrange(FDR.plot, power.plot,
-               top = textGrob(bquote(paste("At Nominal FDR = ", .(q), "\n")), gp = gpar(fontsize = 15, font = 3))
-               )
-  g <- arrangeGrob(FDR.calib.plot, pi0.plot,
-          arrangeGrob(FDR.plot, power.plot,
-            nrow = 2, ncol = 1,
-            top = textGrob(bquote(paste("At Nominal FDR = ", .(q), "\n")), gp = gpar(fontsize = 15, font = 3))
-          ), ncol = 1, heights = c(1, 1, 2),
-          top = textGrob(bquote(paste(pi[0] == .(pi0.vec[j]), "\n")), gp = gpar(fontsize = 15, font = 3))
-      )
-  ggsave(paste0("../output/fig/pi0_", pi0.vec[j], ".eps"), g, height = 10, width = 8)
+  joint <- plot_grid(FDR.calib.plot,
+            pi0.plot + rremove("x.text"),
+            FDR.plot + rremove("x.text"),
+            power.plot,
+            align = "v", ncol = 1, nrow = 4,
+            rel_heights = c(1.5, 1, 1, 1.2)
+  )
+  annotate_figure(joint,
+    top = bquote(pi[0] == .(pi0.vec[j]))
+  )
+  ggsave(paste0("../output/fig/pi0_", pi0.vec[j], ".eps"), height = 10, width = 8)
 }
 ```
