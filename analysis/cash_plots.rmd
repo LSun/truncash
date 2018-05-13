@@ -20,8 +20,6 @@ library(grid)
 library(gridExtra)
 library(RColorBrewer)
 library(scales)
-library(ggpubr)
-library(cowplot)
 ```
 
 ```{r functions}
