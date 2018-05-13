@@ -323,7 +323,8 @@ div.section {
 <ul>
 <li>
 <details>
-<p><summary> <strong style="color:red;">✖</strong> <strong>R Markdown file:</strong> uncommitted changes </summary> The R Markdown file has unstaged changes. To know which version of the R Markdown file created these results, you’ll want to first commit it to the Git repo. If you’re still working on the analysis, you can ignore this warning. When you’re finished, you can run <code>wflow_publish</code> to commit the R Markdown file and build the HTML.</p>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>R Markdown file:</strong> up-to-date </summary></p>
+<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
 </details>
 </li>
 <li>
@@ -346,7 +347,7 @@ div.section {
 </li>
 <li>
 <details>
-<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/5a3de9bd7dc77225a33d71b9d06aae2d19e195a6" target="_blank">5a3de9b</a> </summary></p>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/ac438b4697e1e3025d37654d1430ba1c44be19ba" target="_blank">ac438b4</a> </summary></p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 <pre><code>
 Ignored files:
@@ -394,7 +395,6 @@ Ignored files:
     Ignored:    analysis/diagnostic_plot_2_cache/
     Ignored:    analysis/diagnostic_plot_cache/
     Ignored:    analysis/efron_leukemia_cache/
-    Ignored:    analysis/figure/
     Ignored:    analysis/fitting_normal_cache/
     Ignored:    analysis/gaussian_derivatives_2_cache/
     Ignored:    analysis/gaussian_derivatives_3_cache/
@@ -446,9 +446,6 @@ Ignored files:
     Ignored:    docs/figure/.DS_Store
     Ignored:    output/fig/
 
-Unstaged changes:
-    Modified:   analysis/voom_null.Rmd
-
 </code></pre>
 Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
 </details>
@@ -478,6 +475,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/ac438b4697e1e3025d37654d1430ba1c44be19ba/analysis/voom_null.Rmd" target="_blank">ac438b4</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-12
+</td>
+<td style="text-align:left;">
+Update to 1.0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/ac438b4697e1e3025d37654d1430ba1c44be19ba/docs/voom_null.html" target="_blank">ac438b4</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-12
+</td>
+<td style="text-align:left;">
+Update to 1.0
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 Rmd
@@ -637,7 +668,7 @@ background
 </details>
 <hr />
 <p><strong>Last updated:</strong> 2018-05-12</p>
-<p><strong>Code version:</strong> 5a3de9bd7dc77225a33d71b9d06aae2d19e195a6</p>
+<p><strong>Code version:</strong> ac438b4697e1e3025d37654d1430ba1c44be19ba</p>
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
 <p>This document simply simulates some null data by randomly sampling two groups of 5 samples from some RNA-seq data (GTEx liver samples). We plot <span class="math inline">\(p\)</span> value histograms and see the effects of inflation: some distributions are inflated near 0 and others are inflated near 1. However, when we look at the qqplots (here of the z scores, but should be same for p values) we see something that is interesting, although obvious in hindsight: the most extreme p values (z scores) are never “too extreme” (although they are sometimes not extreme enough). The inflation comes from the “not quite so extreme” p values and z scores. This makes sense: when you have positively correlated variables, the most extreme values will tend to be less extreme than when you have independent samples, because you have “effectively” fewer independent samples.</p>
