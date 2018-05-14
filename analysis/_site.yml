@@ -1,12 +1,8 @@
 name: truncash
 output_dir: ../docs
-include: .nojekyll
-exclude: include
 navbar:
   title: truncash
   left:
-  - text: Home
-    href: index.html
   - text: About
     href: about.html
   - text: License
@@ -20,8 +16,3 @@ output:
     toc_float: yes
     theme: cosmo
     highlight: textmate
-    include:
-      after_body: include/footer.html
-    lib_dir: site_libs
-    self_contained: no
-
