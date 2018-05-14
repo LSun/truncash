@@ -221,7 +221,7 @@ A close look at Efron's classic BRCA data, used in many of his papers to illustr
 
 * [The coefficients of Gaussian derivatives for correlated null](gd_w.html)
 
-* [The underappreciated and surprising robustness of `BH` for correlation](BH_robustness.html). See more systemic exploration at [BHq](https://github.com/LSun/BHq)
+* [The underappreciated and surprising robustness of `BH` for correlation](BH_robustness.html). See more systemic explorations at [BHq](https://github.com/LSun/BHq)
 
 ---
 

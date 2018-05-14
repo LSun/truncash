@@ -218,13 +218,12 @@ div.section {
 <ul>
 <li>
 <details>
-<p><summary> <strong style="color:blue;">✔</strong> <strong>R Markdown file:</strong> up-to-date </summary></p>
-<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+<p><summary> <strong style="color:red;">✖</strong> <strong>R Markdown file:</strong> uncommitted changes </summary> The R Markdown file has unstaged changes. To know which version of the R Markdown file created these results, you’ll want to first commit it to the Git repo. If you’re still working on the analysis, you can ignore this warning. When you’re finished, you can run <code>wflow_publish</code> to commit the R Markdown file and build the HTML.</p>
 </details>
 </li>
 <li>
 <details>
-<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/518f8f43522ffa3e7e1e509d3df823c4088bff9b" target="_blank">518f8f4</a> </summary></p>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/f70370cb7c06d476d4638e0a1ac4fafbe1d04b41" target="_blank">f70370c</a> </summary></p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 <pre><code>
 Ignored files:
@@ -232,12 +231,100 @@ Ignored files:
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
     Ignored:    analysis/.DS_Store
+    Ignored:    analysis/BH_robustness_cache/
+    Ignored:    analysis/FDR_Null_cache/
+    Ignored:    analysis/FDR_null_betahat_cache/
+    Ignored:    analysis/Rmosek_cache/
+    Ignored:    analysis/StepDown_cache/
+    Ignored:    analysis/alternative2_cache/
+    Ignored:    analysis/alternative_cache/
+    Ignored:    analysis/ash_gd_cache/
+    Ignored:    analysis/average_cor_gtex_2_cache/
+    Ignored:    analysis/average_cor_gtex_cache/
+    Ignored:    analysis/brca_cache/
+    Ignored:    analysis/cash_deconv_cache/
+    Ignored:    analysis/cash_fdr_1_cache/
+    Ignored:    analysis/cash_fdr_2_cache/
+    Ignored:    analysis/cash_fdr_3_cache/
+    Ignored:    analysis/cash_fdr_4_cache/
+    Ignored:    analysis/cash_fdr_5_cache/
+    Ignored:    analysis/cash_fdr_6_cache/
+    Ignored:    analysis/cash_plots_cache/
+    Ignored:    analysis/cash_sim_1_cache/
+    Ignored:    analysis/cash_sim_2_cache/
+    Ignored:    analysis/cash_sim_3_cache/
+    Ignored:    analysis/cash_sim_4_cache/
+    Ignored:    analysis/cash_sim_5_cache/
+    Ignored:    analysis/cash_sim_6_cache/
+    Ignored:    analysis/cash_sim_7_cache/
+    Ignored:    analysis/correlated_z_2_cache/
+    Ignored:    analysis/correlated_z_3_cache/
+    Ignored:    analysis/correlated_z_cache/
+    Ignored:    analysis/create_null_cache/
+    Ignored:    analysis/cutoff_null_cache/
+    Ignored:    analysis/design_matrix_2_cache/
+    Ignored:    analysis/design_matrix_cache/
+    Ignored:    analysis/diagnostic_ash_cache/
+    Ignored:    analysis/diagnostic_correlated_z_2_cache/
+    Ignored:    analysis/diagnostic_correlated_z_3_cache/
+    Ignored:    analysis/diagnostic_correlated_z_cache/
+    Ignored:    analysis/diagnostic_plot_2_cache/
+    Ignored:    analysis/diagnostic_plot_cache/
+    Ignored:    analysis/efron_leukemia_cache/
+    Ignored:    analysis/fitting_normal_cache/
+    Ignored:    analysis/gaussian_derivatives_2_cache/
+    Ignored:    analysis/gaussian_derivatives_3_cache/
+    Ignored:    analysis/gaussian_derivatives_4_cache/
+    Ignored:    analysis/gaussian_derivatives_5_cache/
+    Ignored:    analysis/gaussian_derivatives_cache/
+    Ignored:    analysis/gd-ash_cache/
+    Ignored:    analysis/gd_delta_cache/
+    Ignored:    analysis/gd_lik_2_cache/
+    Ignored:    analysis/gd_lik_cache/
+    Ignored:    analysis/gd_w_cache/
+    Ignored:    analysis/knockoff_10_cache/
+    Ignored:    analysis/knockoff_2_cache/
+    Ignored:    analysis/knockoff_3_cache/
+    Ignored:    analysis/knockoff_4_cache/
+    Ignored:    analysis/knockoff_5_cache/
+    Ignored:    analysis/knockoff_6_cache/
+    Ignored:    analysis/knockoff_7_cache/
+    Ignored:    analysis/knockoff_8_cache/
+    Ignored:    analysis/knockoff_9_cache/
+    Ignored:    analysis/knockoff_cache/
+    Ignored:    analysis/knockoff_var_cache/
+    Ignored:    analysis/marginal_z_alternative_cache/
+    Ignored:    analysis/marginal_z_cache/
+    Ignored:    analysis/mosek_reg_2_cache/
+    Ignored:    analysis/mosek_reg_4_cache/
+    Ignored:    analysis/mosek_reg_5_cache/
+    Ignored:    analysis/mosek_reg_6_cache/
+    Ignored:    analysis/mosek_reg_cache/
+    Ignored:    analysis/pihat0_null_cache/
+    Ignored:    analysis/plot_diagnostic_cache/
+    Ignored:    analysis/poster_obayes17_cache/
+    Ignored:    analysis/real_data_simulation_2_cache/
+    Ignored:    analysis/real_data_simulation_3_cache/
+    Ignored:    analysis/real_data_simulation_4_cache/
+    Ignored:    analysis/real_data_simulation_5_cache/
+    Ignored:    analysis/real_data_simulation_cache/
+    Ignored:    analysis/rmosek_primal_dual_2_cache/
+    Ignored:    analysis/rmosek_primal_dual_cache/
+    Ignored:    analysis/seqgendiff_cache/
+    Ignored:    analysis/simulated_correlated_null_2_cache/
+    Ignored:    analysis/simulated_correlated_null_3_cache/
+    Ignored:    analysis/simulated_correlated_null_cache/
+    Ignored:    analysis/simulation_real_se_2_cache/
+    Ignored:    analysis/simulation_real_se_cache/
+    Ignored:    analysis/smemo_2_cache/
     Ignored:    data/LSI/
     Ignored:    docs/.DS_Store
     Ignored:    docs/figure/.DS_Store
+    Ignored:    output/fig/
 
 Unstaged changes:
-    Modified:   analysis/_site.yml
+    Modified:   analysis/cash_plots.rmd
+    Modified:   analysis/index.Rmd
 
 </code></pre>
 Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
@@ -268,6 +355,23 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/f70370cb7c06d476d4638e0a1ac4fafbe1d04b41/docs/index.html" target="_blank">f70370c</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-05-14
+</td>
+<td style="text-align:left;">
+revised _site.yml
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 html
@@ -2911,7 +3015,7 @@ First Commit
 <p>A close look at Efron’s classic BRCA data, used in many of his papers to illustrate the empirical null idea.</p>
 <ul>
 <li><p><a href="gd_w.html">The coefficients of Gaussian derivatives for correlated null</a></p></li>
-<li><p><a href="BH_robustness.html">The underappreciated and surprising robustness of <code>BH</code> for correlation</a>. See more systemic exploration at <a href="https://github.com/LSun/BHq">BHq</a></p></li>
+<li><p><a href="BH_robustness.html">The underappreciated and surprising robustness of <code>BH</code> for correlation</a>. See more systemic explorations at <a href="https://github.com/LSun/BHq">BHq</a></p></li>
 </ul>
 <hr />
 <p>Next it’s a series of investigation of a number of variable selection and false discovery rate control methods in linear regression.</p>
