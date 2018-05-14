@@ -173,6 +173,10 @@ When the noise is correlated, the likelihood should be correlated.  However, in 
 
 A more in-depth look into the [primal vs dual](mosek_reg.html) problem in `Rmosek` implementation.
 
+* [`CASH` on Poisson thinned real data](seqgendiff.html)
+
+Explore the `seqgendiff::poisthin` function developed by [David](https://github.com/dcgerard/seqgendiff).
+
 * [Data analysis: Efron's BRCA data](brca.html)
 
 A close look at Efron's classic BRCA data, used in many of his papers to illustrate the empirical Bayes idea which inspires this project.
@@ -211,7 +215,13 @@ A very important quantity for the shape of the empirical distribution of a large
 
 * [Plots for the `CASH` Paper](cash_plots.html)
 
+* [Data analysis: Efron's Leukemia data](efron_leukemia.html)
+
+A close look at Efron's classic BRCA data, used in many of his papers to illustrate the empirical null idea.
+
 * [The coefficients of Gaussian derivatives for correlated null](gd_w.html)
+
+* [The underappreciated and surprising robustness of `BH` for correlation](BH_robustness.html). See more systemic exploration at [BHq](https://github.com/LSun/BHq)
 
 ---
 

@@ -7,8 +7,7 @@ output:
     code_folding: hide
 ---
 
-
-
+We apply BH to correlated data, generated from pure simulation or real data, to have a sense how robust BH is for correlation.
 
 
 ```{r, cache = TRUE, message = FALSE}
@@ -26,7 +25,7 @@ set.seed(777)
 
 ## Simulated Data
 
-```{r, cache = TRUE}
+```{r}
 d <- 10
 n <- 1e4
 B <- matrix(rnorm(n * d), n, d)
@@ -100,9 +99,11 @@ Z.gtex <- Z.list
 W.sim <- W
 ```
 
-## BH
+## Global null setting
 
-```{r, cache = TRUE}
+### Simulated data
+
+```{r}
 p <- lapply(Z.sim, function(x) {pnorm(-abs(x)) * 2})
 q <- lapply(p, p.adjust, method = "BH")
 q.cutoff <- seq(0.01, 0.99, by = 0.01)
@@ -115,7 +116,11 @@ plot(q.cutoff, fdp, xlab = "Nominal FDR", ylab = "FDP",
      xlim = range(q.cutoff, fdp), ylim = range(q.cutoff, fdp),
      type = "l")
 abline(0, 1, col = "red", lty = 3)
+```
 
+### real data
+
+```{r}
 p <- lapply(Z.gtex, function(x) {pnorm(-abs(x)) * 2})
 q <- lapply(p, p.adjust, method = "BH")
 q.cutoff <- seq(0.001, 0.200, by = 0.001)
@@ -130,8 +135,9 @@ plot(q.cutoff, fdp, xlab = "Nominal FDR", ylab = "FDP",
 abline(0, 1, col = "red", lty = 3)
 ```
 
+## $\theta \sim 0.95 \delta_0 + 0.05 \delta_3$
 
-```{r, cache = TRUE}
+```{r}
 theta <- list()
 for (j in 1 : 1e4) {
   theta[[j]] <- sample(c(rep(0, 9.5e3), rep(3, 0.5e3)))
