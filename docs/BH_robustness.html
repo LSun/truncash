@@ -335,7 +335,7 @@ div.section {
 </div>
 
 
-<p><strong>Last updated:</strong> 2018-05-12</p>
+<p><strong>Last updated:</strong> 2018-05-14</p>
 <strong>workflowr checks:</strong> <small>(Click a bullet for more information)</small>
 <ul>
 <li>
@@ -364,7 +364,7 @@ div.section {
 </li>
 <li>
 <details>
-<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/5b37742d7cdd7ba50dd641579d2705df67b8b441" target="_blank">5b37742</a> </summary></p>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/a9d12a8f8538e23455a7aa910ec0fb3baa3184b6" target="_blank">a9d12a8</a> </summary></p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 <pre><code>
 Ignored files:
@@ -391,7 +391,6 @@ Ignored files:
     Ignored:    analysis/cash_fdr_5_cache/
     Ignored:    analysis/cash_fdr_6_cache/
     Ignored:    analysis/cash_plots_cache/
-    Ignored:    analysis/cash_plots_fdp_cache/
     Ignored:    analysis/cash_sim_1_cache/
     Ignored:    analysis/cash_sim_2_cache/
     Ignored:    analysis/cash_sim_3_cache/
@@ -464,9 +463,8 @@ Ignored files:
     Ignored:    docs/figure/.DS_Store
     Ignored:    output/fig/
 
-Untracked files:
-    Untracked:  analysis/cash_plots_fdp_files/
-    Untracked:  docs/cash_plots_fdp_files/
+Unstaged changes:
+    Modified:   analysis/cash_plots.rmd
 
 </code></pre>
 Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
@@ -497,6 +495,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/a9d12a8f8538e23455a7aa910ec0fb3baa3184b6/analysis/BH_robustness.rmd" target="_blank">a9d12a8</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-14
+</td>
+<td style="text-align:left;">
+wflow_publish(c(“analysis/BH_robustness.rmd”, “analysis/index.Rmd”))
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/ddf906244e82e0675854c40da76dc16cf1a78fa4/docs/BH_robustness.html" target="_blank">ddf9062</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-12
+</td>
+<td style="text-align:left;">
+Update to 1.0
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 rmd
@@ -604,6 +636,7 @@ BH robustness
 </ul>
 </details>
 <hr />
+<p>We apply BH to correlated data, generated from pure simulation or real data, to have a sense how robust BH is for correlation.</p>
 <pre class="r"><code>source(&quot;../code/gdash_lik.R&quot;)
 source(&quot;../code/gdfit.R&quot;)
 source(&quot;../code/count_to_summary.R&quot;)
@@ -672,8 +705,10 @@ for (i in 1 : nsim) {
 Z.gtex &lt;- Z.list
 W.sim &lt;- W</code></pre>
 </div>
-<div id="bh" class="section level2">
-<h2>BH</h2>
+<div id="global-null-setting" class="section level2">
+<h2>Global null setting</h2>
+<div id="simulated-data-1" class="section level3">
+<h3>Simulated data</h3>
 <pre class="r"><code>p &lt;- lapply(Z.sim, function(x) {pnorm(-abs(x)) * 2})
 q &lt;- lapply(p, p.adjust, method = &quot;BH&quot;)
 q.cutoff &lt;- seq(0.01, 0.99, by = 0.01)
@@ -687,6 +722,9 @@ plot(q.cutoff, fdp, xlab = &quot;Nominal FDR&quot;, ylab = &quot;FDP&quot;,
      type = &quot;l&quot;)
 abline(0, 1, col = &quot;red&quot;, lty = 3)</code></pre>
 <p><img src="figure/BH_robustness.rmd/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="real-data" class="section level3">
+<h3>real data</h3>
 <pre class="r"><code>p &lt;- lapply(Z.gtex, function(x) {pnorm(-abs(x)) * 2})
 q &lt;- lapply(p, p.adjust, method = &quot;BH&quot;)
 q.cutoff &lt;- seq(0.001, 0.200, by = 0.001)
@@ -699,7 +737,11 @@ plot(q.cutoff, fdp, xlab = &quot;Nominal FDR&quot;, ylab = &quot;FDP&quot;,
      xlim = range(q.cutoff, fdp), ylim = range(q.cutoff, fdp),
      type = &quot;l&quot;)
 abline(0, 1, col = &quot;red&quot;, lty = 3)</code></pre>
-<p><img src="figure/BH_robustness.rmd/unnamed-chunk-9-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/BH_robustness.rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="theta-sim-0.95-delta_0-0.05-delta_3" class="section level2">
+<h2><span class="math inline">\(\theta \sim 0.95 \delta_0 + 0.05 \delta_3\)</span></h2>
 <pre class="r"><code>theta &lt;- list()
 for (j in 1 : 1e4) {
   theta[[j]] &lt;- sample(c(rep(0, 9.5e3), rep(3, 0.5e3)))
@@ -725,9 +767,9 @@ fdp.avg &lt;- lapply(fdp, mean)
 tdp.avg &lt;- lapply(tdp, mean)
 plot(q.cutoff, fdp.avg, type = &quot;l&quot;, xlim = range(q.cutoff, fdp.avg), ylim = range(q.cutoff, fdp.avg), xlab = &quot;Nominal FDR&quot;, ylab = &quot;Average FDP&quot;)
 abline(0, 1, col = &quot;red&quot;)</code></pre>
-<p><img src="figure/BH_robustness.rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/BH_robustness.rmd/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>plot(q.cutoff, tdp.avg, type = &quot;l&quot;, xlab = &quot;Nominal FDR&quot;, ylab = &quot;TDP&quot;)</code></pre>
-<p><img src="figure/BH_robustness.rmd/unnamed-chunk-10-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/BH_robustness.rmd/unnamed-chunk-11-2.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="session-information" class="section level2">
 <h2>Session information</h2>
