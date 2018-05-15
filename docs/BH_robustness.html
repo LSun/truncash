@@ -17,7 +17,7 @@
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<link href="site_libs/bootstrap-3.3.5/css/readable.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
@@ -288,9 +288,6 @@ div.tocify {
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="index.html">Home</a>
-</li>
-<li>
   <a href="about.html">About</a>
 </li>
 <li>
@@ -335,7 +332,7 @@ div.section {
 </div>
 
 
-<p><strong>Last updated:</strong> 2018-05-14</p>
+<p><strong>Last updated:</strong> 2018-05-15</p>
 <strong>workflowr checks:</strong> <small>(Click a bullet for more information)</small>
 <ul>
 <li>
@@ -364,7 +361,7 @@ div.section {
 </li>
 <li>
 <details>
-<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/a9d12a8f8538e23455a7aa910ec0fb3baa3184b6" target="_blank">a9d12a8</a> </summary></p>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/388e65e06000e313c170a82f3ed57346f6024897" target="_blank">388e65e</a> </summary></p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 <pre><code>
 Ignored files:
@@ -463,9 +460,6 @@ Ignored files:
     Ignored:    docs/figure/.DS_Store
     Ignored:    output/fig/
 
-Unstaged changes:
-    Modified:   analysis/cash_plots.rmd
-
 </code></pre>
 Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
 </details>
@@ -495,6 +489,23 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/eaaa5f9c660ddc9671353414c90c5bfd0a078b9c/docs/BH_robustness.html" target="_blank">eaaa5f9</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-14
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 rmd
@@ -658,6 +669,37 @@ Rho &lt;- cov2cor(Sigma)
 par(mar = c(5.1, 4.1, 1, 2.1))
 hist(Rho[lower.tri(Rho)], xlab = expression(rho[ij]), main = &quot;&quot;)</code></pre>
 <p><img src="figure/BH_robustness.rmd/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-2-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/eaaa5f9c660ddc9671353414c90c5bfd0a078b9c/docs/figure/BH_robustness.rmd/unnamed-chunk-2-1.png" target="_blank">eaaa5f9</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre class="r"><code>rhobar &lt;- c()
 for (l in 1 : 10) {
   rhobar[l] &lt;- (sum(Rho^l) - n) / (n * (n - 1))
@@ -722,6 +764,37 @@ plot(q.cutoff, fdp, xlab = &quot;Nominal FDR&quot;, ylab = &quot;FDP&quot;,
      type = &quot;l&quot;)
 abline(0, 1, col = &quot;red&quot;, lty = 3)</code></pre>
 <p><img src="figure/BH_robustness.rmd/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-9-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/eaaa5f9c660ddc9671353414c90c5bfd0a078b9c/docs/figure/BH_robustness.rmd/unnamed-chunk-9-1.png" target="_blank">eaaa5f9</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 </div>
 <div id="real-data" class="section level3">
 <h3>real data</h3>
@@ -738,6 +811,37 @@ plot(q.cutoff, fdp, xlab = &quot;Nominal FDR&quot;, ylab = &quot;FDP&quot;,
      type = &quot;l&quot;)
 abline(0, 1, col = &quot;red&quot;, lty = 3)</code></pre>
 <p><img src="figure/BH_robustness.rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-10-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/eaaa5f9c660ddc9671353414c90c5bfd0a078b9c/docs/figure/BH_robustness.rmd/unnamed-chunk-10-1.png" target="_blank">eaaa5f9</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 </div>
 </div>
 <div id="theta-sim-0.95-delta_0-0.05-delta_3" class="section level2">
@@ -768,8 +872,70 @@ tdp.avg &lt;- lapply(tdp, mean)
 plot(q.cutoff, fdp.avg, type = &quot;l&quot;, xlim = range(q.cutoff, fdp.avg), ylim = range(q.cutoff, fdp.avg), xlab = &quot;Nominal FDR&quot;, ylab = &quot;Average FDP&quot;)
 abline(0, 1, col = &quot;red&quot;)</code></pre>
 <p><img src="figure/BH_robustness.rmd/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-11-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/eaaa5f9c660ddc9671353414c90c5bfd0a078b9c/docs/figure/BH_robustness.rmd/unnamed-chunk-11-1.png" target="_blank">eaaa5f9</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre class="r"><code>plot(q.cutoff, tdp.avg, type = &quot;l&quot;, xlab = &quot;Nominal FDR&quot;, ylab = &quot;TDP&quot;)</code></pre>
 <p><img src="figure/BH_robustness.rmd/unnamed-chunk-11-2.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-11-2.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/eaaa5f9c660ddc9671353414c90c5bfd0a078b9c/docs/figure/BH_robustness.rmd/unnamed-chunk-11-2.png" target="_blank">eaaa5f9</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-14
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 </div>
 <div id="session-information" class="section level2">
 <h2>Session information</h2>
@@ -798,30 +964,6 @@ loaded via a namespace (and not attached):
 [19] htmltools_0.3.6   knitr_1.20       </code></pre>
 </div>
 
-<hr>
-<p>
-    
-</p>
-<hr>
-
-<!-- To enable disqus, uncomment the section below and provide your disqus_shortname -->
-
-<!-- disqus
-  <div id="disqus_thread"></div>
-    <script type="text/javascript">
-        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
-        var disqus_shortname = 'rmarkdown'; // required: replace example with your forum shortname
-
-        /* * * DON'T EDIT BELOW THIS LINE * * */
-        (function() {
-            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-        })();
-    </script>
-    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
--->
 <!-- Adjust MathJax settings so that all math formulae are shown using
 TeX fonts only; see
 http://docs.mathjax.org/en/latest/configuration.html.  This will make
