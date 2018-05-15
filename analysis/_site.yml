@@ -12,7 +12,7 @@ navbar:
     href: https://github.com/LSun/truncash
 output:
   workflowr::wflow_html:
-    toc: yes
+    toc: true
     toc_float: yes
     theme: readable
     highlight: textmate
