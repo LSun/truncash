@@ -342,6 +342,38 @@ lfdr_top = function (pi0, w, betahat, sebetahat, gd.ord) {
   return(gd.std.mat %*% w * pi0)
 }
 
+array_PosProb = function (betahat, sebetahat, sd, gd.ord, gd.normalized) {
+  sd.mat = sqrt(outer(sebetahat^2, sd^2, FUN = "+"))
+  beta.std.mat = betahat / sd.mat
+  temp2 = array(dim = c(dim(beta.std.mat), gd.ord + 1))
+  temp2_0 = dnorm(beta.std.mat)
+  temp3 <- t(outer(sd, sebetahat, FUN = "/"))
+  temp3_0 <- dnorm(beta.std.mat * temp3)
+  temp3_1 <- pnorm(beta.std.mat * temp3)
+  hermite = Hermite(gd.ord + 1)
+  if (gd.normalized) {
+    for (i in 0 : gd.ord) {
+
+      temp2[, , i + 1] = temp2_0 * hermite[[i + 1]](beta.std.mat) * (-1)^(i + 1) / sqrt(factorial(i))
+    }
+  } else {
+    for (i in 1 : (gd.ord + 1)) {
+      temp2[, , i + 1] = temp2_0 * hermite[[i + 1]](beta.std.mat) * (-1)^(i + 1)
+    }
+  }
+  # temp2.test = outer(beta.std.mat, 0:gd.ord, FUN = gauss.deriv)
+  se.std.mat = sebetahat / sd.mat
+  sd.std.mat2 = t(sd / t(sd.mat))^2
+  temp1 = exp(outer(log(se.std.mat), 0 : gd.ord, FUN = "*"))
+  for (ii in 0 : gd.ord) {
+    temp1[, , ii + 1] = temp1[, , ii + 1] * sd.std.mat2
+  }
+  array_pm = (-1) * temp1 * temp2
+  rm(temp1)
+  rm(temp2)
+  return(array_pm)
+}
+
 autoselect.mixsd = function (betahat, sebetahat, mult)
 {
   sebetahat = sebetahat[sebetahat != 0]
