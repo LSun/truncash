@@ -52,7 +52,7 @@ gdash = function (betahat, sebetahat,
   return(list(fitted_g = fitted_g, w = what, loglik = loglik, niter = res$niter, converged = res$converged, array_F = array_F, array_PM = array_PM, pm = beta_pm, lfdr = as.vector(lfdr), qvalue = qvalue))
 }
 
-#   array_PP <- array_PosProb(betahat, sebetahat, sd, gd.ord, gd.normalized)
+#   array_PP <- array_PosProb(betahat, sebetahat, method, sd, gd.ord, gd.normalized)
 #   array_PP = aperm(array_PP, c(2, 3, 1))
 #   beta_PosProb <- colSums(t(apply(pihat * array_PP, 2, colSums)) * what) / colSums(t(apply(pihat * array_F, 2, colSums)) * what)
 #   lfsr <- ashr::compute_lfsr(1 - lfdr - beta_PosProb, lfdr)
@@ -350,10 +350,11 @@ lfdr_top = function (pi0, w, betahat, sebetahat, gd.ord) {
   return(gd.std.mat %*% w * pi0)
 }
 
-array_PosProb = function (betahat, sebetahat, sd, gd.ord, gd.normalized) {
-  sd <- sd[-1]
+array_PosProb = function (betahat, sebetahat, method, sd, gd.ord, gd.normalized) {
   sd.mat = sqrt(outer(sebetahat^2, sd^2, FUN = "+"))
   beta.std.mat = betahat / sd.mat
+  se.std.mat <- sebetahat / sd.mat
+  sd.std.mat <- t(sd / t(sd.mat))
   sd.se.mat <- 1 / outer(sebetahat, sd, FUN = "/")
   beta.std.sd.se.mat <- beta.std.mat * sd.se.mat
   pdf.beta.std.mat <- dnorm(beta.std.mat)
@@ -361,20 +362,21 @@ array_PosProb = function (betahat, sebetahat, sd, gd.ord, gd.normalized) {
   cdf.beta.std.sd.se.mat <- pnorm(beta.std.sd.se.mat)
   temp2 = array(dim = c(dim(beta.std.mat), gd.ord + 1))
   hermite = Hermite(gd.ord)
-  temp2[, , 1] <- cdf.beta.std.sd.se.mat * pdf.beta.std.mat
-  temp2[, , 2] <- cdf.beta.std.sd.se.mat * hermite[[1]](beta.std.mat) * (-1) * pdf.beta.std.mat + sd.se.mat * pdf.beta.std.sd.se.mat * pdf.beta.std.mat
+  temp2[, , 1] <- cdf.beta.std.sd.se.mat * pdf.beta.std.mat / sd.mat
+  temp2[, , 2] <- cdf.beta.std.sd.se.mat * hermite[[1]](beta.std.mat) * (-1) * pdf.beta.std.mat * se.std.mat^2 / sebetahat +
+    sd.se.mat * pdf.beta.std.sd.se.mat * pdf.beta.std.mat * se.std.mat^2 / sebetahat
   if (gd.normalized) {
-    temp2[, , 3] <- (temp3_1 * hermite[[2]](beta.std.mat) * (-1)^2 * temp2_0 +
-      2 * temp3 * temp3_0 * hermite[[1]](beta.std.mat) * (-1) * temp2_0 +
-      temp3^2 * hermite[[1]](beta.std.mat * temp3) * (-1) * temp3_0 * temp2_0) / sqrt(factorial(2))
+    temp2[, , 3] <- (cdf.beta.std.sd.se.mat * hermite[[2]](beta.std.mat) * (-1)^2 * pdf.beta.std.mat * se.std.mat^3 / sebetahat +
+        2 * sd.se.mat * se.std.mat^3 / sebetahat * pdf.beta.std.sd.se.mat * hermite[[1]](beta.std.mat) * (-1) * pdf.beta.std.mat +
+        sd.se.mat^2 * se.std.mat^3 / sebetahat * hermite[[1]](beta.std.sd.se.mat) * (-1) * pdf.beta.std.sd.se.mat * pdf.beta.std.mat) / sqrt(factorial(2))
     for (i in 3 : gd.ord) {
-      temp2[, , i + 1] <- ((temp3_1 * hermite[[i]](beta.std.mat) * (-1)^i +
-        i * temp3 * temp3_0 * hermite[[i - 1]](beta.std.mat) * (-1)^(i - 1) +
-        temp3^i * hermite[[i - 1]](beta.std.mat * temp3) * (-1)^(i - 1) * temp3_0) * temp2_0 +
-        sum(sapply(2 : (i - 1), function (m) {
-          choose(i, m) * temp3^m * hermite[[m - 1]](beta.std.mat * temp3) *
-            hermite[[i - m]](beta.std.mat)
-        })) * temp3_0 * temp2_0 * (-1)^(i - 1)) / sqrt(factorial(i))
+      temp2[, , i + 1] <- cdf.beta.std.sd.se.mat * hermite[[i]](beta.std.mat) / sqrt(factorial(i)) * (-1)^i * pdf.beta.std.mat * se.std.mat^(i + 1) / sebetahat +
+        i * sd.se.mat * se.std.mat^(i + 1) / sebetahat * pdf.beta.std.sd.se.mat * hermite[[i - 1]](beta.std.mat) / sqrt(factorial(i)) * (-1)^(i - 1) * pdf.beta.std.mat +
+        sd.se.mat^i * se.std.mat^(i + 1) / sebetahat * hermite[[i - 1]](beta.std.sd.se.mat) / sqrt(factorial(i)) * (-1)^(i - 1) * pdf.beta.std.sd.se.mat * pdf.beta.std.mat +
+        Reduce('+', lapply(2 : (i - 1), function (m) {
+          sqrt(choose(i, m)) * hermite[[m - 1]](beta.std.sd.se.mat) / sqrt(factorial(m)) * pdf.beta.std.sd.se.mat * sd.std.mat^m *
+            hermite[[i - m]](beta.std.mat) / sqrt(factorial(i - m)) * pdf.beta.std.mat * se.std.mat^(i - m) / sd.mat
+        }))
     }
   } else {
     temp2[, , 3] <- temp3_1 * hermite[[2]](beta.std.mat) * (-1)^2 * temp2_0 +
@@ -391,10 +393,12 @@ array_PosProb = function (betahat, sebetahat, sd, gd.ord, gd.normalized) {
     }
   }
   # temp2.test = outer(beta.std.mat, 0:gd.ord, FUN = gauss.deriv)
-  se.std.mat = sebetahat / sd.mat
-  temp1 = exp(outer(log(se.std.mat), 0 : gd.ord + 1, FUN = "*"))
-  array_PosProb = temp1 * temp2 / sebetahat
-  rm(temp1)
+  if (method == "fdr") {
+    array_PosProb = temp2
+    array_PosProb[, 1, ] <- 0
+  } else {
+    array_PosProb = temp2
+  }
   rm(temp2)
   return(array_PosProb)
 }
