@@ -351,17 +351,18 @@ lfdr_top = function (pi0, w, betahat, sebetahat, gd.ord) {
 }
 
 array_PosProb = function (betahat, sebetahat, sd, gd.ord, gd.normalized) {
+  sd <- sd[-1]
   sd.mat = sqrt(outer(sebetahat^2, sd^2, FUN = "+"))
   beta.std.mat = betahat / sd.mat
+  sd.se.mat <- 1 / outer(sebetahat, sd, FUN = "/")
+  beta.std.sd.se.mat <- beta.std.mat * sd.se.mat
+  pdf.beta.std.mat <- dnorm(beta.std.mat)
+  pdf.beta.std.sd.se.mat <- dnorm(beta.std.sd.se.mat)
+  cdf.beta.std.sd.se.mat <- pnorm(beta.std.sd.se.mat)
   temp2 = array(dim = c(dim(beta.std.mat), gd.ord + 1))
-  temp2_0 = dnorm(beta.std.mat)
-  temp3 <- t(outer(sd, sebetahat, FUN = "/"))
-  temp3_0 <- dnorm(beta.std.mat * temp3)
-  temp3_1 <- pnorm(beta.std.mat * temp3)
   hermite = Hermite(gd.ord)
-  temp2[, , 1] <- temp3_1 * temp2_0
-  temp2[, , 2] <- temp3_1 * hermite[[1]](beta.std.mat) * (-1) * temp2_0 +
-    temp3 * temp3_0 * temp2_0
+  temp2[, , 1] <- cdf.beta.std.sd.se.mat * pdf.beta.std.mat
+  temp2[, , 2] <- cdf.beta.std.sd.se.mat * hermite[[1]](beta.std.mat) * (-1) * pdf.beta.std.mat + sd.se.mat * pdf.beta.std.sd.se.mat * pdf.beta.std.mat
   if (gd.normalized) {
     temp2[, , 3] <- (temp3_1 * hermite[[2]](beta.std.mat) * (-1)^2 * temp2_0 +
       2 * temp3 * temp3_0 * hermite[[1]](beta.std.mat) * (-1) * temp2_0 +
