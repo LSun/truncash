@@ -70,7 +70,33 @@ subset = top_genes_index(ngene, Y)
 r = r[subset,]
 ```
 
+```{r g}
+plotx <- seq(-10, 10, by = 0.01)
+ploty.0 <- dnorm(plotx)
+ploty.1 <- dnorm(plotx, 0, 2)
+ploty.2 <- 0.5 * dnorm(plotx, -2, 1) + 0.5 * dnorm(plotx, 2, 1)
+ploty.3 <- 0.4 * dnorm(plotx, 0, 0.5) +
+  0.2 * dnorm(plotx) + 0.2 * dnorm(plotx, 0, 2) +
+  0.2 * dnorm(plotx, 0, 3)
+ploty.4 <- sapply(plotx, function(x) {mean(dnorm(x, seq(-3, 3, by = 0.5), 0.5))})
+ploty.5 <- 0.6 * dnorm(plotx) + 0.4 * dnorm(plotx, 0, 3)
+ploty.6 <- dnorm(plotx, 0, 5)
+ploty.7 <- 0.25 * dnorm(plotx, -2, 2) + 0.25 * dnorm(plotx, -1, 1.5) + 1 / 3 * dnorm(plotx) + 1 / 6 * dnorm(plotx, 1, 1)
+ploty <- cbind(ploty.0, ploty.1, ploty.2, ploty.3, ploty.4, ploty.5, ploty.6, ploty.7)
+plot(plotx, plotx, type = "n", xlim = c(-6, 6), ylim = range(ploty), xlab = expression(theta), ylab = expression(g(theta)))
+for (j in seq(ncol(ploty))) {
+  lines(plotx, ploty[, j], col = j)
+}
+```
+
 ## $g_1 = N\left(0, 2^2\right)$
+
+```{r g1}
+plot(plotx, plotx, type = "n", xlim = c(-6, 6), ylim = range(ploty), xlab = expression(theta), ylab = expression(g(theta)))
+for (j in c(0, 1) + 1) {
+  lines(plotx, ploty[, j], col = j)
+}
+```
 
 ```{r gtex_z_1, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
 set.seed(777)
@@ -299,6 +325,13 @@ for (j in seq(length(pi0.vec))) {
 
 ## Bimodal: $g_2 = 0.5 N\left(-2, 1\right) + 0.5 N\left(2, 1\right)$
 
+```{r g2}
+plot(plotx, plotx, type = "n", xlim = c(-6, 6), ylim = range(ploty), xlab = expression(theta), ylab = expression(g(theta)))
+for (j in c(0, 2) + 1) {
+  lines(plotx, ploty[, j], col = j)
+}
+```
+
 ```{r gtex_z_2, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
 set.seed(777)
 
@@ -513,6 +546,13 @@ for (j in seq(length(pi0.vec))) {
 ```
 
 ## Spiky: $g_3 = 0.4 N\left(0, 0.5^2\right) + 0.2 N\left(0, 1^2\right) + 0.2 N\left(0, 2^2\right) + 0.2 N\left(0, 3^2\right)$
+
+```{r g3}
+plot(plotx, plotx, type = "n", xlim = c(-6, 6), ylim = range(ploty), xlab = expression(theta), ylab = expression(g(theta)))
+for (j in c(0, 3) + 1) {
+  lines(plotx, ploty[, j], col = j)
+}
+```
 
 ```{r gtex_z_3, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
 set.seed(777)
@@ -732,6 +772,13 @@ for (j in seq(length(pi0.vec))) {
 
 ## Flattop: $g_4 = 1 / 13 \left( N\left(-3, 0.5^2\right) + N\left(-2.5, 0.5^2\right) + N\left(-2, 0.5^2\right) + N\left(-1.5, 0.5^2\right) + N\left(-1, 0.5^2\right) + N\left(-0.5, 0.5^2\right) + N\left(0, 0.5^2\right) + N\left(0.5, 0.5^2\right) + N\left(1, 0.5^2\right) + N\left(1.5, 0.5^2\right) + N\left(2, 0.5^2\right) + N\left(2.5, 0.5^2\right) + N\left(3, 0.5^2\right) \right)$
 
+```{r g4}
+plot(plotx, plotx, type = "n", xlim = c(-6, 6), ylim = range(ploty), xlab = expression(theta), ylab = expression(g(theta)))
+for (j in c(0, 4) + 1) {
+  lines(plotx, ploty[, j], col = j)
+}
+```
+
 ```{r gtex_z_4, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
 set.seed(777)
 
@@ -944,6 +991,13 @@ for (j in seq(length(pi0.vec))) {
 ```
 
 ## Near normal: $g_5 = 0.6 N\left(0, 1^2\right) + 0.4 N\left(0, 3^2\right)$
+
+```{r g5}
+plot(plotx, plotx, type = "n", xlim = c(-6, 6), ylim = range(ploty), xlab = expression(theta), ylab = expression(g(theta)))
+for (j in c(0, 5) + 1) {
+  lines(plotx, ploty[, j], col = j)
+}
+```
 
 ```{r gtex_z_5, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
 set.seed(777)
@@ -1161,6 +1215,13 @@ for (j in seq(length(pi0.vec))) {
 
 ## Big normal: $g_6 = N\left(0, 5^2\right)$
 
+```{r g6}
+plot(plotx, plotx, type = "n", xlim = c(-6, 6), ylim = range(ploty), xlab = expression(theta), ylab = expression(g(theta)))
+for (j in c(0, 6) + 1) {
+  lines(plotx, ploty[, j], col = j)
+}
+```
+
 ```{r gtex_z_6, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
 set.seed(777)
 
@@ -1375,6 +1436,13 @@ for (j in seq(length(pi0.vec))) {
 ```
 
 ## Skew: $g_7 = 1/4 N\left(-2, 2^2\right) + 1/4 N\left(-1, 1.5^2\right) + 1/3 N\left(0, 1^2\right) + 1 / 6 N\left(1, 1^2\right)$
+
+```{r g7}
+plot(plotx, plotx, type = "n", xlim = c(-6, 6), ylim = range(ploty), xlab = expression(theta), ylab = expression(g(theta)))
+for (j in c(0, 7) + 1) {
+  lines(plotx, ploty[, j], col = j)
+}
+```
 
 ```{r gtex_z_7, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
 set.seed(777)
