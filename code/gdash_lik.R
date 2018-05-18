@@ -10,7 +10,7 @@ gdash = function (betahat, sebetahat,
                   mixcompdist = "normal", method = "fdr",
                   gd.normalized = TRUE, primal = FALSE,
                   gd.ord = 10, w.lambda = 10, w.rho = 0.5, w.pen = NULL,
-                  gd.priority = FALSE,
+                  gd.priority = FALSE, lfsr = FALSE,
                   control = list(maxiter = 50)) {
   if (method == "fdr") {
     sd = c(0, autoselect.mixsd(betahat, sebetahat, mult = sqrt(2)))
@@ -49,16 +49,16 @@ gdash = function (betahat, sebetahat,
   beta_pm = colSums(t(apply(pihat * array_PM, 2, colSums)) * what) / colSums(t(apply(pihat * array_F, 2, colSums)) * what)
   lfdr = lfdr_top(pihat[1], what, betahat, sebetahat, gd.ord) / colSums(t(apply(pihat * array_F, 2, colSums)) * what)
   qvalue = ashr::qval.from.lfdr(lfdr)
+  if (lfsr) {
+    array_PP <- array_PosProb(betahat, sebetahat, method, sd, gd.ord, gd.normalized)
+    array_PP = aperm(array_PP, c(2, 3, 1))
+    beta_PosProb <- colSums(t(apply(pihat * array_PP, 2, colSums)) * what) / colSums(t(apply(pihat * array_F, 2, colSums)) * what)
+    lfsr <- ashr::compute_lfsr(1 - lfdr - beta_PosProb, lfdr)
+    svalue <- ashr::qval.from.lfdr(lfsr)
+    return(list(fitted_g = fitted_g, w = what, loglik = loglik, niter = res$niter, converged = res$converged, array_F = array_F, array_PM = array_PM, pm = beta_pm, lfdr = as.vector(lfdr), qvalue = qvalue, lfsr = lfsr, svalue = svalue))
+  }
   return(list(fitted_g = fitted_g, w = what, loglik = loglik, niter = res$niter, converged = res$converged, array_F = array_F, array_PM = array_PM, pm = beta_pm, lfdr = as.vector(lfdr), qvalue = qvalue))
 }
-
-#   array_PP <- array_PosProb(betahat, sebetahat, method, sd, gd.ord, gd.normalized)
-#   array_PP = aperm(array_PP, c(2, 3, 1))
-#   beta_PosProb <- colSums(t(apply(pihat * array_PP, 2, colSums)) * what) / colSums(t(apply(pihat * array_F, 2, colSums)) * what)
-#   lfsr <- ashr::compute_lfsr(1 - lfdr - beta_PosProb, lfdr)
-#   svalue <- ashr::qval.from.lfdr(lfsr)
-#   return(list(fitted_g = fitted_g, w = what, loglik = loglik, niter = res$niter, converged = res$converged, array_F = array_F, array_PM = array_PM, pm = beta_pm, lfdr = as.vector(lfdr), qvalue = qvalue, lfsr = lfsr, svalue = svalue))
-# }
 
 bifixpoint = function(pinw, array_F, matrix_lik_z, pi_prior, w_prior, primal, gd.priority){
   Kpi = dim(array_F)[1]
@@ -370,12 +370,12 @@ array_PosProb = function (betahat, sebetahat, method, sd, gd.ord, gd.normalized)
         2 * sd.se.mat * se.std.mat^3 / sebetahat * pdf.beta.std.sd.se.mat * hermite[[1]](beta.std.mat) * (-1) * pdf.beta.std.mat +
         sd.se.mat^2 * se.std.mat^3 / sebetahat * hermite[[1]](beta.std.sd.se.mat) * (-1) * pdf.beta.std.sd.se.mat * pdf.beta.std.mat) / sqrt(factorial(2))
     for (i in 3 : gd.ord) {
-      temp2[, , i + 1] <- cdf.beta.std.sd.se.mat * hermite[[i]](beta.std.mat) / sqrt(factorial(i)) * (-1)^i * pdf.beta.std.mat * se.std.mat^(i + 1) / sebetahat +
+      temp2[, , (i + 1)] <- cdf.beta.std.sd.se.mat * hermite[[i]](beta.std.mat) / sqrt(factorial(i)) * (-1)^i * pdf.beta.std.mat * se.std.mat^(i + 1) / sebetahat +
         i * sd.se.mat * se.std.mat^(i + 1) / sebetahat * pdf.beta.std.sd.se.mat * hermite[[i - 1]](beta.std.mat) / sqrt(factorial(i)) * (-1)^(i - 1) * pdf.beta.std.mat +
         sd.se.mat^i * se.std.mat^(i + 1) / sebetahat * hermite[[i - 1]](beta.std.sd.se.mat) / sqrt(factorial(i)) * (-1)^(i - 1) * pdf.beta.std.sd.se.mat * pdf.beta.std.mat +
         Reduce('+', lapply(2 : (i - 1), function (m) {
           sqrt(choose(i, m)) * hermite[[m - 1]](beta.std.sd.se.mat) / sqrt(factorial(m)) * pdf.beta.std.sd.se.mat * sd.std.mat^m *
-            hermite[[i - m]](beta.std.mat) / sqrt(factorial(i - m)) * pdf.beta.std.mat * se.std.mat^(i - m) / sd.mat
+            hermite[[i - m]](beta.std.mat) / sqrt(factorial(i - m)) * pdf.beta.std.mat * se.std.mat^(i - m) / sd.mat * (-1)^(i - 1)
         }))
     }
   } else {
