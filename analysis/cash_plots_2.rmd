@@ -375,7 +375,7 @@ for (i in 1 : nsim) {
   ## different methods
   fit.ash = ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
   w.rho <- ifelse(mad.mean(zscore) > sqrt(2 / pi), 0.5, 0.1)
-  fit.gdash = gdash(betahat, sebetahat, gd.ord = 10, w.rho = w.rho)
+  fit.gdash = gdash(betahat, sebetahat, w.rho = w.rho, lfsr = TRUE)
   fit.qvalue = qvalue::qvalue(pvalue)
   fit.BH = p.adjust(pvalue, method = "BH")
   fit.locfdr <- tryCatch(locfdr::locfdr(zscore, plot = 0), error = function(e) {NA})

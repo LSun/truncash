@@ -1,0 +1,111 @@
+---
+title: "`lfsr` in `CASH`"
+author: "Lei Sun"
+date: "5/18/2018"
+output: html_document
+---
+
+## Introduction
+
+The analytic form of `lfsr` in `CASH` has been derived and implemented.
+
+## `lfsr`
+
+Following the steps laid out in the [posterior calculations](gd_lik_2.html), the `lfsr` in `CASH` should be defined as
+$$
+\begin{array}{rcl}
+\text{Pr}\left(\theta_j \ge 0 \mid X_j, s_j, \hat g, \hat f\right)
+&=&
+\displaystyle
+\int_0^\infty p\left(\theta_j \ge 0 \mid X_j, s_j, \hat g, \hat f\right) \mathrm{d}\theta_j \\
+&=&\frac{1}{\sum_k\sum_l\pi_k\omega_l p_{jkl}}
+\sum_k\sum_l
+\displaystyle
+\int_0^\infty
+N\left(\theta_j \mid \mu_k, \sigma_k^2\right)
+\frac{1}{s_j}\frac{1}{\sqrt{l!}}
+\varphi^{(l)}\left(\frac{X_j - \theta_j}{s_j}\right)
+\mathrm{d}\theta_j
+\end{array}
+$$
+
+The key is to get the analytic form for
+$$
+s\left(X_i\right)
+=:
+\int_0^\infty
+N\left(\theta_j \mid \mu_k, \sigma_k^2\right)
+\frac{1}{s_j}\frac{1}{\sqrt{l!}}
+\varphi^{(l)}\left(\frac{X_j - \theta_j}{s_j}\right)
+\mathrm{d}\theta_j \ .
+$$
+
+First, recognize that
+$$
+\begin{array}{rrcl}
+&\varphi\left(x\right)
+&=&
+s_j N\left(s_jx \mid 0, s_j^2\right)
+\\\Rightarrow&
+\varphi^{(l)}\left(x\right)
+&=&
+s_j^{l + 1} N^{(l)}\left(s_jx \mid 0, s_j^2\right)
+\\\Rightarrow&
+\varphi^{(l)}\left(\frac{X_j - \theta_j}{s_j}\right)
+&=&
+s_j^{l + 1} N^{(l)}\left(X_j - \theta_j \mid 0, s_j^2\right) \ .
+\end{array}
+$$
+
+Then
+$$
+s\left(X_i\right)
+=
+\frac{s_j^l}{\sqrt{l!}}
+\int_0^\infty
+N\left(\theta_j \mid \mu_k, \sigma_k^2\right)
+N^{(l)}\left(X_j - \theta_j \mid 0, s_j^2\right)
+\mathrm{d}\theta_j
+$$
+
+It's a convolution between 
+$$
+N^+\left(\cdot \mid \mu_k, \sigma_k^2\right) =:
+\begin{cases}
+N\left(\cdot \mid \mu_k, \sigma_k^2\right) & \cdot > 0\\
+0 & \text{otherwise}
+\end{cases}
+$$
+and $N^{(l)}\left(\cdot \mid 0, s_j^2\right)$. Therefore,
+$$
+\begin{array}{rcl}
+s\left(X_i\right) = 
+\frac{s_j^l}{\sqrt{l!}}
+N^+\left(\cdot \mid \mu_k, \sigma_k^2\right) \circledast
+N^{(l)}\left(\cdot \mid 0, s_j^2\right)\left(X_i\right)
+\\=
+\frac{s_j^l}{\sqrt{l!}}
+\left(N^+\left(\cdot \mid \mu_k, \sigma_k^2\right) \circledast
+N\left(\cdot \mid 0, s_j^2\right)\right)^{(l)}\left(X_i\right)
+\\=
+\frac{s_j^l}{\sqrt{l!}}
+\left(
+\displaystyle
+\int_0^\infty
+N\left(\theta_j \mid \mu_k, \sigma_k^2\right)
+N\left(X_j - \theta_j \mid 0, s_j^2\right)
+\mathrm{d}\theta_j
+\right)^{(l)}
+\\=
+\frac{s_j^l}{\sqrt{l!}}
+\left(
+\displaystyle
+\int_0^\infty
+\frac{1}{\sqrt{2\pi}\sigma_k}
+e^{-\frac{\left(\theta_j - \mu_k\right)^2}{2\sigma_k^2}}
+\frac{1}{\sqrt{2\pi}s_j}
+e^{-\frac{\left(X_j - \theta_j\right)^2}{2s_j^2}}
+\mathrm{d}\theta_j
+\right)^{(l)}
+\end{array}
+$$
