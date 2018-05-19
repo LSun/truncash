@@ -88,7 +88,7 @@ TN\left(\theta_j \mid \mu_k, \sigma_k^2, 0, \infty\right)
 N^{(l)}\left(X_j - \theta_j \mid 0, s_j^2\right)
 \mathrm{d}\theta_j
 $$
-which is the convolution of $TN\left(\cdot \mid \mu_k, \sigma_k^2, 0, \infty\right)$ and $N^{(l)}\left(\cdot \mid 0, s_j^2\right)$. Therefore, according to the property of convolution,
+which is the convolution of $TN\left(\cdot \mid \mu_k, \sigma_k^2, 0, \infty\right)$ and $N^{(l)}\left(\cdot \mid 0, s_j^2\right)$. According to the property of convolution,
 $$
 \begin{array}{rl}
 &\displaystyle\int_{-\infty}^\infty
@@ -163,13 +163,14 @@ $$
 Note that this expression also works in the special cases such as $l = 0$ when we don't take derivatives and $\sigma_k = 0$ when $N\left(\mu_k, \sigma_k^2\right)$ is a point mass at $\mu_k$.
 
 In the latter case, when $\sigma_k = 0$,
+
 - If $\mu_k < 0$, $\frac{\sigma_k^2X_j + s_j^2\mu_k}{s_j\sigma_k\sqrt{s_j^2 + \sigma_k^2}} \to -\infty$, $\Phi\left(\frac{\sigma_k^2X_j + s_j^2\mu_k}{s_j\sigma_k\sqrt{s_j^2 + \sigma_k^2}}\right) = 0$, $\tau_{jkl} = 0$.
 
 - If $\mu_k > 0$, $\frac{\sigma_k^2X_j + s_j^2\mu_k}{s_j\sigma_k\sqrt{s_j^2 + \sigma_k^2}} \to \infty$, $\Phi\left(\frac{\sigma_k^2X_j + s_j^2\mu_k}{s_j\sigma_k\sqrt{s_j^2 + \sigma_k^2}}\right) = 1$, $\tau_{jkl} = \frac{1}{s_j}\frac{1}{\sqrt{l!}}\varphi\left(\frac{X_j - \mu_k}{s_j}\right)$.
 
 - If $\mu_k = 0$, since the integral is taken from $0^+$ to $\infty$, $\mu_k$ is on the left of the starting point of the integral and essentially $0^{-}$, so $\Phi\left(\frac{\sigma_k^2X_j + s_j^2\mu_k}{s_j\sigma_k\sqrt{s_j^2 + \sigma_k^2}}\right) \to 0$ and $\tau_{jkl} = 0$.
 
-Numerically, the above expresion is not stable, as $\frac{\sigma_k}{s_j}$ could be large and $\left(\frac{\sigma_k}{s_j}\right)^m$ could easily blow up. Thus we come up with the following expression to faciliate the implementation.
+Numerically, the above expresion is not stable, as $\frac{\sigma_k}{s_j}$ could be large and $\left(\frac{\sigma_k}{s_j}\right)^m$ could easily blow up. Thus we come up with the following normalized expression to stablize the implementation.
 $$
 \tau_{jkl}
 =
@@ -201,4 +202,4 @@ $$
 \varphi^{(l - m)}
 \left(\frac{X_j}{\sqrt{s_j^2 + \sigma_k^2}}\right).
 $$
-This is the version implemented in `CASH` with the special case $\sigma_0 = 0$ taken care of numerically.
+This is the version implemented in `CASH`, with the special case $\sigma_0 = 0$ taken care of numerically.

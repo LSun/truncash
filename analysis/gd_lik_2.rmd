@@ -133,6 +133,8 @@ $$
 
 Right now the analytic form of `lfsr` using Gaussian derivatives is unavailable.
 
+- `lfsr` has been [derived and implemented](gd_lik_3.html) as of May 17, 2018.
+
 ## Simulation
 
 The correlated $N\left(0, 1\right)$ $z$ scores are simulated from the GTEx/Liver data by the [null pipeline](nullpipeline.html).  In order to get a better sense of the effectiveness of `GD-ASH` and `GD-Lik`, we are using data sets more distorted by correlation in the simulation.  In particular, we are using an "inflation" batch, defined as the standard error of the correlated $z$ no less than $1.2$, and a "deflation" batch, defined as that no greater than $0.8$.  Out of $1000$ simulated data sets, there are $109$ inflation ones and $99$ deflation ones.

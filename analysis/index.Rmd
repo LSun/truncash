@@ -214,6 +214,7 @@ First public presentation of `CASH`.
 A very important quantity for the shape of the empirical distribution of a large number of correlated null is **average pairwise correlation** $=\sqrt{\overline{\rho_{ij}^2}}$.
 
 * [Plots for the `CASH` Paper](cash_plots.html)
+* [Plots for the `CASH` Paper: `lfsr` & `svalue`](cash_plots_2.html)
 
 * [Data analysis: Efron's Leukemia data](efron_leukemia.html)
 
@@ -222,6 +223,8 @@ A close look at Efron's classic BRCA data, used in many of his papers to illustr
 * [The coefficients of Gaussian derivatives for correlated null](gd_w.html)
 
 * [The underappreciated and surprising robustness of `BH` for correlation](BH_robustness.html). See more systemic explorations at [BHq](https://github.com/LSun/BHq)
+
+* [`CASH`: `lfsr` calculation](gd_lik_3.html)
 
 ---
 
