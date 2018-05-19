@@ -17,9 +17,9 @@ $$
 \text{Pr}\left(\theta_j \ge 0 \mid X_j, s_j, \hat g, \hat f\right)
 &=&
 \displaystyle
-\int_0^\infty p\left(\theta_j \ge 0 \mid X_j, s_j, \hat g, \hat f\right) \mathrm{d}\theta_j \\
+\int_{0^+}^\infty p\left(\theta_j \ge 0 \mid X_j, s_j, \hat g, \hat f\right) \mathrm{d}\theta_j \\
 &=&\frac{1}{\sum_k\sum_l\pi_k\omega_l p_{jkl}}
-\sum_k\sum_l
+\sum_k\sum_l\pi_k\omega_l
 \displaystyle
 \int_0^\infty
 N\left(\theta_j \mid \mu_k, \sigma_k^2\right)
@@ -31,9 +31,9 @@ $$
 
 The key is to get the analytic form for
 $$
-s\left(X_i\right)
+\tau_{jkl}
 =:
-\int_0^\infty
+\int_{0^+}^\infty
 N\left(\theta_j \mid \mu_k, \sigma_k^2\right)
 \frac{1}{s_j}\frac{1}{\sqrt{l!}}
 \varphi^{(l)}\left(\frac{X_j - \theta_j}{s_j}\right)
@@ -59,53 +59,146 @@ $$
 
 Then
 $$
-s\left(X_i\right)
-=
+\begin{array}{rcl}
+\tau_{jkl}
+&=&
+\displaystyle
 \frac{s_j^l}{\sqrt{l!}}
-\int_0^\infty
+\int_{0^+}^\infty
 N\left(\theta_j \mid \mu_k, \sigma_k^2\right)
+N^{(l)}\left(X_j - \theta_j \mid 0, s_j^2\right)
+\mathrm{d}\theta_j \\
+&=&
+\displaystyle
+\frac{s_j^l
+\Phi\left(\frac{\mu_k}{\sigma_k}\right)
+}
+{\sqrt{l!}}
+\int_{-\infty}^\infty
+TN\left(\theta_j \mid \mu_k, \sigma_k^2, 0, \infty\right)
+N^{(l)}\left(X_j - \theta_j \mid 0, s_j^2\right)
+\mathrm{d}\theta_j \ ,
+\end{array}
+$$
+where $TN\left(\cdot \mid \mu, \sigma^2, a, b\right)$ is the pdf of the [truncated normal distribution](https://en.wikipedia.org/wiki/Truncated_normal_distribution). The key part in $s\left(X_j\right)$ is
+$$
+\displaystyle
+\int_{-\infty}^\infty
+TN\left(\theta_j \mid \mu_k, \sigma_k^2, 0, \infty\right)
 N^{(l)}\left(X_j - \theta_j \mid 0, s_j^2\right)
 \mathrm{d}\theta_j
 $$
-
-It's a convolution between 
+which is the convolution of $TN\left(\cdot \mid \mu_k, \sigma_k^2, 0, \infty\right)$ and $N^{(l)}\left(\cdot \mid 0, s_j^2\right)$. Therefore, according to the property of convolution,
 $$
-N^+\left(\cdot \mid \mu_k, \sigma_k^2\right) =:
-\begin{cases}
-N\left(\cdot \mid \mu_k, \sigma_k^2\right) & \cdot > 0\\
-0 & \text{otherwise}
-\end{cases}
-$$
-and $N^{(l)}\left(\cdot \mid 0, s_j^2\right)$. Therefore,
-$$
-\begin{array}{rcl}
-s\left(X_i\right) = 
-\frac{s_j^l}{\sqrt{l!}}
-N^+\left(\cdot \mid \mu_k, \sigma_k^2\right) \circledast
-N^{(l)}\left(\cdot \mid 0, s_j^2\right)\left(X_i\right)
-\\=
-\frac{s_j^l}{\sqrt{l!}}
-\left(N^+\left(\cdot \mid \mu_k, \sigma_k^2\right) \circledast
-N\left(\cdot \mid 0, s_j^2\right)\right)^{(l)}\left(X_i\right)
-\\=
-\frac{s_j^l}{\sqrt{l!}}
-\left(
-\displaystyle
-\int_0^\infty
-N\left(\theta_j \mid \mu_k, \sigma_k^2\right)
-N\left(X_j - \theta_j \mid 0, s_j^2\right)
+\begin{array}{rl}
+&\displaystyle\int_{-\infty}^\infty
+TN\left(\theta_j \mid \mu_k, \sigma_k^2, 0, \infty\right)
+N^{(l)}\left(X_j - \theta_j \mid 0, s_j^2\right)
 \mathrm{d}\theta_j
-\right)^{(l)}
-\\=
-\frac{s_j^l}{\sqrt{l!}}
-\left(
-\displaystyle
-\int_0^\infty
-\frac{1}{\sqrt{2\pi}\sigma_k}
-e^{-\frac{\left(\theta_j - \mu_k\right)^2}{2\sigma_k^2}}
-\frac{1}{\sqrt{2\pi}s_j}
-e^{-\frac{\left(X_j - \theta_j\right)^2}{2s_j^2}}
-\mathrm{d}\theta_j
-\right)^{(l)}
+\\ =& 
+TN\left(\cdot \mid \mu_k, \sigma_k^2, 0, \infty\right) \circledast
+N^{(l)}\left(\cdot \mid 0, s_j^2\right)\left(X_j\right)
+\\=&
+\left(TN\left(\cdot \mid \mu_k, \sigma_k^2, 0, \infty\right) \circledast
+N\left(\cdot \mid 0, s_j^2\right)\right)^{(l)}\left(X_j\right)
+\end{array} 
+$$
+Algebra shows that the convolution of a truncated normal and a zero-mean normal is
+$$
+\begin{array}{rl}
+&TN\left(\cdot \mid \mu_k, \sigma_k^2, 0, \infty\right) \circledast
+N\left(\cdot \mid 0, s_j^2\right)\left(X_j\right)
+\\
+=&
+\frac{1}{\sqrt{s_j^2 + \sigma_k^2}\Phi\left(\frac{\mu_k}{\sigma_k}\right)}
+\frac{1}{\sqrt{2\pi}}e^{-\frac{\left(X_j - \mu_k\right)^2}{2\left(s_j^2 + \sigma_k^2\right)}}
+\Phi\left(\frac{\sigma_k^2X_j + s_j^2\mu_k}{s_j\sigma_k\sqrt{s_j^2 + \sigma_k^2}}\right)
+\\
+=&
+\frac{1}{\sqrt{s_j^2 + \sigma_k^2}\Phi\left(\frac{\mu_k}{\sigma_k}\right)}
+\varphi\left(\frac{X_j - \mu_k}{\sqrt{s_j^2 + \sigma_k^2}}\right)
+\Phi\left(\frac{\sigma_k^2X_j + s_j^2\mu_k}{s_j\sigma_k\sqrt{s_j^2 + \sigma_k^2}}\right)
 \end{array}
 $$
+
+Therefore,
+$$
+\begin{array}{rcl}
+\tau_{jkl}
+&=&
+\frac{s_j^l
+\Phi\left(\frac{\mu_k}{\sigma_k}\right)
+}
+{\sqrt{l!}}
+\left(
+\frac{1}{\sqrt{s_j^2 + \sigma_k^2}\Phi\left(\frac{\mu_k}{\sigma_k}\right)}
+\varphi\left(\frac{X_j - \mu_k}{\sqrt{s_j^2 + \sigma_k^2}}\right)
+\Phi\left(\frac{\sigma_k^2X_j + s_j^2\mu_k}{s_j\sigma_k\sqrt{s_j^2 + \sigma_k^2}}\right)
+\right)^{(l)}\\
+&=&
+\frac{s_j^l
+}
+{\sqrt{l!}\sqrt{s_j^2 + \sigma_k^2}}
+\left(
+\varphi\left(\frac{X_j - \mu_k}{\sqrt{s_j^2 + \sigma_k^2}}\right)
+\Phi\left(\frac{\sigma_k^2X_j + s_j^2\mu_k}{s_j\sigma_k\sqrt{s_j^2 + \sigma_k^2}}\right)
+\right)^{(l)}
+\\
+&=&
+\frac{s_j^l
+}
+{\sqrt{l!}\sqrt{s_j^2 + \sigma_k^2}^{l + 1}}
+\left(
+\sum\limits_{m = 0}^{l}
+\binom{l}{m}
+\left(\frac{\sigma_k}{s_j}\right)^m
+\varphi^{(m - 1)}
+\left(\frac{\sigma_k^2X_j + s_j^2\mu_k}{s_j\sigma_k\sqrt{s_j^2 + \sigma_k^2}}\right)
+\varphi^{(l - m)}
+\left(\frac{X_j - \mu_k}{\sqrt{s_j^2 + \sigma_k^2}}\right)
+\right)
+\end{array}
+$$
+
+Note that this expression also works in the special cases such as $l = 0$ when we don't take derivatives and $\sigma_k = 0$ when $N\left(\mu_k, \sigma_k^2\right)$ is a point mass at $\mu_k$.
+
+In the latter case, when $\sigma_k = 0$,
+- If $\mu_k < 0$, $\frac{\sigma_k^2X_j + s_j^2\mu_k}{s_j\sigma_k\sqrt{s_j^2 + \sigma_k^2}} \to -\infty$, $\Phi\left(\frac{\sigma_k^2X_j + s_j^2\mu_k}{s_j\sigma_k\sqrt{s_j^2 + \sigma_k^2}}\right) = 0$, $\tau_{jkl} = 0$.
+
+- If $\mu_k > 0$, $\frac{\sigma_k^2X_j + s_j^2\mu_k}{s_j\sigma_k\sqrt{s_j^2 + \sigma_k^2}} \to \infty$, $\Phi\left(\frac{\sigma_k^2X_j + s_j^2\mu_k}{s_j\sigma_k\sqrt{s_j^2 + \sigma_k^2}}\right) = 1$, $\tau_{jkl} = \frac{1}{s_j}\frac{1}{\sqrt{l!}}\varphi\left(\frac{X_j - \mu_k}{s_j}\right)$.
+
+- If $\mu_k = 0$, since the integral is taken from $0^+$ to $\infty$, $\mu_k$ is on the left of the starting point of the integral and essentially $0^{-}$, so $\Phi\left(\frac{\sigma_k^2X_j + s_j^2\mu_k}{s_j\sigma_k\sqrt{s_j^2 + \sigma_k^2}}\right) \to 0$ and $\tau_{jkl} = 0$.
+
+Numerically, the above expresion is not stable, as $\frac{\sigma_k}{s_j}$ could be large and $\left(\frac{\sigma_k}{s_j}\right)^m$ could easily blow up. Thus we come up with the following expression to faciliate the implementation.
+$$
+\tau_{jkl}
+=
+\frac{1}{\sqrt{s_j^2 + \sigma_k^2}}
+\sum\limits_{m = 0}^l
+\sqrt{\binom{l}{m}}
+\left(\frac{\sigma_k}{\sqrt{s_j^2 + \sigma_k^2}}\right)^m
+\frac{1}{\sqrt{m!}}
+\varphi^{(m - 1)}
+\left(\frac{\sigma_k^2X_j + s_j^2\mu_k}{s_j\sigma_k\sqrt{s_j^2 + \sigma_k^2}}\right)
+\left(\frac{s_j}{\sqrt{s_j^2 + \sigma_k^2}}\right)^{l - m}
+\frac{1}{\sqrt{(l - m)!}}
+\varphi^{(l - m)}
+\left(\frac{X_j - \mu_k}{\sqrt{s_j^2 + \sigma_k^2}}\right).
+$$
+When $\mu_k \equiv 0$,
+$$
+\tau_{jkl}
+=
+\frac{1}{\sqrt{s_j^2 + \sigma_k^2}}
+\sum\limits_{m = 0}^l
+\sqrt{\binom{l}{m}}
+\left(\frac{\sigma_k}{\sqrt{s_j^2 + \sigma_k^2}}\right)^m
+\frac{1}{\sqrt{m!}}
+\varphi^{(m - 1)}
+\left(\frac{X_j}{\sqrt{s_j^2 + \sigma_k^2}}\frac{\sigma_k}{s_j}\right)
+\left(\frac{s_j}{\sqrt{s_j^2 + \sigma_k^2}}\right)^{l - m}
+\frac{1}{\sqrt{(l - m)!}}
+\varphi^{(l - m)}
+\left(\frac{X_j}{\sqrt{s_j^2 + \sigma_k^2}}\right).
+$$
+This is the version implemented in `CASH` with the special case $\sigma_0 = 0$ taken care of numerically.
