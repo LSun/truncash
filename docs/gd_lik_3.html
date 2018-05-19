@@ -325,7 +325,7 @@ div.section {
 </li>
 <li>
 <details>
-<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/7c1e2f84c74e830801024116b58a0b9efad8938c" target="_blank">7c1e2f8</a> </summary></p>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/5eb3d956dea23780a2458428248cc14490905ef6" target="_blank">5eb3d95</a> </summary></p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 <pre><code>
 Ignored files:
@@ -425,9 +425,6 @@ Ignored files:
     Ignored:    docs/figure/.DS_Store
     Ignored:    output/fig/
 
-Untracked files:
-    Untracked:  docs/figure/cash_plots_2.rmd/
-
 </code></pre>
 Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
 </details>
@@ -462,6 +459,57 @@ Message
 Rmd
 </td>
 <td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/5eb3d956dea23780a2458428248cc14490905ef6/analysis/gd_lik_3.Rmd" target="_blank">5eb3d95</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-18
+</td>
+<td style="text-align:left;">
+wflow_publish(c(“analysis/gd_lik_2.rmd”,
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/bd9644ee24bbd8477a498343c483b5afe3a5f95c/analysis/gd_lik_3.Rmd" target="_blank">bd9644e</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-05-18
+</td>
+<td style="text-align:left;">
+lfsr
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/d51ff505b9c82c81b2972420eef56a5bbcb80ab3/docs/gd_lik_3.html" target="_blank">d51ff50</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-18
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
 <a href="https://github.com/LSun/truncash/blob/7c1e2f84c74e830801024116b58a0b9efad8938c/analysis/gd_lik_3.Rmd" target="_blank">7c1e2f8</a>
 </td>
 <td style="text-align:left;">
@@ -490,9 +538,9 @@ wflow_publish(c(“analysis/cash_plots_2.rmd”,
 \text{Pr}\left(\theta_j \ge 0 \mid X_j, s_j, \hat g, \hat f\right)
 &amp;=&amp;
 \displaystyle
-\int_0^\infty p\left(\theta_j \ge 0 \mid X_j, s_j, \hat g, \hat f\right) \mathrm{d}\theta_j \\
+\int_{0^+}^\infty p\left(\theta_j \ge 0 \mid X_j, s_j, \hat g, \hat f\right) \mathrm{d}\theta_j \\
 &amp;=&amp;\frac{1}{\sum_k\sum_l\pi_k\omega_l p_{jkl}}
-\sum_k\sum_l
+\sum_k\sum_l\pi_k\omega_l
 \displaystyle
 \int_0^\infty
 N\left(\theta_j \mid \mu_k, \sigma_k^2\right)
@@ -502,9 +550,9 @@ N\left(\theta_j \mid \mu_k, \sigma_k^2\right)
 \end{array}
 \]</span></p>
 <p>The key is to get the analytic form for <span class="math display">\[
-s\left(X_i\right)
+\tau_{jkl}
 =:
-\int_0^\infty
+\int_{0^+}^\infty
 N\left(\theta_j \mid \mu_k, \sigma_k^2\right)
 \frac{1}{s_j}\frac{1}{\sqrt{l!}}
 \varphi^{(l)}\left(\frac{X_j - \theta_j}{s_j}\right)
@@ -526,52 +574,134 @@ s_j^{l + 1} N^{(l)}\left(X_j - \theta_j \mid 0, s_j^2\right) \  .
 \end{array}
 \]</span></p>
 <p>Then <span class="math display">\[
-s\left(X_i\right)
-=
+\begin{array}{rcl}
+\tau_{jkl}
+&amp;=&amp;
+\displaystyle
 \frac{s_j^l}{\sqrt{l!}}
-\int_0^\infty
+\int_{0^+}^\infty
 N\left(\theta_j \mid \mu_k, \sigma_k^2\right)
 N^{(l)}\left(X_j - \theta_j \mid 0, s_j^2\right)
-\mathrm{d}\theta_j
-\]</span></p>
-<p>It’s a convolution between <span class="math display">\[
-N^+\left(\cdot \mid \mu_k, \sigma_k^2\right) =:
-\begin{cases}
-N\left(\cdot \mid \mu_k, \sigma_k^2\right) &amp; \cdot &gt; 0\\
-0 &amp; \text{otherwise}
-\end{cases}
-\]</span> and <span class="math inline">\(N^{(l)}\left(\cdot \mid 0, s_j^2\right)\)</span>. Therefore, <span class="math display">\[
-\begin{array}{rcl}
-s\left(X_i\right) = 
-\frac{s_j^l}{\sqrt{l!}}
-N^+\left(\cdot \mid \mu_k, \sigma_k^2\right) \circledast
-N^{(l)}\left(\cdot \mid 0, s_j^2\right)\left(X_i\right)
-\\=
-\frac{s_j^l}{\sqrt{l!}}
-\left(N^+\left(\cdot \mid \mu_k, \sigma_k^2\right) \circledast
-N\left(\cdot \mid 0, s_j^2\right)\right)^{(l)}\left(X_i\right)
-\\=
-\frac{s_j^l}{\sqrt{l!}}
-\left(
+\mathrm{d}\theta_j \\
+&amp;=&amp;
 \displaystyle
-\int_0^\infty
-N\left(\theta_j \mid \mu_k, \sigma_k^2\right)
-N\left(X_j - \theta_j \mid 0, s_j^2\right)
-\mathrm{d}\theta_j
-\right)^{(l)}
-\\=
-\frac{s_j^l}{\sqrt{l!}}
-\left(
+\frac{s_j^l
+\Phi\left(\frac{\mu_k}{\sigma_k}\right)
+}
+{\sqrt{l!}}
+\int_{-\infty}^\infty
+TN\left(\theta_j \mid \mu_k, \sigma_k^2, 0, \infty\right)
+N^{(l)}\left(X_j - \theta_j \mid 0, s_j^2\right)
+\mathrm{d}\theta_j \  ,
+\end{array}
+\]</span> where <span class="math inline">\(TN\left(\cdot \mid \mu, \sigma^2, a, b\right)\)</span> is the pdf of the <a href="https://en.wikipedia.org/wiki/Truncated_normal_distribution">truncated normal distribution</a>. The key part in <span class="math inline">\(s\left(X_j\right)\)</span> is <span class="math display">\[
 \displaystyle
-\int_0^\infty
-\frac{1}{\sqrt{2\pi}\sigma_k}
-e^{-\frac{\left(\theta_j - \mu_k\right)^2}{2\sigma_k^2}}
-\frac{1}{\sqrt{2\pi}s_j}
-e^{-\frac{\left(X_j - \theta_j\right)^2}{2s_j^2}}
+\int_{-\infty}^\infty
+TN\left(\theta_j \mid \mu_k, \sigma_k^2, 0, \infty\right)
+N^{(l)}\left(X_j - \theta_j \mid 0, s_j^2\right)
 \mathrm{d}\theta_j
-\right)^{(l)}
+\]</span> which is the convolution of <span class="math inline">\(TN\left(\cdot \mid \mu_k, \sigma_k^2, 0, \infty\right)\)</span> and <span class="math inline">\(N^{(l)}\left(\cdot \mid 0, s_j^2\right)\)</span>. According to the property of convolution, <span class="math display">\[
+\begin{array}{rl}
+&amp;\displaystyle\int_{-\infty}^\infty
+TN\left(\theta_j \mid \mu_k, \sigma_k^2, 0, \infty\right)
+N^{(l)}\left(X_j - \theta_j \mid 0, s_j^2\right)
+\mathrm{d}\theta_j
+\\ =&amp; 
+TN\left(\cdot \mid \mu_k, \sigma_k^2, 0, \infty\right) \circledast
+N^{(l)}\left(\cdot \mid 0, s_j^2\right)\left(X_j\right)
+\\=&amp;
+\left(TN\left(\cdot \mid \mu_k, \sigma_k^2, 0, \infty\right) \circledast
+N\left(\cdot \mid 0, s_j^2\right)\right)^{(l)}\left(X_j\right)
+\end{array} 
+\]</span> Algebra shows that the convolution of a truncated normal and a zero-mean normal is <span class="math display">\[
+\begin{array}{rl}
+&amp;TN\left(\cdot \mid \mu_k, \sigma_k^2, 0, \infty\right) \circledast
+N\left(\cdot \mid 0, s_j^2\right)\left(X_j\right)
+\\
+=&amp;
+\frac{1}{\sqrt{s_j^2 + \sigma_k^2}\Phi\left(\frac{\mu_k}{\sigma_k}\right)}
+\frac{1}{\sqrt{2\pi}}e^{-\frac{\left(X_j - \mu_k\right)^2}{2\left(s_j^2 + \sigma_k^2\right)}}
+\Phi\left(\frac{\sigma_k^2X_j + s_j^2\mu_k}{s_j\sigma_k\sqrt{s_j^2 + \sigma_k^2}}\right)
+\\
+=&amp;
+\frac{1}{\sqrt{s_j^2 + \sigma_k^2}\Phi\left(\frac{\mu_k}{\sigma_k}\right)}
+\varphi\left(\frac{X_j - \mu_k}{\sqrt{s_j^2 + \sigma_k^2}}\right)
+\Phi\left(\frac{\sigma_k^2X_j + s_j^2\mu_k}{s_j\sigma_k\sqrt{s_j^2 + \sigma_k^2}}\right)
 \end{array}
 \]</span></p>
+<p>Therefore, <span class="math display">\[
+\begin{array}{rcl}
+\tau_{jkl}
+&amp;=&amp;
+\frac{s_j^l
+\Phi\left(\frac{\mu_k}{\sigma_k}\right)
+}
+{\sqrt{l!}}
+\left(
+\frac{1}{\sqrt{s_j^2 + \sigma_k^2}\Phi\left(\frac{\mu_k}{\sigma_k}\right)}
+\varphi\left(\frac{X_j - \mu_k}{\sqrt{s_j^2 + \sigma_k^2}}\right)
+\Phi\left(\frac{\sigma_k^2X_j + s_j^2\mu_k}{s_j\sigma_k\sqrt{s_j^2 + \sigma_k^2}}\right)
+\right)^{(l)}\\
+&amp;=&amp;
+\frac{s_j^l
+}
+{\sqrt{l!}\sqrt{s_j^2 + \sigma_k^2}}
+\left(
+\varphi\left(\frac{X_j - \mu_k}{\sqrt{s_j^2 + \sigma_k^2}}\right)
+\Phi\left(\frac{\sigma_k^2X_j + s_j^2\mu_k}{s_j\sigma_k\sqrt{s_j^2 + \sigma_k^2}}\right)
+\right)^{(l)}
+\\
+&amp;=&amp;
+\frac{s_j^l
+}
+{\sqrt{l!}\sqrt{s_j^2 + \sigma_k^2}^{l + 1}}
+\left(
+\sum\limits_{m = 0}^{l}
+\binom{l}{m}
+\left(\frac{\sigma_k}{s_j}\right)^m
+\varphi^{(m - 1)}
+\left(\frac{\sigma_k^2X_j + s_j^2\mu_k}{s_j\sigma_k\sqrt{s_j^2 + \sigma_k^2}}\right)
+\varphi^{(l - m)}
+\left(\frac{X_j - \mu_k}{\sqrt{s_j^2 + \sigma_k^2}}\right)
+\right)
+\end{array}
+\]</span></p>
+<p>Note that this expression also works in the special cases such as <span class="math inline">\(l = 0\)</span> when we don’t take derivatives and <span class="math inline">\(\sigma_k = 0\)</span> when <span class="math inline">\(N\left(\mu_k, \sigma_k^2\right)\)</span> is a point mass at <span class="math inline">\(\mu_k\)</span>.</p>
+<p>In the latter case, when <span class="math inline">\(\sigma_k = 0\)</span>,</p>
+<ul>
+<li><p>If <span class="math inline">\(\mu_k &lt; 0\)</span>, <span class="math inline">\(\frac{\sigma_k^2X_j + s_j^2\mu_k}{s_j\sigma_k\sqrt{s_j^2 + \sigma_k^2}} \to -\infty\)</span>, <span class="math inline">\(\Phi\left(\frac{\sigma_k^2X_j + s_j^2\mu_k}{s_j\sigma_k\sqrt{s_j^2 + \sigma_k^2}}\right) = 0\)</span>, <span class="math inline">\(\tau_{jkl} = 0\)</span>.</p></li>
+<li><p>If <span class="math inline">\(\mu_k &gt; 0\)</span>, <span class="math inline">\(\frac{\sigma_k^2X_j + s_j^2\mu_k}{s_j\sigma_k\sqrt{s_j^2 + \sigma_k^2}} \to \infty\)</span>, <span class="math inline">\(\Phi\left(\frac{\sigma_k^2X_j + s_j^2\mu_k}{s_j\sigma_k\sqrt{s_j^2 + \sigma_k^2}}\right) = 1\)</span>, <span class="math inline">\(\tau_{jkl} = \frac{1}{s_j}\frac{1}{\sqrt{l!}}\varphi\left(\frac{X_j - \mu_k}{s_j}\right)\)</span>.</p></li>
+<li><p>If <span class="math inline">\(\mu_k = 0\)</span>, since the integral is taken from <span class="math inline">\(0^+\)</span> to <span class="math inline">\(\infty\)</span>, <span class="math inline">\(\mu_k\)</span> is on the left of the starting point of the integral and essentially <span class="math inline">\(0^{-}\)</span>, so <span class="math inline">\(\Phi\left(\frac{\sigma_k^2X_j + s_j^2\mu_k}{s_j\sigma_k\sqrt{s_j^2 + \sigma_k^2}}\right) \to 0\)</span> and <span class="math inline">\(\tau_{jkl} = 0\)</span>.</p></li>
+</ul>
+<p>Numerically, the above expresion is not stable, as <span class="math inline">\(\frac{\sigma_k}{s_j}\)</span> could be large and <span class="math inline">\(\left(\frac{\sigma_k}{s_j}\right)^m\)</span> could easily blow up. Thus we come up with the following normalized expression to stablize the implementation. <span class="math display">\[
+\tau_{jkl}
+=
+\frac{1}{\sqrt{s_j^2 + \sigma_k^2}}
+\sum\limits_{m = 0}^l
+\sqrt{\binom{l}{m}}
+\left(\frac{\sigma_k}{\sqrt{s_j^2 + \sigma_k^2}}\right)^m
+\frac{1}{\sqrt{m!}}
+\varphi^{(m - 1)}
+\left(\frac{\sigma_k^2X_j + s_j^2\mu_k}{s_j\sigma_k\sqrt{s_j^2 + \sigma_k^2}}\right)
+\left(\frac{s_j}{\sqrt{s_j^2 + \sigma_k^2}}\right)^{l - m}
+\frac{1}{\sqrt{(l - m)!}}
+\varphi^{(l - m)}
+\left(\frac{X_j - \mu_k}{\sqrt{s_j^2 + \sigma_k^2}}\right).
+\]</span> When <span class="math inline">\(\mu_k \equiv 0\)</span>, <span class="math display">\[
+\tau_{jkl}
+=
+\frac{1}{\sqrt{s_j^2 + \sigma_k^2}}
+\sum\limits_{m = 0}^l
+\sqrt{\binom{l}{m}}
+\left(\frac{\sigma_k}{\sqrt{s_j^2 + \sigma_k^2}}\right)^m
+\frac{1}{\sqrt{m!}}
+\varphi^{(m - 1)}
+\left(\frac{X_j}{\sqrt{s_j^2 + \sigma_k^2}}\frac{\sigma_k}{s_j}\right)
+\left(\frac{s_j}{\sqrt{s_j^2 + \sigma_k^2}}\right)^{l - m}
+\frac{1}{\sqrt{(l - m)!}}
+\varphi^{(l - m)}
+\left(\frac{X_j}{\sqrt{s_j^2 + \sigma_k^2}}\right).
+\]</span> This is the version implemented in <code>CASH</code>, with the special case <span class="math inline">\(\sigma_0 = 0\)</span> taken care of numerically.</p>
 </div>
 
 <!-- Adjust MathJax settings so that all math formulae are shown using
