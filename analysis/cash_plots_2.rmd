@@ -150,6 +150,17 @@ for (i in 1 : nsim) {
 ```
 
 ```{r}
+saveRDS(pi0hat.list, "~/Desktop/temp/pi0hat.list.rds")
+saveRDS(qvalue.list, "~/Desktop/temp/qvalue.list.rds")
+saveRDS(svalue.list, "~/Desktop/temp/svalue.list.rds")
+saveRDS(z.list, "~/Desktop/temp/z.list.rds")
+saveRDS(sebetahat.list, "~/Desktop/temp/sebetahat.list.rds")
+saveRDS(pi0.list, "~/Desktop/temp/pi0.list.rds")
+saveRDS(beta.list, "~/Desktop/temp/beta.list.rds")
+saveRDS(betahat.list, "~/Desktop/temp/betahat.list.rds")
+```
+
+```{r}
 q.vec <- seq(0.001, 0.20, by = 0.001)
 method.name.FDR <- c("BHq", "qvalue", "locfdr", "ASH", "CASH")
 method.name.FSR <- c("ASH", "CASH")
