@@ -124,21 +124,20 @@ for (i in 1 : nsim) {
     ASH = ashr::get_pi0(fit.ash),
     CASH = fit.gdash$fitted_g$pi[1]
   )
-  colnames(pi0hat.list[[i]]) <- c("qvalue", "locfdr", "ASH", "CASH")
 
   ## FDR
   qvalue.list[[i]] <- cbind(
-    BH <- fit.BH,
-    qvalue <- fit.qvalue$qvalues,
-    locfdr <- tryCatch(ashr::qval.from.lfdr(fit.locfdr$fdr), error = function(e) {rep(NA, ngene)}),
-    ASH <- ashr::get_qvalue(fit.ash),
-    CASH <- fit.gdash$qvalue
+    BH = fit.BH,
+    qvalue = fit.qvalue$qvalues,
+    locfdr = tryCatch(ashr::qval.from.lfdr(fit.locfdr$fdr), error = function(e) {rep(NA, ngene)}),
+    ASH = ashr::get_qvalue(fit.ash),
+    CASH = fit.gdash$qvalue
   )
   
   ## FSR
   svalue.list[[i]] <- cbind(
-    ASH <- ashr::get_svalue(fit.ash),
-    CASH <- fit.gdash$svalue
+    ASH = ashr::get_svalue(fit.ash),
+    CASH = fit.gdash$svalue
   )
   
   ## data storage
@@ -148,17 +147,6 @@ for (i in 1 : nsim) {
   beta.list[[i]] <- beta
   betahat.list[[i]] <- betahat
 }
-```
-
-```{r}
-saveRDS(pi0hat.list, "~/Desktop/temp/pi0hat.list.rds")
-saveRDS(qvalue.list, "~/Desktop/temp/qvalue.list.rds")
-saveRDS(svalue.list, "~/Desktop/temp/svalue.list.rds")
-saveRDS(z.list, "~/Desktop/temp/z.list.rds")
-saveRDS(sebetahat.list, "~/Desktop/temp/sebetahat.list.rds")
-saveRDS(pi0.list, "~/Desktop/temp/pi0.list.rds")
-saveRDS(beta.list, "~/Desktop/temp/beta.list.rds")
-saveRDS(betahat.list, "~/Desktop/temp/betahat.list.rds")
 ```
 
 ```{r}
