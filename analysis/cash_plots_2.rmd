@@ -157,15 +157,7 @@ FDP.list <- lapply(q.vec, function (q) {
     }, q, beta)
   }, qvalue.list, beta.list, q))
 })
-FDP.mean <- t(sapply(FDP.list, function (FDP.mat) {
-  colMeans(FDP.mat)
-}))
-FDP.q975 <- t(sapply(FDP.list, function (FDP.mat) {
-  apply(FDP.mat, 2, quantile, probs = 0.975)
-}))
-FDP.q025 <- t(sapply(FDP.list, function (FDP.mat) {
-  apply(FDP.mat, 2, quantile, probs = 0.025)
-}))
+names(FDP.list) <- q.vec
 
 FSP.list <- lapply(q.vec, function (q) {
   t(mapply(function (qvalue.mat, beta, betahat, q) {
@@ -174,15 +166,7 @@ FSP.list <- lapply(q.vec, function (q) {
     }, q, beta, betahat)
   }, qvalue.list, beta.list, betahat.list, q))
 })
-FSP.mean <- t(sapply(FSP.list, function (FSP.mat) {
-  colMeans(FSP.mat)
-}))
-FSP.q975 <- t(sapply(FSP.list, function (FSP.mat) {
-  apply(FSP.mat, 2, quantile, probs = 0.975)
-}))
-FSP.q025 <- t(sapply(FSP.list, function (FSP.mat) {
-  apply(FSP.mat, 2, quantile, probs = 0.025)
-}))
+names(FDP.list) <- q.vec
 
 TDP.list <- lapply(q.vec, function(q) {
   t(mapply(function(qvalue.mat, beta, q) {
@@ -228,58 +212,53 @@ pi0hat.plot <- ggplot(data = pi0hat.ggdata, aes(x = pi0, y = pi0hat)) +
         axis.text.y = element_text(size = 10),
         strip.text = element_text(size = 15))
 
-  FDP.summary.pi0 <- aperm(FDP.summary[, , , j], c(2, 1, 3))
-  FDP.summary.pi0.method <- FDP.summary.pi0[, , 1]
-  for (kk in 2 : length(method.name)) {
-    FDP.summary.pi0.method <- rbind.data.frame(FDP.summary.pi0.method, FDP.summary.pi0[, , kk])
-  }
-  FDP.summary.pi0.method <- cbind.data.frame(
-    rep(factor(seq(method.name)), each = dim(FDP.summary.pi0)[1]),
-    rep(q.vec, length(method.name)),
-    FDP.summary.pi0.method
+##==================================================
+
+FDP.mean <- lapply(FDP.list, function (FDP.mat) {
+  rbind(
+    All = colMeans(FDP.mat, na.rm = TRUE),
+    apply(FDP.mat, 2, tapply, Noise, mean, na.rm = TRUE)
   )
-  colnames(FDP.summary.pi0.method) <- c(
-    "Method", "FDR", "FDP", "sd", "n", "q975", "q025", "q750", "q250"
+})
+FDP.mean.ggdata <- melt(FDP.mean, value.name = "FDP.mean")
+FDP.q975 <- lapply(FDP.list, function (FDP.mat) {
+  rbind(
+    All = apply(FDP.mat, 2, quantile, probs = 0.975, na.rm = TRUE),
+    apply(FDP.mat, 2, tapply, Noise, quantile, probs = 0.975, na.rm = TRUE)
   )
-  
-  FDP.array.pi0 <- aperm(FDP.array[, , , j], c(2, 1, 3))
-  FDP.pi0.noise <- as.vector(aperm(apply(FDP.array.pi0, c(1, 3), tapply, Noise, mean, na.rm = TRUE), c(2, 1, 3)))
-  sd.pi0.noise <- as.vector(aperm(apply(FDP.array.pi0, c(1, 3), tapply, Noise, sd, na.rm = TRUE), c(2, 1, 3)))
-  n.pi0.noise <- as.vector(aperm(apply(FDP.array.pi0, c(1, 3), tapply, Noise, function(x){sum(!is.na(x))}), c(2, 1, 3)))
-  q975.pi0.noise <- as.vector(aperm(apply(FDP.array.pi0, c(1, 3), tapply, Noise, quantile, probs = 0.975, na.rm = TRUE), c(2, 1, 3)))
-  q025.pi0.noise <- as.vector(aperm(apply(FDP.array.pi0, c(1, 3), tapply, Noise, quantile, probs = 0.025, na.rm = TRUE), c(2, 1, 3)))
-  q750.pi0.noise <- as.vector(aperm(apply(FDP.array.pi0, c(1, 3), tapply, Noise, quantile, probs = 0.75, na.rm = TRUE), c(2, 1, 3)))
-  q250.pi0.noise <- as.vector(aperm(apply(FDP.array.pi0, c(1, 3), tapply, Noise, quantile, probs = 0.25, na.rm = TRUE), c(2, 1, 3)))
-  FDP.summary.pi0.method.noise <- cbind.data.frame(
-    rep(rep(levels(Noise), each = length(q.vec)), length(method.name)),
-    rep(factor(seq(method.name)), each = length(levels(Noise)) * length(q.vec)),
-    rep(q.vec, length(levels(Noise)) * length(method.name)),
-    FDP.pi0.noise,
-    sd.pi0.noise,
-    n.pi0.noise,
-    q975.pi0.noise,
-    q025.pi0.noise,
-    q750.pi0.noise,
-    q250.pi0.noise
+})
+FDP.q975.ggdata <- melt(FDP.q975, value.name = "FDP.q975")
+FDP.q025 <- lapply(FDP.list, function (FDP.mat) {
+  rbind(
+    All = apply(FDP.mat, 2, quantile, probs = 0.025, na.rm = TRUE),
+    apply(FDP.mat, 2, tapply, Noise, quantile, probs = 0.025, na.rm = TRUE)
   )
-  colnames(FDP.summary.pi0.method.noise) <- c(
-    "Noise", "Method", "FDR", "FDP", "sd", "n", "q975", "q025", "q750", "q250"
-  )
-  FDP.summary.pi0.method.noise <- rbind.data.frame(
-    FDP.summary.pi0.method.noise,
-    cbind.data.frame(Noise = rep("All", dim(FDP.summary.pi0.method)[1]), FDP.summary.pi0.method)
-  )
-  
-  FDR.calib.plot <- ggplot(data = FDP.summary.pi0.method.noise, aes(x = FDR, y = FDP, group = Method, col = Method)) +
+})
+FDP.q025.ggdata <- melt(FDP.q025, value.name = "FDP.q025")
+FDP.calib.ggdata <- cbind.data.frame(FDP.mean.ggdata,
+  FDP.q975 = FDP.q975.ggdata$FDP.q975,
+  FDP.q025 = FDP.q025.ggdata$FDP.q025
+)
+FDP.calib.ggdata$L1 <- as.numeric(FDP.calib.ggdata)
+
+FDR.calib.plot <- ggplot(data = FDP.calib.ggdata, aes(x = L1, y = FDP.mean, group = Var2, col = Var2)) +
   geom_line() +
-  geom_ribbon(aes(ymin = q025, ymax = q975, fill = Method), alpha = 0.35, linetype = "blank") +
-  scale_color_manual(labels = method.name, values = method.col) +
-  scale_fill_manual(labels = method.name, values = method.col) +
-  facet_wrap(~Noise, nrow = 1, ncol = 4) +
+  geom_ribbon(aes(ymin = FDP.q025, ymax = FDP.q975, fill = Var2), alpha = 0.35, linetype = "blank") +
+  scale_color_manual(labels = method.name.FDR, values = method.col.FDR) +
+  scale_fill_manual(labels = method.name.FDR, values = method.col.FDR) +
+  facet_wrap(~Var1, nrow = 1, ncol = 4) +
   geom_abline(slope = 1, intercept = 0, linetype = "dashed", size = 1, col = "black") +
   labs(x = "Nominal FDR", y = "FDP") +
-  theme(legend.position = "top", legend.text = element_text(size = 15), plot.title = element_text(hjust = 0.5, size = 15), axis.title.x = element_text(size = 15), axis.title.y = element_text(size = 15), axis.text.x = element_text(angle = 45, size = 15), axis.text.y = element_text(size = 15), strip.text = element_text(size = 15))
-  
+  theme(axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(angle = 45, size = 10),
+        axis.title.y = element_text(size = 15),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "none",
+        legend.text = element_text(size = 15))
+
+##==================================================
+
   FDP.q <- FDP.array[, which(round(q.vec, 4) == q), , j]
   FDP.q.noise <- rbind.data.frame(cbind.data.frame(Noise, FDP.q), cbind.data.frame(Noise = rep("All", length(Noise)), FDP.q))
 
