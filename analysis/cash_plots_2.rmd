@@ -16,12 +16,6 @@ library(locfdr)
 library(qvalue)
 library(reshape2)
 library(ggplot2)
-library(grid)
-library(gridExtra)
-library(RColorBrewer)
-library(scales)
-library(cowplot)
-library(ggpubr)
 ```
 
 ```{r functions}
@@ -39,7 +33,7 @@ FDP <- function (FDR, qvalue, beta) {
 pFDP <- function (FDR, qvalue, beta) {
   return(sum(qvalue <= FDR & beta == 0) / sum(qvalue <= FDR))
 }
-power <- function (FDR, qvalue, beta) {
+TDP <- function (FDR, qvalue, beta) {
   return(sum(qvalue <= FDR & beta != 0) / sum(beta != 0))
 }
 FSP <- function (FSR, svalue, beta, betahat) {
@@ -143,93 +137,96 @@ for (i in 1 : nsim) {
   ## data storage
   z.list[[i]] <- z
   sebetahat.list[[i]] <- sebetahat
-  pi0.list[[i]] <- pi0
+  pi0.list[[i]] <- c(pi0 = pi0)
   beta.list[[i]] <- beta
   betahat.list[[i]] <- betahat
 }
 ```
 
 ```{r}
-saveRDS(pi0hat.list, "~/Desktop/temp/pi0hat.list.rds")
-saveRDS(qvalue.list, "~/Desktop/temp/qvalue.list.rds")
-saveRDS(svalue.list, "~/Desktop/temp/svalue.list.rds")
-saveRDS(z.list, "~/Desktop/temp/z.list.rds")
-saveRDS(sebetahat.list, "~/Desktop/temp/sebetahat.list.rds")
-saveRDS(pi0.list, "~/Desktop/temp/pi0.list.rds")
-saveRDS(beta.list, "~/Desktop/temp/beta.list.rds")
-saveRDS(betahat.list, "~/Desktop/temp/betahat.list.rds")
-```
-
-```{r}
 q.vec <- seq(0.001, 0.20, by = 0.001)
-method.name.FDR <- c("BHq", "qvalue", "locfdr", "ASH", "CASH")
-method.name.FSR <- c("ASH", "CASH")
 ```
 
 ```{r, cache = TRUE}
-FDP.array <- pFDP.array <- power.array <- array(0, dim = c(nsim, length(q.vec), length(method.name), length(pi0.vec)))
-FDP.summary <- array(0, dim = c(7, length(q.vec), length(method.name), length(pi0.vec)))
-pFDP.summary <- power.summary <- array(0, dim = c(5, length(q.vec), length(method.name), length(pi0.vec)))
-for (j in seq(length(pi0.vec))) {
-  for (k in seq(length(method.name))) {
-    for (i in seq(nsim)) {
-      FDP.array[i, , k, j] <- sapply(q.vec, FDP, qvalue = qvalue.pi0.list[[j]][[i]][, k], beta = beta.pi0.list[[j]][[i]])
-      pFDP.array[i, , k, j] <- sapply(q.vec, pFDP, qvalue = qvalue.pi0.list[[j]][[i]][, k], beta = beta.pi0.list[[j]][[i]])
-      power.array[i, , k, j] <- sapply(q.vec, power, qvalue = qvalue.pi0.list[[j]][[i]][, k], beta = beta.pi0.list[[j]][[i]])
-    }
-    FDP.summary[, , k, j] <- rbind(
-      avg <- colMeans(FDP.array[, , k, j], na.rm = TRUE),
-      sd <- apply(FDP.array[, , k, j], 2, sd, na.rm = TRUE),
-      n <- colSums(!is.na(FDP.array[, , k, j])),
-      q975 <- apply(FDP.array[, , k, j], 2, quantile, probs = 0.975, na.rm = TRUE),
-      q025 <- apply(FDP.array[, , k, j], 2, quantile, probs = 0.025, na.rm = TRUE),
-      q750 <- apply(FDP.array[, , k, j], 2, quantile, probs = 0.75, na.rm = TRUE),
-      q250 <- apply(FDP.array[, , k, j], 2, quantile, probs = 0.25, na.rm = TRUE)
-    )
-    pFDP.summary[, , k, j] <- rbind(
-      avg <- colMeans(pFDP.array[, , k, j], na.rm = TRUE),
-      sd <- apply(pFDP.array[, , k, j], 2, sd, na.rm = TRUE),
-      n <- colSums(!is.na(pFDP.array[, , k, j])),
-      q975 <- apply(pFDP.array[, , k, j], 2, quantile, probs = 0.975, na.rm = TRUE),
-      q025 <- apply(pFDP.array[, , k, j], 2, quantile, probs = 0.025, na.rm = TRUE)
-    )
-    power.summary[, , k, j] <- rbind(
-      avg <- colMeans(power.array[, , k, j], na.rm = TRUE),
-      sd <- apply(power.array[, , k, j], 2, sd, na.rm = TRUE),
-      n <- colSums(!is.na(power.array[, , k, j])),
-      q975 <- apply(power.array[, , k, j], 2, quantile, probs = 0.975, na.rm = TRUE),
-      q025 <- apply(power.array[, , k, j], 2, quantile, probs = 0.025, na.rm = TRUE)
-    )
-  }
-}
+pi0hat.mat <- cbind.data.frame(pi0 = factor(do.call(rbind, pi0.list)), do.call(rbind, pi0hat.list))
+
+FDP.list <- lapply(q.vec, function (q) {
+  t(mapply(function (qvalue.mat, beta, q) {
+    apply(qvalue.mat, 2, function (qvalue, q, beta) {
+      FDP(q, qvalue, beta)
+    }, q, beta)
+  }, qvalue.list, beta.list, q))
+})
+FDP.mean <- t(sapply(FDP.list, function (FDP.mat) {
+  colMeans(FDP.mat)
+}))
+FDP.q975 <- t(sapply(FDP.list, function (FDP.mat) {
+  apply(FDP.mat, 2, quantile, probs = 0.975)
+}))
+FDP.q025 <- t(sapply(FDP.list, function (FDP.mat) {
+  apply(FDP.mat, 2, quantile, probs = 0.025)
+}))
+
+FSP.list <- lapply(q.vec, function (q) {
+  t(mapply(function (qvalue.mat, beta, betahat, q) {
+    apply(qvalue.mat, 2, function (qvalue, q, beta, betahat) {
+      FSP(q, qvalue, beta, betahat)
+    }, q, beta, betahat)
+  }, qvalue.list, beta.list, betahat.list, q))
+})
+FSP.mean <- t(sapply(FSP.list, function (FSP.mat) {
+  colMeans(FSP.mat)
+}))
+FSP.q975 <- t(sapply(FSP.list, function (FSP.mat) {
+  apply(FSP.mat, 2, quantile, probs = 0.975)
+}))
+FSP.q025 <- t(sapply(FSP.list, function (FSP.mat) {
+  apply(FSP.mat, 2, quantile, probs = 0.025)
+}))
+
+TDP.list <- lapply(q.vec, function(q) {
+  t(mapply(function(qvalue.mat, beta, q) {
+    apply(qvalue.mat, 2, function (qvalue, q, beta) {
+      TDP(q, qvalue, beta)
+    }, q, beta)
+  }, qvalue.list, beta.list, q))
+})
 ```
 
 ```{r}
 q <- 0.1
 z.over <- 1.05
 z.under <- 0.95
-method.col <- scales::hue_pal()(5)
-# method.col <- c("#377eb8", "#984ea3", "#4daf4a", "#ff7f00", "#e41a1c")
+method.name.FDR <- c("BHq", "qvalue", "locfdr", "ASH", "CASH")
+method.name.FSR <- c("ASH", "CASH")
+method.col.FDR <- scales::hue_pal()(length(method.name.FDR))
+method.col.pi0hat <- method.col.FDR[-1]
+method.col.FSR <- method.col.FDR[4 : 5]
 ```
 
 ```{r, message = FALSE, warning = FALSE, fig.asp = 1.5}
-for (j in seq(length(pi0.vec))) {
-  sd.z <- sapply(z.pi0.list[[j]], sd)
-  Noise <- cut(sd.z, breaks = c(0, quantile(sd.z, probs = 1 : 2 / 3), Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
+sd.z <- sapply(z.list, sd)
+Noise <- cut(sd.z, breaks = c(0, quantile(sd.z, probs = 1 : 2 / 3), Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
 # Noise <- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
 
-  pi0.pi0 <- matrix(unlist(pi0.pi0.list[[j]]), byrow = TRUE, length(pi0.pi0.list[[j]]))
-  pi0.pi0.noise <- rbind.data.frame(cbind.data.frame(Noise, pi0.pi0), cbind.data.frame(Noise = rep("All", length(Noise)), pi0.pi0))
-  
-  pi0.plot <- ggplot(data = melt(pi0.pi0.noise, id.vars = "Noise"), aes(x = variable, y = value, col = variable)) +
-  geom_boxplot() +
-  stat_summary(fun.y = mean, geom = "point", shape = 13, size = 3) +
-  scale_color_manual(values = method.col[-1]) +
+pi0hat.noise.mat <- rbind.data.frame(
+  cbind.data.frame(Noise = rep("All", length(Noise)), pi0hat.mat),
+  cbind.data.frame(Noise, pi0hat.mat)
+)
+
+pi0hat.ggdata <- melt(pi0hat.noise.mat, id.vars = c("Noise", "pi0"), variable.name = "Method", value.name = "pi0hat")
+pi0hat.plot <- ggplot(data = pi0hat.ggdata, aes(x = pi0, y = pi0hat)) +
+  geom_boxplot(aes(fill = Method)) +
+  scale_fill_manual(values = method.col.pi0hat) +
   facet_wrap(~Noise, nrow = 1, ncol = 4) +
-  geom_hline(yintercept = pi0.vec[j], col = "black", linetype = "dashed", size = 1) +
-  scale_x_discrete(labels = method.name[-1]) +
-  labs(x = "", y = expression(hat(pi)[0])) +
-  theme(legend.position = "none", plot.title = element_text(hjust = 0.5, size = 15), axis.title.y = element_text(size = 15), axis.text.x = element_text(size = 15, angle = 45, hjust = 1), axis.text.y = element_text(size = 15), strip.text = element_text(size = 15))
+  geom_hline(yintercept = pi0.vec, col = "black", linetype = "dashed", size = 1) +
+  labs(x = expression(pi[0]), y = expression(hat(pi)[0])) +
+  theme(legend.position = "none",
+        axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
+        axis.title.y = element_text(size = 15),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15))
 
   FDP.summary.pi0 <- aperm(FDP.summary[, , , j], c(2, 1, 3))
   FDP.summary.pi0.method <- FDP.summary.pi0[, , 1]
@@ -320,7 +317,6 @@ for (j in seq(length(pi0.vec))) {
   )
   print(joint)
   ggsave(paste0("../output/fig/g1_pi0_", pi0.vec[j], ".pdf"), joint, height = 10, width = 8)
-}
 ```
 
 ## Bimodal: $g_2 = 0.5 N\left(-2, 1\right) + 0.5 N\left(2, 1\right)$
