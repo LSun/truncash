@@ -361,7 +361,7 @@ div.section {
 </li>
 <li>
 <details>
-<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/f912730dcae94159e6e20f798d36495082aaa56a" target="_blank">f912730</a> </summary></p>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/0cdcf7b633b7faf9a9c1c5661e8ce8f3f89a27ab" target="_blank">0cdcf7b</a> </summary></p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 <pre><code>
 Ignored files:
@@ -490,6 +490,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/0cdcf7b633b7faf9a9c1c5661e8ce8f3f89a27ab/analysis/cash_plots_2.rmd" target="_blank">0cdcf7b</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+<td style="text-align:left;">
+wflow_publish(“analysis/cash_plots_2.rmd”)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/1eec7b15f4d59c0da2a1209d79cfe5f819e45e14/docs/cash_plots_2.html" target="_blank">1eec7b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 rmd
@@ -772,8 +806,11 @@ method.col.FSR &lt;- method.col.FDR[4 : 5]</code></pre>
   
   return(FXP.ggdata)
 }</code></pre>
-<div id="normal-g_1-nleft0-22right" class="section level2">
-<h2>Normal: <span class="math inline">\(g_1 = N\left(0, 2^2\right)\)</span></h2>
+<div id="normal" class="section level2">
+<h2>Normal</h2>
+<p><span class="math display">\[
+g_1 = N\left(0, 2^2\right)
+\]</span></p>
 <pre class="r"><code>plotx &lt;- seq(-6, 6, by = 0.01)
 plot(plotx, plotx, ylim = c(0, dnorm(0)),
      xlab = expression(theta), ylab = expression(g(theta)),
@@ -782,6 +819,57 @@ lines(plotx, dnorm(plotx), lty = 2)
 lines(plotx, dnorm(plotx, 0, 2), col = &quot;blue&quot;)
 legend(&quot;topright&quot;, lty = c(1, 2), col = c(4, 1), c(&quot;g&quot;, &quot;N(0, 1)&quot;))</code></pre>
 <p><img src="figure/cash_plots_2.rmd/g1-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of g1-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1eec7b15f4d59c0da2a1209d79cfe5f819e45e14/docs/figure/cash_plots_2.rmd/g1-1.png" target="_blank">1eec7b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+</tr>
+</tbody>
+</table>
+</details>
+<pre class="r"><code># n01 &lt;- cbind.data.frame(x = plotx, n01 = dnorm(plotx))
+# g1 &lt;- cbind.data.frame(n01, g1 = dnorm(plotx, 0, 2))
+# g1.ggdata &lt;- melt(g1, id.vars = &quot;x&quot;, variable.name = &quot;g&quot;, value.name = &quot;pdf&quot;)
+
+# g.plot &lt;- ggplot(data = g1.ggdata, aes(x = x, y = pdf, col = g, linetype = g)) +
+#   geom_line() +
+#   scale_color_manual(values = c(&quot;black&quot;, &quot;blue&quot;)) +
+#   scale_linetype_manual(values = c(&quot;dashed&quot;, &quot;solid&quot;)) +
+#   labs(x = expression(theta), y = expression(g(theta))) +
+#   annotate(&quot;text&quot;, x = -Inf, y = Inf, label = &quot;Normal&quot;, vjust = 1, hjust = 0, color = &quot;blue&quot;, size = 15) +
+#   theme(axis.title.x = element_text(size = 15),
+#         axis.text.x = element_text(size = 10, hjust = 1),
+#         axis.title.y = element_text(size = 15),
+#         axis.text.y = element_text(size = 10),
+#         strip.text = element_text(size = 15),
+#         legend.position = &quot;none&quot;,
+#         legend.background = element_rect(color = &quot;grey&quot;),
+#         legend.text = element_text(size = 12))
+# 
+# g.plot</code></pre>
 <pre class="r"><code>pi0hat.mat &lt;- cbind.data.frame(pi0 = factor(do.call(rbind, pi0.list)), do.call(rbind, pi0hat.list))
 
 FDP.list &lt;- lapply(q.vec, function (q) {
@@ -947,10 +1035,103 @@ TDP.q.plot &lt;- ggplot(data = TDP.q.ggdata, aes(x = pi0, y = TDP)) +
 <h3>Overall</h3>
 <pre class="r"><code>pi0hat.plot</code></pre>
 <p><img src="figure/cash_plots_2.rmd/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-7-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1eec7b15f4d59c0da2a1209d79cfe5f819e45e14/docs/figure/cash_plots_2.rmd/unnamed-chunk-7-1.png" target="_blank">1eec7b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre class="r"><code>FDR.calib.plot</code></pre>
 <p><img src="figure/cash_plots_2.rmd/unnamed-chunk-7-2.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-7-2.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1eec7b15f4d59c0da2a1209d79cfe5f819e45e14/docs/figure/cash_plots_2.rmd/unnamed-chunk-7-2.png" target="_blank">1eec7b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre class="r"><code>FSR.calib.plot</code></pre>
 <p><img src="figure/cash_plots_2.rmd/unnamed-chunk-7-3.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-7-3.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1eec7b15f4d59c0da2a1209d79cfe5f819e45e14/docs/figure/cash_plots_2.rmd/unnamed-chunk-7-3.png" target="_blank">1eec7b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 </div>
 <div id="at-nominal-fdr-0.1" class="section level3">
 <h3>At nominal FDR = <span class="math inline">\(0.1\)</span></h3>
@@ -973,6 +1154,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1eec7b15f4d59c0da2a1209d79cfe5f819e45e14/docs/figure/cash_plots_2.rmd/unnamed-chunk-8-1.png" target="_blank">1eec7b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 <a href="https://github.com/LSun/truncash/blob/d51ff505b9c82c81b2972420eef56a5bbcb80ab3/docs/figure/cash_plots_2.rmd/unnamed-chunk-8-1.png" target="_blank">d51ff50</a>
@@ -1008,6 +1200,17 @@ Date
 <tbody>
 <tr>
 <td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1eec7b15f4d59c0da2a1209d79cfe5f819e45e14/docs/figure/cash_plots_2.rmd/unnamed-chunk-8-2.png" target="_blank">1eec7b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
 <a href="https://github.com/LSun/truncash/blob/d51ff505b9c82c81b2972420eef56a5bbcb80ab3/docs/figure/cash_plots_2.rmd/unnamed-chunk-8-2.png" target="_blank">d51ff50</a>
 </td>
 <td style="text-align:left;">
@@ -1020,10 +1223,15 @@ LSun
 </tbody>
 </table>
 </details>
+<pre class="r"><code># g.plot.all &lt;- gridExtra::arrangeGrob(g.plot, pi0hat.plot, FDR.calib.plot, FSR.calib.plot, FDP.q.plot, TDP.q.plot, ncol = 1, heights = c(0.8, rep(1, 5)))
+# ggsave(&quot;../output/fig/g1.pdf&quot;, g.plot.all, width = 10, height = 29)</code></pre>
 </div>
 </div>
-<div id="big-normal-g_2-nleft0-52right" class="section level2">
-<h2>Big normal: <span class="math inline">\(g_2 = N\left(0, 5^2\right)\)</span></h2>
+<div id="big-normal" class="section level2">
+<h2>Big normal</h2>
+<p><span class="math display">\[
+g_2 = N\left(0, 5^2\right)
+\]</span></p>
 <pre class="r"><code>plotx &lt;- seq(-6, 6, by = 0.01)
 plot(plotx, plotx, ylim = c(0, dnorm(0)),
      xlab = expression(theta), ylab = expression(g(theta)),
@@ -1032,6 +1240,37 @@ lines(plotx, dnorm(plotx), lty = 2)
 lines(plotx, dnorm(plotx, 0, 5), col = &quot;blue&quot;)
 legend(&quot;topright&quot;, lty = c(1, 2), col = c(4, 1), c(&quot;g&quot;, &quot;N(0, 1)&quot;))</code></pre>
 <p><img src="figure/cash_plots_2.rmd/g2-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of g2-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1eec7b15f4d59c0da2a1209d79cfe5f819e45e14/docs/figure/cash_plots_2.rmd/g2-1.png" target="_blank">1eec7b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre class="r"><code>pi0hat.mat &lt;- cbind.data.frame(pi0 = factor(do.call(rbind, pi0.list)), do.call(rbind, pi0hat.list))
 
 FDP.list &lt;- lapply(q.vec, function (q) {
@@ -1197,21 +1436,179 @@ TDP.q.plot &lt;- ggplot(data = TDP.q.ggdata, aes(x = pi0, y = TDP)) +
 <h3>Overall</h3>
 <pre class="r"><code>pi0hat.plot</code></pre>
 <p><img src="figure/cash_plots_2.rmd/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-11-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1eec7b15f4d59c0da2a1209d79cfe5f819e45e14/docs/figure/cash_plots_2.rmd/unnamed-chunk-11-1.png" target="_blank">1eec7b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre class="r"><code>FDR.calib.plot</code></pre>
 <p><img src="figure/cash_plots_2.rmd/unnamed-chunk-11-2.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-11-2.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1eec7b15f4d59c0da2a1209d79cfe5f819e45e14/docs/figure/cash_plots_2.rmd/unnamed-chunk-11-2.png" target="_blank">1eec7b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre class="r"><code>FSR.calib.plot</code></pre>
 <p><img src="figure/cash_plots_2.rmd/unnamed-chunk-11-3.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-11-3.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1eec7b15f4d59c0da2a1209d79cfe5f819e45e14/docs/figure/cash_plots_2.rmd/unnamed-chunk-11-3.png" target="_blank">1eec7b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 </div>
 <div id="at-nominal-fdr-0.1-1" class="section level3">
 <h3>At nominal FDR = <span class="math inline">\(0.1\)</span></h3>
 <pre class="r"><code>FDP.q.plot</code></pre>
 <p><img src="figure/cash_plots_2.rmd/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-12-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1eec7b15f4d59c0da2a1209d79cfe5f819e45e14/docs/figure/cash_plots_2.rmd/unnamed-chunk-12-1.png" target="_blank">1eec7b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre class="r"><code>TDP.q.plot</code></pre>
 <p><img src="figure/cash_plots_2.rmd/unnamed-chunk-12-2.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-12-2.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1eec7b15f4d59c0da2a1209d79cfe5f819e45e14/docs/figure/cash_plots_2.rmd/unnamed-chunk-12-2.png" target="_blank">1eec7b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 </div>
 </div>
-<div id="near-normal-g_3-0.6-nleft0-12right-0.4-nleft0-32right" class="section level2">
-<h2>Near normal: <span class="math inline">\(g_3 = 0.6 N\left(0, 1^2\right) + 0.4 N\left(0, 3^2\right)\)</span></h2>
+<div id="near-normal" class="section level2">
+<h2>Near normal</h2>
+<p><span class="math display">\[
+g_3 = 0.6 N\left(0, 1^2\right) + 0.4 N\left(0, 3^2\right)
+\]</span></p>
 <pre class="r"><code>plotx &lt;- seq(-6, 6, by = 0.01)
 plot(plotx, plotx, ylim = c(0, dnorm(0)),
      xlab = expression(theta), ylab = expression(g(theta)),
@@ -1220,6 +1617,37 @@ lines(plotx, dnorm(plotx), lty = 2)
 lines(plotx, 0.6 * dnorm(plotx) + 0.4 * dnorm(plotx, 0, 3), col = &quot;blue&quot;)
 legend(&quot;topright&quot;, lty = c(1, 2), col = c(4, 1), c(&quot;g&quot;, &quot;N(0, 1)&quot;))</code></pre>
 <p><img src="figure/cash_plots_2.rmd/g3-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of g3-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1eec7b15f4d59c0da2a1209d79cfe5f819e45e14/docs/figure/cash_plots_2.rmd/g3-1.png" target="_blank">1eec7b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre class="r"><code>pi0hat.mat &lt;- cbind.data.frame(pi0 = factor(do.call(rbind, pi0.list)), do.call(rbind, pi0hat.list))
 
 FDP.list &lt;- lapply(q.vec, function (q) {
@@ -1385,21 +1813,179 @@ TDP.q.plot &lt;- ggplot(data = TDP.q.ggdata, aes(x = pi0, y = TDP)) +
 <h3>Overall</h3>
 <pre class="r"><code>pi0hat.plot</code></pre>
 <p><img src="figure/cash_plots_2.rmd/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-15-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1eec7b15f4d59c0da2a1209d79cfe5f819e45e14/docs/figure/cash_plots_2.rmd/unnamed-chunk-15-1.png" target="_blank">1eec7b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre class="r"><code>FDR.calib.plot</code></pre>
 <p><img src="figure/cash_plots_2.rmd/unnamed-chunk-15-2.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-15-2.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1eec7b15f4d59c0da2a1209d79cfe5f819e45e14/docs/figure/cash_plots_2.rmd/unnamed-chunk-15-2.png" target="_blank">1eec7b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre class="r"><code>FSR.calib.plot</code></pre>
 <p><img src="figure/cash_plots_2.rmd/unnamed-chunk-15-3.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-15-3.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1eec7b15f4d59c0da2a1209d79cfe5f819e45e14/docs/figure/cash_plots_2.rmd/unnamed-chunk-15-3.png" target="_blank">1eec7b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 </div>
 <div id="at-nominal-fdr-0.1-2" class="section level3">
 <h3>At nominal FDR = <span class="math inline">\(0.1\)</span></h3>
 <pre class="r"><code>FDP.q.plot</code></pre>
 <p><img src="figure/cash_plots_2.rmd/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-16-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1eec7b15f4d59c0da2a1209d79cfe5f819e45e14/docs/figure/cash_plots_2.rmd/unnamed-chunk-16-1.png" target="_blank">1eec7b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre class="r"><code>TDP.q.plot</code></pre>
 <p><img src="figure/cash_plots_2.rmd/unnamed-chunk-16-2.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-16-2.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1eec7b15f4d59c0da2a1209d79cfe5f819e45e14/docs/figure/cash_plots_2.rmd/unnamed-chunk-16-2.png" target="_blank">1eec7b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 </div>
 </div>
-<div id="spikey-g_4-0.4-nleft0-0.52right-0.2-nleft0-12right-0.2-nleft0-22right-0.2-nleft0-32right" class="section level2">
-<h2>Spikey: <span class="math inline">\(g_4 = 0.4 N\left(0, 0.5^2\right) + 0.2 N\left(0, 1^2\right) + 0.2 N\left(0, 2^2\right) + 0.2 N\left(0, 3^2\right)\)</span></h2>
+<div id="spikey" class="section level2">
+<h2>Spikey</h2>
+<p><span class="math display">\[
+g_4 = 0.4 N\left(0, 0.5^2\right) + 0.2 N\left(0, 1^2\right) + 0.2 N\left(0, 2^2\right) + 0.2 N\left(0, 3^2\right)
+\]</span></p>
 <pre class="r"><code>plotx &lt;- seq(-6, 6, by = 0.01)
 plot(plotx, plotx, ylim = c(0,
         0.4 * dnorm(0, 0, 0.5) + 
@@ -1415,6 +2001,37 @@ lines(plotx, 0.4 * dnorm(plotx, 0, 0.5) +
         0.2 * dnorm(plotx, 0, 3), col = &quot;blue&quot;)
 legend(&quot;topright&quot;, lty = c(1, 2), col = c(4, 1), c(&quot;g&quot;, &quot;N(0, 1)&quot;))</code></pre>
 <p><img src="figure/cash_plots_2.rmd/g4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of g4-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1eec7b15f4d59c0da2a1209d79cfe5f819e45e14/docs/figure/cash_plots_2.rmd/g4-1.png" target="_blank">1eec7b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre class="r"><code>pi0hat.mat &lt;- cbind.data.frame(pi0 = factor(do.call(rbind, pi0.list)), do.call(rbind, pi0hat.list))
 
 FDP.list &lt;- lapply(q.vec, function (q) {
@@ -1580,21 +2197,179 @@ TDP.q.plot &lt;- ggplot(data = TDP.q.ggdata, aes(x = pi0, y = TDP)) +
 <h3>Overall</h3>
 <pre class="r"><code>pi0hat.plot</code></pre>
 <p><img src="figure/cash_plots_2.rmd/unnamed-chunk-19-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-19-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1eec7b15f4d59c0da2a1209d79cfe5f819e45e14/docs/figure/cash_plots_2.rmd/unnamed-chunk-19-1.png" target="_blank">1eec7b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre class="r"><code>FDR.calib.plot</code></pre>
 <p><img src="figure/cash_plots_2.rmd/unnamed-chunk-19-2.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-19-2.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1eec7b15f4d59c0da2a1209d79cfe5f819e45e14/docs/figure/cash_plots_2.rmd/unnamed-chunk-19-2.png" target="_blank">1eec7b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre class="r"><code>FSR.calib.plot</code></pre>
 <p><img src="figure/cash_plots_2.rmd/unnamed-chunk-19-3.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-19-3.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1eec7b15f4d59c0da2a1209d79cfe5f819e45e14/docs/figure/cash_plots_2.rmd/unnamed-chunk-19-3.png" target="_blank">1eec7b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 </div>
 <div id="at-nominal-fdr-0.1-3" class="section level3">
 <h3>At nominal FDR = <span class="math inline">\(0.1\)</span></h3>
 <pre class="r"><code>FDP.q.plot</code></pre>
 <p><img src="figure/cash_plots_2.rmd/unnamed-chunk-20-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-20-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1eec7b15f4d59c0da2a1209d79cfe5f819e45e14/docs/figure/cash_plots_2.rmd/unnamed-chunk-20-1.png" target="_blank">1eec7b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre class="r"><code>TDP.q.plot</code></pre>
 <p><img src="figure/cash_plots_2.rmd/unnamed-chunk-20-2.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-20-2.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1eec7b15f4d59c0da2a1209d79cfe5f819e45e14/docs/figure/cash_plots_2.rmd/unnamed-chunk-20-2.png" target="_blank">1eec7b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 </div>
 </div>
-<div id="skew-g_5-14-nleft-2-22right-14-nleft-1-22right-14-nleft0-12right-1-4-nleft1-12right" class="section level2">
-<h2>Skew: <span class="math inline">\(g_5 = 1/4 N\left(-2, 2^2\right) + 1/4 N\left(-1, 2^2\right) + 1/4 N\left(0, 1^2\right) + 1 / 4 N\left(1, 1^2\right)\)</span></h2>
+<div id="skew" class="section level2">
+<h2>Skew</h2>
+<p><span class="math display">\[
+g_5 = 1/4 N\left(-2, 2^2\right) + 1/4 N\left(-1, 2^2\right) + 1/4 N\left(0, 1^2\right) + 1 / 4 N\left(1, 1^2\right)
+\]</span></p>
 <pre class="r"><code>plotx &lt;- seq(-6, 6, by = 0.01)
 plot(plotx, plotx, ylim = c(0, dnorm(0)),
      xlab = expression(theta), ylab = expression(g(theta)),
@@ -1606,6 +2381,37 @@ lines(plotx, 0.25 * dnorm(plotx, -2, 2) +
         0.25 * dnorm(plotx, 1, 1), col = &quot;blue&quot;)
 legend(&quot;topright&quot;, lty = c(1, 2), col = c(4, 1), c(&quot;g&quot;, &quot;N(0, 1)&quot;))</code></pre>
 <p><img src="figure/cash_plots_2.rmd/g5-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of g5-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1eec7b15f4d59c0da2a1209d79cfe5f819e45e14/docs/figure/cash_plots_2.rmd/g5-1.png" target="_blank">1eec7b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre class="r"><code>pi0hat.mat &lt;- cbind.data.frame(pi0 = factor(do.call(rbind, pi0.list)), do.call(rbind, pi0hat.list))
 
 FDP.list &lt;- lapply(q.vec, function (q) {
@@ -1771,21 +2577,179 @@ TDP.q.plot &lt;- ggplot(data = TDP.q.ggdata, aes(x = pi0, y = TDP)) +
 <h3>Overall</h3>
 <pre class="r"><code>pi0hat.plot</code></pre>
 <p><img src="figure/cash_plots_2.rmd/unnamed-chunk-23-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-23-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1eec7b15f4d59c0da2a1209d79cfe5f819e45e14/docs/figure/cash_plots_2.rmd/unnamed-chunk-23-1.png" target="_blank">1eec7b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre class="r"><code>FDR.calib.plot</code></pre>
 <p><img src="figure/cash_plots_2.rmd/unnamed-chunk-23-2.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-23-2.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1eec7b15f4d59c0da2a1209d79cfe5f819e45e14/docs/figure/cash_plots_2.rmd/unnamed-chunk-23-2.png" target="_blank">1eec7b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre class="r"><code>FSR.calib.plot</code></pre>
 <p><img src="figure/cash_plots_2.rmd/unnamed-chunk-23-3.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-23-3.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1eec7b15f4d59c0da2a1209d79cfe5f819e45e14/docs/figure/cash_plots_2.rmd/unnamed-chunk-23-3.png" target="_blank">1eec7b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 </div>
 <div id="at-nominal-fdr-0.1-4" class="section level3">
 <h3>At nominal FDR = <span class="math inline">\(0.1\)</span></h3>
 <pre class="r"><code>FDP.q.plot</code></pre>
 <p><img src="figure/cash_plots_2.rmd/unnamed-chunk-24-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-24-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1eec7b15f4d59c0da2a1209d79cfe5f819e45e14/docs/figure/cash_plots_2.rmd/unnamed-chunk-24-1.png" target="_blank">1eec7b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre class="r"><code>TDP.q.plot</code></pre>
 <p><img src="figure/cash_plots_2.rmd/unnamed-chunk-24-2.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-24-2.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1eec7b15f4d59c0da2a1209d79cfe5f819e45e14/docs/figure/cash_plots_2.rmd/unnamed-chunk-24-2.png" target="_blank">1eec7b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 </div>
 </div>
-<div id="flattop-g_6" class="section level2">
-<h2>Flattop: <span class="math inline">\(g_6\)</span></h2>
+<div id="flattop" class="section level2">
+<h2>Flattop</h2>
+<p><span class="math display">\[
+g_6 = \frac17\left[N\left(-1.5, 0.5^2\right) + N\left(-1, 0.5^2\right) + N\left(-0.5, 0.5^2\right) + N\left(0, 0.5^2\right) + N\left(0.5, 0.5^2\right) + N\left(1, 0.5^2\right) + N\left(1.5, 0.5^2\right)\right]
+\]</span></p>
 <pre class="r"><code>plotx &lt;- seq(-6, 6, by = 0.01)
 plot(plotx, plotx, ylim = c(0, dnorm(0)),
      xlab = expression(theta), ylab = expression(g(theta)),
@@ -1794,6 +2758,37 @@ lines(plotx, dnorm(plotx), lty = 2)
 lines(plotx, sapply(plotx, function(x) {mean(dnorm(x, seq(-1.5, 1.5, by = 0.5), 0.5))}), col = &quot;blue&quot;)
 legend(&quot;topright&quot;, lty = c(1, 2), col = c(4, 1), c(&quot;g&quot;, &quot;N(0, 1)&quot;))</code></pre>
 <p><img src="figure/cash_plots_2.rmd/g6-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of g6-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1eec7b15f4d59c0da2a1209d79cfe5f819e45e14/docs/figure/cash_plots_2.rmd/g6-1.png" target="_blank">1eec7b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre class="r"><code>pi0hat.mat &lt;- cbind.data.frame(pi0 = factor(do.call(rbind, pi0.list)), do.call(rbind, pi0hat.list))
 
 FDP.list &lt;- lapply(q.vec, function (q) {
@@ -1959,21 +2954,179 @@ TDP.q.plot &lt;- ggplot(data = TDP.q.ggdata, aes(x = pi0, y = TDP)) +
 <h3>Overall</h3>
 <pre class="r"><code>pi0hat.plot</code></pre>
 <p><img src="figure/cash_plots_2.rmd/unnamed-chunk-27-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-27-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1eec7b15f4d59c0da2a1209d79cfe5f819e45e14/docs/figure/cash_plots_2.rmd/unnamed-chunk-27-1.png" target="_blank">1eec7b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre class="r"><code>FDR.calib.plot</code></pre>
 <p><img src="figure/cash_plots_2.rmd/unnamed-chunk-27-2.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-27-2.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1eec7b15f4d59c0da2a1209d79cfe5f819e45e14/docs/figure/cash_plots_2.rmd/unnamed-chunk-27-2.png" target="_blank">1eec7b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre class="r"><code>FSR.calib.plot</code></pre>
 <p><img src="figure/cash_plots_2.rmd/unnamed-chunk-27-3.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-27-3.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1eec7b15f4d59c0da2a1209d79cfe5f819e45e14/docs/figure/cash_plots_2.rmd/unnamed-chunk-27-3.png" target="_blank">1eec7b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 </div>
 <div id="at-nominal-fdr-0.1-5" class="section level3">
 <h3>At nominal FDR = <span class="math inline">\(0.1\)</span></h3>
 <pre class="r"><code>FDP.q.plot</code></pre>
 <p><img src="figure/cash_plots_2.rmd/unnamed-chunk-28-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-28-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1eec7b15f4d59c0da2a1209d79cfe5f819e45e14/docs/figure/cash_plots_2.rmd/unnamed-chunk-28-1.png" target="_blank">1eec7b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre class="r"><code>TDP.q.plot</code></pre>
 <p><img src="figure/cash_plots_2.rmd/unnamed-chunk-28-2.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-28-2.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1eec7b15f4d59c0da2a1209d79cfe5f819e45e14/docs/figure/cash_plots_2.rmd/unnamed-chunk-28-2.png" target="_blank">1eec7b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 </div>
 </div>
-<div id="bimodal-g_7-0.5-nleft-1.5-1right-0.5-nleft1.5-1right" class="section level2">
-<h2>Bimodal: <span class="math inline">\(g_7 = 0.5 N\left(-1.5, 1\right) + 0.5 N\left(1.5, 1\right)\)</span></h2>
+<div id="bimodal" class="section level2">
+<h2>Bimodal</h2>
+<p><span class="math display">\[
+g_7 = 0.5 N\left(-1.5, 1\right) + 0.5 N\left(1.5, 1\right)
+\]</span></p>
 <pre class="r"><code>plotx &lt;- seq(-6, 6, by = 0.01)
 plot(plotx, plotx, ylim = c(0, dnorm(0)),
      xlab = expression(theta), ylab = expression(g(theta)),
@@ -1983,6 +3136,37 @@ lines(plotx, 0.5 * dnorm(plotx, -1.5, 1) +
         0.5 * dnorm(plotx, 1.5, 1), col = &quot;blue&quot;)
 legend(&quot;topright&quot;, lty = c(1, 2), col = c(4, 1), c(&quot;g&quot;, &quot;N(0, 1)&quot;))</code></pre>
 <p><img src="figure/cash_plots_2.rmd/g7-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of g7-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1eec7b15f4d59c0da2a1209d79cfe5f819e45e14/docs/figure/cash_plots_2.rmd/g7-1.png" target="_blank">1eec7b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre class="r"><code>pi0hat.mat &lt;- cbind.data.frame(pi0 = factor(do.call(rbind, pi0.list)), do.call(rbind, pi0hat.list))
 
 FDP.list &lt;- lapply(q.vec, function (q) {
@@ -2148,17 +3332,172 @@ TDP.q.plot &lt;- ggplot(data = TDP.q.ggdata, aes(x = pi0, y = TDP)) +
 <h3>Overall</h3>
 <pre class="r"><code>pi0hat.plot</code></pre>
 <p><img src="figure/cash_plots_2.rmd/unnamed-chunk-31-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-31-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1eec7b15f4d59c0da2a1209d79cfe5f819e45e14/docs/figure/cash_plots_2.rmd/unnamed-chunk-31-1.png" target="_blank">1eec7b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre class="r"><code>FDR.calib.plot</code></pre>
 <p><img src="figure/cash_plots_2.rmd/unnamed-chunk-31-2.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-31-2.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1eec7b15f4d59c0da2a1209d79cfe5f819e45e14/docs/figure/cash_plots_2.rmd/unnamed-chunk-31-2.png" target="_blank">1eec7b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre class="r"><code>FSR.calib.plot</code></pre>
 <p><img src="figure/cash_plots_2.rmd/unnamed-chunk-31-3.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-31-3.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1eec7b15f4d59c0da2a1209d79cfe5f819e45e14/docs/figure/cash_plots_2.rmd/unnamed-chunk-31-3.png" target="_blank">1eec7b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 </div>
 <div id="at-nominal-fdr-0.1-6" class="section level3">
 <h3>At nominal FDR = <span class="math inline">\(0.1\)</span></h3>
 <pre class="r"><code>FDP.q.plot</code></pre>
 <p><img src="figure/cash_plots_2.rmd/unnamed-chunk-32-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-32-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1eec7b15f4d59c0da2a1209d79cfe5f819e45e14/docs/figure/cash_plots_2.rmd/unnamed-chunk-32-1.png" target="_blank">1eec7b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre class="r"><code>TDP.q.plot</code></pre>
 <p><img src="figure/cash_plots_2.rmd/unnamed-chunk-32-2.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of unnamed-chunk-32-2.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1eec7b15f4d59c0da2a1209d79cfe5f819e45e14/docs/figure/cash_plots_2.rmd/unnamed-chunk-32-2.png" target="_blank">1eec7b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 </div>
 </div>
 <div id="session-information" class="section level2">
