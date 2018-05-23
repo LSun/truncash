@@ -226,7 +226,7 @@ TDP.list <- lapply(q.vec, function(q) {
 names(TDP.list) <- q.vec
 ```
 
-```{r, message = FALSE, warning = FALSE}
+```{r, cache = TRUE, message = FALSE, warning = FALSE}
 sd.z <- sapply(z.list, sd)
 Noise <- cut(sd.z, breaks = c(0, quantile(sd.z, probs = 1 : 2 / 3), Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
 # Noise <- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
@@ -271,7 +271,7 @@ FDR.calib.plot <- ggplot(data = FDP.calib.ggdata, aes(x = L1, y = mean, group = 
   geom_abline(slope = 1, intercept = 0, linetype = "dashed", size = 1, col = "black") +
   labs(x = "Nominal FDR", y = "FDP") +
   theme(axis.title.x = element_text(size = 12),
-        axis.text.x = element_text(angle = 45, size = 10),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
         axis.title.y = element_text(size = 12),
         axis.text.y = element_text(size = 10),
         strip.text = element_text(size = 15),
@@ -292,7 +292,7 @@ FSR.calib.plot <- ggplot(data = FSP.calib.ggdata, aes(x = L1, y = mean, group = 
   geom_abline(slope = 1, intercept = 0, linetype = "dashed", size = 1, col = "black") +
   labs(x = "Nominal FSR", y = "FSP") +
   theme(axis.title.x = element_text(size = 12),
-        axis.text.x = element_text(angle = 45, size = 10),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
         axis.title.y = element_text(size = 12),
         axis.text.y = element_text(size = 10),
         strip.text = element_text(size = 15),
@@ -321,10 +321,10 @@ FDP.q.plot <- ggplot(data = FDP.q.ggdata, aes(x = pi0, y = FDP)) +
   scale_fill_manual(values = alpha(method.col.FDR, 0.35)) +
   facet_wrap(~Noise, nrow = 1, ncol = 4) +
   geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
-  labs(x = expression(pi[0]), y = bquote(paste("FDP at Nominal FDR = ", .(q)))) +
+  labs(x = expression(pi[0]), y = "FDP") +
   theme(axis.title.x = element_text(size = 15),
         axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
-        axis.title.y = element_text(size = 15),
+        axis.title.y = element_text(size = 12),
         axis.text.y = element_text(size = 10),
         strip.text = element_text(size = 15),
         legend.position = "top",
@@ -351,20 +351,30 @@ TDP.q.plot <- ggplot(data = TDP.q.ggdata, aes(x = pi0, y = TDP)) +
   scale_color_manual(values = method.col.FDR) +
   scale_fill_manual(values = alpha(method.col.FDR, 0.35)) +
   facet_wrap(~Noise, nrow = 1, ncol = 4) +
-  geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
-  labs(x = expression(pi[0]), y = bquote(paste("TDP at Nominal FDR = ", .(q)))) +
+  labs(x = expression(pi[0]), y = "TDP") +
   theme(axis.title.x = element_text(size = 15),
         axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
-        axis.title.y = element_text(size = 15),
+        axis.title.y = element_text(size = 12),
         axis.text.y = element_text(size = 10),
         strip.text = element_text(size = 15),
         legend.position = "top",
         legend.background = element_rect(color = "grey"),
         legend.text = element_text(size = 12))
+```
 
-##================================================
+### Overall
 
-gridExtra::grid.arrange(pi0hat.plot, FDR.calib.plot, FSR.calib.plot, FDP.q.plot, TDP.q.plot, ncol = 1)
+```{r, fig.asp = 0.5, message = FALSE, warning = FALSE}
+pi0hat.plot
+FDR.calib.plot
+FSR.calib.plot
+```
+
+### At nominal FDR = $0.1$
+
+```{r, fig.asp = 0.5, message = FALSE, warning = FALSE}
+FDP.q.plot
+TDP.q.plot
 ```
 
 ## Big normal: $g_2 = N\left(0, 5^2\right)$
@@ -478,7 +488,7 @@ TDP.list <- lapply(q.vec, function(q) {
 names(TDP.list) <- q.vec
 ```
 
-```{r, message = FALSE, warning = FALSE}
+```{r, cache = TRUE, message = FALSE, warning = FALSE}
 sd.z <- sapply(z.list, sd)
 Noise <- cut(sd.z, breaks = c(0, quantile(sd.z, probs = 1 : 2 / 3), Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
 # Noise <- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
@@ -523,7 +533,7 @@ FDR.calib.plot <- ggplot(data = FDP.calib.ggdata, aes(x = L1, y = mean, group = 
   geom_abline(slope = 1, intercept = 0, linetype = "dashed", size = 1, col = "black") +
   labs(x = "Nominal FDR", y = "FDP") +
   theme(axis.title.x = element_text(size = 12),
-        axis.text.x = element_text(angle = 45, size = 10),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
         axis.title.y = element_text(size = 12),
         axis.text.y = element_text(size = 10),
         strip.text = element_text(size = 15),
@@ -544,7 +554,7 @@ FSR.calib.plot <- ggplot(data = FSP.calib.ggdata, aes(x = L1, y = mean, group = 
   geom_abline(slope = 1, intercept = 0, linetype = "dashed", size = 1, col = "black") +
   labs(x = "Nominal FSR", y = "FSP") +
   theme(axis.title.x = element_text(size = 12),
-        axis.text.x = element_text(angle = 45, size = 10),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
         axis.title.y = element_text(size = 12),
         axis.text.y = element_text(size = 10),
         strip.text = element_text(size = 15),
@@ -573,10 +583,10 @@ FDP.q.plot <- ggplot(data = FDP.q.ggdata, aes(x = pi0, y = FDP)) +
   scale_fill_manual(values = alpha(method.col.FDR, 0.35)) +
   facet_wrap(~Noise, nrow = 1, ncol = 4) +
   geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
-  labs(x = expression(pi[0]), y = bquote(paste("FDP at Nominal FDR = ", .(q)))) +
+  labs(x = expression(pi[0]), y = "FDP") +
   theme(axis.title.x = element_text(size = 15),
         axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
-        axis.title.y = element_text(size = 15),
+        axis.title.y = element_text(size = 12),
         axis.text.y = element_text(size = 10),
         strip.text = element_text(size = 15),
         legend.position = "top",
@@ -603,20 +613,30 @@ TDP.q.plot <- ggplot(data = TDP.q.ggdata, aes(x = pi0, y = TDP)) +
   scale_color_manual(values = method.col.FDR) +
   scale_fill_manual(values = alpha(method.col.FDR, 0.35)) +
   facet_wrap(~Noise, nrow = 1, ncol = 4) +
-  geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
-  labs(x = expression(pi[0]), y = bquote(paste("TDP at Nominal FDR = ", .(q)))) +
+  labs(x = expression(pi[0]), y = "TDP") +
   theme(axis.title.x = element_text(size = 15),
         axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
-        axis.title.y = element_text(size = 15),
+        axis.title.y = element_text(size = 12),
         axis.text.y = element_text(size = 10),
         strip.text = element_text(size = 15),
         legend.position = "top",
         legend.background = element_rect(color = "grey"),
         legend.text = element_text(size = 12))
+```
 
-##================================================
+### Overall
 
-gridExtra::grid.arrange(pi0hat.plot, FDR.calib.plot, FSR.calib.plot, FDP.q.plot, TDP.q.plot, ncol = 1)
+```{r, fig.asp = 0.5, message = FALSE, warning = FALSE}
+pi0hat.plot
+FDR.calib.plot
+FSR.calib.plot
+```
+
+### At nominal FDR = $0.1$
+
+```{r, fig.asp = 0.5, message = FALSE, warning = FALSE}
+FDP.q.plot
+TDP.q.plot
 ```
 
 ## Near normal: $g_3 = 0.6 N\left(0, 1^2\right) + 0.4 N\left(0, 3^2\right)$
@@ -731,7 +751,7 @@ TDP.list <- lapply(q.vec, function(q) {
 names(TDP.list) <- q.vec
 ```
 
-```{r, message = FALSE, warning = FALSE}
+```{r, cache = TRUE, message = FALSE, warning = FALSE}
 sd.z <- sapply(z.list, sd)
 Noise <- cut(sd.z, breaks = c(0, quantile(sd.z, probs = 1 : 2 / 3), Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
 # Noise <- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
@@ -776,7 +796,7 @@ FDR.calib.plot <- ggplot(data = FDP.calib.ggdata, aes(x = L1, y = mean, group = 
   geom_abline(slope = 1, intercept = 0, linetype = "dashed", size = 1, col = "black") +
   labs(x = "Nominal FDR", y = "FDP") +
   theme(axis.title.x = element_text(size = 12),
-        axis.text.x = element_text(angle = 45, size = 10),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
         axis.title.y = element_text(size = 12),
         axis.text.y = element_text(size = 10),
         strip.text = element_text(size = 15),
@@ -797,7 +817,7 @@ FSR.calib.plot <- ggplot(data = FSP.calib.ggdata, aes(x = L1, y = mean, group = 
   geom_abline(slope = 1, intercept = 0, linetype = "dashed", size = 1, col = "black") +
   labs(x = "Nominal FSR", y = "FSP") +
   theme(axis.title.x = element_text(size = 12),
-        axis.text.x = element_text(angle = 45, size = 10),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
         axis.title.y = element_text(size = 12),
         axis.text.y = element_text(size = 10),
         strip.text = element_text(size = 15),
@@ -826,10 +846,10 @@ FDP.q.plot <- ggplot(data = FDP.q.ggdata, aes(x = pi0, y = FDP)) +
   scale_fill_manual(values = alpha(method.col.FDR, 0.35)) +
   facet_wrap(~Noise, nrow = 1, ncol = 4) +
   geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
-  labs(x = expression(pi[0]), y = bquote(paste("FDP at Nominal FDR = ", .(q)))) +
+  labs(x = expression(pi[0]), y = "FDP") +
   theme(axis.title.x = element_text(size = 15),
         axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
-        axis.title.y = element_text(size = 15),
+        axis.title.y = element_text(size = 12),
         axis.text.y = element_text(size = 10),
         strip.text = element_text(size = 15),
         legend.position = "top",
@@ -856,20 +876,30 @@ TDP.q.plot <- ggplot(data = TDP.q.ggdata, aes(x = pi0, y = TDP)) +
   scale_color_manual(values = method.col.FDR) +
   scale_fill_manual(values = alpha(method.col.FDR, 0.35)) +
   facet_wrap(~Noise, nrow = 1, ncol = 4) +
-  geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
-  labs(x = expression(pi[0]), y = bquote(paste("TDP at Nominal FDR = ", .(q)))) +
+  labs(x = expression(pi[0]), y = "TDP") +
   theme(axis.title.x = element_text(size = 15),
         axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
-        axis.title.y = element_text(size = 15),
+        axis.title.y = element_text(size = 12),
         axis.text.y = element_text(size = 10),
         strip.text = element_text(size = 15),
         legend.position = "top",
         legend.background = element_rect(color = "grey"),
         legend.text = element_text(size = 12))
+```
 
-##================================================
+### Overall
 
-gridExtra::grid.arrange(pi0hat.plot, FDR.calib.plot, FSR.calib.plot, FDP.q.plot, TDP.q.plot, ncol = 1)
+```{r, fig.asp = 0.5, message = FALSE, warning = FALSE}
+pi0hat.plot
+FDR.calib.plot
+FSR.calib.plot
+```
+
+### At nominal FDR = $0.1$
+
+```{r, fig.asp = 0.5, message = FALSE, warning = FALSE}
+FDP.q.plot
+TDP.q.plot
 ```
 
 ## Spikey: $g_4 = 0.4 N\left(0, 0.5^2\right) + 0.2 N\left(0, 1^2\right) + 0.2 N\left(0, 2^2\right) + 0.2 N\left(0, 3^2\right)$
@@ -993,7 +1023,7 @@ TDP.list <- lapply(q.vec, function(q) {
 names(TDP.list) <- q.vec
 ```
 
-```{r, message = FALSE, warning = FALSE}
+```{r, cache = TRUE, message = FALSE, warning = FALSE}
 sd.z <- sapply(z.list, sd)
 Noise <- cut(sd.z, breaks = c(0, quantile(sd.z, probs = 1 : 2 / 3), Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
 # Noise <- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
@@ -1038,7 +1068,7 @@ FDR.calib.plot <- ggplot(data = FDP.calib.ggdata, aes(x = L1, y = mean, group = 
   geom_abline(slope = 1, intercept = 0, linetype = "dashed", size = 1, col = "black") +
   labs(x = "Nominal FDR", y = "FDP") +
   theme(axis.title.x = element_text(size = 12),
-        axis.text.x = element_text(angle = 45, size = 10),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
         axis.title.y = element_text(size = 12),
         axis.text.y = element_text(size = 10),
         strip.text = element_text(size = 15),
@@ -1059,7 +1089,7 @@ FSR.calib.plot <- ggplot(data = FSP.calib.ggdata, aes(x = L1, y = mean, group = 
   geom_abline(slope = 1, intercept = 0, linetype = "dashed", size = 1, col = "black") +
   labs(x = "Nominal FSR", y = "FSP") +
   theme(axis.title.x = element_text(size = 12),
-        axis.text.x = element_text(angle = 45, size = 10),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
         axis.title.y = element_text(size = 12),
         axis.text.y = element_text(size = 10),
         strip.text = element_text(size = 15),
@@ -1088,10 +1118,10 @@ FDP.q.plot <- ggplot(data = FDP.q.ggdata, aes(x = pi0, y = FDP)) +
   scale_fill_manual(values = alpha(method.col.FDR, 0.35)) +
   facet_wrap(~Noise, nrow = 1, ncol = 4) +
   geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
-  labs(x = expression(pi[0]), y = bquote(paste("FDP at Nominal FDR = ", .(q)))) +
+  labs(x = expression(pi[0]), y = "FDP") +
   theme(axis.title.x = element_text(size = 15),
         axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
-        axis.title.y = element_text(size = 15),
+        axis.title.y = element_text(size = 12),
         axis.text.y = element_text(size = 10),
         strip.text = element_text(size = 15),
         legend.position = "top",
@@ -1118,20 +1148,30 @@ TDP.q.plot <- ggplot(data = TDP.q.ggdata, aes(x = pi0, y = TDP)) +
   scale_color_manual(values = method.col.FDR) +
   scale_fill_manual(values = alpha(method.col.FDR, 0.35)) +
   facet_wrap(~Noise, nrow = 1, ncol = 4) +
-  geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
-  labs(x = expression(pi[0]), y = bquote(paste("TDP at Nominal FDR = ", .(q)))) +
+  labs(x = expression(pi[0]), y = "TDP") +
   theme(axis.title.x = element_text(size = 15),
         axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
-        axis.title.y = element_text(size = 15),
+        axis.title.y = element_text(size = 12),
         axis.text.y = element_text(size = 10),
         strip.text = element_text(size = 15),
         legend.position = "top",
         legend.background = element_rect(color = "grey"),
         legend.text = element_text(size = 12))
+```
 
-##================================================
+### Overall
 
-gridExtra::grid.arrange(pi0hat.plot, FDR.calib.plot, FSR.calib.plot, FDP.q.plot, TDP.q.plot, ncol = 1)
+```{r, fig.asp = 0.5, message = FALSE, warning = FALSE}
+pi0hat.plot
+FDR.calib.plot
+FSR.calib.plot
+```
+
+### At nominal FDR = $0.1$
+
+```{r, fig.asp = 0.5, message = FALSE, warning = FALSE}
+FDP.q.plot
+TDP.q.plot
 ```
 
 ## Skew: $g_5 = 1/4 N\left(-2, 2^2\right) + 1/4 N\left(-1, 2^2\right) + 1/4 N\left(0, 1^2\right) + 1 / 4 N\left(1, 1^2\right)$
@@ -1251,7 +1291,7 @@ TDP.list <- lapply(q.vec, function(q) {
 names(TDP.list) <- q.vec
 ```
 
-```{r, message = FALSE, warning = FALSE}
+```{r, cache = TRUE, message = FALSE, warning = FALSE}
 sd.z <- sapply(z.list, sd)
 Noise <- cut(sd.z, breaks = c(0, quantile(sd.z, probs = 1 : 2 / 3), Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
 # Noise <- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
@@ -1296,7 +1336,7 @@ FDR.calib.plot <- ggplot(data = FDP.calib.ggdata, aes(x = L1, y = mean, group = 
   geom_abline(slope = 1, intercept = 0, linetype = "dashed", size = 1, col = "black") +
   labs(x = "Nominal FDR", y = "FDP") +
   theme(axis.title.x = element_text(size = 12),
-        axis.text.x = element_text(angle = 45, size = 10),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
         axis.title.y = element_text(size = 12),
         axis.text.y = element_text(size = 10),
         strip.text = element_text(size = 15),
@@ -1317,7 +1357,7 @@ FSR.calib.plot <- ggplot(data = FSP.calib.ggdata, aes(x = L1, y = mean, group = 
   geom_abline(slope = 1, intercept = 0, linetype = "dashed", size = 1, col = "black") +
   labs(x = "Nominal FSR", y = "FSP") +
   theme(axis.title.x = element_text(size = 12),
-        axis.text.x = element_text(angle = 45, size = 10),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
         axis.title.y = element_text(size = 12),
         axis.text.y = element_text(size = 10),
         strip.text = element_text(size = 15),
@@ -1346,10 +1386,10 @@ FDP.q.plot <- ggplot(data = FDP.q.ggdata, aes(x = pi0, y = FDP)) +
   scale_fill_manual(values = alpha(method.col.FDR, 0.35)) +
   facet_wrap(~Noise, nrow = 1, ncol = 4) +
   geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
-  labs(x = expression(pi[0]), y = bquote(paste("FDP at Nominal FDR = ", .(q)))) +
+  labs(x = expression(pi[0]), y = "FDP") +
   theme(axis.title.x = element_text(size = 15),
         axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
-        axis.title.y = element_text(size = 15),
+        axis.title.y = element_text(size = 12),
         axis.text.y = element_text(size = 10),
         strip.text = element_text(size = 15),
         legend.position = "top",
@@ -1376,20 +1416,30 @@ TDP.q.plot <- ggplot(data = TDP.q.ggdata, aes(x = pi0, y = TDP)) +
   scale_color_manual(values = method.col.FDR) +
   scale_fill_manual(values = alpha(method.col.FDR, 0.35)) +
   facet_wrap(~Noise, nrow = 1, ncol = 4) +
-  geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
-  labs(x = expression(pi[0]), y = bquote(paste("TDP at Nominal FDR = ", .(q)))) +
+  labs(x = expression(pi[0]), y = "TDP") +
   theme(axis.title.x = element_text(size = 15),
         axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
-        axis.title.y = element_text(size = 15),
+        axis.title.y = element_text(size = 12),
         axis.text.y = element_text(size = 10),
         strip.text = element_text(size = 15),
         legend.position = "top",
         legend.background = element_rect(color = "grey"),
         legend.text = element_text(size = 12))
+```
 
-##================================================
+### Overall
 
-gridExtra::grid.arrange(pi0hat.plot, FDR.calib.plot, FSR.calib.plot, FDP.q.plot, TDP.q.plot, ncol = 1)
+```{r, fig.asp = 0.5, message = FALSE, warning = FALSE}
+pi0hat.plot
+FDR.calib.plot
+FSR.calib.plot
+```
+
+### At nominal FDR = $0.1$
+
+```{r, fig.asp = 0.5, message = FALSE, warning = FALSE}
+FDP.q.plot
+TDP.q.plot
 ```
 
 ## Flattop: $g_6$
@@ -1501,7 +1551,7 @@ TDP.list <- lapply(q.vec, function(q) {
 names(TDP.list) <- q.vec
 ```
 
-```{r, message = FALSE, warning = FALSE}
+```{r, cache = TRUE, message = FALSE, warning = FALSE}
 sd.z <- sapply(z.list, sd)
 Noise <- cut(sd.z, breaks = c(0, quantile(sd.z, probs = 1 : 2 / 3), Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
 # Noise <- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
@@ -1546,7 +1596,7 @@ FDR.calib.plot <- ggplot(data = FDP.calib.ggdata, aes(x = L1, y = mean, group = 
   geom_abline(slope = 1, intercept = 0, linetype = "dashed", size = 1, col = "black") +
   labs(x = "Nominal FDR", y = "FDP") +
   theme(axis.title.x = element_text(size = 12),
-        axis.text.x = element_text(angle = 45, size = 10),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
         axis.title.y = element_text(size = 12),
         axis.text.y = element_text(size = 10),
         strip.text = element_text(size = 15),
@@ -1567,7 +1617,7 @@ FSR.calib.plot <- ggplot(data = FSP.calib.ggdata, aes(x = L1, y = mean, group = 
   geom_abline(slope = 1, intercept = 0, linetype = "dashed", size = 1, col = "black") +
   labs(x = "Nominal FSR", y = "FSP") +
   theme(axis.title.x = element_text(size = 12),
-        axis.text.x = element_text(angle = 45, size = 10),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
         axis.title.y = element_text(size = 12),
         axis.text.y = element_text(size = 10),
         strip.text = element_text(size = 15),
@@ -1596,10 +1646,10 @@ FDP.q.plot <- ggplot(data = FDP.q.ggdata, aes(x = pi0, y = FDP)) +
   scale_fill_manual(values = alpha(method.col.FDR, 0.35)) +
   facet_wrap(~Noise, nrow = 1, ncol = 4) +
   geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
-  labs(x = expression(pi[0]), y = bquote(paste("FDP at Nominal FDR = ", .(q)))) +
+  labs(x = expression(pi[0]), y = "FDP") +
   theme(axis.title.x = element_text(size = 15),
         axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
-        axis.title.y = element_text(size = 15),
+        axis.title.y = element_text(size = 12),
         axis.text.y = element_text(size = 10),
         strip.text = element_text(size = 15),
         legend.position = "top",
@@ -1626,20 +1676,30 @@ TDP.q.plot <- ggplot(data = TDP.q.ggdata, aes(x = pi0, y = TDP)) +
   scale_color_manual(values = method.col.FDR) +
   scale_fill_manual(values = alpha(method.col.FDR, 0.35)) +
   facet_wrap(~Noise, nrow = 1, ncol = 4) +
-  geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
-  labs(x = expression(pi[0]), y = bquote(paste("TDP at Nominal FDR = ", .(q)))) +
+  labs(x = expression(pi[0]), y = "TDP") +
   theme(axis.title.x = element_text(size = 15),
         axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
-        axis.title.y = element_text(size = 15),
+        axis.title.y = element_text(size = 12),
         axis.text.y = element_text(size = 10),
         strip.text = element_text(size = 15),
         legend.position = "top",
         legend.background = element_rect(color = "grey"),
         legend.text = element_text(size = 12))
+```
 
-##================================================
+### Overall
 
-gridExtra::grid.arrange(pi0hat.plot, FDR.calib.plot, FSR.calib.plot, FDP.q.plot, TDP.q.plot, ncol = 1)
+```{r, fig.asp = 0.5, message = FALSE, warning = FALSE}
+pi0hat.plot
+FDR.calib.plot
+FSR.calib.plot
+```
+
+### At nominal FDR = $0.1$
+
+```{r, fig.asp = 0.5, message = FALSE, warning = FALSE}
+FDP.q.plot
+TDP.q.plot
 ```
 
 ## Bimodal: $g_7 = 0.5 N\left(-1.5, 1\right) + 0.5 N\left(1.5, 1\right)$
@@ -1755,7 +1815,7 @@ TDP.list <- lapply(q.vec, function(q) {
 names(TDP.list) <- q.vec
 ```
 
-```{r, message = FALSE, warning = FALSE}
+```{r, cache = TRUE, message = FALSE, warning = FALSE}
 sd.z <- sapply(z.list, sd)
 Noise <- cut(sd.z, breaks = c(0, quantile(sd.z, probs = 1 : 2 / 3), Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
 # Noise <- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
@@ -1800,7 +1860,7 @@ FDR.calib.plot <- ggplot(data = FDP.calib.ggdata, aes(x = L1, y = mean, group = 
   geom_abline(slope = 1, intercept = 0, linetype = "dashed", size = 1, col = "black") +
   labs(x = "Nominal FDR", y = "FDP") +
   theme(axis.title.x = element_text(size = 12),
-        axis.text.x = element_text(angle = 45, size = 10),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
         axis.title.y = element_text(size = 12),
         axis.text.y = element_text(size = 10),
         strip.text = element_text(size = 15),
@@ -1821,7 +1881,7 @@ FSR.calib.plot <- ggplot(data = FSP.calib.ggdata, aes(x = L1, y = mean, group = 
   geom_abline(slope = 1, intercept = 0, linetype = "dashed", size = 1, col = "black") +
   labs(x = "Nominal FSR", y = "FSP") +
   theme(axis.title.x = element_text(size = 12),
-        axis.text.x = element_text(angle = 45, size = 10),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
         axis.title.y = element_text(size = 12),
         axis.text.y = element_text(size = 10),
         strip.text = element_text(size = 15),
@@ -1850,10 +1910,10 @@ FDP.q.plot <- ggplot(data = FDP.q.ggdata, aes(x = pi0, y = FDP)) +
   scale_fill_manual(values = alpha(method.col.FDR, 0.35)) +
   facet_wrap(~Noise, nrow = 1, ncol = 4) +
   geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
-  labs(x = expression(pi[0]), y = bquote(paste("FDP at Nominal FDR = ", .(q)))) +
+  labs(x = expression(pi[0]), y = "FDP") +
   theme(axis.title.x = element_text(size = 15),
         axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
-        axis.title.y = element_text(size = 15),
+        axis.title.y = element_text(size = 12),
         axis.text.y = element_text(size = 10),
         strip.text = element_text(size = 15),
         legend.position = "top",
@@ -1880,18 +1940,28 @@ TDP.q.plot <- ggplot(data = TDP.q.ggdata, aes(x = pi0, y = TDP)) +
   scale_color_manual(values = method.col.FDR) +
   scale_fill_manual(values = alpha(method.col.FDR, 0.35)) +
   facet_wrap(~Noise, nrow = 1, ncol = 4) +
-  geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
-  labs(x = expression(pi[0]), y = bquote(paste("TDP at Nominal FDR = ", .(q)))) +
+  labs(x = expression(pi[0]), y = "TDP") +
   theme(axis.title.x = element_text(size = 15),
         axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
-        axis.title.y = element_text(size = 15),
+        axis.title.y = element_text(size = 12),
         axis.text.y = element_text(size = 10),
         strip.text = element_text(size = 15),
         legend.position = "top",
         legend.background = element_rect(color = "grey"),
         legend.text = element_text(size = 12))
+```
 
-##================================================
+### Overall
 
-gridExtra::grid.arrange(pi0hat.plot, FDR.calib.plot, FSR.calib.plot, FDP.q.plot, TDP.q.plot, ncol = 1)
+```{r, fig.asp = 0.5, message = FALSE, warning = FALSE}
+pi0hat.plot
+FDR.calib.plot
+FSR.calib.plot
+```
+
+### At nominal FDR = $0.1$
+
+```{r, fig.asp = 0.5, message = FALSE, warning = FALSE}
+FDP.q.plot
+TDP.q.plot
 ```
