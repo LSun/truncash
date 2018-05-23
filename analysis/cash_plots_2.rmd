@@ -115,7 +115,11 @@ FXP.ggdata <- function (FXP.list, Noise) {
 }
 ```
 
-## Normal: $g_1 = N\left(0, 2^2\right)$
+## Normal
+
+$$
+g_1 = N\left(0, 2^2\right)
+$$
 
 ```{r g1}
 plotx <- seq(-6, 6, by = 0.01)
@@ -125,6 +129,27 @@ plot(plotx, plotx, ylim = c(0, dnorm(0)),
 lines(plotx, dnorm(plotx), lty = 2)
 lines(plotx, dnorm(plotx, 0, 2), col = "blue")
 legend("topright", lty = c(1, 2), col = c(4, 1), c("g", "N(0, 1)"))
+
+# n01 <- cbind.data.frame(x = plotx, n01 = dnorm(plotx))
+# g1 <- cbind.data.frame(n01, g1 = dnorm(plotx, 0, 2))
+# g1.ggdata <- melt(g1, id.vars = "x", variable.name = "g", value.name = "pdf")
+
+# g.plot <- ggplot(data = g1.ggdata, aes(x = x, y = pdf, col = g, linetype = g)) +
+#   geom_line() +
+#   scale_color_manual(values = c("black", "blue")) +
+#   scale_linetype_manual(values = c("dashed", "solid")) +
+#   labs(x = expression(theta), y = expression(g(theta))) +
+#   annotate("text", x = -Inf, y = Inf, label = "Normal", vjust = 1, hjust = 0, color = "blue", size = 15) +
+#   theme(axis.title.x = element_text(size = 15),
+#         axis.text.x = element_text(size = 10, hjust = 1),
+#         axis.title.y = element_text(size = 15),
+#         axis.text.y = element_text(size = 10),
+#         strip.text = element_text(size = 15),
+#         legend.position = "none",
+#         legend.background = element_rect(color = "grey"),
+#         legend.text = element_text(size = 12))
+# 
+# g.plot
 ```
 
 ```{r gtex_z_1, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
@@ -375,9 +400,16 @@ FSR.calib.plot
 ```{r, fig.asp = 0.5, message = FALSE, warning = FALSE}
 FDP.q.plot
 TDP.q.plot
+
+# g.plot.all <- gridExtra::arrangeGrob(g.plot, pi0hat.plot, FDR.calib.plot, FSR.calib.plot, FDP.q.plot, TDP.q.plot, ncol = 1, heights = c(0.8, rep(1, 5)))
+# ggsave("../output/fig/g1.pdf", g.plot.all, width = 10, height = 29)
 ```
 
-## Big normal: $g_2 = N\left(0, 5^2\right)$
+## Big normal
+
+$$
+g_2 = N\left(0, 5^2\right)
+$$
 
 ```{r g2}
 plotx <- seq(-6, 6, by = 0.01)
@@ -639,7 +671,11 @@ FDP.q.plot
 TDP.q.plot
 ```
 
-## Near normal: $g_3 = 0.6 N\left(0, 1^2\right) + 0.4 N\left(0, 3^2\right)$
+## Near normal
+
+$$
+g_3 = 0.6 N\left(0, 1^2\right) + 0.4 N\left(0, 3^2\right)
+$$
 
 ```{r g3}
 plotx <- seq(-6, 6, by = 0.01)
@@ -902,7 +938,11 @@ FDP.q.plot
 TDP.q.plot
 ```
 
-## Spikey: $g_4 = 0.4 N\left(0, 0.5^2\right) + 0.2 N\left(0, 1^2\right) + 0.2 N\left(0, 2^2\right) + 0.2 N\left(0, 3^2\right)$
+## Spikey
+
+$$
+g_4 = 0.4 N\left(0, 0.5^2\right) + 0.2 N\left(0, 1^2\right) + 0.2 N\left(0, 2^2\right) + 0.2 N\left(0, 3^2\right)
+$$
 
 ```{r g4}
 plotx <- seq(-6, 6, by = 0.01)
@@ -1174,7 +1214,11 @@ FDP.q.plot
 TDP.q.plot
 ```
 
-## Skew: $g_5 = 1/4 N\left(-2, 2^2\right) + 1/4 N\left(-1, 2^2\right) + 1/4 N\left(0, 1^2\right) + 1 / 4 N\left(1, 1^2\right)$
+## Skew
+
+$$
+g_5 = 1/4 N\left(-2, 2^2\right) + 1/4 N\left(-1, 2^2\right) + 1/4 N\left(0, 1^2\right) + 1 / 4 N\left(1, 1^2\right)
+$$
 
 ```{r g5}
 plotx <- seq(-6, 6, by = 0.01)
@@ -1442,7 +1486,11 @@ FDP.q.plot
 TDP.q.plot
 ```
 
-## Flattop: $g_6$
+## Flattop
+
+$$
+g_6 = \frac17\left[N\left(-1.5, 0.5^2\right) + N\left(-1, 0.5^2\right) + N\left(-0.5, 0.5^2\right) + N\left(0, 0.5^2\right) + N\left(0.5, 0.5^2\right) + N\left(1, 0.5^2\right) + N\left(1.5, 0.5^2\right)\right]
+$$
 
 ```{r g6}
 plotx <- seq(-6, 6, by = 0.01)
@@ -1702,7 +1750,11 @@ FDP.q.plot
 TDP.q.plot
 ```
 
-## Bimodal: $g_7 = 0.5 N\left(-1.5, 1\right) + 0.5 N\left(1.5, 1\right)$
+## Bimodal
+
+$$
+g_7 = 0.5 N\left(-1.5, 1\right) + 0.5 N\left(1.5, 1\right)
+$$
 
 ```{r g7}
 plotx <- seq(-6, 6, by = 0.01)
