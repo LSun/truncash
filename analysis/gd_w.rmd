@@ -202,7 +202,7 @@ legend("bottomleft", lty = c(1, 2, 2, 2), col = c(1, 2, 4, 3), legend = c(
 ))
 ```
 
-```{r}
+```{r, cache = TRUE}
 set.seed(777)
 nsamp <- 50
 nsim <- 1e3
