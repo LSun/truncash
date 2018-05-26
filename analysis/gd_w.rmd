@@ -300,7 +300,7 @@ gd.ord <- 10
 
 ## the image is 7.5 * 6.1
 setEPS()
-postscript("cor_z_hist.eps", width = 7.5, height = 6)
+postscript("../output/fig/cor_z_hist.eps", width = 7.5, height = 6)
 
 par(mfrow = c(2, 2)) # 2-by-2 grid of plots
 par(oma = c(0.5, 2.5, 0, 0)) # make room (i.e. the 4's) for the overall x and y axis titles
