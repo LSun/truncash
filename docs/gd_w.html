@@ -332,7 +332,7 @@ div.section {
 </div>
 
 
-<p><strong>Last updated:</strong> 2018-05-15</p>
+<p><strong>Last updated:</strong> 2018-05-25</p>
 <strong>workflowr checks:</strong> <small>(Click a bullet for more information)</small>
 <ul>
 <li>
@@ -361,7 +361,7 @@ div.section {
 </li>
 <li>
 <details>
-<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/388e65e06000e313c170a82f3ed57346f6024897" target="_blank">388e65e</a> </summary></p>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/535ecdd8026b74f26e81083b2ed3aabe238cba32" target="_blank">535ecdd</a> </summary></p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 <pre><code>
 Ignored files:
@@ -387,6 +387,7 @@ Ignored files:
     Ignored:    analysis/cash_fdr_4_cache/
     Ignored:    analysis/cash_fdr_5_cache/
     Ignored:    analysis/cash_fdr_6_cache/
+    Ignored:    analysis/cash_plots_2_cache/
     Ignored:    analysis/cash_plots_cache/
     Ignored:    analysis/cash_sim_1_cache/
     Ignored:    analysis/cash_sim_2_cache/
@@ -489,6 +490,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/535ecdd8026b74f26e81083b2ed3aabe238cba32/analysis/gd_w.rmd" target="_blank">535ecdd</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-25
+</td>
+<td style="text-align:left;">
+wflow_publish(“analysis/gd_w.rmd”)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/4d653b1ae6bf3ff8cebb37187f586c52433d74ed/docs/gd_w.html" target="_blank">4d653b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-15
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 html
@@ -783,8 +818,9 @@ add lfsr
 </ul>
 </details>
 <hr />
-<pre class="r"><code>source(&quot;../code/gdash_lik.R&quot;)
-source(&quot;../code/gdfit.R&quot;)
+<pre class="r"><code>source(&quot;../code/gdash_lik.R&quot;)</code></pre>
+<pre><code>Warning: package &#39;Matrix&#39; was built under R version 3.4.4</code></pre>
+<pre class="r"><code>source(&quot;../code/gdfit.R&quot;)
 source(&quot;../code/count_to_summary.R&quot;)
 library(limma)
 library(edgeR)
@@ -1316,28 +1352,28 @@ attached base packages:
 
 other attached packages:
  [1] reshape2_1.4.3    ggplot2_2.2.1     plyr_1.8.4       
- [4] edgeR_3.20.2      limma_3.34.4      ashr_2.2-2       
- [7] Rmosek_8.0.69     PolynomF_1.0-1    CVXR_0.95        
-[10] REBayes_1.2       Matrix_1.2-12     SQUAREM_2017.10-1
+ [4] edgeR_3.20.9      limma_3.34.9      ashr_2.2-7       
+ [7] Rmosek_8.0.69     PolynomF_1.0-2    CVXR_0.95        
+[10] REBayes_1.3       Matrix_1.2-14     SQUAREM_2017.10-1
 [13] EQL_1.0-0         ttutils_1.0-1    
 
 loaded via a namespace (and not attached):
- [1] gmp_0.5-13.1      Rcpp_0.12.16      pillar_1.0.1     
+ [1] gmp_0.5-13.1      Rcpp_0.12.16      pillar_1.2.2     
  [4] compiler_3.4.3    git2r_0.21.0      workflowr_1.0.1  
  [7] R.methodsS3_1.7.1 R.utils_2.6.0     iterators_1.0.9  
-[10] tools_3.4.3       digest_0.6.15     bit_1.1-12       
-[13] tibble_1.4.1      gtable_0.2.0      evaluate_0.10.1  
-[16] lattice_0.20-35   rlang_0.1.6       foreach_1.4.4    
-[19] yaml_2.1.18       parallel_3.4.3    Rmpfr_0.6-1      
-[22] ECOSolveR_0.4     stringr_1.3.0     knitr_1.20       
+[10] tools_3.4.3       digest_0.6.15     bit_1.1-13       
+[13] tibble_1.4.2      gtable_0.2.0      evaluate_0.10.1  
+[16] lattice_0.20-35   rlang_0.2.0       foreach_1.4.4    
+[19] yaml_2.1.19       parallel_3.4.3    Rmpfr_0.7-0      
+[22] ECOSolveR_0.4     stringr_1.3.1     knitr_1.20       
 [25] locfit_1.5-9.1    rprojroot_1.3-2   bit64_0.9-7      
 [28] grid_3.4.3        R6_2.2.2          rmarkdown_1.9    
 [31] magrittr_1.5      whisker_0.3-2     scales_0.5.0     
-[34] MASS_7.3-47       backports_1.1.2   codetools_0.2-15 
+[34] MASS_7.3-50       backports_1.1.2   codetools_0.2-15 
 [37] htmltools_0.3.6   scs_1.1-1         colorspace_1.3-2 
-[40] stringi_1.1.6     lazyeval_0.2.1    munsell_0.4.3    
-[43] pscl_1.5.2        doParallel_1.0.11 truncnorm_1.0-7  
-[46] R.oo_1.21.0      </code></pre>
+[40] stringi_1.2.2     lazyeval_0.2.1    munsell_0.4.3    
+[43] pscl_1.5.2        doParallel_1.0.11 truncnorm_1.0-8  
+[46] R.oo_1.22.0      </code></pre>
 </div>
 
 <!-- Adjust MathJax settings so that all math formulae are shown using
