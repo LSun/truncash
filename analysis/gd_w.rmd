@@ -289,4 +289,64 @@ W.gtex.gd <- sapply(Z.gtex, function (z) {fit.z <- gdfit(z, L = 10); return(
   list(w = fit.z$w, status = fit.z$status))})
 ```
 
+## Correlated null
 
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+source("../code/gdash_lik.R")
+source("../code/gdfit.R")
+z.mat <- readRDS("../output/z_null_liver_777.rds")
+sel = c(32, 327, 355, 459)
+gd.ord <- 10
+
+## the image is 7.5 * 6.1
+setEPS()
+postscript("cor_z_hist.eps", width = 7.5, height = 6)
+
+par(mfrow = c(2, 2)) # 2-by-2 grid of plots
+par(oma = c(0.5, 2.5, 0, 0)) # make room (i.e. the 4's) for the overall x and y axis titles
+par(mar = c(2, 2, 3.5, 1)) # make the plots be closer together
+
+z = z.mat[sel[4], ]
+w <- gdfit(z, gd.ord)$w
+x.plot = seq(- max(abs(z)) - 2, max(abs(z)) + 2, length = 1000)
+hermite = Hermite(gd.ord)
+gd0.std = dnorm(x.plot)
+matrix_lik_plot = cbind(gd0.std)
+for (j in 1 : gd.ord) {
+  gd.std = (-1)^j * hermite[[j]](x.plot) * gd0.std / sqrt(factorial(j))
+  matrix_lik_plot = cbind(matrix_lik_plot, gd.std)
+}
+y.plot = matrix_lik_plot %*% w
+z.hist = hist(z, breaks = seq(-ceiling(max(abs(z.mat[sel, ]))), ceiling(max(abs(z.mat[sel, ]))), by = 0.1), plot = FALSE)
+y.max = max(z.hist$density, y.plot, dnorm(0))
+
+# now plot the graphs with the appropriate axes removed (via xaxt and yaxt),
+# remove axis labels (so that they are not redundant with overall labels,
+# and set some other nice choices for graphics parameters
+x.plot = seq(-ceiling(max(abs(z.mat[sel, ]))), ceiling(max(abs(z.mat[sel, ]))), by = 0.001)
+hist.label <- c("(a)", "(b)", "(c)", "(d)")
+for (i in seq(sel)) {
+  z = z.mat[sel[i], ]
+  w <- gdfit(z, gd.ord)$w
+  hermite = Hermite(gd.ord)
+  gd0.std = dnorm(x.plot)
+  matrix_lik_plot = cbind(gd0.std)
+  for (j in 1 : gd.ord) {
+    gd.std = (-1)^j * hermite[[j]](x.plot) * gd0.std / sqrt(factorial(j))
+    matrix_lik_plot = cbind(matrix_lik_plot, gd.std)
+  }
+  y.plot = matrix_lik_plot %*% w
+  hist(z, breaks = seq(-ceiling(max(abs(z.mat[sel, ]))), ceiling(max(abs(z.mat[sel, ]))), by = 0.1), prob = TRUE, ylim = c(0, y.max), main = NULL, xlab = "", xlim = c(-ceiling(max(abs(z.mat[sel, ]))), ceiling(max(abs(z.mat[sel, ])))))
+  lines(x.plot, y.plot, col = "red", lwd = 2)
+  lines(x.plot, dnorm(x.plot), col = "blue", lwd = 2)
+  legend("topleft", bty = "n", hist.label[i], cex = 1.25)
+}
+
+# print the overall labels
+mtext('Density', side = 2, outer = TRUE, line = 1)
+mtext("Histograms of correlated N(0,1) z-scores", line = -2, outer = TRUE)
+
+legend("topleft", inset = c(-0.85, -0.225), legend = c("N(0, 1)", "Gaussian Derivatives"), lty = 1, lwd = 2, xpd = NA, col = c("blue", "red"), ncol = 2, cex = 1.25)
+
+dev.off()
+```
