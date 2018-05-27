@@ -296,6 +296,8 @@ source("../code/gdash_lik.R")
 source("../code/gdfit.R")
 z.mat <- readRDS("../output/z_null_liver_777.rds")
 sel = c(32, 327, 23, 459)
+z.mat.sel <- z.mat[sel, ]
+z.mat.sel[3, ] <- Z.gtex[[4503]]
 gd.ord <- 10
 
 ## the image is 7.5 * 6
@@ -306,7 +308,7 @@ par(mfrow = c(2, 2)) # 2-by-2 grid of plots
 par(oma = c(0.5, 2.5, 0, 0)) # make room (i.e. the 4's) for the overall x and y axis titles
 par(mar = c(2, 2, 3.5, 1)) # make the plots be closer together
 
-z = z.mat[sel[4], ]
+z = z.mat.sel[4, ]
 w <- gdfit(z, gd.ord)$w
 x.plot = seq(- max(abs(z)) - 2, max(abs(z)) + 2, length = 1000)
 hermite = Hermite(gd.ord)
@@ -323,10 +325,10 @@ y.max = max(z.hist$density, y.plot, dnorm(0))
 # now plot the graphs with the appropriate axes removed (via xaxt and yaxt),
 # remove axis labels (so that they are not redundant with overall labels,
 # and set some other nice choices for graphics parameters
-x.plot = seq(-ceiling(max(abs(z.mat[sel, ]))), ceiling(max(abs(z.mat[sel, ]))), by = 0.001)
+x.plot = seq(-ceiling(max(abs(z.mat.sel))), ceiling(max(abs(z.mat.sel))), by = 0.001)
 hist.label <- c("(a)", "(b)", "(c)", "(d)")
 for (i in seq(sel)) {
-  z = z.mat[sel[i], ]
+  z = z.mat.sel[i, ]
   w <- gdfit(z, gd.ord)$w
   hermite = Hermite(gd.ord)
   gd0.std = dnorm(x.plot)
@@ -336,7 +338,7 @@ for (i in seq(sel)) {
     matrix_lik_plot = cbind(matrix_lik_plot, gd.std)
   }
   y.plot = matrix_lik_plot %*% w
-  hist(z, breaks = seq(-ceiling(max(abs(z.mat[sel, ]))), ceiling(max(abs(z.mat[sel, ]))), by = 0.1), prob = TRUE, ylim = c(0, y.max), main = NULL, xlab = "", xlim = c(-ceiling(max(abs(z.mat[sel, ]))), ceiling(max(abs(z.mat[sel, ])))))
+  hist(z, breaks = seq(-ceiling(max(abs(z.mat.sel))), ceiling(max(abs(z.mat.sel))), by = 0.1), prob = TRUE, ylim = c(0, y.max), main = NULL, xlab = "", xlim = c(-ceiling(max(abs(z.mat.sel))), ceiling(max(abs(z.mat.sel)))))
   lines(x.plot, y.plot, col = "red", lwd = 2)
   lines(x.plot, dnorm(x.plot), col = "blue", lwd = 2)
   legend("topleft", bty = "n", hist.label[i], cex = 1.25)
@@ -354,7 +356,7 @@ dev.off()
 ## Shoulder inflation
 
 ```{r}
-z <- z.mat[23, ]
+z <- z.mat.sel[3, ]
 p <- pnorm(-abs(z)) * 2
 
 ## the image is 7.5 * 3
@@ -369,11 +371,11 @@ plot(ecdf(z), xlab = "", ylab = "", lwd = 2, main = expression("(a): CDF of Hist
 lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01)), col = "blue", lwd = 2)
 lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01), 0, 1.6), col = "green", lwd = 2)
 
-plot(ecdf(z), xlab = "", ylab = "", main = expression("(b): Left Tail"), lwd = 2, xlim = c(-5, -2.75), ylim = c(0, 0.04), cex.main = 1.5)
+plot(ecdf(z), xlab = "", ylab = "", main = expression("(b): Left Tail"), lwd = 2, xlim = c(-5, -2.5), ylim = c(0, 0.05), cex.main = 1.5)
 lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01)), col = "blue", lwd = 2)
 lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01), 0, 1.6), col = "green", lwd = 2)
 
-plot(ecdf(z), xlab = "", ylab = "", main = expression("(c): Right tail"), lwd = 2, xlim = c(2.75, 5), ylim = c(0.96, 1), cex.main = 1.5)
+plot(ecdf(z), xlab = "", ylab = "", main = expression("(c): Right tail"), lwd = 2, xlim = c(2.5, 5), ylim = c(0.95, 1), cex.main = 1.5)
 lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01)), col = "blue", lwd = 2)
 lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01), 0, 1.6), col = "green", lwd = 2)
 
@@ -392,25 +394,29 @@ par(mfrow = c(1, 3))
 par(oma = c(4, 2.5, 0, 0)) # make room (i.e. the 4's) for the overall x and y axis titles
 par(mar = c(4.5, 2, 2.5, 1)) # make the plots be closer together
 
-set.seed(6)
-plot(-log(pnorm(-abs(rnorm(1e4))) * 2), ylim = c(0, 20), ylab = "-log(p)", main = expression(paste("(d): Independent ", N(0, 1))), pch = 19, cex = 0.5, col = "blue", cex.main = 1.5, cex.lab = 1.5)
+set.seed(5)
+p.norm.1 <- pnorm(-abs(rnorm(1e4))) * 2
+set.seed(5)
+p.norm.1.6 <- pnorm(-abs(rnorm(1e4, 0, 1.6))) * 2
+y.max <- -log(min(p.norm.1, p, p.norm.1.6))
+plot(-log(p.norm.1), ylim = c(0, y.max), ylab = "-log(p)", main = expression(paste("(d): Independent ", N(0, 1))), col = "blue", cex.main = 1.5, cex.lab = 1.5)
 abline(h = -log(0.005), col = "red", lwd = 2)
-abline(h = -log(pnorm(-sqrt(2 * log(1e4))) * 2), col = "yellow", lwd = 2)
-abline(h = -log(0.05 / 1e4), col = "orange", lwd = 2)
+abline(h = -log(pnorm(-sqrt(2 * log(1e4))) * 2), col = "orange", lwd = 2)
+abline(h = -log(0.05 / 1e4), col = "yellow", lwd = 2)
 
-plot(sample(-log(p)), ylim = c(0, 20), ylab = "-log(p)", main = expression("(e): Hist. (c)"), pch = 19, cex = 0.5, cex.main = 1.5, cex.lab = 1.5)
+plot(sample(-log(p)), ylim = c(0, y.max), ylab = "-log(p)", main = expression("(e): Hist. (c)"), cex.main = 1.5, cex.lab = 1.5)
 abline(h = -log(0.005), col = "red", lwd = 2)
-abline(h = -log(pnorm(-sqrt(2 * log(1e4))) * 2), col = "yellow", lwd = 2)
-abline(h = -log(0.05 / 1e4), col = "orange", lwd = 2)
+abline(h = -log(pnorm(-sqrt(2 * log(1e4))) * 2), col = "orange", lwd = 2)
+abline(h = -log(0.05 / 1e4), col = "yellow", lwd = 2)
 
-plot(-log(pnorm(-abs(rnorm(1e4, 0, 1.6))) * 2), ylim = c(0, 20), ylab = "-log(p)", main = expression(paste("(f): Independent ", N(0, 1.6^2))), pch = 19, cex = 0.5, col = "green", cex.main = 1.5, cex.lab = 1.5)
+plot(-log(p.norm.1.6), ylim = c(0, y.max), ylab = "-log(p)", main = expression(paste("(f): Independent ", N(0, 1.6^2))), col = "green", cex.main = 1.5, cex.lab = 1.5)
 abline(h = -log(0.005), col = "red", lwd = 2)
-abline(h = -log(pnorm(-sqrt(2 * log(1e4))) * 2), col = "yellow", lwd = 2)
-abline(h = -log(0.05 / 1e4), col = "orange", lwd = 2)
+abline(h = -log(pnorm(-sqrt(2 * log(1e4))) * 2), col = "orange", lwd = 2)
+abline(h = -log(0.05 / 1e4), col = "yellow", lwd = 2)
 
 mtext('-log(p)', side = 2, outer = TRUE, line = 1)
 
-legend("bottomleft", inset = c(-2.01, -0.51), legend = c("0.005", "Bonferroni", "Universal Threshold"), lty = 1, lwd = 2, xpd = NA, col = c("red", "yellow", "orange"), ncol = 3, cex = 1.25)
+legend("bottomleft", inset = c(-2.01, -0.51), legend = c("0.005", "Universal Threshold", "Bonferroni"), lty = 1, lwd = 2, xpd = NA, col = c("red", "orange", "yellow"), ncol = 3, cex = 1.25)
 
 dev.off()
 ```
