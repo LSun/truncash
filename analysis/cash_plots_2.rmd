@@ -172,7 +172,7 @@ for (i in 1 : nsim) {
   pi0 <- sample(pi0.vec, 1)
   beta <- sample(c(
     rep(0, round(pi0 * ngene)),
-    rnorm(round((1 - pi0) * ngene), 0, 2)
+    rnorm(round((1 - pi0) * ngene), 0, 3)
     ))
   betahat <- beta + sebetahat * z
   
@@ -385,6 +385,14 @@ TDP.q.plot <- ggplot(data = TDP.q.ggdata, aes(x = pi0, y = TDP)) +
         legend.position = "top",
         legend.background = element_rect(color = "grey"),
         legend.text = element_text(size = 12))
+
+##=================================================
+
+FDP.q.all.mat <- cbind.data.frame(
+  pi0 = factor(do.call(rbind, pi0.list)),
+  FDP.q
+  )
+FDP.q.all.ggdata <- melt(FDP.q.noise.mat, id.vars = c("pi0"), variable.name = "Method", value.name = "FDP")
 ```
 
 ### Overall
