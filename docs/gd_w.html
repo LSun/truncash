@@ -332,7 +332,7 @@ div.section {
 </div>
 
 
-<p><strong>Last updated:</strong> 2018-05-25</p>
+<p><strong>Last updated:</strong> 2018-05-26</p>
 <strong>workflowr checks:</strong> <small>(Click a bullet for more information)</small>
 <ul>
 <li>
@@ -361,7 +361,7 @@ div.section {
 </li>
 <li>
 <details>
-<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/535ecdd8026b74f26e81083b2ed3aabe238cba32" target="_blank">535ecdd</a> </summary></p>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/572e589939eac44d6184a56a2f8c9c0f6334818b" target="_blank">572e589</a> </summary></p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 <pre><code>
 Ignored files:
@@ -490,6 +490,125 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/572e589939eac44d6184a56a2f8c9c0f6334818b/analysis/gd_w.rmd" target="_blank">572e589</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-05-26
+</td>
+<td style="text-align:left;">
+plots
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/bb5722633782effff45df099cb92ba9aa7fe350b/analysis/gd_w.rmd" target="_blank">bb57226</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-05-26
+</td>
+<td style="text-align:left;">
+plots
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/854ec312c1fd7e4ac6991bea716188953b257fac/analysis/gd_w.rmd" target="_blank">854ec31</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-05-26
+</td>
+<td style="text-align:left;">
+plots
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/9b269329f27b6279a5461c7b498248a5268cf10d/analysis/gd_w.rmd" target="_blank">9b26932</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-05-26
+</td>
+<td style="text-align:left;">
+plots
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/086a2bf4f9820b2be56c5d8de97e8f5c7bcadfd4/analysis/gd_w.rmd" target="_blank">086a2bf</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-05-26
+</td>
+<td style="text-align:left;">
+output
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/14d847a1c7a5cb6eac588325ac85d3110688dded/analysis/gd_w.rmd" target="_blank">14d847a</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-05-26
+</td>
+<td style="text-align:left;">
+histograms of z
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/7b21d1ff44200592df002f5e2ed4c2961ac022ce/docs/gd_w.html" target="_blank">7b21d1f</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-25
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 rmd
@@ -1332,6 +1451,82 @@ LSun
   list(w = fit.z$w, status = fit.z$status))})</code></pre>
 <pre class="r"><code>W.gtex.gd &lt;- sapply(Z.gtex, function (z) {fit.z &lt;- gdfit(z, L = 10); return(
   list(w = fit.z$w, status = fit.z$status))})</code></pre>
+</div>
+<div id="correlated-null" class="section level2">
+<h2>Correlated null</h2>
+<pre><code>quartz_off_screen 
+                2 </code></pre>
+</div>
+<div id="shoulder-inflation" class="section level2">
+<h2>Shoulder inflation</h2>
+<pre class="r"><code>z &lt;- z.mat.sel[3, ]
+p &lt;- pnorm(-abs(z)) * 2
+
+## the image is 7.5 * 3
+setEPS()
+postscript(&quot;../output/fig/cor_z_cdf.eps&quot;, width = 7.5, height = 3)
+
+par(mfrow = c(1, 3))
+par(oma = c(4, 2.5, 0, 0)) # make room (i.e. the 4&#39;s) for the overall x and y axis titles
+par(mar = c(2, 2, 2.5, 1)) # make the plots be closer together
+
+plot(ecdf(z), xlab = &quot;&quot;, ylab = &quot;&quot;, lwd = 2, main = expression(&quot;(a): CDF of Hist. (c)&quot;), cex.main = 1.5)
+lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01)), col = &quot;blue&quot;, lwd = 2)
+lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01), 0, 1.6), col = &quot;green&quot;, lwd = 2)
+
+plot(ecdf(z), xlab = &quot;&quot;, ylab = &quot;&quot;, main = expression(&quot;(b): Left Tail&quot;), lwd = 2, xlim = c(-5, -2.5), ylim = c(0, 0.05), cex.main = 1.5)
+lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01)), col = &quot;blue&quot;, lwd = 2)
+lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01), 0, 1.6), col = &quot;green&quot;, lwd = 2)
+
+plot(ecdf(z), xlab = &quot;&quot;, ylab = &quot;&quot;, main = expression(&quot;(c): Right tail&quot;), lwd = 2, xlim = c(2.5, 5), ylim = c(0.95, 1), cex.main = 1.5)
+lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01)), col = &quot;blue&quot;, lwd = 2)
+lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01), 0, 1.6), col = &quot;green&quot;, lwd = 2)
+
+mtext(&#39;CDF&#39;, side = 2, outer = TRUE, line = 1)
+
+legend(&quot;bottomleft&quot;, inset = c(-1.275, -0.35), legend = c(&quot;N(0, 1)&quot;, expression(N(0, 1.6^2))), lty = 1, lwd = 2, xpd = NA, col = c(&quot;blue&quot;, &quot;green&quot;), ncol = 2, cex = 1.25)
+
+dev.off()</code></pre>
+<pre><code>quartz_off_screen 
+                2 </code></pre>
+<pre class="r"><code># 7.5 * 3
+setEPS()
+postscript(&quot;../output/fig/cor_z_pval.eps&quot;, width = 7.5, height = 3.3)
+
+par(mfrow = c(1, 3))
+par(oma = c(4, 2.5, 0, 0)) # make room (i.e. the 4&#39;s) for the overall x and y axis titles
+par(mar = c(4.5, 2, 2.5, 1)) # make the plots be closer together
+
+set.seed(5)
+p.norm.1 &lt;- pnorm(-abs(rnorm(1e4))) * 2
+set.seed(25)
+p.norm.1.6 &lt;- pnorm(-abs(rnorm(1e4, 0, 1.6))) * 2
+sum(p.norm.1.6 &lt;= 0.005)</code></pre>
+<pre><code>[1] 803</code></pre>
+<pre class="r"><code>y.max &lt;- -log(min(p.norm.1, p, p.norm.1.6))
+y.max &lt;- 20
+plot(-log(p.norm.1), ylim = c(0, y.max), ylab = &quot;-log(p)&quot;, main = expression(paste(&quot;(d): Independent &quot;, N(0, 1))), col = &quot;blue&quot;, cex.main = 1.5, cex.lab = 1.5)
+abline(h = -log(0.005), col = &quot;red&quot;, lwd = 2)
+abline(h = -log(pnorm(-sqrt(2 * log(1e4))) * 2), col = &quot;orange&quot;, lwd = 2)
+abline(h = -log(0.05 / 1e4), col = &quot;yellow&quot;, lwd = 2)
+
+plot(sample(-log(p)), ylim = c(0, y.max), ylab = &quot;-log(p)&quot;, main = expression(&quot;(e): Hist. (c)&quot;), cex.main = 1.5, cex.lab = 1.5)
+abline(h = -log(0.005), col = &quot;red&quot;, lwd = 2)
+abline(h = -log(pnorm(-sqrt(2 * log(1e4))) * 2), col = &quot;orange&quot;, lwd = 2)
+abline(h = -log(0.05 / 1e4), col = &quot;yellow&quot;, lwd = 2)
+
+plot(-log(p.norm.1.6), ylim = c(0, y.max), ylab = &quot;-log(p)&quot;, main = expression(paste(&quot;(f): Independent &quot;, N(0, 1.6^2))), col = &quot;green&quot;, cex.main = 1.5, cex.lab = 1.5)
+abline(h = -log(0.005), col = &quot;red&quot;, lwd = 2)
+abline(h = -log(pnorm(-sqrt(2 * log(1e4))) * 2), col = &quot;orange&quot;, lwd = 2)
+abline(h = -log(0.05 / 1e4), col = &quot;yellow&quot;, lwd = 2)
+
+mtext(&#39;-log(p)&#39;, side = 2, outer = TRUE, line = 1)
+
+legend(&quot;bottomleft&quot;, inset = c(-2.01, -0.51), legend = c(&quot;0.005&quot;, &quot;Universal Threshold&quot;, &quot;Bonferroni&quot;), lty = 1, lwd = 2, xpd = NA, col = c(&quot;red&quot;, &quot;orange&quot;, &quot;yellow&quot;), ncol = 3, cex = 1.25)
+
+dev.off()</code></pre>
+<pre><code>quartz_off_screen 
+                2 </code></pre>
 </div>
 <div id="session-information" class="section level2">
 <h2>Session information</h2>
