@@ -396,9 +396,11 @@ par(mar = c(4.5, 2, 2.5, 1)) # make the plots be closer together
 
 set.seed(5)
 p.norm.1 <- pnorm(-abs(rnorm(1e4))) * 2
-set.seed(5)
+set.seed(25)
 p.norm.1.6 <- pnorm(-abs(rnorm(1e4, 0, 1.6))) * 2
+sum(p.norm.1.6 <= 0.005)
 y.max <- -log(min(p.norm.1, p, p.norm.1.6))
+y.max <- 20
 plot(-log(p.norm.1), ylim = c(0, y.max), ylab = "-log(p)", main = expression(paste("(d): Independent ", N(0, 1))), col = "blue", cex.main = 1.5, cex.lab = 1.5)
 abline(h = -log(0.005), col = "red", lwd = 2)
 abline(h = -log(pnorm(-sqrt(2 * log(1e4))) * 2), col = "orange", lwd = 2)
