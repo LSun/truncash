@@ -422,3 +422,19 @@ legend("bottomleft", inset = c(-2.01, -0.51), legend = c("0.005", "Universal Thr
 
 dev.off()
 ```
+
+```{r}
+p.bh <- p.adjust(p, method = "BH")
+## BHq at FDR 0.05
+sum(p.bh <= 0.05)
+fit.q <- qvalue::qvalue(p)
+## pi0 by qvalue
+1 - fit.q$pi0
+## qvalue at FDR 0.05
+sum(fit.q$qvalues <= 0.05)
+## pi0 by ashr
+fit.a <- ashr::ash(z, 1, method = "fdr")
+1 - ashr::get_pi0(fit.a)
+## ashr at FDR 0.05
+sum(ashr::get_qvalue(fit.a) <= 0.05)
+```
