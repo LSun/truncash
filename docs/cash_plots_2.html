@@ -361,7 +361,7 @@ div.section {
 </li>
 <li>
 <details>
-<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/d4d750e635c98ea7a5f46784477584e0bc51298d" target="_blank">d4d750e</a> </summary></p>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/10d1bae3298c0f9b82dde543d88026052008ab4c" target="_blank">10d1bae</a> </summary></p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 <pre><code>
 Ignored files:
@@ -490,6 +490,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/10d1bae3298c0f9b82dde543d88026052008ab4c/analysis/cash_plots_2.rmd" target="_blank">10d1bae</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-05-28
+</td>
+<td style="text-align:left;">
+choose typical
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/899a50f8d215bd6f962cffaca517cc0376ad4447/docs/cash_plots_2.html" target="_blank">899a50f</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-28
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 rmd
@@ -1239,7 +1273,10 @@ FDP.q.sep.plot &lt;- ggplot(data = FDP.q.ggdata.sep, aes(x = pi0, y = FDP)) +
 
 ##====================================================
 
-typical.noise &lt;- order(sd.z)[floor(quantile(seq(sd.z), c(0.1, 0.5, 0.9)))]
+pi0.0.9 &lt;- which(pi0.list == 0.9)
+sd.z.0.9 &lt;- sd.z[pi0.0.9]
+typical.noise &lt;- pi0.0.9[order(sd.z.0.9)[floor(quantile(seq(sd.z.0.9), c(0.1, 0.5, 0.9)))]]
+
 z.list.sel &lt;- z.list[typical.noise]
 names(z.list.sel) &lt;- c(&quot;Deflated Noise&quot;, &quot;In-between&quot;, &quot;Inflated Noise&quot;)
 z.sep.ggdata &lt;- melt(z.list.sel, value.name = &quot;z&quot;)
@@ -4335,19 +4372,19 @@ knitr::kable(D)</code></pre>
 <tbody>
 <tr class="odd">
 <td>FD</td>
-<td align="right">8</td>
-<td align="right">8</td>
-<td align="right">156</td>
-<td align="right">18</td>
-<td align="right">79</td>
+<td align="right">5</td>
+<td align="right">5</td>
+<td align="right">54</td>
+<td align="right">6</td>
+<td align="right">36</td>
 </tr>
 <tr class="even">
 <td>TD</td>
-<td align="right">490</td>
-<td align="right">490</td>
-<td align="right">634</td>
-<td align="right">506</td>
-<td align="right">597</td>
+<td align="right">432</td>
+<td align="right">432</td>
+<td align="right">557</td>
+<td align="right">436</td>
+<td align="right">538</td>
 </tr>
 </tbody>
 </table>
@@ -4367,51 +4404,51 @@ knitr::kable(D)</code></pre>
 <tbody>
 <tr class="odd">
 <td>FD</td>
-<td align="right">46</td>
-<td align="right">104</td>
-<td align="right">27</td>
-<td align="right">226</td>
-<td align="right">285</td>
-</tr>
-<tr class="even">
-<td>TD</td>
-<td align="right">2767</td>
-<td align="right">2966</td>
-<td align="right">2655</td>
-<td align="right">3123</td>
-<td align="right">3207</td>
-</tr>
-</tbody>
-</table>
-</td>
-<td>
-<table>
-<thead>
-<tr class="header">
-<th></th>
-<th align="right">BH</th>
-<th align="right">qvalue</th>
-<th align="right">locfdr</th>
-<th align="right">ASH</th>
-<th align="right">CASH</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>FD</td>
-<td align="right">2</td>
-<td align="right">6</td>
-<td align="right">0</td>
-<td align="right">88</td>
-<td align="right">6</td>
-</tr>
-<tr class="even">
-<td>TD</td>
-<td align="right">44</td>
-<td align="right">45</td>
+<td align="right">16</td>
+<td align="right">25</td>
 <td align="right">14</td>
-<td align="right">48</td>
+<td align="right">24</td>
 <td align="right">45</td>
+</tr>
+<tr class="even">
+<td>TD</td>
+<td align="right">486</td>
+<td align="right">509</td>
+<td align="right">451</td>
+<td align="right">508</td>
+<td align="right">534</td>
+</tr>
+</tbody>
+</table>
+</td>
+<td>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="right">BH</th>
+<th align="right">qvalue</th>
+<th align="right">locfdr</th>
+<th align="right">ASH</th>
+<th align="right">CASH</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>FD</td>
+<td align="right">79</td>
+<td align="right">174</td>
+<td align="right">0</td>
+<td align="right">947</td>
+<td align="right">35</td>
+</tr>
+<tr class="even">
+<td>TD</td>
+<td align="right">498</td>
+<td align="right">531</td>
+<td align="right">216</td>
+<td align="right">623</td>
+<td align="right">467</td>
 </tr>
 </tbody>
 </table>
