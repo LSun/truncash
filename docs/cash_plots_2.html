@@ -332,7 +332,7 @@ div.section {
 </div>
 
 
-<p><strong>Last updated:</strong> 2018-05-23</p>
+<p><strong>Last updated:</strong> 2018-05-28</p>
 <strong>workflowr checks:</strong> <small>(Click a bullet for more information)</small>
 <ul>
 <li>
@@ -361,7 +361,7 @@ div.section {
 </li>
 <li>
 <details>
-<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/0cdcf7b633b7faf9a9c1c5661e8ce8f3f89a27ab" target="_blank">0cdcf7b</a> </summary></p>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/41b64611dc155cb216adeb1d7048920ce64911ee" target="_blank">41b6461</a> </summary></p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 <pre><code>
 Ignored files:
@@ -490,6 +490,108 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/41b64611dc155cb216adeb1d7048920ce64911ee/analysis/cash_plots_2.rmd" target="_blank">41b6461</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-28
+</td>
+<td style="text-align:left;">
+wflow_publish(“analysis/cash_plots_2.rmd”)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/5ebe9d5432d46316c4b796cb79b0ad88805ea3de/analysis/cash_plots_2.rmd" target="_blank">5ebe9d5</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-05-28
+</td>
+<td style="text-align:left;">
+plots
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/756fdcc915af4df19a14ef2ea10b25959daa5033/analysis/cash_plots_2.rmd" target="_blank">756fdcc</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-28
+</td>
+<td style="text-align:left;">
+revision
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/9978e57369a0b1275aded82a66ea7fc94c58cf85/analysis/cash_plots_2.rmd" target="_blank">9978e57</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-05-27
+</td>
+<td style="text-align:left;">
+different g
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/2b3ee638be10dea25d4a99e5d3c898c27737ebc4/analysis/cash_plots_2.rmd" target="_blank">2b3ee63</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-05-27
+</td>
+<td style="text-align:left;">
+sigma = 3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/7610f05dc93cda50324fbc0390f9ccb3a7e310db/docs/cash_plots_2.html" target="_blank">7610f05</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-23
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 rmd
@@ -809,14 +911,14 @@ method.col.FSR &lt;- method.col.FDR[4 : 5]</code></pre>
 <div id="normal" class="section level2">
 <h2>Normal</h2>
 <p><span class="math display">\[
-g_1 = N\left(0, 2^2\right)
+g_1 = N\left(0, 3^2\right)
 \]</span></p>
 <pre class="r"><code>plotx &lt;- seq(-6, 6, by = 0.01)
 plot(plotx, plotx, ylim = c(0, dnorm(0)),
      xlab = expression(theta), ylab = expression(g(theta)),
      type = &quot;n&quot;)
 lines(plotx, dnorm(plotx), lty = 2)
-lines(plotx, dnorm(plotx, 0, 2), col = &quot;blue&quot;)
+lines(plotx, dnorm(plotx, 0, 3), col = &quot;blue&quot;)
 legend(&quot;topright&quot;, lty = c(1, 2), col = c(4, 1), c(&quot;g&quot;, &quot;N(0, 1)&quot;))</code></pre>
 <p><img src="figure/cash_plots_2.rmd/g1-1.png" width="672" style="display: block; margin: auto;" /></p>
 <details>
@@ -850,26 +952,11 @@ LSun
 </tbody>
 </table>
 </details>
-<pre class="r"><code># n01 &lt;- cbind.data.frame(x = plotx, n01 = dnorm(plotx))
-# g1 &lt;- cbind.data.frame(n01, g1 = dnorm(plotx, 0, 2))
-# g1.ggdata &lt;- melt(g1, id.vars = &quot;x&quot;, variable.name = &quot;g&quot;, value.name = &quot;pdf&quot;)
-
-# g.plot &lt;- ggplot(data = g1.ggdata, aes(x = x, y = pdf, col = g, linetype = g)) +
-#   geom_line() +
-#   scale_color_manual(values = c(&quot;black&quot;, &quot;blue&quot;)) +
-#   scale_linetype_manual(values = c(&quot;dashed&quot;, &quot;solid&quot;)) +
-#   labs(x = expression(theta), y = expression(g(theta))) +
-#   annotate(&quot;text&quot;, x = -Inf, y = Inf, label = &quot;Normal&quot;, vjust = 1, hjust = 0, color = &quot;blue&quot;, size = 15) +
-#   theme(axis.title.x = element_text(size = 15),
-#         axis.text.x = element_text(size = 10, hjust = 1),
-#         axis.title.y = element_text(size = 15),
-#         axis.text.y = element_text(size = 10),
-#         strip.text = element_text(size = 15),
-#         legend.position = &quot;none&quot;,
-#         legend.background = element_rect(color = &quot;grey&quot;),
-#         legend.text = element_text(size = 12))
-# 
-# g.plot</code></pre>
+<pre class="r"><code>density.ggdata.normal &lt;- cbind.data.frame(
+  g = &quot;Normal&quot;,
+  plotx,
+  ploty = dnorm(plotx, 0, 2)
+)</code></pre>
 <pre class="r"><code>pi0hat.mat &lt;- cbind.data.frame(pi0 = factor(do.call(rbind, pi0.list)), do.call(rbind, pi0hat.list))
 
 FDP.list &lt;- lapply(q.vec, function (q) {
@@ -1030,7 +1117,61 @@ TDP.q.plot &lt;- ggplot(data = TDP.q.ggdata, aes(x = pi0, y = TDP)) +
         strip.text = element_text(size = 15),
         legend.position = &quot;top&quot;,
         legend.background = element_rect(color = &quot;grey&quot;),
-        legend.text = element_text(size = 12))</code></pre>
+        legend.text = element_text(size = 12))
+
+##=================================================
+
+FDP.q.all.mat &lt;- cbind.data.frame(
+  pi0 = factor(do.call(rbind, pi0.list)),
+  FDP.q
+  )
+FDP.q.all.ggdata &lt;- melt(FDP.q.all.mat, id.vars = c(&quot;pi0&quot;), variable.name = &quot;Method&quot;, value.name = &quot;FDP&quot;)
+FDP.q.all.ggdata.normal &lt;- cbind.data.frame(
+  g = &quot;Normal&quot;,
+  FDP.q.all.ggdata
+)
+
+##============================================================
+
+FDP.q.noise.sep &lt;- cbind.data.frame(
+  Noise,
+  pi0 = factor(do.call(rbind, pi0.list)),
+  FDP.q
+)
+  
+FDP.q.ggdata.sep &lt;- melt(FDP.q.noise.sep, id.vars = c(&quot;Noise&quot;, &quot;pi0&quot;), variable.name = &quot;Method&quot;, value.name = &quot;FDP&quot;)
+
+FDP.q.sep.plot &lt;- ggplot(data = FDP.q.ggdata.sep, aes(x = pi0, y = FDP)) +
+  geom_boxplot(aes(fill = Method, color = Method), outlier.color = NULL, outlier.size = 0.5) +
+  scale_color_manual(values = method.col.FDR) +
+  scale_fill_manual(values = alpha(method.col.FDR, 0.35)) +
+  facet_wrap(~Noise, nrow = 1, ncol = 4) +
+  geom_hline(yintercept = q, col = &quot;black&quot;, linetype = &quot;dashed&quot;, size = 1) +
+  labs(x = expression(pi[0]), y = &quot;FDP&quot;, title = bquote(paste(&quot;At nominal FDR = &quot;, .(q)))) +
+  theme(plot.title = element_text(size = 12),
+        axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10),
+        axis.title.y = element_text(size = 15),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = &quot;bottom&quot;,
+        legend.background = element_rect(color = &quot;grey&quot;),
+        legend.text = element_text(size = 12))
+
+##====================================================
+
+z.list.sel &lt;- z.list[order(sd.z)[floor(quantile(seq(sd.z), c(0.1, 0.5, 0.9)))]]
+names(z.list.sel) &lt;- c(&quot;Deflated Noise&quot;, &quot;In-between&quot;, &quot;Inflated Noise&quot;)
+z.sep.ggdata &lt;- melt(z.list.sel, value.name = &quot;z&quot;)
+z.sep.plot &lt;- ggplot(data = z.sep.ggdata, aes(x = z)) +
+  geom_histogram(aes(y = ..density..), binwidth = 0.2) +
+  facet_wrap(~L1, nrow = 1) +
+  stat_function(fun = dnorm, color = &quot;blue&quot;, lwd = 1.5) +
+  theme(axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10),
+        axis.title.y = element_text(size = 15),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15))</code></pre>
 <div id="overall" class="section level3">
 <h3>Overall</h3>
 <pre class="r"><code>pi0hat.plot</code></pre>
@@ -1223,8 +1364,6 @@ LSun
 </tbody>
 </table>
 </details>
-<pre class="r"><code># g.plot.all &lt;- gridExtra::arrangeGrob(g.plot, pi0hat.plot, FDR.calib.plot, FSR.calib.plot, FDP.q.plot, TDP.q.plot, ncol = 1, heights = c(0.8, rep(1, 5)))
-# ggsave(&quot;../output/fig/g1.pdf&quot;, g.plot.all, width = 10, height = 29)</code></pre>
 </div>
 </div>
 <div id="big-normal" class="section level2">
@@ -1271,6 +1410,11 @@ LSun
 </tbody>
 </table>
 </details>
+<pre class="r"><code>density.ggdata.bignormal &lt;- cbind.data.frame(
+  g = &quot;Big Normal&quot;,
+  plotx,
+  ploty = dnorm(plotx, 0, 5)
+)</code></pre>
 <pre class="r"><code>pi0hat.mat &lt;- cbind.data.frame(pi0 = factor(do.call(rbind, pi0.list)), do.call(rbind, pi0hat.list))
 
 FDP.list &lt;- lapply(q.vec, function (q) {
@@ -1431,7 +1575,19 @@ TDP.q.plot &lt;- ggplot(data = TDP.q.ggdata, aes(x = pi0, y = TDP)) +
         strip.text = element_text(size = 15),
         legend.position = &quot;top&quot;,
         legend.background = element_rect(color = &quot;grey&quot;),
-        legend.text = element_text(size = 12))</code></pre>
+        legend.text = element_text(size = 12))
+
+##=================================================
+
+FDP.q.all.mat &lt;- cbind.data.frame(
+  pi0 = factor(do.call(rbind, pi0.list)),
+  FDP.q
+  )
+FDP.q.all.ggdata &lt;- melt(FDP.q.all.mat, id.vars = c(&quot;pi0&quot;), variable.name = &quot;Method&quot;, value.name = &quot;FDP&quot;)
+FDP.q.all.ggdata.bignormal &lt;- cbind.data.frame(
+  g = &quot;Big Normal&quot;,
+  FDP.q.all.ggdata
+)</code></pre>
 <div id="overall-1" class="section level3">
 <h3>Overall</h3>
 <pre class="r"><code>pi0hat.plot</code></pre>
@@ -1648,6 +1804,11 @@ LSun
 </tbody>
 </table>
 </details>
+<pre class="r"><code>density.ggdata.nearnormal &lt;- cbind.data.frame(
+  g = &quot;Near Normal&quot;,
+  plotx,
+  ploty = 0.6 * dnorm(plotx) + 0.4 * dnorm(plotx, 0, 3)
+)</code></pre>
 <pre class="r"><code>pi0hat.mat &lt;- cbind.data.frame(pi0 = factor(do.call(rbind, pi0.list)), do.call(rbind, pi0hat.list))
 
 FDP.list &lt;- lapply(q.vec, function (q) {
@@ -1808,7 +1969,19 @@ TDP.q.plot &lt;- ggplot(data = TDP.q.ggdata, aes(x = pi0, y = TDP)) +
         strip.text = element_text(size = 15),
         legend.position = &quot;top&quot;,
         legend.background = element_rect(color = &quot;grey&quot;),
-        legend.text = element_text(size = 12))</code></pre>
+        legend.text = element_text(size = 12))
+
+##=================================================
+
+FDP.q.all.mat &lt;- cbind.data.frame(
+  pi0 = factor(do.call(rbind, pi0.list)),
+  FDP.q
+  )
+FDP.q.all.ggdata &lt;- melt(FDP.q.all.mat, id.vars = c(&quot;pi0&quot;), variable.name = &quot;Method&quot;, value.name = &quot;FDP&quot;)
+FDP.q.all.ggdata.nearnormal &lt;- cbind.data.frame(
+  g = &quot;Near Normal&quot;,
+  FDP.q.all.ggdata
+)</code></pre>
 <div id="overall-2" class="section level3">
 <h3>Overall</h3>
 <pre class="r"><code>pi0hat.plot</code></pre>
@@ -1981,8 +2154,8 @@ LSun
 </details>
 </div>
 </div>
-<div id="spikey" class="section level2">
-<h2>Spikey</h2>
+<div id="spiky" class="section level2">
+<h2>Spiky</h2>
 <p><span class="math display">\[
 g_4 = 0.4 N\left(0, 0.5^2\right) + 0.2 N\left(0, 1^2\right) + 0.2 N\left(0, 2^2\right) + 0.2 N\left(0, 3^2\right)
 \]</span></p>
@@ -2032,6 +2205,14 @@ LSun
 </tbody>
 </table>
 </details>
+<pre class="r"><code>density.ggdata.spiky &lt;- cbind.data.frame(
+  g = &quot;Spiky&quot;,
+  plotx,
+  ploty = 0.4 * dnorm(plotx, 0, 0.5) + 
+        0.2 * dnorm(plotx) +
+        0.2 * dnorm(plotx, 0, 2) +
+        0.2 * dnorm(plotx, 0, 3)
+)</code></pre>
 <pre class="r"><code>pi0hat.mat &lt;- cbind.data.frame(pi0 = factor(do.call(rbind, pi0.list)), do.call(rbind, pi0hat.list))
 
 FDP.list &lt;- lapply(q.vec, function (q) {
@@ -2192,7 +2373,19 @@ TDP.q.plot &lt;- ggplot(data = TDP.q.ggdata, aes(x = pi0, y = TDP)) +
         strip.text = element_text(size = 15),
         legend.position = &quot;top&quot;,
         legend.background = element_rect(color = &quot;grey&quot;),
-        legend.text = element_text(size = 12))</code></pre>
+        legend.text = element_text(size = 12))
+
+##=================================================
+
+FDP.q.all.mat &lt;- cbind.data.frame(
+  pi0 = factor(do.call(rbind, pi0.list)),
+  FDP.q
+  )
+FDP.q.all.ggdata &lt;- melt(FDP.q.all.mat, id.vars = c(&quot;pi0&quot;), variable.name = &quot;Method&quot;, value.name = &quot;FDP&quot;)
+FDP.q.all.ggdata.spiky &lt;- cbind.data.frame(
+  g = &quot;Spiky&quot;,
+  FDP.q.all.ggdata
+)</code></pre>
 <div id="overall-3" class="section level3">
 <h3>Overall</h3>
 <pre class="r"><code>pi0hat.plot</code></pre>
@@ -2412,6 +2605,14 @@ LSun
 </tbody>
 </table>
 </details>
+<pre class="r"><code>density.ggdata.skew &lt;- cbind.data.frame(
+  g = &quot;Skew&quot;,
+  plotx,
+  ploty = 0.25 * dnorm(plotx, -2, 2) + 
+        0.25 * dnorm(plotx, -1, 2) +
+        0.25 * dnorm(plotx, 0, 1) +
+        0.25 * dnorm(plotx, 1, 1)
+)</code></pre>
 <pre class="r"><code>pi0hat.mat &lt;- cbind.data.frame(pi0 = factor(do.call(rbind, pi0.list)), do.call(rbind, pi0hat.list))
 
 FDP.list &lt;- lapply(q.vec, function (q) {
@@ -2572,7 +2773,19 @@ TDP.q.plot &lt;- ggplot(data = TDP.q.ggdata, aes(x = pi0, y = TDP)) +
         strip.text = element_text(size = 15),
         legend.position = &quot;top&quot;,
         legend.background = element_rect(color = &quot;grey&quot;),
-        legend.text = element_text(size = 12))</code></pre>
+        legend.text = element_text(size = 12))
+
+##=================================================
+
+FDP.q.all.mat &lt;- cbind.data.frame(
+  pi0 = factor(do.call(rbind, pi0.list)),
+  FDP.q
+  )
+FDP.q.all.ggdata &lt;- melt(FDP.q.all.mat, id.vars = c(&quot;pi0&quot;), variable.name = &quot;Method&quot;, value.name = &quot;FDP&quot;)
+FDP.q.all.ggdata.skew &lt;- cbind.data.frame(
+  g = &quot;Skew&quot;,
+  FDP.q.all.ggdata
+)</code></pre>
 <div id="overall-4" class="section level3">
 <h3>Overall</h3>
 <pre class="r"><code>pi0hat.plot</code></pre>
@@ -2789,6 +3002,11 @@ LSun
 </tbody>
 </table>
 </details>
+<pre class="r"><code>density.ggdata.flattop &lt;- cbind.data.frame(
+  g = &quot;Flat Top&quot;,
+  plotx,
+  ploty = sapply(plotx, function(x) {mean(dnorm(x, seq(-1.5, 1.5, by = 0.5), 0.5))})
+)</code></pre>
 <pre class="r"><code>pi0hat.mat &lt;- cbind.data.frame(pi0 = factor(do.call(rbind, pi0.list)), do.call(rbind, pi0hat.list))
 
 FDP.list &lt;- lapply(q.vec, function (q) {
@@ -2949,7 +3167,19 @@ TDP.q.plot &lt;- ggplot(data = TDP.q.ggdata, aes(x = pi0, y = TDP)) +
         strip.text = element_text(size = 15),
         legend.position = &quot;top&quot;,
         legend.background = element_rect(color = &quot;grey&quot;),
-        legend.text = element_text(size = 12))</code></pre>
+        legend.text = element_text(size = 12))
+
+##=================================================
+
+FDP.q.all.mat &lt;- cbind.data.frame(
+  pi0 = factor(do.call(rbind, pi0.list)),
+  FDP.q
+  )
+FDP.q.all.ggdata &lt;- melt(FDP.q.all.mat, id.vars = c(&quot;pi0&quot;), variable.name = &quot;Method&quot;, value.name = &quot;FDP&quot;)
+FDP.q.all.ggdata.flattop &lt;- cbind.data.frame(
+  g = &quot;Flat Top&quot;,
+  FDP.q.all.ggdata
+)</code></pre>
 <div id="overall-5" class="section level3">
 <h3>Overall</h3>
 <pre class="r"><code>pi0hat.plot</code></pre>
@@ -3167,6 +3397,12 @@ LSun
 </tbody>
 </table>
 </details>
+<pre class="r"><code>density.ggdata.bimodal &lt;- cbind.data.frame(
+  g = &quot;Bimodal&quot;,
+  plotx,
+  ploty = 0.5 * dnorm(plotx, -1.5, 1) + 
+        0.5 * dnorm(plotx, 1.5, 1)
+)</code></pre>
 <pre class="r"><code>pi0hat.mat &lt;- cbind.data.frame(pi0 = factor(do.call(rbind, pi0.list)), do.call(rbind, pi0hat.list))
 
 FDP.list &lt;- lapply(q.vec, function (q) {
@@ -3327,7 +3563,19 @@ TDP.q.plot &lt;- ggplot(data = TDP.q.ggdata, aes(x = pi0, y = TDP)) +
         strip.text = element_text(size = 15),
         legend.position = &quot;top&quot;,
         legend.background = element_rect(color = &quot;grey&quot;),
-        legend.text = element_text(size = 12))</code></pre>
+        legend.text = element_text(size = 12))
+
+##=================================================
+
+FDP.q.all.mat &lt;- cbind.data.frame(
+  pi0 = factor(do.call(rbind, pi0.list)),
+  FDP.q
+  )
+FDP.q.all.ggdata &lt;- melt(FDP.q.all.mat, id.vars = c(&quot;pi0&quot;), variable.name = &quot;Method&quot;, value.name = &quot;FDP&quot;)
+FDP.q.all.ggdata.bimodal &lt;- cbind.data.frame(
+  g = &quot;Bimodal&quot;,
+  FDP.q.all.ggdata
+)</code></pre>
 <div id="overall-6" class="section level3">
 <h3>Overall</h3>
 <pre class="r"><code>pi0hat.plot</code></pre>
@@ -3500,6 +3748,81 @@ LSun
 </details>
 </div>
 </div>
+<div id="put-together" class="section level2">
+<h2>Put together</h2>
+<pre class="r"><code>pi0.list &lt;- list()
+for (i in seq(1000)) {pi0.list[[i]] &lt;- sample(c(0.5, 0.9, 0.99), 1)}
+
+FDP.q &lt;- cbind.data.frame(
+  BH = runif(1e3, 0, 0.2),
+  qvalue = runif(1e3, 0, 0.2),
+  locfdr = runif(1e3, 0, 0.2),
+  ASH = runif(1e3, 0, 0.2),
+  CASH = runif(1e3, 0, 0.2)
+)
+
+Noise &lt;- sample(c(&quot;Deflated Noise&quot;, &quot;In-between&quot;, &quot;Inflated Noise&quot;), 1e3, replace = TRUE)
+
+z.list &lt;- list()
+for (i in seq(1000)) {z.list[[i]] &lt;- rnorm(1e4)}</code></pre>
+<pre class="r"><code>density.g.ggdata &lt;- rbind.data.frame(
+  density.ggdata.normal,
+  density.ggdata.nearnormal,
+  density.ggdata.spiky,
+  density.ggdata.flattop,
+  density.ggdata.skew,
+  density.ggdata.bimodal
+)
+
+density.g.plot &lt;- ggplot(data = density.g.ggdata, aes(x = plotx, y = ploty)) +
+  geom_line() +
+  facet_wrap(~g, nrow = 1) +
+  labs(x = expression(theta), y = expression(g(theta))) +
+  theme(axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10),
+        axis.title.y = element_text(size = 15),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = &quot;none&quot;,
+        legend.background = element_rect(color = &quot;grey&quot;),
+        legend.text = element_text(size = 12))
+
+FDP.q.g.ggdata &lt;- rbind.data.frame(
+  FDP.q.all.ggdata.normal,
+  FDP.q.all.ggdata.nearnormal,
+  FDP.q.all.ggdata.spiky,
+  FDP.q.all.ggdata.flattop,
+  FDP.q.all.ggdata.skew,
+  FDP.q.all.ggdata.bimodal
+)
+
+FDP.q.g.plot &lt;- ggplot(data = FDP.q.g.ggdata, aes(x = pi0, y = FDP)) +
+  geom_boxplot(aes(fill = Method, color = Method), outlier.color = NULL, outlier.size = 0.5) +
+  scale_color_manual(values = method.col.FDR) +
+  scale_fill_manual(values = alpha(method.col.FDR, 0.35)) +
+  facet_wrap(~g, nrow = 1) +
+  geom_hline(yintercept = q, col = &quot;black&quot;, linetype = &quot;dashed&quot;, size = 1) +
+  labs(x = expression(pi[0]), y = &quot;FDP&quot;, title = bquote(paste(&quot;At nominal FDR = &quot;, .(q)))) +
+  theme(plot.title = element_text(size = 12),
+        axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10),
+        axis.title.y = element_text(size = 15),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = &quot;bottom&quot;,
+        legend.background = element_rect(color = &quot;grey&quot;),
+        legend.text = element_text(size = 12))
+
+FDP.q.g.plot.save &lt;- gridExtra::arrangeGrob(density.g.plot, FDP.q.g.plot, heights = c(1, 1.5))</code></pre>
+<pre><code>Warning: Removed 8 rows containing non-finite values (stat_boxplot).</code></pre>
+<pre class="r"><code>ggsave(&quot;../output/fig/FDP.q.g.pdf&quot;, FDP.q.g.plot.save, height = 6, width = 9)
+
+##=========================================================
+
+FDP.q.sep.plot.save &lt;- gridExtra::arrangeGrob(z.sep.plot, FDP.q.sep.plot, heights = c(1, 1.5))
+
+ggsave(&quot;../output/fig/FDP.q.sep.pdf&quot;, FDP.q.sep.plot.save, height = 6, width = 8)</code></pre>
+</div>
 <div id="session-information" class="section level2">
 <h2>Session information</h2>
 <pre class="r"><code>sessionInfo()</code></pre>
@@ -3525,22 +3848,23 @@ other attached packages:
 [13] PolynomF_1.0-2   
 
 loaded via a namespace (and not attached):
- [1] gmp_0.5-13.1      Rcpp_0.12.16      pillar_1.2.2     
- [4] plyr_1.8.4        compiler_3.4.3    git2r_0.21.0     
- [7] workflowr_1.0.1   R.methodsS3_1.7.1 R.utils_2.6.0    
-[10] iterators_1.0.9   tools_3.4.3       digest_0.6.15    
-[13] bit_1.1-13        tibble_1.4.2      gtable_0.2.0     
-[16] evaluate_0.10.1   lattice_0.20-35   rlang_0.2.0      
-[19] foreach_1.4.4     parallel_3.4.3    yaml_2.1.19      
-[22] Rmpfr_0.7-0       ECOSolveR_0.4     stringr_1.3.1    
-[25] knitr_1.20        rprojroot_1.3-2   bit64_0.9-7      
-[28] grid_3.4.3        R6_2.2.2          rmarkdown_1.9    
-[31] magrittr_1.5      whisker_0.3-2     scales_0.5.0     
-[34] splines_3.4.3     MASS_7.3-50       backports_1.1.2  
-[37] codetools_0.2-15  htmltools_0.3.6   scs_1.1-1        
-[40] colorspace_1.3-2  labeling_0.3      stringi_1.2.2    
-[43] lazyeval_0.2.1    munsell_0.4.3     pscl_1.5.2       
-[46] doParallel_1.0.11 truncnorm_1.0-8   R.oo_1.22.0      </code></pre>
+ [1] splines_3.4.3     lattice_0.20-35   colorspace_1.3-2 
+ [4] htmltools_0.3.6   yaml_2.1.19       gmp_0.5-13.1     
+ [7] rlang_0.2.0       R.oo_1.22.0       pillar_1.2.2     
+[10] Rmpfr_0.7-0       R.utils_2.6.0     bit64_0.9-7      
+[13] scs_1.1-1         foreach_1.4.4     plyr_1.8.4       
+[16] stringr_1.3.1     munsell_0.4.3     gtable_0.2.0     
+[19] workflowr_1.0.1   R.methodsS3_1.7.1 codetools_0.2-15 
+[22] evaluate_0.10.1   labeling_0.3      knitr_1.20       
+[25] doParallel_1.0.11 pscl_1.5.2        parallel_3.4.3   
+[28] Rcpp_0.12.16      backports_1.1.2   scales_0.5.0     
+[31] truncnorm_1.0-8   bit_1.1-13        gridExtra_2.3    
+[34] digest_0.6.15     stringi_1.2.2     grid_3.4.3       
+[37] rprojroot_1.3-2   ECOSolveR_0.4     tools_3.4.3      
+[40] magrittr_1.5      lazyeval_0.2.1    tibble_1.4.2     
+[43] whisker_0.3-2     MASS_7.3-50       rmarkdown_1.9    
+[46] iterators_1.0.9   R6_2.2.2          git2r_0.21.0     
+[49] compiler_3.4.3   </code></pre>
 </div>
 
 <!-- Adjust MathJax settings so that all math formulae are shown using
