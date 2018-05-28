@@ -170,7 +170,7 @@ for (i in 1 : nsim) {
   fit.locfdr <- tryCatch(locfdr::locfdr(zscore, plot = 0), error = function(e) {NA})
   if (!is.na(fit.locfdr)) {
     w.rho <- ifelse(
-      fit.locfdr$fp0[3, 2] > 1, 0.5, 0.1
+      fit.locfdr$fp0[3, 2] > 1.05 & mad.mean(zscore) > sqrt(2 / pi) * 1.05, 0.5, 0.1
     )
   } else {
     w.rho <- ifelse(mad.mean(zscore) > sqrt(2 / pi), 0.5, 0.1)
