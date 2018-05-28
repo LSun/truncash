@@ -118,7 +118,7 @@ FXP.ggdata <- function (FXP.list, Noise) {
 ## Normal
 
 $$
-g_1 = N\left(0, 3^2\right)
+g_1 = N\left(0, 2^2\right)
 $$
 
 ```{r g1}
@@ -127,7 +127,7 @@ plot(plotx, plotx, ylim = c(0, dnorm(0)),
      xlab = expression(theta), ylab = expression(g(theta)),
      type = "n")
 lines(plotx, dnorm(plotx), lty = 2)
-lines(plotx, dnorm(plotx, 0, 3), col = "blue")
+lines(plotx, dnorm(plotx, 0, 2), col = "blue")
 legend("topright", lty = c(1, 2), col = c(4, 1), c("g", "N(0, 1)"))
 
 density.ggdata.normal <- cbind.data.frame(
@@ -140,7 +140,7 @@ density.ggdata.normal <- cbind.data.frame(
 ```{r gtex_z_1, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
 set.seed(777)
 
-nsim <- 1000
+nsim <- 3000
 
 z.list <- sebetahat.list <- pi0.list <- beta.list <- betahat.list <- list()
 pi0hat.list <- qvalue.list <- svalue.list <- list()
@@ -157,7 +157,7 @@ for (i in 1 : nsim) {
   pi0 <- sample(pi0.vec, 1)
   beta <- sample(c(
     rep(0, round(pi0 * ngene)),
-    rnorm(round((1 - pi0) * ngene), 0, 3)
+    rnorm(round((1 - pi0) * ngene), 0, 2)
     ))
   betahat <- beta + sebetahat * z
   
@@ -167,11 +167,17 @@ for (i in 1 : nsim) {
 
   ## different methods
   fit.ash = ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
-  w.rho <- ifelse(mad.mean(zscore) > sqrt(2 / pi), 0.5, 0.1)
+  fit.locfdr <- tryCatch(locfdr::locfdr(zscore, plot = 0), error = function(e) {NA})
+  if (!is.na(fit.locfdr)) {
+    w.rho <- ifelse(
+      fit.locfdr$fp0[3, 2] > 1, 0.5, 0.1
+    )
+  } else {
+    w.rho <- ifelse(mad.mean(zscore) > sqrt(2 / pi), 0.5, 0.1)
+  }
   fit.gdash = gdash(betahat, sebetahat, w.rho = w.rho, lfsr = TRUE)
   fit.qvalue = qvalue::qvalue(pvalue)
   fit.BH = p.adjust(pvalue, method = "BH")
-  fit.locfdr <- tryCatch(locfdr::locfdr(zscore, plot = 0), error = function(e) {NA})
 
   ## pi0
   pi0hat.list[[i]] <- c(
@@ -183,7 +189,7 @@ for (i in 1 : nsim) {
 
   ## FDR
   qvalue.list[[i]] <- cbind(
-    BH = fit.BH,
+    BHq = fit.BH,
     qvalue = fit.qvalue$qvalues,
     locfdr = tryCatch(ashr::qval.from.lfdr(fit.locfdr$fdr), error = function(e) {rep(NA, ngene)}),
     ASH = ashr::get_qvalue(fit.ash),
