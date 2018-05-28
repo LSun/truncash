@@ -412,7 +412,8 @@ FDP.q.sep.plot <- ggplot(data = FDP.q.ggdata.sep, aes(x = pi0, y = FDP)) +
 
 ##====================================================
 
-z.list.sel <- z.list[order(sd.z)[floor(quantile(seq(sd.z), c(0.1, 0.5, 0.9)))]]
+typical.noise <- order(sd.z)[floor(quantile(seq(sd.z), c(0.1, 0.5, 0.9)))]
+z.list.sel <- z.list[typical.noise]
 names(z.list.sel) <- c("Deflated Noise", "In-between", "Inflated Noise")
 z.sep.ggdata <- melt(z.list.sel, value.name = "z")
 z.sep.plot <- ggplot(data = z.sep.ggdata, aes(x = z)) +
@@ -424,6 +425,17 @@ z.sep.plot <- ggplot(data = z.sep.ggdata, aes(x = z)) +
         axis.title.y = element_text(size = 15),
         axis.text.y = element_text(size = 10),
         strip.text = element_text(size = 15))
+
+##===========================================================
+
+qvalue.list.sel <- qvalue.list[typical.noise]
+beta.list.sel <- beta.list[typical.noise]
+D <- mapply(function (X, y, q) {
+  apply(X, 2, function (x, y, q) {
+    c(FD = sum(y[x <= q] == 0), TD = sum(y[x <= q] != 0))
+  }, y, q)
+}, qvalue.list.sel, beta.list.sel, MoreArgs = list(q = q), SIMPLIFY = FALSE)
+names(D) <- c("Deflated Noise", "In-between", "Inflated Noise")
 ```
 
 ### Overall
@@ -2187,6 +2199,22 @@ Noise <- sample(c("Deflated Noise", "In-between", "Inflated Noise"), 1e3, replac
 
 z.list <- list()
 for (i in seq(1000)) {z.list[[i]] <- rnorm(1e4)}
+
+qvalue.list.sel <- list()
+for (i in 1 : 3) {
+qvalue.list.sel[[i]] <- cbind(
+  BH = runif(1e4, 0, 0.2),
+  qvalue = runif(1e4, 0, 0.2),
+  locfdr = runif(1e4, 0, 0.2),
+  ASH = runif(1e4, 0, 0.2),
+  CASH = runif(1e4, 0, 0.2)
+)
+}
+
+beta.list.sel <- list()
+for (i in 1 : 3) {
+beta.list.sel[[i]] <- sample(c(rep(0, 9e3), rnorm(1e3)))
+}
 ```
 
 ```{r}
@@ -2247,4 +2275,7 @@ ggsave("../output/fig/FDP.q.g.pdf", FDP.q.g.plot.save, height = 6, width = 9)
 FDP.q.sep.plot.save <- gridExtra::arrangeGrob(z.sep.plot, FDP.q.sep.plot, heights = c(1, 1.5))
 
 ggsave("../output/fig/FDP.q.sep.pdf", FDP.q.sep.plot.save, height = 6, width = 8)
+
+##============================================================
+knitr::kable(D)
 ```
