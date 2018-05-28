@@ -395,8 +395,8 @@ FDP.q.ggdata.sep <- melt(FDP.q.noise.sep, id.vars = c("Noise", "pi0"), variable.
 
 FDP.q.sep.plot <- ggplot(data = FDP.q.ggdata.sep, aes(x = pi0, y = FDP)) +
   geom_boxplot(aes(fill = Method, color = Method), outlier.color = NULL, outlier.size = 0.5) +
-  scale_color_manual(values = method.col.FDR) +
-  scale_fill_manual(values = alpha(method.col.FDR, 0.35)) +
+  scale_color_manual(labels = method.name.FDR, values = method.col.FDR) +
+  scale_fill_manual(labels = method.name.FDR, values = alpha(method.col.FDR, 0.35)) +
   facet_wrap(~Noise, nrow = 1, ncol = 4) +
   geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
   labs(x = expression(pi[0]), y = "FDP", title = bquote(paste("At nominal FDR = ", .(q)))) +
@@ -2223,8 +2223,8 @@ FDP.q.g.ggdata <- rbind.data.frame(
 
 FDP.q.g.plot <- ggplot(data = FDP.q.g.ggdata, aes(x = pi0, y = FDP)) +
   geom_boxplot(aes(fill = Method, color = Method), outlier.color = NULL, outlier.size = 0.5) +
-  scale_color_manual(values = method.col.FDR) +
-  scale_fill_manual(values = alpha(method.col.FDR, 0.35)) +
+  scale_color_manual(labels = method.name.FDR, values = method.col.FDR) +
+  scale_fill_manual(labels = method.name.FDR, values = alpha(method.col.FDR, 0.35)) +
   facet_wrap(~g, nrow = 1) +
   geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
   labs(x = expression(pi[0]), y = "FDP", title = bquote(paste("At nominal FDR = ", .(q)))) +
