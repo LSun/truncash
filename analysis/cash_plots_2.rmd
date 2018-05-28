@@ -382,6 +382,48 @@ FDP.q.all.ggdata.normal <- cbind.data.frame(
   g = "Normal",
   FDP.q.all.ggdata
 )
+
+##============================================================
+
+FDP.q.noise.sep <- cbind.data.frame(
+  Noise,
+  pi0 = factor(do.call(rbind, pi0.list)),
+  FDP.q
+)
+  
+FDP.q.ggdata.sep <- melt(FDP.q.noise.sep, id.vars = c("Noise", "pi0"), variable.name = "Method", value.name = "FDP")
+
+FDP.q.sep.plot <- ggplot(data = FDP.q.ggdata.sep, aes(x = pi0, y = FDP)) +
+  geom_boxplot(aes(fill = Method, color = Method), outlier.color = NULL, outlier.size = 0.5) +
+  scale_color_manual(values = method.col.FDR) +
+  scale_fill_manual(values = alpha(method.col.FDR, 0.35)) +
+  facet_wrap(~Noise, nrow = 1, ncol = 4) +
+  geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
+  labs(x = expression(pi[0]), y = "FDP", title = bquote(paste("At nominal FDR = ", .(q)))) +
+  theme(plot.title = element_text(size = 12),
+        axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10),
+        axis.title.y = element_text(size = 15),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "bottom",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+
+##====================================================
+
+z.list.sel <- z.list[order(sd.z)[floor(quantile(seq(sd.z), c(0.2, 0.5, 0.8)))]]
+names(z.list.sel) <- c("Deflated Noise", "In-between", "Inflated Noise")
+z.sep.ggdata <- melt(z.list.sel, value.name = "z")
+z.sep.plot <- ggplot(data = z.sep.ggdata, aes(x = z)) +
+  geom_histogram(aes(y = ..density..), binwidth = 0.2) +
+  facet_wrap(~L1, nrow = 1) +
+  stat_function(fun = dnorm, color = "blue", lwd = 1.5) +
+  theme(axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10),
+        axis.title.y = element_text(size = 15),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15))
 ```
 
 ### Overall
@@ -397,9 +439,6 @@ FSR.calib.plot
 ```{r, fig.asp = 0.5, message = FALSE, warning = FALSE}
 FDP.q.plot
 TDP.q.plot
-
-# g.plot.all <- gridExtra::arrangeGrob(g.plot, pi0hat.plot, FDR.calib.plot, FSR.calib.plot, FDP.q.plot, TDP.q.plot, ncol = 1, heights = c(0.8, rep(1, 5)))
-# ggsave("../output/fig/g1.pdf", g.plot.all, width = 10, height = 29)
 ```
 
 ## Big normal
@@ -2132,6 +2171,24 @@ TDP.q.plot
 
 ## Put together
 
+```{r, eval = FALSE}
+pi0.list <- list()
+for (i in seq(1000)) {pi0.list[[i]] <- sample(c(0.5, 0.9, 0.99), 1)}
+
+FDP.q <- cbind.data.frame(
+  BH = runif(1e3, 0, 0.2),
+  qvalue = runif(1e3, 0, 0.2),
+  locfdr = runif(1e3, 0, 0.2),
+  ASH = runif(1e3, 0, 0.2),
+  CASH = runif(1e3, 0, 0.2)
+)
+
+Noise <- sample(c("Deflated Noise", "In-between", "Inflated Noise"), 1e3, replace = TRUE)
+
+z.list <- list()
+for (i in seq(1000)) {z.list[[i]] <- rnorm(1e4)}
+```
+
 ```{r}
 density.g.ggdata <- rbind.data.frame(
   density.ggdata.normal,
@@ -2171,7 +2228,7 @@ FDP.q.g.plot <- ggplot(data = FDP.q.g.ggdata, aes(x = pi0, y = FDP)) +
   facet_wrap(~g, nrow = 1) +
   geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
   labs(x = expression(pi[0]), y = "FDP", title = bquote(paste("At nominal FDR = ", .(q)))) +
-  theme(plot.title = element_text(size = 18),
+  theme(plot.title = element_text(size = 12),
         axis.title.x = element_text(size = 15),
         axis.text.x = element_text(size = 10),
         axis.title.y = element_text(size = 15),
@@ -2184,4 +2241,10 @@ FDP.q.g.plot <- ggplot(data = FDP.q.g.ggdata, aes(x = pi0, y = FDP)) +
 FDP.q.g.plot.save <- gridExtra::arrangeGrob(density.g.plot, FDP.q.g.plot, heights = c(1, 1.5))
 
 ggsave("../output/fig/FDP.q.g.pdf", FDP.q.g.plot.save, height = 6, width = 9)
+
+##=========================================================
+
+FDP.q.sep.plot.save <- gridExtra::arrangeGrob(z.sep.plot, FDP.q.sep.plot, heights = c(1, 1.75))
+
+ggsave("../output/fig/FDP.q.g.pdf", FDP.q.sep.plot.save, height = 5, width = 7.5)
 ```
