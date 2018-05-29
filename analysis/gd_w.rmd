@@ -370,6 +370,10 @@ par(mar = c(2, 2, 2.5, 1)) # make the plots be closer together
 plot(ecdf(z), xlab = "", ylab = "", lwd = 2, main = expression("(a): CDF of All"), cex.main = 1.5)
 lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01)), col = "blue", lwd = 2)
 lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01), 0, 1.6), col = "green", lwd = 2)
+rect(xleft = c(-5, 2.5),
+     xright = c(-2.5, 5),
+     ytop = c(0.05, 1),
+     ybottom = c(0, 0.95), border = "red")
 
 plot(ecdf(z), xlab = "", ylab = "", main = expression("(b): Left Tail"), lwd = 2, xlim = c(-5, -2.5), ylim = c(0, 0.05), cex.main = 1.5)
 lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01)), col = "blue", lwd = 2)
@@ -515,12 +519,12 @@ Wasser <- function(G, h, interp = FALSE, eps = 0.001, bw = 0.7){
 
 ```{r}
 G <- function (t) {
-  0.6 * pnorm(t, 0, 0.25) + 0.3 * pnorm(t, 0, 1) + 0.1 * pnorm(t, 0, 3)
+  0.6 * pnorm(t, 0, 0.1) + 0.3 * pnorm(t, 0, 1) + 0.1 * pnorm(t, 0, 3)
 # 0.6 * pnorm(t, 0, 0) + 0.3 * pnorm(t, 0, 1) + 0.1 * pnorm(t, 0, 3)
 }
 
 theta <- sample(c(
-  rnorm(6e3, 0, 0.25),
+  rnorm(6e3, 0, 0.1),
   rnorm(3e3, 0, 1),
   rnorm(1e3, 0, 3)
 ))
@@ -529,10 +533,11 @@ x.plot <- seq(-6, 6, by = 0.01)
 
 g.plot <- G(x.plot)
 
-s <- sqrt(rchisq(1e4, 5) / 5)
+s <- rep(1, 1e4)
+# s <- sqrt(rchisq(1e4, 5) / 5)
 
-method.name <- c("Kiefer-Wolfowitz", "Kernal Deconv", "Efron", "ASH", "CASH")
-method.col <- scales::hue_pal()(length(method.name))
+method.name <- c("KW", "Efron", "ASH", "CASH")
+method.col <- c(scales::hue_pal()(4)[1 : 2], scales::hue_pal()(5)[4 : 5])
 
 for (i in 3 : 4) {
   z <- z.mat.sel[i, ]
@@ -540,19 +545,19 @@ for (i in 3 : 4) {
   Z <- X / s
   
   ## ASH
-  fit.ash <- ashr::ash(X, s, method = "shrink", mixcompdist = "normal")
+  fit.ash <- ashr::ash(X, s, method = "fdr", mixcompdist = "normal")
   ash.plot <- as.numeric(ashr::mixcdf(ashr::get_fitted_g(fit.ash), x.plot))
   ASH.data <- cbind.data.frame(
-    method = "ASH",
+    Method = "ASH",
     x = x.plot,
     cdfhat = ash.plot
   )
   
   ## CASH
-  fit.cash <- gdash(X, s, method = "shrink")
+  fit.cash <- gdash(X, s, gd.priority = TRUE)
   cash.plot <- as.numeric(ashr::mixcdf(ashr::get_fitted_g(fit.cash), x.plot))
   CASH.data <- cbind.data.frame(
-    method = "CASH",
+    Method = "CASH",
     x = x.plot,
     cdfhat = cash.plot
   )
@@ -561,7 +566,7 @@ for (i in 3 : 4) {
   fit.bd <- BDE(Z)
   bd.plot <- Wasser(G, fit.bd)
   BD.data <- cbind.data.frame(
-    method = "E-BD",
+    Method = "E-BD",
     x = fit.bd$x,
     cdfhat = bd.plot$H
   )
@@ -570,19 +575,19 @@ for (i in 3 : 4) {
   fit.kw <- REBayes::GLmix(Z)
   kw.plot <- Wasser(G, fit.kw, interp = "biweight")
   KW.data <- cbind.data.frame(
-    method = "KW-KMG",
+    Method = "KW-KMG",
     x = fit.kw$x,
     cdfhat = kw.plot$H
   )
 
-  ## kernal deconvolution by Stefanski and Carroll 1990
-  fit.sc <- KFE(Z)
-  sc.plot <- Wasser(G, fit.sc)
-  SC.data <- cbind.data.frame(
-    method = "SC-FK",
-    x = fit.sc$x,
-    cdfhat = sc.plot$H
-  )
+  # ## kernal deconvolution by Stefanski and Carroll 1990
+  # fit.sc <- KFE(Z)
+  # sc.plot <- Wasser(G, fit.sc)
+  # SC.data <- cbind.data.frame(
+  #   Method = "SC-FK",
+  #   x = fit.sc$x,
+  #   cdfhat = sc.plot$H
+  # )
   
   if (i == 3) {
     deconv.inf.ggdata <- cbind.data.frame(
@@ -594,16 +599,40 @@ for (i in 3 : 4) {
         CASH.data
       )
     )
+  } else {
+    deconv.def.ggdata <- cbind.data.frame(
+      Noise = "Deflated Noise",
+      rbind.data.frame(
+        KW.data,
+        BD.data,
+        ASH.data,
+        CASH.data
+      )
+    )
   }
-
-  ## plotting
-  plot(x.plot, g.plot, type = "l")
-  lines(x.plot, cash.plot, col = "red")
-  lines(x.plot, ash.plot, col = "blue")
-  lines(fit.bd$x, bd.plot$H, col = "green")
-  lines(fit.kw$x, kw.plot$H, col = "maroon")
-  lines(fit.sc$x, sc.plot$H, col = "orange")
 }
 
-ggplot(data = deconv.inf.ggdata, aes(x = x, y = cdfhat, col = method)) + geom_line() + stat_function(fun = G, col = "red") + xlim(-5, 5)
+deconv.ggdata <- rbind.data.frame(
+  deconv.inf.ggdata,
+  deconv.def.ggdata
+)
+
+## plotting
+ggplot(data = deconv.ggdata, aes(x = x, y = cdfhat, col = method, linetype = method)) + 
+  geom_line() +
+  facet_wrap(~Noise, nrow = 1) +
+  stat_function(fun = G, col = "black", lty = 1) + 
+  xlim(-5, 5) +
+  scale_linetype_manual(values = 2 : 5, labels = method.name) +
+  scale_color_manual(values = method.col, labels = method.name) +
+  labs(x = expression(theta), y = "Estimated CDF of g") +
+  theme(axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10),
+        axis.title.y = element_text(size = 12),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "top",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+  
 ```
