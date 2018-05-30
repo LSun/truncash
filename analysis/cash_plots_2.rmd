@@ -423,6 +423,7 @@ FDP.q.sep.plot <- ggplot(data = FDP.q.ggdata.sep, aes(x = pi0, y = FDP)) +
 
 FDP.q.all.sep.plot <- ggplot(data = FDP.q.ggdata, aes(x = pi0, y = FDP, fill = Method, color = Method)) +
   stat_summary(fun.data = boxplot.quantile, geom = "boxplot", position = "dodge") +
+  stat_summary(fun.y = mean, geom = "point", shape = 13, size = 3, position = position_dodge(width = 0.9), show.legend = FALSE) +
   scale_color_manual(labels = method.name.FDR, values = method.col.FDR) +
   scale_fill_manual(labels = method.name.FDR, values = alpha(method.col.FDR, 0.35)) +
   facet_wrap(~Noise, nrow = 1) +
