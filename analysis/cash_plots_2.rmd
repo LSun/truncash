@@ -39,6 +39,11 @@ TDP <- function (FDR, qvalue, beta) {
 FSP <- function (FSR, svalue, beta, betahat) {
   return(sum(sign(betahat[svalue <= FSR]) != sign(beta[svalue <= FSR])) / max(sum(svalue <= FSR), 1))
 }
+boxplot.quantile <- function(x) {
+  r <- quantile(x, probs = c(0.05, 0.25, 0.5, 0.75, 0.95))
+  names(r) <- c("ymin", "lower", "middle", "upper", "ymax")
+  r
+}
 ```
 
 ```{r}
@@ -403,10 +408,27 @@ FDP.q.sep.plot <- ggplot(data = FDP.q.ggdata.sep, aes(x = pi0, y = FDP)) +
   geom_boxplot(aes(fill = Method, color = Method), outlier.color = NULL, outlier.size = 0.5) +
   scale_color_manual(labels = method.name.FDR, values = method.col.FDR) +
   scale_fill_manual(labels = method.name.FDR, values = alpha(method.col.FDR, 0.35)) +
-  facet_wrap(~Noise, nrow = 1, ncol = 4) +
+  facet_wrap(~Noise, nrow = 1) +
   geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
   labs(x = expression(pi[0]), y = "FDP", title = bquote(paste("At nominal FDR = ", .(q)))) +
   theme(plot.title = element_text(size = 12),
+        axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10),
+        axis.title.y = element_text(size = 15),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "bottom",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+
+FDP.q.all.sep.plot <- ggplot(data = FDP.q.ggdata, aes(x = pi0, y = FDP, fill = Method, color = Method)) +
+  stat_summary(fun.data = boxplot.quantile, geom = "boxplot", position = "dodge") +
+  scale_color_manual(labels = method.name.FDR, values = method.col.FDR) +
+  scale_fill_manual(labels = method.name.FDR, values = alpha(method.col.FDR, 0.35)) +
+  facet_wrap(~Noise, nrow = 1) +
+  geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
+  labs(x = expression(pi[0]), y = "FDP", title = bquote(paste("At nominal FDR = ", .(q)))) +
+  theme(plot.title = element_text(size = 12, hjust = 0),
         axis.title.x = element_text(size = 15),
         axis.text.x = element_text(size = 10),
         axis.title.y = element_text(size = 15),
@@ -420,7 +442,7 @@ FDP.q.sep.plot <- ggplot(data = FDP.q.ggdata.sep, aes(x = pi0, y = FDP)) +
 
 pi0.0.9 <- which(pi0.list == 0.9)
 sd.z.0.9 <- sd.z[pi0.0.9]
-typical.noise <- pi0.0.9[order(sd.z.0.9)[floor(quantile(seq(sd.z.0.9), c(0.1, 0.5, 0.9)))]]
+typical.noise <- pi0.0.9[order(sd.z.0.9)[floor(quantile(seq(sd.z.0.9), c(0.1, 0.5, 0.95)))]]
 
 z.list.sel <- z.list[typical.noise]
 names(z.list.sel) <- c("Deflated Noise", "In-between", "Inflated Noise")
@@ -428,12 +450,16 @@ z.sep.ggdata <- melt(z.list.sel, value.name = "z")
 z.sep.plot <- ggplot(data = z.sep.ggdata, aes(x = z)) +
   geom_histogram(aes(y = ..density..), binwidth = 0.2) +
   facet_wrap(~L1, nrow = 1) +
-  stat_function(fun = dnorm, color = "blue", lwd = 1.5) +
+  stat_function(fun = dnorm, aes(color = "N(0, 1)"), lwd = 1.5, show.legend = TRUE) +
+  scale_color_manual(values = "blue") +
   theme(axis.title.x = element_text(size = 15),
         axis.text.x = element_text(size = 10),
         axis.title.y = element_text(size = 15),
         axis.text.y = element_text(size = 10),
-        strip.text = element_text(size = 15))
+        strip.text = element_text(size = 15),
+        legend.position = "left",
+        legend.title = element_blank(),
+        legend.text = element_text(size = 12))
 
 ##===========================================================
 
@@ -2258,14 +2284,14 @@ FDP.q.g.ggdata <- rbind.data.frame(
   FDP.q.all.ggdata.bimodal
 )
 
-FDP.q.g.plot <- ggplot(data = FDP.q.g.ggdata, aes(x = pi0, y = FDP)) +
-  geom_boxplot(aes(fill = Method, color = Method), outlier.color = NULL, outlier.size = 0.5) +
+FDP.q.g.plot <- ggplot(data = FDP.q.g.ggdata, aes(x = pi0, y = FDP, fill = Method, color = Method)) +
+  stat_summary(fun.data = boxplot.quantile, geom = "boxplot", position = "dodge") +
   scale_color_manual(labels = method.name.FDR, values = method.col.FDR) +
   scale_fill_manual(labels = method.name.FDR, values = alpha(method.col.FDR, 0.35)) +
   facet_wrap(~g, nrow = 1) +
   geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
   labs(x = expression(pi[0]), y = "FDP", title = bquote(paste("At nominal FDR = ", .(q)))) +
-  theme(plot.title = element_text(size = 12),
+  theme(plot.title = element_text(size = 12, hjust = 0),
         axis.title.x = element_text(size = 15),
         axis.text.x = element_text(size = 10),
         axis.title.y = element_text(size = 15),
@@ -2281,7 +2307,13 @@ ggsave("../output/fig/FDP.q.g.pdf", FDP.q.g.plot.save, height = 6, width = 9)
 
 ##=========================================================
 
-FDP.q.sep.plot.save <- gridExtra::arrangeGrob(z.sep.plot, FDP.q.sep.plot, heights = c(1, 1.5))
+blank.ggdata <- data.frame()
+blank.plot <- ggplot(data = blank.ggdata) + 
+  geom_blank()
+
+z.sep.plot.save <- gridExtra::arrangeGrob(blank.plot, z.sep.plot, nrow = 1, widths = c(0.4, 3.8))
+
+FDP.q.sep.plot.save <- gridExtra::arrangeGrob(z.sep.plot.save, FDP.q.all.sep.plot, heights = c(1, 1.5))
 
 ggsave("../output/fig/FDP.q.sep.pdf", FDP.q.sep.plot.save, height = 6, width = 8)
 
