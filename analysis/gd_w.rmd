@@ -494,7 +494,6 @@ library(deconvolveR)
 
 ```{r, cache = TRUE}
 G <- function (t) {
-# 0.6 * pnorm(t, 0, 0.1) + 0.3 * pnorm(t, 0, 1) + 0.1 * pnorm(t, 0, 3)
   0.6 * pnorm(t, 0, 0) + 0.3 * pnorm(t, 0, 1) + 0.1 * pnorm(t, 0, 3)
 }
 
@@ -553,7 +552,6 @@ for (i in 3 : 5) {
   )
   
   ## CASH
-  gd.priority = ifelse(i == 3, TRUE, FALSE)
   fit.cash <- gdash(X, s)
   cash.plot <- as.numeric(ashr::mixcdf(ashr::get_fitted_g(fit.cash), x.plot))
   CASH.data <- cbind.data.frame(
@@ -571,7 +569,9 @@ for (i in 3 : 5) {
   )
   
   ## Kiefer-Wolfowitz's NPMLE (1956)
-  fit.kw <- REBayes::GLmix(x = X, sigma = s)
+  ## implemented by Koenker-Mizera-Gu's REBayes (2016)
+  v = seq(-6, 6, by = 0.01)
+  fit.kw <- REBayes::GLmix(x = X, v = v, sigma = s)
   kw.plot <- CDF.KW(fit.kw)
   KW.data <- cbind.data.frame(
     Method = "KW",
@@ -579,6 +579,7 @@ for (i in 3 : 5) {
     cdfhat = kw.plot
   )
   
+  ## KW smoothed by the biweight kernel
   kws.plot <- CDF.KW(fit.kw, interp = "biweight")
   KWs.data <- cbind.data.frame(
     Method = "KWs",
@@ -587,6 +588,7 @@ for (i in 3 : 5) {
   )
 
   ## kernal deconvolution by Stefanski and Carroll 1990
+  ## implemented by Koenker
   fit.sc <- KFE(Z)
   sc.plot <- CDF.KW(fit.sc)
   SC.data <- cbind.data.frame(
@@ -641,11 +643,16 @@ deconv.ggdata <- rbind.data.frame(
   deconv.ind.ggdata,
   deconv.inf.ggdata
 )
+```
 
+
+```{r}
 method.name <- c("True", "Fourier", "KW", "Efron", "ASH", "CASH")
 method.col <- c("black", scales::hue_pal()(5))
 method.linetype <- c("longdash", rep("solid", 5))
+```
 
+```{r}
 ## plotting
 ggplot(data = deconv.ggdata, aes(x = x, y = cdfhat, col = Method, linetype = Method)) + 
   geom_line() +
