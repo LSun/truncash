@@ -361,7 +361,7 @@ div.section {
 </li>
 <li>
 <details>
-<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/e9c3b2dc0978bdc852f5154cd5dcf8f15575e393" target="_blank">e9c3b2d</a> </summary></p>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/edfa8cedc512337933b88b9e4abd1cde56294e4c" target="_blank">edfa8ce</a> </summary></p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 <pre><code>
 Ignored files:
@@ -410,6 +410,7 @@ Ignored files:
     Ignored:    analysis/diagnostic_plot_2_cache/
     Ignored:    analysis/diagnostic_plot_cache/
     Ignored:    analysis/efron_leukemia_cache/
+    Ignored:    analysis/figure/
     Ignored:    analysis/fitting_normal_cache/
     Ignored:    analysis/gaussian_derivatives_2_cache/
     Ignored:    analysis/gaussian_derivatives_3_cache/
@@ -493,6 +494,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/edfa8cedc512337933b88b9e4abd1cde56294e4c/analysis/gd_w.rmd" target="_blank">edfa8ce</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-05-30
+</td>
+<td style="text-align:left;">
+new KM
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/086abd61eba0be82f28340a839efff90c04de299/docs/gd_w.html" target="_blank">086abd6</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-30
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 rmd
@@ -1821,7 +1856,6 @@ CDF.KW &lt;- function(h, interp = FALSE, eps = 0.001, bw = 0.7){
 
 library(deconvolveR)</code></pre>
 <pre class="r"><code>G &lt;- function (t) {
-# 0.6 * pnorm(t, 0, 0.1) + 0.3 * pnorm(t, 0, 1) + 0.1 * pnorm(t, 0, 3)
   0.6 * pnorm(t, 0, 0) + 0.3 * pnorm(t, 0, 1) + 0.1 * pnorm(t, 0, 3)
 }
 
@@ -1874,7 +1908,6 @@ for (i in 3 : 5) {
   )
   
   ## CASH
-  gd.priority = ifelse(i == 3, TRUE, FALSE)
   fit.cash &lt;- gdash(X, s)
   cash.plot &lt;- as.numeric(ashr::mixcdf(ashr::get_fitted_g(fit.cash), x.plot))
   CASH.data &lt;- cbind.data.frame(
@@ -1892,7 +1925,9 @@ for (i in 3 : 5) {
   )
   
   ## Kiefer-Wolfowitz&#39;s NPMLE (1956)
-  fit.kw &lt;- REBayes::GLmix(x = X, sigma = s)
+  ## implemented by Koenker-Mizera-Gu&#39;s REBayes (2016)
+  v = seq(-6, 6, by = 0.01)
+  fit.kw &lt;- REBayes::GLmix(x = X, v = v, sigma = s)
   kw.plot &lt;- CDF.KW(fit.kw)
   KW.data &lt;- cbind.data.frame(
     Method = &quot;KW&quot;,
@@ -1900,6 +1935,7 @@ for (i in 3 : 5) {
     cdfhat = kw.plot
   )
   
+  ## KW smoothed by the biweight kernel
   kws.plot &lt;- CDF.KW(fit.kw, interp = &quot;biweight&quot;)
   KWs.data &lt;- cbind.data.frame(
     Method = &quot;KWs&quot;,
@@ -1908,6 +1944,7 @@ for (i in 3 : 5) {
   )
 
   ## kernal deconvolution by Stefanski and Carroll 1990
+  ## implemented by Koenker
   fit.sc &lt;- KFE(Z)
   sc.plot &lt;- CDF.KW(fit.sc)
   SC.data &lt;- cbind.data.frame(
@@ -2032,13 +2069,11 @@ replaced by maximum positive value</code></pre>
   deconv.def.ggdata,
   deconv.ind.ggdata,
   deconv.inf.ggdata
-)
-
-method.name &lt;- c(&quot;True&quot;, &quot;Fourier&quot;, &quot;KW&quot;, &quot;Efron&quot;, &quot;ASH&quot;, &quot;CASH&quot;)
+)</code></pre>
+<pre class="r"><code>method.name &lt;- c(&quot;True&quot;, &quot;Fourier&quot;, &quot;KW&quot;, &quot;Efron&quot;, &quot;ASH&quot;, &quot;CASH&quot;)
 method.col &lt;- c(&quot;black&quot;, scales::hue_pal()(5))
-method.linetype &lt;- c(&quot;longdash&quot;, rep(&quot;solid&quot;, 5))
-
-## plotting
+method.linetype &lt;- c(&quot;longdash&quot;, rep(&quot;solid&quot;, 5))</code></pre>
+<pre class="r"><code>## plotting
 ggplot(data = deconv.ggdata, aes(x = x, y = cdfhat, col = Method, linetype = Method)) + 
   geom_line() +
   facet_wrap(~Noise, nrow = 1) +
@@ -2058,52 +2093,10 @@ ggplot(data = deconv.ggdata, aes(x = x, y = cdfhat, col = Method, linetype = Met
         legend.text = element_text(size = 12)) +
 
 ggsave(&quot;../output/fig/deconv.eps&quot;, height = 4, width = 9)</code></pre>
-<pre><code>Warning: Removed 1158 rows containing missing values (geom_path).
+<pre><code>Warning: Removed 1153 rows containing missing values (geom_path).
 
-Warning: Removed 1158 rows containing missing values (geom_path).</code></pre>
-<p><img src="figure/gd_w.rmd/unnamed-chunk-24-1.png" width="672" style="display: block; margin: auto;" /></p>
-<details>
-<summary><em>Expand here to see past versions of unnamed-chunk-24-1.png:</em></summary>
-<table style = "border-collapse:separate; border-spacing:5px;">
-<thead>
-<tr>
-<th style="text-align:left;">
-Version
-</th>
-<th style="text-align:left;">
-Author
-</th>
-<th style="text-align:left;">
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-<a href="https://github.com/LSun/truncash/blob/99004e98b8bb93f6e06ae0aec73d08268d4970f8/docs/figure/gd_w.rmd/unnamed-chunk-24-1.png" target="_blank">99004e9</a>
-</td>
-<td style="text-align:left;">
-LSun
-</td>
-<td style="text-align:left;">
-2018-05-30
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-<a href="https://github.com/LSun/truncash/blob/b42a125861f1ee266f0cb25082a60595990a0a23/docs/figure/gd_w.rmd/unnamed-chunk-24-1.png" target="_blank">b42a125</a>
-</td>
-<td style="text-align:left;">
-LSun
-</td>
-<td style="text-align:left;">
-2018-05-29
-</td>
-</tr>
-</tbody>
-</table>
-</details>
+Warning: Removed 1153 rows containing missing values (geom_path).</code></pre>
+<p><img src="figure/gd_w.rmd/unnamed-chunk-26-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="session-information" class="section level2">
 <h2>Session information</h2>
