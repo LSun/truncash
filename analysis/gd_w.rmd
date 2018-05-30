@@ -373,13 +373,15 @@ lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01), 0, 1.6), col = "green"
 rect(xleft = c(-5, 2.5),
      xright = c(-2.5, 5),
      ytop = c(0.05, 1),
-     ybottom = c(0, 0.95), border = "red")
+     ybottom = c(0, 0.95), border = "red", lty = c(1, 5))
 
-plot(ecdf(z), xlab = "", ylab = "", main = expression("(b): Left Tail"), lwd = 2, xlim = c(-5, -2.5), ylim = c(0, 0.05), cex.main = 1.5)
+plot(ecdf(z), xlab = "", ylab = "", main = expression("(b): Left Tail"), lwd = 2, xlim = c(-5, -2.5), ylim = c(0, 0.05), cex.main = 1.5, bty = "n")
+box(col = "red")
 lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01)), col = "blue", lwd = 2)
 lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01), 0, 1.6), col = "green", lwd = 2)
 
-plot(ecdf(z), xlab = "", ylab = "", main = expression("(c): Right tail"), lwd = 2, xlim = c(2.5, 5), ylim = c(0.95, 1), cex.main = 1.5)
+plot(ecdf(z), xlab = "", ylab = "", main = expression("(c): Right tail"), lwd = 2, xlim = c(2.5, 5), ylim = c(0.95, 1), cex.main = 1.5, bty = "n")
+box(col = "red", lty = 5)
 lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01)), col = "blue", lwd = 2)
 lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01), 0, 1.6), col = "green", lwd = 2)
 
@@ -618,6 +620,7 @@ deconv.ggdata <- rbind.data.frame(
 ```{r}
 method.name <- c("Fourier", "KW", "Efron", "ASH", "CASH")
 method.col <- scales::hue_pal()(5)
+method.linetype <- c("dashed", "dotdash", "twodash", "longdash", "dashed")
 
 ## plotting
 ggplot(data = deconv.ggdata, aes(x = x, y = cdfhat, col = Method, linetype = Method)) + 
@@ -625,7 +628,7 @@ ggplot(data = deconv.ggdata, aes(x = x, y = cdfhat, col = Method, linetype = Met
   facet_wrap(~Noise, nrow = 1) +
   stat_function(fun = G, col = "black", lty = 1) + 
   xlim(-5, 5) +
-  scale_linetype_manual(values = 2 : 5, labels = method.name) +
+  scale_linetype_manual(values = method.linetype, labels = method.name) +
   scale_color_manual(values = method.col, labels = method.name) +
   labs(x = expression(theta), y = "Estimated CDF of g", title = expression(g == 0.6~delta[0] + 0.3~N(0, 1^2) + 0.1~N(0, 3^2))) +
   theme(plot.title = element_text(size = 15, hjust = 0.5),
