@@ -332,7 +332,7 @@ div.section {
 </div>
 
 
-<p><strong>Last updated:</strong> 2018-05-29</p>
+<p><strong>Last updated:</strong> 2018-05-30</p>
 <strong>workflowr checks:</strong> <small>(Click a bullet for more information)</small>
 <ul>
 <li>
@@ -361,7 +361,7 @@ div.section {
 </li>
 <li>
 <details>
-<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/fc26405cf472c8734c1c292f32752f6bdf38b30f" target="_blank">fc26405</a> </summary></p>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/d54a1559fb9447c1e5748bffb24dc4db782b6e02" target="_blank">d54a155</a> </summary></p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 <pre><code>
 Ignored files:
@@ -410,7 +410,6 @@ Ignored files:
     Ignored:    analysis/diagnostic_plot_2_cache/
     Ignored:    analysis/diagnostic_plot_cache/
     Ignored:    analysis/efron_leukemia_cache/
-    Ignored:    analysis/figure/
     Ignored:    analysis/fitting_normal_cache/
     Ignored:    analysis/gaussian_derivatives_2_cache/
     Ignored:    analysis/gaussian_derivatives_3_cache/
@@ -462,6 +461,9 @@ Ignored files:
     Ignored:    docs/figure/.DS_Store
     Ignored:    output/fig/
 
+Unstaged changes:
+    Modified:   analysis/cash_plots_2.rmd
+
 </code></pre>
 Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
 </details>
@@ -491,6 +493,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d54a1559fb9447c1e5748bffb24dc4db782b6e02/analysis/gd_w.rmd" target="_blank">d54a155</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-05-30
+</td>
+<td style="text-align:left;">
+eps
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/2acb1abb6aad2555365c1815df7e1d0a8741a6af/docs/gd_w.html" target="_blank">2acb1ab</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-29
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 rmd
@@ -1897,7 +1933,7 @@ ggplot(data = deconv.ggdata, aes(x = x, y = cdfhat, col = Method, linetype = Met
   xlim(-5, 5) +
   scale_linetype_manual(values = method.linetype, labels = method.name) +
   scale_color_manual(values = method.col, labels = method.name) +
-  labs(x = expression(theta), y = &quot;Estimated CDF of g&quot;, title = expression(g == 0.6~delta[0] + 0.3~N(0, 1^2) + 0.1~N(0, 3^2))) +
+  labs(x = expression(theta), y = &quot;Estimated CDF of g&quot;, title = expression(g == 0.6~delta[0] + 0.3~N(0, 1) + 0.1~N(0, 3^2))) +
   theme(plot.title = element_text(size = 15, hjust = 0.5),
         axis.title.x = element_text(size = 15),
         axis.text.x = element_text(size = 10),
@@ -1940,7 +1976,7 @@ LSun
 </tbody>
 </table>
 </details>
-<pre class="r"><code>ggsave(&quot;../output/fig/deconv.eps&quot;, height = 4, width = 7)</code></pre>
+<pre class="r"><code>ggsave(&quot;../output/fig/deconv.eps&quot;, height = 5, width = 7)</code></pre>
 <pre><code>Warning: Removed 908 rows containing missing values (geom_path).</code></pre>
 </div>
 <div id="session-information" class="section level2">
@@ -1961,12 +1997,11 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] polynom_1.3-9     deconvolveR_1.1   reshape2_1.4.3   
- [4] ggplot2_2.2.1     plyr_1.8.4        edgeR_3.20.9     
- [7] limma_3.34.9      ashr_2.2-7        Rmosek_8.0.69    
-[10] PolynomF_1.0-2    CVXR_0.95         REBayes_1.3      
-[13] Matrix_1.2-14     SQUAREM_2017.10-1 EQL_1.0-0        
-[16] ttutils_1.0-1    
+ [1] deconvolveR_1.1   reshape2_1.4.3    ggplot2_2.2.1    
+ [4] plyr_1.8.4        edgeR_3.20.9      limma_3.34.9     
+ [7] ashr_2.2-7        Rmosek_8.0.69     PolynomF_1.0-2   
+[10] CVXR_0.95         REBayes_1.3       Matrix_1.2-14    
+[13] SQUAREM_2017.10-1 EQL_1.0-0         ttutils_1.0-1    
 
 loaded via a namespace (and not attached):
  [1] qvalue_2.10.0     locfit_1.5-9.1    splines_3.4.3    
