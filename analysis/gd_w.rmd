@@ -466,40 +466,12 @@ KFE <- function(y, T = 300, lambda = 1/3){
     list(x = T, y = g)
 }
 
-BDE <- function(y, T = 300, df = 5, c0 = 1){
-    # Bayesian Deconvolution Estimator: Efron (B'ka, 2016)
-    require(splines)
-    eps <- 1e-04
-    if(length(T) == 1) T <- seq(min(y)-eps, max(y)+eps, length = T)
-    X <- ns(T, df = df)
-    a0 <- rep(0, ncol(X))
-    A <- dnorm(outer(y,T,"-"))
-    qmle <- function(a, X, A, c0){
-	g <- exp(X %*% a)
-	g <- g/sum(g)
-	f <- A %*% g
-	-sum(log(f)) + c0 * sum(a^2)^.5
-    }
-    ahat <- nlm(qmle, a0, X=X, A=A, c0 = c0)$estimate
-    g <- exp(X %*% ahat)
-    g <- g/integrate(approxfun(T,g),min(T),max(T))$value
-    list(x = T,y = g)
-}
-
-W <- function(G, h, interp = FALSE, eps = 0.001){
-    #Wasserstein distance:  ||G-H||_W
-    H <- cumsum(h$y)
-    H <- H/H[length(H)]
-    W <- integrate(approxfun(h$x, abs(G(h$x) - H)),min(h$x),max(h$x))$value
-    list(W=W, H=H)
-}
-
 biweight <- function(x0, x, bw){
     t <- (x - x0)/bw
     (1-t^2)^2*((t> -1 & t<1)-0) *15/16
 }
 
-Wasser <- function(G, h, interp = FALSE, eps = 0.001, bw = 0.7){
+CDF.KW <- function(h, interp = FALSE, eps = 0.001, bw = 0.7){
     #Wasserstein distance:  ||G-H||_W
     if(interp == "biweight"){
 	yk = h$x
@@ -512,38 +484,52 @@ Wasser <- function(G, h, interp = FALSE, eps = 0.001, bw = 0.7){
 	H <- cumsum(h$y)
 	H <- H/H[length(H)]
     }
-    W <- integrate(approxfun(h$x, abs(G(h$x) - H)),min(h$x),max(h$x), subdivisions = 500)$value
-    list(W=W, H=H)
+    return(H)
 }
+
+library(deconvolveR)
 ```
 
-```{r}
+```{r, cache = TRUE}
 G <- function (t) {
-  0.6 * pnorm(t, 0, 0.1) + 0.3 * pnorm(t, 0, 1) + 0.1 * pnorm(t, 0, 3)
-# 0.6 * pnorm(t, 0, 0) + 0.3 * pnorm(t, 0, 1) + 0.1 * pnorm(t, 0, 3)
+# 0.6 * pnorm(t, 0, 0.1) + 0.3 * pnorm(t, 0, 1) + 0.1 * pnorm(t, 0, 3)
+  0.6 * pnorm(t, 0, 0) + 0.3 * pnorm(t, 0, 1) + 0.1 * pnorm(t, 0, 3)
 }
 
+set.seed(777)
+
 theta <- sample(c(
-  rnorm(6e3, 0, 0.1),
+  rnorm(6e3, 0, 0),
   rnorm(3e3, 0, 1),
   rnorm(1e3, 0, 3)
 ))
+```
 
+```{r, cache = TRUE}
+set.seed(777)
+r <- readRDS("../data/liver.rds")
+nsamp <- 5
+ngene <- 1e4
+Y = lcpm(r)
+subset = top_genes_index(ngene, Y)
+r = r[subset,]
+counts <- r[, sample(ncol(r), 2 * nsamp)]
+design <- model.matrix(~c(rep(0, nsamp), rep(1, nsamp)))
+summary <- count_to_summary(counts, design)
+s <- summary$sebetahat
+s <- s / sqrt(mean(s^2))
+```
+
+```{r, cache = TRUE}
 x.plot <- seq(-6, 6, by = 0.01)
 
 g.plot <- G(x.plot)
 
-s <- rep(1, 1e4)
-# s <- sqrt(rchisq(1e4, 5) / 5)
-
-method.name <- c("KW", "Efron", "ASH", "CASH")
-method.col <- c(scales::hue_pal()(4)[1 : 2], scales::hue_pal()(5)[4 : 5])
-
 for (i in 3 : 4) {
   z <- z.mat.sel[i, ]
   X <- theta + s * z
-  Z <- X / s
-  
+  Z <- theta + z
+
   ## ASH
   fit.ash <- ashr::ash(X, s, method = "fdr", mixcompdist = "normal")
   ash.plot <- as.numeric(ashr::mixcdf(ashr::get_fitted_g(fit.ash), x.plot))
@@ -554,45 +540,55 @@ for (i in 3 : 4) {
   )
   
   ## CASH
-  fit.cash <- gdash(X, s, gd.priority = TRUE)
+  gd.priority = ifelse(i == 3, TRUE, FALSE)
+  fit.cash <- gdash(X, s)
   cash.plot <- as.numeric(ashr::mixcdf(ashr::get_fitted_g(fit.cash), x.plot))
   CASH.data <- cbind.data.frame(
     Method = "CASH",
     x = x.plot,
     cdfhat = cash.plot
   )
+  plot(x.plot, g.plot, type = "l")
+  lines(x.plot, cash.plot, col = "blue")
   
   ## Efron's BD (2016)
-  fit.bd <- BDE(Z)
-  bd.plot <- Wasser(G, fit.bd)
+  fit.bd <- deconvolveR::deconv(tau = x.plot, X = Z, family = "Normal", deltaAt = 0)
   BD.data <- cbind.data.frame(
-    Method = "E-BD",
-    x = fit.bd$x,
-    cdfhat = bd.plot$H
+    Method = "Efron",
+    x = fit.bd$stats[, 1],
+    cdfhat = fit.bd$stats[, 4]
   )
   
   ## Kiefer-Wolfowitz's NPMLE (1956)
-  fit.kw <- REBayes::GLmix(Z)
-  kw.plot <- Wasser(G, fit.kw, interp = "biweight")
+  fit.kw <- REBayes::GLmix(x = X, sigma = s)
+  kw.plot <- CDF.KW(fit.kw)
   KW.data <- cbind.data.frame(
-    Method = "KW-KMG",
+    Method = "KW",
     x = fit.kw$x,
-    cdfhat = kw.plot$H
+    cdfhat = kw.plot
+  )
+  
+  kws.plot <- CDF.KW(fit.kw, interp = "biweight")
+  KWs.data <- cbind.data.frame(
+    Method = "KWs",
+    x = fit.kw$x,
+    cdfhat = kws.plot
   )
 
-  # ## kernal deconvolution by Stefanski and Carroll 1990
-  # fit.sc <- KFE(Z)
-  # sc.plot <- Wasser(G, fit.sc)
-  # SC.data <- cbind.data.frame(
-  #   Method = "SC-FK",
-  #   x = fit.sc$x,
-  #   cdfhat = sc.plot$H
-  # )
+  ## kernal deconvolution by Stefanski and Carroll 1990
+  fit.sc <- KFE(Z)
+  sc.plot <- CDF.KW(fit.sc)
+  SC.data <- cbind.data.frame(
+    Method = "SC-FK",
+    x = fit.sc$x,
+    cdfhat = sc.plot
+  )
   
   if (i == 3) {
     deconv.inf.ggdata <- cbind.data.frame(
       Noise = "Inflated Noise",
       rbind.data.frame(
+        SC.data,
         KW.data,
         BD.data,
         ASH.data,
@@ -603,6 +599,7 @@ for (i in 3 : 4) {
     deconv.def.ggdata <- cbind.data.frame(
       Noise = "Deflated Noise",
       rbind.data.frame(
+        SC.data,
         KW.data,
         BD.data,
         ASH.data,
@@ -616,23 +613,30 @@ deconv.ggdata <- rbind.data.frame(
   deconv.inf.ggdata,
   deconv.def.ggdata
 )
+```
+
+```{r}
+method.name <- c("Fourier", "KW", "Efron", "ASH", "CASH")
+method.col <- scales::hue_pal()(5)
 
 ## plotting
-ggplot(data = deconv.ggdata, aes(x = x, y = cdfhat, col = method, linetype = method)) + 
-  geom_line() +
+ggplot(data = deconv.ggdata, aes(x = x, y = cdfhat, col = Method, linetype = Method)) + 
+  geom_line(lwd = 1.1) +
   facet_wrap(~Noise, nrow = 1) +
   stat_function(fun = G, col = "black", lty = 1) + 
   xlim(-5, 5) +
   scale_linetype_manual(values = 2 : 5, labels = method.name) +
   scale_color_manual(values = method.col, labels = method.name) +
-  labs(x = expression(theta), y = "Estimated CDF of g") +
-  theme(axis.title.x = element_text(size = 15),
+  labs(x = expression(theta), y = "Estimated CDF of g", title = expression(g == 0.6~delta[0] + 0.3~N(0, 1^2) + 0.1~N(0, 3^2))) +
+  theme(plot.title = element_text(size = 15, hjust = 0.5),
+        axis.title.x = element_text(size = 15),
         axis.text.x = element_text(size = 10),
-        axis.title.y = element_text(size = 12),
+        axis.title.y = element_text(size = 15),
         axis.text.y = element_text(size = 10),
         strip.text = element_text(size = 15),
-        legend.position = "top",
+        legend.position = "bottom",
         legend.background = element_rect(color = "grey"),
         legend.text = element_text(size = 12))
-  
+
+ggsave("../output/fig/deconv.eps", height = 4, width = 7)
 ```
