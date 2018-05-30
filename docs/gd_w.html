@@ -332,7 +332,7 @@ div.section {
 </div>
 
 
-<p><strong>Last updated:</strong> 2018-05-27</p>
+<p><strong>Last updated:</strong> 2018-05-29</p>
 <strong>workflowr checks:</strong> <small>(Click a bullet for more information)</small>
 <ul>
 <li>
@@ -361,7 +361,7 @@ div.section {
 </li>
 <li>
 <details>
-<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/9a2747c30cfb77d907ed19221996783a518595d3" target="_blank">9a2747c</a> </summary></p>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/c1f43e06aec6d1c40d338d132152d8f6c48f9213" target="_blank">c1f43e0</a> </summary></p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 <pre><code>
 Ignored files:
@@ -490,6 +490,91 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/c1f43e06aec6d1c40d338d132152d8f6c48f9213/analysis/gd_w.rmd" target="_blank">c1f43e0</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-29
+</td>
+<td style="text-align:left;">
+wflow_publish(“analysis/gd_w.rmd”)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1ca47ca69d07c828c86606659e7a2973e47de80e/analysis/gd_w.rmd" target="_blank">1ca47ca</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-05-29
+</td>
+<td style="text-align:left;">
+revise
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/119caf9fab9f3bc2fd0707a5fffeed5ad91ba11d/analysis/gd_w.rmd" target="_blank">119caf9</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-29
+</td>
+<td style="text-align:left;">
+deconv
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/2716923c64b6f2afa6879389dc64556e46fc6b12/analysis/gd_w.rmd" target="_blank">2716923</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-05-29
+</td>
+<td style="text-align:left;">
+deconv
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/991488505c91ecafd24726409decb0e1e72b40d4/docs/gd_w.html" target="_blank">9914885</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-27
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 rmd
@@ -1507,12 +1592,18 @@ par(mar = c(2, 2, 2.5, 1)) # make the plots be closer together
 plot(ecdf(z), xlab = &quot;&quot;, ylab = &quot;&quot;, lwd = 2, main = expression(&quot;(a): CDF of All&quot;), cex.main = 1.5)
 lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01)), col = &quot;blue&quot;, lwd = 2)
 lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01), 0, 1.6), col = &quot;green&quot;, lwd = 2)
+rect(xleft = c(-5, 2.5),
+     xright = c(-2.5, 5),
+     ytop = c(0.05, 1),
+     ybottom = c(0, 0.95), border = &quot;red&quot;, lty = c(1, 5))
 
-plot(ecdf(z), xlab = &quot;&quot;, ylab = &quot;&quot;, main = expression(&quot;(b): Left Tail&quot;), lwd = 2, xlim = c(-5, -2.5), ylim = c(0, 0.05), cex.main = 1.5)
+plot(ecdf(z), xlab = &quot;&quot;, ylab = &quot;&quot;, main = expression(&quot;(b): Left Tail&quot;), lwd = 2, xlim = c(-5, -2.5), ylim = c(0, 0.05), cex.main = 1.5, bty = &quot;n&quot;)
+box(col = &quot;red&quot;)
 lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01)), col = &quot;blue&quot;, lwd = 2)
 lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01), 0, 1.6), col = &quot;green&quot;, lwd = 2)
 
-plot(ecdf(z), xlab = &quot;&quot;, ylab = &quot;&quot;, main = expression(&quot;(c): Right tail&quot;), lwd = 2, xlim = c(2.5, 5), ylim = c(0.95, 1), cex.main = 1.5)
+plot(ecdf(z), xlab = &quot;&quot;, ylab = &quot;&quot;, main = expression(&quot;(c): Right tail&quot;), lwd = 2, xlim = c(2.5, 5), ylim = c(0.95, 1), cex.main = 1.5, bty = &quot;n&quot;)
+box(col = &quot;red&quot;, lty = 5)
 lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01)), col = &quot;blue&quot;, lwd = 2)
 lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01), 0, 1.6), col = &quot;green&quot;, lwd = 2)
 
@@ -1582,6 +1673,213 @@ fit.a &lt;- ashr::ash(z, 1, method = &quot;fdr&quot;)
 sum(ashr::get_qvalue(fit.a) &lt;= 0.05)</code></pre>
 <pre><code>[1] 10000</code></pre>
 </div>
+<div id="deconvolution" class="section level2">
+<h2>Deconvolution</h2>
+<pre class="r"><code>KFE &lt;- function(y, T = 300, lambda = 1/3){
+    # Kernel Fourier Estimator: Stefanski and Carroll (Statistics, 1990)
+    ks &lt;- function(s,x) exp(s^2/2) * cos(s * x)
+    K &lt;- function(t, y, lambda = 1/3){
+    k &lt;- y
+    for(i in 1:length(y)){
+        k[i] &lt;- integrate(ks, 0, 1/lambda, x = (y[i] - t))$value/pi 
+    }
+    mean(k)
+    }
+    eps &lt;- 1e-04
+    if(length(T) == 1) T &lt;- seq(min(y)-eps, max(y)+eps, length = T)
+    g &lt;- T
+    for(j in 1:length(T))
+    g[j] &lt;- K(T[j], y, lambda = lambda)
+    list(x = T, y = g)
+}
+
+biweight &lt;- function(x0, x, bw){
+    t &lt;- (x - x0)/bw
+    (1-t^2)^2*((t&gt; -1 &amp; t&lt;1)-0) *15/16
+}
+
+CDF.KW &lt;- function(h, interp = FALSE, eps = 0.001, bw = 0.7){
+    #Wasserstein distance:  ||G-H||_W
+    if(interp == &quot;biweight&quot;){
+    yk = h$x
+    for (j in 1:length(yk))
+        yk[j] = sum(biweight(h$x[j], h$x, bw = bw)*h$y/sum(h$y))
+    H &lt;- cumsum(yk)
+    H &lt;- H/H[length(H)]
+    }
+    else {
+    H &lt;- cumsum(h$y)
+    H &lt;- H/H[length(H)]
+    }
+    return(H)
+}
+
+library(deconvolveR)</code></pre>
+<pre class="r"><code>G &lt;- function (t) {
+# 0.6 * pnorm(t, 0, 0.1) + 0.3 * pnorm(t, 0, 1) + 0.1 * pnorm(t, 0, 3)
+  0.6 * pnorm(t, 0, 0) + 0.3 * pnorm(t, 0, 1) + 0.1 * pnorm(t, 0, 3)
+}
+
+set.seed(777)
+
+theta &lt;- sample(c(
+  rnorm(6e3, 0, 0),
+  rnorm(3e3, 0, 1),
+  rnorm(1e3, 0, 3)
+))</code></pre>
+<pre class="r"><code>set.seed(777)
+r &lt;- readRDS(&quot;../data/liver.rds&quot;)
+nsamp &lt;- 5
+ngene &lt;- 1e4
+Y = lcpm(r)
+subset = top_genes_index(ngene, Y)
+r = r[subset,]
+counts &lt;- r[, sample(ncol(r), 2 * nsamp)]
+design &lt;- model.matrix(~c(rep(0, nsamp), rep(1, nsamp)))
+summary &lt;- count_to_summary(counts, design)
+s &lt;- summary$sebetahat
+s &lt;- s / sqrt(mean(s^2))</code></pre>
+<pre class="r"><code>x.plot &lt;- seq(-6, 6, by = 0.01)
+
+g.plot &lt;- G(x.plot)
+
+for (i in 3 : 4) {
+  z &lt;- z.mat.sel[i, ]
+  X &lt;- theta + s * z
+  Z &lt;- theta + z
+
+  ## ASH
+  fit.ash &lt;- ashr::ash(X, s, method = &quot;fdr&quot;, mixcompdist = &quot;normal&quot;)
+  ash.plot &lt;- as.numeric(ashr::mixcdf(ashr::get_fitted_g(fit.ash), x.plot))
+  ASH.data &lt;- cbind.data.frame(
+    Method = &quot;ASH&quot;,
+    x = x.plot,
+    cdfhat = ash.plot
+  )
+  
+  ## CASH
+  gd.priority = ifelse(i == 3, TRUE, FALSE)
+  fit.cash &lt;- gdash(X, s)
+  cash.plot &lt;- as.numeric(ashr::mixcdf(ashr::get_fitted_g(fit.cash), x.plot))
+  CASH.data &lt;- cbind.data.frame(
+    Method = &quot;CASH&quot;,
+    x = x.plot,
+    cdfhat = cash.plot
+  )
+  plot(x.plot, g.plot, type = &quot;l&quot;)
+  lines(x.plot, cash.plot, col = &quot;blue&quot;)
+  
+  ## Efron&#39;s BD (2016)
+  fit.bd &lt;- deconvolveR::deconv(tau = x.plot, X = Z, family = &quot;Normal&quot;, deltaAt = 0)
+  BD.data &lt;- cbind.data.frame(
+    Method = &quot;Efron&quot;,
+    x = fit.bd$stats[, 1],
+    cdfhat = fit.bd$stats[, 4]
+  )
+  
+  ## Kiefer-Wolfowitz&#39;s NPMLE (1956)
+  fit.kw &lt;- REBayes::GLmix(x = X, sigma = s)
+  kw.plot &lt;- CDF.KW(fit.kw)
+  KW.data &lt;- cbind.data.frame(
+    Method = &quot;KW&quot;,
+    x = fit.kw$x,
+    cdfhat = kw.plot
+  )
+  
+  kws.plot &lt;- CDF.KW(fit.kw, interp = &quot;biweight&quot;)
+  KWs.data &lt;- cbind.data.frame(
+    Method = &quot;KWs&quot;,
+    x = fit.kw$x,
+    cdfhat = kws.plot
+  )
+
+  ## kernal deconvolution by Stefanski and Carroll 1990
+  fit.sc &lt;- KFE(Z)
+  sc.plot &lt;- CDF.KW(fit.sc)
+  SC.data &lt;- cbind.data.frame(
+    Method = &quot;SC-FK&quot;,
+    x = fit.sc$x,
+    cdfhat = sc.plot
+  )
+  
+  if (i == 3) {
+    deconv.inf.ggdata &lt;- cbind.data.frame(
+      Noise = &quot;Inflated Noise&quot;,
+      rbind.data.frame(
+        SC.data,
+        KW.data,
+        BD.data,
+        ASH.data,
+        CASH.data
+      )
+    )
+  } else {
+    deconv.def.ggdata &lt;- cbind.data.frame(
+      Noise = &quot;Deflated Noise&quot;,
+      rbind.data.frame(
+        SC.data,
+        KW.data,
+        BD.data,
+        ASH.data,
+        CASH.data
+      )
+    )
+  }
+}</code></pre>
+<pre><code>Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
+               consider reducing rtol
+
+Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
+               consider reducing rtol
+
+Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
+               consider reducing rtol
+
+Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
+               consider reducing rtol
+
+Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
+               consider reducing rtol
+
+Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
+               consider reducing rtol</code></pre>
+<p><img src="figure/gd_w.rmd/unnamed-chunk-23-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code>Warning in stats::nlm(f = loglik, p = aStart, gradtol = 1e-10, ...): NA/Inf
+replaced by maximum positive value</code></pre>
+<pre><code>Warning in stats::nlm(f = loglik, p = aStart, gradtol = 1e-10, ...): NA/Inf
+replaced by maximum positive value</code></pre>
+<p><img src="figure/gd_w.rmd/unnamed-chunk-23-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>deconv.ggdata &lt;- rbind.data.frame(
+  deconv.inf.ggdata,
+  deconv.def.ggdata
+)</code></pre>
+<pre class="r"><code>method.name &lt;- c(&quot;Fourier&quot;, &quot;KW&quot;, &quot;Efron&quot;, &quot;ASH&quot;, &quot;CASH&quot;)
+method.col &lt;- scales::hue_pal()(5)
+method.linetype &lt;- c(&quot;dashed&quot;, &quot;dotdash&quot;, &quot;twodash&quot;, &quot;longdash&quot;, &quot;dashed&quot;)
+
+## plotting
+ggplot(data = deconv.ggdata, aes(x = x, y = cdfhat, col = Method, linetype = Method)) + 
+  geom_line(lwd = 1.1) +
+  facet_wrap(~Noise, nrow = 1) +
+  stat_function(fun = G, col = &quot;black&quot;, lty = 1) + 
+  xlim(-5, 5) +
+  scale_linetype_manual(values = method.linetype, labels = method.name) +
+  scale_color_manual(values = method.col, labels = method.name) +
+  labs(x = expression(theta), y = &quot;Estimated CDF of g&quot;, title = expression(g == 0.6~delta[0] + 0.3~N(0, 1^2) + 0.1~N(0, 3^2))) +
+  theme(plot.title = element_text(size = 15, hjust = 0.5),
+        axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10),
+        axis.title.y = element_text(size = 15),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = &quot;bottom&quot;,
+        legend.background = element_rect(color = &quot;grey&quot;),
+        legend.text = element_text(size = 12))</code></pre>
+<pre><code>Warning: Removed 908 rows containing missing values (geom_path).</code></pre>
+<p><img src="figure/gd_w.rmd/unnamed-chunk-24-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggsave(&quot;../output/fig/deconv.eps&quot;, height = 4, width = 7)</code></pre>
+<pre><code>Warning: Removed 908 rows containing missing values (geom_path).</code></pre>
+</div>
 <div id="session-information" class="section level2">
 <h2>Session information</h2>
 <pre class="r"><code>sessionInfo()</code></pre>
@@ -1600,11 +1898,11 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] reshape2_1.4.3    ggplot2_2.2.1     plyr_1.8.4       
- [4] edgeR_3.20.9      limma_3.34.9      ashr_2.2-7       
- [7] Rmosek_8.0.69     PolynomF_1.0-2    CVXR_0.95        
-[10] REBayes_1.3       Matrix_1.2-14     SQUAREM_2017.10-1
-[13] EQL_1.0-0         ttutils_1.0-1    
+ [1] deconvolveR_1.1   reshape2_1.4.3    ggplot2_2.2.1    
+ [4] plyr_1.8.4        edgeR_3.20.9      limma_3.34.9     
+ [7] ashr_2.2-7        Rmosek_8.0.69     PolynomF_1.0-2   
+[10] CVXR_0.95         REBayes_1.3       Matrix_1.2-14    
+[13] SQUAREM_2017.10-1 EQL_1.0-0         ttutils_1.0-1    
 
 loaded via a namespace (and not attached):
  [1] qvalue_2.10.0     locfit_1.5-9.1    splines_3.4.3    
@@ -1614,16 +1912,16 @@ loaded via a namespace (and not attached):
 [13] R.utils_2.6.0     bit64_0.9-7       scs_1.1-1        
 [16] foreach_1.4.4     stringr_1.3.1     munsell_0.4.3    
 [19] gtable_0.2.0      workflowr_1.0.1   R.methodsS3_1.7.1
-[22] codetools_0.2-15  evaluate_0.10.1   knitr_1.20       
-[25] doParallel_1.0.11 pscl_1.5.2        parallel_3.4.3   
-[28] Rcpp_0.12.16      backports_1.1.2   scales_0.5.0     
-[31] truncnorm_1.0-8   bit_1.1-13        digest_0.6.15    
-[34] stringi_1.2.2     grid_3.4.3        rprojroot_1.3-2  
-[37] ECOSolveR_0.4     tools_3.4.3       magrittr_1.5     
-[40] lazyeval_0.2.1    tibble_1.4.2      whisker_0.3-2    
-[43] MASS_7.3-50       assertthat_0.2.0  rmarkdown_1.9    
-[46] iterators_1.0.9   R6_2.2.2          git2r_0.21.0     
-[49] compiler_3.4.3   </code></pre>
+[22] codetools_0.2-15  evaluate_0.10.1   labeling_0.3     
+[25] knitr_1.20        doParallel_1.0.11 pscl_1.5.2       
+[28] parallel_3.4.3    Rcpp_0.12.16      backports_1.1.2  
+[31] scales_0.5.0      truncnorm_1.0-8   bit_1.1-13       
+[34] digest_0.6.15     stringi_1.2.2     grid_3.4.3       
+[37] rprojroot_1.3-2   ECOSolveR_0.4     tools_3.4.3      
+[40] magrittr_1.5      lazyeval_0.2.1    tibble_1.4.2     
+[43] whisker_0.3-2     MASS_7.3-50       assertthat_0.2.0 
+[46] rmarkdown_1.9     iterators_1.0.9   R6_2.2.2         
+[49] git2r_0.21.0      compiler_3.4.3   </code></pre>
 </div>
 
 <!-- Adjust MathJax settings so that all math formulae are shown using
