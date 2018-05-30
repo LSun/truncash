@@ -628,7 +628,7 @@ ggplot(data = deconv.ggdata, aes(x = x, y = cdfhat, col = Method, linetype = Met
   xlim(-5, 5) +
   scale_linetype_manual(values = method.linetype, labels = method.name) +
   scale_color_manual(values = method.col, labels = method.name) +
-  labs(x = expression(theta), y = "Estimated CDF of g", title = expression(g == 0.6~delta[0] + 0.3~N(0, 1^2) + 0.1~N(0, 3^2))) +
+  labs(x = expression(theta), y = "Estimated CDF of g", title = expression(g == 0.6~delta[0] + 0.3~N(0, 1) + 0.1~N(0, 3^2))) +
   theme(plot.title = element_text(size = 15, hjust = 0.5),
         axis.title.x = element_text(size = 15),
         axis.text.x = element_text(size = 10),
@@ -639,5 +639,5 @@ ggplot(data = deconv.ggdata, aes(x = x, y = cdfhat, col = Method, linetype = Met
         legend.background = element_rect(color = "grey"),
         legend.text = element_text(size = 12))
 
-ggsave("../output/fig/deconv.eps", height = 4, width = 7)
+ggsave("../output/fig/deconv.eps", height = 5, width = 7)
 ```
