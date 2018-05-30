@@ -525,12 +525,23 @@ s <- s / sqrt(mean(s^2))
 ```{r, cache = TRUE}
 x.plot <- seq(-6, 6, by = 0.01)
 
-g.plot <- G(x.plot)
+G.plot <- G(x.plot)
 
-for (i in 3 : 4) {
-  z <- z.mat.sel[i, ]
+for (i in 3 : 5) {
+  if (i != 5) {
+    z <- z.mat.sel[i, ]
+  } else {
+    z <- rnorm(1e4)
+  }
   X <- theta + s * z
   Z <- theta + z
+  
+  ## Truth
+  True.data <- cbind.data.frame(
+    Method = "True",
+    x = x.plot,
+    cdfhat = G.plot
+  )
 
   ## ASH
   fit.ash <- ashr::ash(X, s, method = "fdr", mixcompdist = "normal")
@@ -588,6 +599,19 @@ for (i in 3 : 4) {
     deconv.inf.ggdata <- cbind.data.frame(
       Noise = "Inflated Noise",
       rbind.data.frame(
+        True.data,
+        SC.data,
+        KW.data,
+        BD.data,
+        ASH.data,
+        CASH.data
+      )
+    )
+  } else if (i == 4) {
+    deconv.def.ggdata <- cbind.data.frame(
+      Noise = "Deflated Noise",
+      rbind.data.frame(
+        True.data,
         SC.data,
         KW.data,
         BD.data,
@@ -596,9 +620,10 @@ for (i in 3 : 4) {
       )
     )
   } else {
-    deconv.def.ggdata <- cbind.data.frame(
-      Noise = "Deflated Noise",
+    deconv.ind.ggdata <- cbind.data.frame(
+      Noise = "Independent Noise",
       rbind.data.frame(
+        True.data,
         SC.data,
         KW.data,
         BD.data,
@@ -608,26 +633,26 @@ for (i in 3 : 4) {
     )
   }
 }
-
-deconv.ggdata <- rbind.data.frame(
-  deconv.inf.ggdata,
-  deconv.def.ggdata
-)
 ```
 
 ```{r}
-method.name <- c("Fourier", "KW", "Efron", "ASH", "CASH")
-method.col <- scales::hue_pal()(5)
-method.linetype <- c("dashed", "dotdash", "twodash", "longdash", "dashed")
+deconv.ggdata <- rbind.data.frame(
+  deconv.def.ggdata,
+  deconv.ind.ggdata,
+  deconv.inf.ggdata
+)
+
+method.name <- c("True", "Fourier", "KW", "Efron", "ASH", "CASH")
+method.col <- c("black", scales::hue_pal()(5))
+method.linetype <- c("longdash", rep("solid", 5))
 
 ## plotting
 ggplot(data = deconv.ggdata, aes(x = x, y = cdfhat, col = Method, linetype = Method)) + 
-  geom_line(lwd = 1.1) +
+  geom_line() +
   facet_wrap(~Noise, nrow = 1) +
-  stat_function(fun = G, col = "black", lty = 1) + 
   xlim(-5, 5) +
-  scale_linetype_manual(values = method.linetype, labels = method.name) +
-  scale_color_manual(values = method.col, labels = method.name) +
+  scale_linetype_manual(values = method.linetype, labels = method.name, guide = guide_legend(nrow = 1)) +
+  scale_color_manual(values = method.col, labels = method.name, guide = guide_legend(nrow = 1)) +
   labs(x = expression(theta), y = "Estimated CDF of g", title = expression(g == 0.6~delta[0] + 0.3~N(0, 1) + 0.1~N(0, 3^2))) +
   theme(plot.title = element_text(size = 15, hjust = 0.5),
         axis.title.x = element_text(size = 15),
@@ -636,8 +661,9 @@ ggplot(data = deconv.ggdata, aes(x = x, y = cdfhat, col = Method, linetype = Met
         axis.text.y = element_text(size = 10),
         strip.text = element_text(size = 15),
         legend.position = "bottom",
+        legend.title = element_blank(),
         legend.background = element_rect(color = "grey"),
-        legend.text = element_text(size = 12))
+        legend.text = element_text(size = 12)) +
 
-ggsave("../output/fig/deconv.eps", height = 5, width = 7)
+ggsave("../output/fig/deconv.eps", height = 4, width = 9)
 ```
