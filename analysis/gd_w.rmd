@@ -550,9 +550,7 @@ for (i in 3 : 4) {
     x = x.plot,
     cdfhat = cash.plot
   )
-  plot(x.plot, g.plot, type = "l")
-  lines(x.plot, cash.plot, col = "blue")
-  
+
   ## Efron's BD (2016)
   fit.bd <- deconvolveR::deconv(tau = x.plot, X = Z, family = "Normal", deltaAt = 0)
   BD.data <- cbind.data.frame(
