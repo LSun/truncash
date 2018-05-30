@@ -361,7 +361,7 @@ div.section {
 </li>
 <li>
 <details>
-<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/d54a1559fb9447c1e5748bffb24dc4db782b6e02" target="_blank">d54a155</a> </summary></p>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/e9c3b2dc0978bdc852f5154cd5dcf8f15575e393" target="_blank">e9c3b2d</a> </summary></p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 <pre><code>
 Ignored files:
@@ -493,6 +493,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/e9c3b2dc0978bdc852f5154cd5dcf8f15575e393/analysis/gd_w.rmd" target="_blank">e9c3b2d</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-30
+</td>
+<td style="text-align:left;">
+wflow_publish(“analysis/gd_w.rmd”)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/99004e98b8bb93f6e06ae0aec73d08268d4970f8/docs/gd_w.html" target="_blank">99004e9</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-30
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 rmd
@@ -1812,12 +1846,23 @@ s &lt;- summary$sebetahat
 s &lt;- s / sqrt(mean(s^2))</code></pre>
 <pre class="r"><code>x.plot &lt;- seq(-6, 6, by = 0.01)
 
-g.plot &lt;- G(x.plot)
+G.plot &lt;- G(x.plot)
 
-for (i in 3 : 4) {
-  z &lt;- z.mat.sel[i, ]
+for (i in 3 : 5) {
+  if (i != 5) {
+    z &lt;- z.mat.sel[i, ]
+  } else {
+    z &lt;- rnorm(1e4)
+  }
   X &lt;- theta + s * z
   Z &lt;- theta + z
+  
+  ## Truth
+  True.data &lt;- cbind.data.frame(
+    Method = &quot;True&quot;,
+    x = x.plot,
+    cdfhat = G.plot
+  )
 
   ## ASH
   fit.ash &lt;- ashr::ash(X, s, method = &quot;fdr&quot;, mixcompdist = &quot;normal&quot;)
@@ -1875,6 +1920,19 @@ for (i in 3 : 4) {
     deconv.inf.ggdata &lt;- cbind.data.frame(
       Noise = &quot;Inflated Noise&quot;,
       rbind.data.frame(
+        True.data,
+        SC.data,
+        KW.data,
+        BD.data,
+        ASH.data,
+        CASH.data
+      )
+    )
+  } else if (i == 4) {
+    deconv.def.ggdata &lt;- cbind.data.frame(
+      Noise = &quot;Deflated Noise&quot;,
+      rbind.data.frame(
+        True.data,
         SC.data,
         KW.data,
         BD.data,
@@ -1883,9 +1941,10 @@ for (i in 3 : 4) {
       )
     )
   } else {
-    deconv.def.ggdata &lt;- cbind.data.frame(
-      Noise = &quot;Deflated Noise&quot;,
+    deconv.ind.ggdata &lt;- cbind.data.frame(
+      Noise = &quot;Independent Noise&quot;,
       rbind.data.frame(
+        True.data,
         SC.data,
         KW.data,
         BD.data,
@@ -1917,22 +1976,75 @@ replaced by maximum positive value
 
 Warning in stats::nlm(f = loglik, p = aStart, gradtol = 1e-10, ...): NA/Inf
 replaced by maximum positive value</code></pre>
+<pre><code>Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
+               consider reducing rtol
+
+Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
+               consider reducing rtol
+
+Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
+               consider reducing rtol
+
+Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
+               consider reducing rtol
+
+Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
+               consider reducing rtol
+
+Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
+               consider reducing rtol
+
+Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
+               consider reducing rtol
+
+Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
+               consider reducing rtol
+
+Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
+               consider reducing rtol
+
+Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
+               consider reducing rtol
+
+Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
+               consider reducing rtol
+
+Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
+               consider reducing rtol
+
+Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
+               consider reducing rtol</code></pre>
+<pre><code>Warning in stats::nlm(f = loglik, p = aStart, gradtol = 1e-10, ...): NA/Inf
+replaced by maximum positive value
+
+Warning in stats::nlm(f = loglik, p = aStart, gradtol = 1e-10, ...): NA/Inf
+replaced by maximum positive value
+
+Warning in stats::nlm(f = loglik, p = aStart, gradtol = 1e-10, ...): NA/Inf
+replaced by maximum positive value
+
+Warning in stats::nlm(f = loglik, p = aStart, gradtol = 1e-10, ...): NA/Inf
+replaced by maximum positive value
+
+Warning in stats::nlm(f = loglik, p = aStart, gradtol = 1e-10, ...): NA/Inf
+replaced by maximum positive value</code></pre>
 <pre class="r"><code>deconv.ggdata &lt;- rbind.data.frame(
-  deconv.inf.ggdata,
-  deconv.def.ggdata
-)</code></pre>
-<pre class="r"><code>method.name &lt;- c(&quot;Fourier&quot;, &quot;KW&quot;, &quot;Efron&quot;, &quot;ASH&quot;, &quot;CASH&quot;)
-method.col &lt;- scales::hue_pal()(5)
-method.linetype &lt;- c(&quot;dashed&quot;, &quot;dotdash&quot;, &quot;twodash&quot;, &quot;longdash&quot;, &quot;dashed&quot;)
+  deconv.def.ggdata,
+  deconv.ind.ggdata,
+  deconv.inf.ggdata
+)
+
+method.name &lt;- c(&quot;True&quot;, &quot;Fourier&quot;, &quot;KW&quot;, &quot;Efron&quot;, &quot;ASH&quot;, &quot;CASH&quot;)
+method.col &lt;- c(&quot;black&quot;, scales::hue_pal()(5))
+method.linetype &lt;- c(&quot;longdash&quot;, rep(&quot;solid&quot;, 5))
 
 ## plotting
 ggplot(data = deconv.ggdata, aes(x = x, y = cdfhat, col = Method, linetype = Method)) + 
-  geom_line(lwd = 1.1) +
+  geom_line() +
   facet_wrap(~Noise, nrow = 1) +
-  stat_function(fun = G, col = &quot;black&quot;, lty = 1) + 
   xlim(-5, 5) +
-  scale_linetype_manual(values = method.linetype, labels = method.name) +
-  scale_color_manual(values = method.col, labels = method.name) +
+  scale_linetype_manual(values = method.linetype, labels = method.name, guide = guide_legend(nrow = 1)) +
+  scale_color_manual(values = method.col, labels = method.name, guide = guide_legend(nrow = 1)) +
   labs(x = expression(theta), y = &quot;Estimated CDF of g&quot;, title = expression(g == 0.6~delta[0] + 0.3~N(0, 1) + 0.1~N(0, 3^2))) +
   theme(plot.title = element_text(size = 15, hjust = 0.5),
         axis.title.x = element_text(size = 15),
@@ -1941,9 +2053,14 @@ ggplot(data = deconv.ggdata, aes(x = x, y = cdfhat, col = Method, linetype = Met
         axis.text.y = element_text(size = 10),
         strip.text = element_text(size = 15),
         legend.position = &quot;bottom&quot;,
+        legend.title = element_blank(),
         legend.background = element_rect(color = &quot;grey&quot;),
-        legend.text = element_text(size = 12))</code></pre>
-<pre><code>Warning: Removed 908 rows containing missing values (geom_path).</code></pre>
+        legend.text = element_text(size = 12)) +
+
+ggsave(&quot;../output/fig/deconv.eps&quot;, height = 4, width = 9)</code></pre>
+<pre><code>Warning: Removed 1158 rows containing missing values (geom_path).
+
+Warning: Removed 1158 rows containing missing values (geom_path).</code></pre>
 <p><img src="figure/gd_w.rmd/unnamed-chunk-24-1.png" width="672" style="display: block; margin: auto;" /></p>
 <details>
 <summary><em>Expand here to see past versions of unnamed-chunk-24-1.png:</em></summary>
@@ -1964,6 +2081,17 @@ Date
 <tbody>
 <tr>
 <td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/99004e98b8bb93f6e06ae0aec73d08268d4970f8/docs/figure/gd_w.rmd/unnamed-chunk-24-1.png" target="_blank">99004e9</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-30
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
 <a href="https://github.com/LSun/truncash/blob/b42a125861f1ee266f0cb25082a60595990a0a23/docs/figure/gd_w.rmd/unnamed-chunk-24-1.png" target="_blank">b42a125</a>
 </td>
 <td style="text-align:left;">
@@ -1976,8 +2104,6 @@ LSun
 </tbody>
 </table>
 </details>
-<pre class="r"><code>ggsave(&quot;../output/fig/deconv.eps&quot;, height = 5, width = 7)</code></pre>
-<pre><code>Warning: Removed 908 rows containing missing values (geom_path).</code></pre>
 </div>
 <div id="session-information" class="section level2">
 <h2>Session information</h2>
