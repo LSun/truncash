@@ -2,13 +2,10 @@
 title: "Creating Null"
 author: "Lei Sun"
 date: 2017-05-08
-output: workflowr::wflow_html
+output:
+  workflowr::wflow_html:
+    code_folding: hide
 ---
-
-
-**Last updated:** `r Sys.Date()`
-
-**Code version:** `r workflowr::extract_commit(".", 1)$sha1`
 
 ## Introduction
 
@@ -22,15 +19,14 @@ Our hope is that $z^0$ will make the effects part in $z^1$ to be $0$, and only k
 
 Here is a way to check this.  Suppose there is no difference between the conditions in cases and controls, then the effects part in $z^1$ should be $0$ anyway.  Therefore, we may check if $z^0$ and $z^1$ have the same empirical distribution distorted by correlation.
 
-```{r, cache = TRUE, message = FALSE}
+```{r}
 library(limma)
 library(edgeR)
 library(qvalue)
 library(ashr)
-r = read.csv("../data/liver.csv")
-r = r[, -(1 : 2)] # remove gene name and description
-#extract top g genes from G by n matrix X of expression
-top_genes_index = function(g, X) {
+r <- readRDS("../data/liver.rds")
+ngene <- 1e4
+top_genes_index = function (g, X) {
   return(order(rowSums(X), decreasing = TRUE)[1 : g])
 }
 lcpm = function (r) {
@@ -38,12 +34,11 @@ lcpm = function (r) {
   t(log2(((t(r) + 0.5) / (R + 1)) * 10^6))
 }
 Y = lcpm(r)
-subset = top_genes_index(10000, Y)
-Y = Y[subset,]
+subset = top_genes_index(ngene, Y)
 r = r[subset,]
 ```
 
-```{r, cache = TRUE}
+```{r}
 counts_to_z = function (counts, condition) {
   design = stats::model.matrix(~condition)
   dgecounts = edgeR::calcNormFactors(edgeR::DGEList(counts = counts, group = condition))
@@ -61,21 +56,21 @@ We are looking at $3$ cases with different case-control sample sizes: $n = 2$, $
 
 ## 2 vs 2
 
-```{r, cache = TRUE, echo = FALSE}
+```{r, cache = TRUE}
 set.seed(777)
 n = 2
 m = 10
 z1 = z0 = list()
 condition = c(rep(0, n), rep(1, n))
 for (i in 1 : m) {
-  counts1 = r[, sample(1 : ncol(r), 2 * n)]
+  counts1 = r[, sample(ncol(r), 2 * n)]
   counts0 = counts1[, c(seq(1, 2 * n, by = 2), seq(2, 2 * n, by = 2))]
   z1[[i]] = counts_to_z(counts1, condition)
   z0[[i]] = counts_to_z(counts0, condition)
 }
 ```
 
-```{r, echo = FALSE}
+```{r}
 for (i in 1 : m) {
   z1.hist = hist(z1[[i]], breaks = 100, plot = FALSE)
   z0.hist = hist(z0[[i]], breaks = 100, plot = FALSE)
@@ -92,7 +87,7 @@ for (i in 1 : m) {
 
 ## 10 vs 10
 
-```{r, cache = TRUE, echo = FALSE}
+```{r, cache = TRUE}
 set.seed(777)
 n = 10
 m = 10
@@ -106,7 +101,7 @@ for (i in 1 : m) {
 }
 ```
 
-```{r, echo = FALSE}
+```{r}
 for (i in 1 : m) {
   z1.hist = hist(z1[[i]], breaks = 100, plot = FALSE)
   z0.hist = hist(z0[[i]], breaks = 100, plot = FALSE)
@@ -123,7 +118,7 @@ for (i in 1 : m) {
 
 ## 50 vs 50
 
-```{r, cache = TRUE, echo = FALSE}
+```{r, cache = TRUE}
 set.seed(777)
 n = 50
 m = 10
@@ -137,7 +132,7 @@ for (i in 1 : m) {
 }
 ```
 
-```{r, echo = FALSE}
+```{r}
 for (i in 1 : m) {
   z1.hist = hist(z1[[i]], breaks = 100, plot = FALSE)
   z0.hist = hist(z0[[i]], breaks = 100, plot = FALSE)
@@ -160,6 +155,3 @@ Larger sample size doesn't make the empirical distribution of correlated $z$ sco
 Merely changing the labels of the null data could generate starkly different empirical distributions of $z$ scores, no matter what sample size $n$ is, although as $n$ gets larger, the difference in the empirical distributions of $z^1$ and $z^0$ seems to get smaller.
 
 Therefore, creating null through various resampling schemes is basically impossible for this application.
-
-## Session Information
-
