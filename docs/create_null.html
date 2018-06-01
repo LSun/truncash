@@ -25,6 +25,7 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
 <link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
@@ -165,6 +166,14 @@ $(document).ready(function () {
 </script>
 
 <!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
 
 
 
@@ -306,6 +315,14 @@ div.section {
 
 <div class="fluid-row" id="header">
 
+<div class="btn-group pull-right">
+<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
 
 
 <h1 class="title toc-ignore">Creating Null</h1>
@@ -344,7 +361,7 @@ div.section {
 </li>
 <li>
 <details>
-<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/83b5f1784f786ac940829acdc52755d98c3b463e" target="_blank">83b5f17</a> </summary></p>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/4cf3706263940f06ec481e198ad3c0a729aec3ec" target="_blank">4cf3706</a> </summary></p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 <pre><code>
 Ignored files:
@@ -478,6 +495,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/4cf3706263940f06ec481e198ad3c0a729aec3ec/analysis/create_null.Rmd" target="_blank">4cf3706</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-06-01
+</td>
+<td style="text-align:left;">
+wflow_publish(“analysis/create_null.Rmd”)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/b8d63a56b3033e117a1d31aa6ef64196588cd524/docs/create_null.html" target="_blank">b8d63a5</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-06-01
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 Rmd
@@ -636,8 +687,6 @@ creating null
 </ul>
 </details>
 <hr />
-<p><strong>Last updated:</strong> 2018-06-01</p>
-<p><strong>Code version:</strong> 83b5f17</p>
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
 <p>In many of his seminal papers on simultaneous inference, for example, <a href="http://www.tandfonline.com/doi/abs/10.1198/016214501753382129">Efron et al 2001</a>, Efron used some techniques to create null from the raw data. One big concern of this approach is whether the created null could successfully remove the effects of interest whereas keep the distortion due to correlation. Let’s take a look.</p>
@@ -649,10 +698,9 @@ creating null
 library(edgeR)
 library(qvalue)
 library(ashr)
-r = read.csv(&quot;../data/liver.csv&quot;)
-r = r[, -(1 : 2)] # remove gene name and description
-#extract top g genes from G by n matrix X of expression
-top_genes_index = function(g, X) {
+r &lt;- readRDS(&quot;../data/liver.rds&quot;)
+ngene &lt;- 1e4
+top_genes_index = function (g, X) {
   return(order(rowSums(X), decreasing = TRUE)[1 : g])
 }
 lcpm = function (r) {
@@ -660,8 +708,7 @@ lcpm = function (r) {
   t(log2(((t(r) + 0.5) / (R + 1)) * 10^6))
 }
 Y = lcpm(r)
-subset = top_genes_index(10000, Y)
-Y = Y[subset,]
+subset = top_genes_index(ngene, Y)
 r = r[subset,]</code></pre>
 <pre class="r"><code>counts_to_z = function (counts, condition) {
   design = stats::model.matrix(~condition)
@@ -678,6 +725,29 @@ r = r[subset,]</code></pre>
 </div>
 <div id="vs-2" class="section level2">
 <h2>2 vs 2</h2>
+<pre class="r"><code>set.seed(777)
+n = 2
+m = 10
+z1 = z0 = list()
+condition = c(rep(0, n), rep(1, n))
+for (i in 1 : m) {
+  counts1 = r[, sample(ncol(r), 2 * n)]
+  counts0 = counts1[, c(seq(1, 2 * n, by = 2), seq(2, 2 * n, by = 2))]
+  z1[[i]] = counts_to_z(counts1, condition)
+  z0[[i]] = counts_to_z(counts0, condition)
+}</code></pre>
+<pre class="r"><code>for (i in 1 : m) {
+  z1.hist = hist(z1[[i]], breaks = 100, plot = FALSE)
+  z0.hist = hist(z0[[i]], breaks = 100, plot = FALSE)
+  ymax = max(c(dnorm(0), z1.hist$density, z0.hist$density))
+  xmax = max(c(abs(z1[[i]]), abs(z0[[i]])))
+  par(mfrow = c(1, 2))
+  hist(z1[[i]], breaks = 100, prob = TRUE, xlab = expression(z^1), main = expression(paste(&quot;Histogram of &quot;, z^1)), ylim = c(0, ymax), xlim = c(-xmax, xmax))
+  x.seq = seq(-xmax, xmax, 0.01)
+  lines(x.seq, dnorm(x.seq), col = &quot;red&quot;)
+  hist(z0[[i]], breaks = 100, prob = TRUE, xlab = expression(z^0), main = expression(paste(&quot;Histogram of &quot;, z^0)), ylim = c(0, ymax), xlim = c(-xmax, xmax))
+  lines(x.seq, dnorm(x.seq), col = &quot;red&quot;)
+}</code></pre>
 <p><img src="figure/create_null.Rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
 <details>
 <summary><em>Expand here to see past versions of unnamed-chunk-4-1.png:</em></summary>
@@ -1001,6 +1071,29 @@ LSun
 </div>
 <div id="vs-10" class="section level2">
 <h2>10 vs 10</h2>
+<pre class="r"><code>set.seed(777)
+n = 10
+m = 10
+z1 = z0 = list()
+condition = c(rep(0, n), rep(1, n))
+for (i in 1 : m) {
+  counts1 = r[, sample(1 : ncol(r), 2 * n)]
+  counts0 = counts1[, c(seq(1, 2 * n, by = 2), seq(2, 2 * n, by = 2))]
+  z1[[i]] = counts_to_z(counts1, condition)
+  z0[[i]] = counts_to_z(counts0, condition)
+}</code></pre>
+<pre class="r"><code>for (i in 1 : m) {
+  z1.hist = hist(z1[[i]], breaks = 100, plot = FALSE)
+  z0.hist = hist(z0[[i]], breaks = 100, plot = FALSE)
+  ymax = max(c(dnorm(0), z1.hist$density, z0.hist$density))
+  xmax = max(c(abs(z1[[i]]), abs(z0[[i]])))
+  par(mfrow = c(1, 2))
+  hist(z1[[i]], breaks = 100, prob = TRUE, xlab = expression(z^1), main = expression(paste(&quot;Histogram of &quot;, z^1)), ylim = c(0, ymax), xlim = c(-xmax, xmax))
+  x.seq = seq(-xmax, xmax, 0.01)
+  lines(x.seq, dnorm(x.seq), col = &quot;red&quot;)
+  hist(z0[[i]], breaks = 100, prob = TRUE, xlab = expression(z^0), main = expression(paste(&quot;Histogram of &quot;, z^0)), ylim = c(0, ymax), xlim = c(-xmax, xmax))
+  lines(x.seq, dnorm(x.seq), col = &quot;red&quot;)
+}</code></pre>
 <p><img src="figure/create_null.Rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
 <details>
 <summary><em>Expand here to see past versions of unnamed-chunk-6-1.png:</em></summary>
@@ -1019,6 +1112,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/b8d63a56b3033e117a1d31aa6ef64196588cd524/docs/figure/create_null.Rmd/unnamed-chunk-6-1.png" target="_blank">b8d63a5</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-06-01
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 <a href="https://github.com/LSun/truncash/blob/b1410203d4d98ed9676334a7c3f32f8349fb9923/docs/figure/create_null.Rmd/unnamed-chunk-6-1.png" target="_blank">b141020</a>
@@ -1053,6 +1157,17 @@ Date
 <tbody>
 <tr>
 <td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/b8d63a56b3033e117a1d31aa6ef64196588cd524/docs/figure/create_null.Rmd/unnamed-chunk-6-2.png" target="_blank">b8d63a5</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-06-01
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
 <a href="https://github.com/LSun/truncash/blob/b1410203d4d98ed9676334a7c3f32f8349fb9923/docs/figure/create_null.Rmd/unnamed-chunk-6-2.png" target="_blank">b141020</a>
 </td>
 <td style="text-align:left;">
@@ -1083,6 +1198,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/b8d63a56b3033e117a1d31aa6ef64196588cd524/docs/figure/create_null.Rmd/unnamed-chunk-6-3.png" target="_blank">b8d63a5</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-06-01
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 <a href="https://github.com/LSun/truncash/blob/b1410203d4d98ed9676334a7c3f32f8349fb9923/docs/figure/create_null.Rmd/unnamed-chunk-6-3.png" target="_blank">b141020</a>
@@ -1117,6 +1243,17 @@ Date
 <tbody>
 <tr>
 <td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/b8d63a56b3033e117a1d31aa6ef64196588cd524/docs/figure/create_null.Rmd/unnamed-chunk-6-4.png" target="_blank">b8d63a5</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-06-01
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
 <a href="https://github.com/LSun/truncash/blob/b1410203d4d98ed9676334a7c3f32f8349fb9923/docs/figure/create_null.Rmd/unnamed-chunk-6-4.png" target="_blank">b141020</a>
 </td>
 <td style="text-align:left;">
@@ -1147,6 +1284,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/b8d63a56b3033e117a1d31aa6ef64196588cd524/docs/figure/create_null.Rmd/unnamed-chunk-6-5.png" target="_blank">b8d63a5</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-06-01
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 <a href="https://github.com/LSun/truncash/blob/b1410203d4d98ed9676334a7c3f32f8349fb9923/docs/figure/create_null.Rmd/unnamed-chunk-6-5.png" target="_blank">b141020</a>
@@ -1181,6 +1329,17 @@ Date
 <tbody>
 <tr>
 <td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/b8d63a56b3033e117a1d31aa6ef64196588cd524/docs/figure/create_null.Rmd/unnamed-chunk-6-6.png" target="_blank">b8d63a5</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-06-01
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
 <a href="https://github.com/LSun/truncash/blob/b1410203d4d98ed9676334a7c3f32f8349fb9923/docs/figure/create_null.Rmd/unnamed-chunk-6-6.png" target="_blank">b141020</a>
 </td>
 <td style="text-align:left;">
@@ -1211,6 +1370,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/b8d63a56b3033e117a1d31aa6ef64196588cd524/docs/figure/create_null.Rmd/unnamed-chunk-6-7.png" target="_blank">b8d63a5</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-06-01
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 <a href="https://github.com/LSun/truncash/blob/b1410203d4d98ed9676334a7c3f32f8349fb9923/docs/figure/create_null.Rmd/unnamed-chunk-6-7.png" target="_blank">b141020</a>
@@ -1245,6 +1415,17 @@ Date
 <tbody>
 <tr>
 <td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/b8d63a56b3033e117a1d31aa6ef64196588cd524/docs/figure/create_null.Rmd/unnamed-chunk-6-8.png" target="_blank">b8d63a5</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-06-01
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
 <a href="https://github.com/LSun/truncash/blob/b1410203d4d98ed9676334a7c3f32f8349fb9923/docs/figure/create_null.Rmd/unnamed-chunk-6-8.png" target="_blank">b141020</a>
 </td>
 <td style="text-align:left;">
@@ -1275,6 +1456,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/b8d63a56b3033e117a1d31aa6ef64196588cd524/docs/figure/create_null.Rmd/unnamed-chunk-6-9.png" target="_blank">b8d63a5</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-06-01
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 <a href="https://github.com/LSun/truncash/blob/b1410203d4d98ed9676334a7c3f32f8349fb9923/docs/figure/create_null.Rmd/unnamed-chunk-6-9.png" target="_blank">b141020</a>
@@ -1309,6 +1501,17 @@ Date
 <tbody>
 <tr>
 <td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/b8d63a56b3033e117a1d31aa6ef64196588cd524/docs/figure/create_null.Rmd/unnamed-chunk-6-10.png" target="_blank">b8d63a5</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-06-01
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
 <a href="https://github.com/LSun/truncash/blob/b1410203d4d98ed9676334a7c3f32f8349fb9923/docs/figure/create_null.Rmd/unnamed-chunk-6-10.png" target="_blank">b141020</a>
 </td>
 <td style="text-align:left;">
@@ -1324,6 +1527,29 @@ LSun
 </div>
 <div id="vs-50" class="section level2">
 <h2>50 vs 50</h2>
+<pre class="r"><code>set.seed(777)
+n = 50
+m = 10
+z1 = z0 = list()
+condition = c(rep(0, n), rep(1, n))
+for (i in 1 : m) {
+  counts1 = r[, sample(1 : ncol(r), 2 * n)]
+  counts0 = counts1[, c(seq(1, 2 * n, by = 2), seq(2, 2 * n, by = 2))]
+  z1[[i]] = counts_to_z(counts1, condition)
+  z0[[i]] = counts_to_z(counts0, condition)
+}</code></pre>
+<pre class="r"><code>for (i in 1 : m) {
+  z1.hist = hist(z1[[i]], breaks = 100, plot = FALSE)
+  z0.hist = hist(z0[[i]], breaks = 100, plot = FALSE)
+  ymax = max(c(dnorm(0), z1.hist$density, z0.hist$density))
+  xmax = max(c(abs(z1[[i]]), abs(z0[[i]])))
+  par(mfrow = c(1, 2))
+  hist(z1[[i]], breaks = 100, prob = TRUE, xlab = expression(z^1), main = expression(paste(&quot;Histogram of &quot;, z^1)), ylim = c(0, ymax), xlim = c(-xmax, xmax))
+  x.seq = seq(-xmax, xmax, 0.01)
+  lines(x.seq, dnorm(x.seq), col = &quot;red&quot;)
+  hist(z0[[i]], breaks = 100, prob = TRUE, xlab = expression(z^0), main = expression(paste(&quot;Histogram of &quot;, z^0)), ylim = c(0, ymax), xlim = c(-xmax, xmax))
+  lines(x.seq, dnorm(x.seq), col = &quot;red&quot;)
+}</code></pre>
 <p><img src="figure/create_null.Rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
 <details>
 <summary><em>Expand here to see past versions of unnamed-chunk-8-1.png:</em></summary>
@@ -1342,6 +1568,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/b8d63a56b3033e117a1d31aa6ef64196588cd524/docs/figure/create_null.Rmd/unnamed-chunk-8-1.png" target="_blank">b8d63a5</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-06-01
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 <a href="https://github.com/LSun/truncash/blob/b1410203d4d98ed9676334a7c3f32f8349fb9923/docs/figure/create_null.Rmd/unnamed-chunk-8-1.png" target="_blank">b141020</a>
@@ -1376,6 +1613,17 @@ Date
 <tbody>
 <tr>
 <td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/b8d63a56b3033e117a1d31aa6ef64196588cd524/docs/figure/create_null.Rmd/unnamed-chunk-8-2.png" target="_blank">b8d63a5</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-06-01
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
 <a href="https://github.com/LSun/truncash/blob/b1410203d4d98ed9676334a7c3f32f8349fb9923/docs/figure/create_null.Rmd/unnamed-chunk-8-2.png" target="_blank">b141020</a>
 </td>
 <td style="text-align:left;">
@@ -1406,6 +1654,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/b8d63a56b3033e117a1d31aa6ef64196588cd524/docs/figure/create_null.Rmd/unnamed-chunk-8-3.png" target="_blank">b8d63a5</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-06-01
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 <a href="https://github.com/LSun/truncash/blob/b1410203d4d98ed9676334a7c3f32f8349fb9923/docs/figure/create_null.Rmd/unnamed-chunk-8-3.png" target="_blank">b141020</a>
@@ -1440,6 +1699,17 @@ Date
 <tbody>
 <tr>
 <td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/b8d63a56b3033e117a1d31aa6ef64196588cd524/docs/figure/create_null.Rmd/unnamed-chunk-8-4.png" target="_blank">b8d63a5</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-06-01
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
 <a href="https://github.com/LSun/truncash/blob/b1410203d4d98ed9676334a7c3f32f8349fb9923/docs/figure/create_null.Rmd/unnamed-chunk-8-4.png" target="_blank">b141020</a>
 </td>
 <td style="text-align:left;">
@@ -1470,6 +1740,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/b8d63a56b3033e117a1d31aa6ef64196588cd524/docs/figure/create_null.Rmd/unnamed-chunk-8-5.png" target="_blank">b8d63a5</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-06-01
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 <a href="https://github.com/LSun/truncash/blob/b1410203d4d98ed9676334a7c3f32f8349fb9923/docs/figure/create_null.Rmd/unnamed-chunk-8-5.png" target="_blank">b141020</a>
@@ -1504,6 +1785,17 @@ Date
 <tbody>
 <tr>
 <td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/b8d63a56b3033e117a1d31aa6ef64196588cd524/docs/figure/create_null.Rmd/unnamed-chunk-8-6.png" target="_blank">b8d63a5</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-06-01
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
 <a href="https://github.com/LSun/truncash/blob/b1410203d4d98ed9676334a7c3f32f8349fb9923/docs/figure/create_null.Rmd/unnamed-chunk-8-6.png" target="_blank">b141020</a>
 </td>
 <td style="text-align:left;">
@@ -1534,6 +1826,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/b8d63a56b3033e117a1d31aa6ef64196588cd524/docs/figure/create_null.Rmd/unnamed-chunk-8-7.png" target="_blank">b8d63a5</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-06-01
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 <a href="https://github.com/LSun/truncash/blob/b1410203d4d98ed9676334a7c3f32f8349fb9923/docs/figure/create_null.Rmd/unnamed-chunk-8-7.png" target="_blank">b141020</a>
@@ -1568,6 +1871,17 @@ Date
 <tbody>
 <tr>
 <td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/b8d63a56b3033e117a1d31aa6ef64196588cd524/docs/figure/create_null.Rmd/unnamed-chunk-8-8.png" target="_blank">b8d63a5</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-06-01
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
 <a href="https://github.com/LSun/truncash/blob/b1410203d4d98ed9676334a7c3f32f8349fb9923/docs/figure/create_null.Rmd/unnamed-chunk-8-8.png" target="_blank">b141020</a>
 </td>
 <td style="text-align:left;">
@@ -1598,6 +1912,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/b8d63a56b3033e117a1d31aa6ef64196588cd524/docs/figure/create_null.Rmd/unnamed-chunk-8-9.png" target="_blank">b8d63a5</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-06-01
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 <a href="https://github.com/LSun/truncash/blob/b1410203d4d98ed9676334a7c3f32f8349fb9923/docs/figure/create_null.Rmd/unnamed-chunk-8-9.png" target="_blank">b141020</a>
@@ -1632,6 +1957,17 @@ Date
 <tbody>
 <tr>
 <td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/b8d63a56b3033e117a1d31aa6ef64196588cd524/docs/figure/create_null.Rmd/unnamed-chunk-8-10.png" target="_blank">b8d63a5</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-06-01
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
 <a href="https://github.com/LSun/truncash/blob/b1410203d4d98ed9676334a7c3f32f8349fb9923/docs/figure/create_null.Rmd/unnamed-chunk-8-10.png" target="_blank">b141020</a>
 </td>
 <td style="text-align:left;">
@@ -1652,9 +1988,6 @@ LSun
 <p>Therefore, creating null through various resampling schemes is basically impossible for this application.</p>
 </div>
 <div id="session-information" class="section level2">
-<h2>Session Information</h2>
-</div>
-<div id="session-information-1" class="section level2">
 <h2>Session information</h2>
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>R version 3.4.3 (2017-11-30)
@@ -1671,14 +2004,25 @@ locale:
 attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
+other attached packages:
+[1] ashr_2.2-7    qvalue_2.10.0 edgeR_3.20.9  limma_3.34.9 
+
 loaded via a namespace (and not attached):
- [1] workflowr_1.0.1   Rcpp_0.12.16      digest_0.6.15    
- [4] rprojroot_1.3-2   R.methodsS3_1.7.1 backports_1.1.2  
- [7] git2r_0.21.0      magrittr_1.5      evaluate_0.10.1  
-[10] stringi_1.2.2     whisker_0.3-2     R.oo_1.22.0      
-[13] R.utils_2.6.0     rmarkdown_1.9     tools_3.4.3      
-[16] stringr_1.3.1     yaml_2.1.19       compiler_3.4.3   
-[19] htmltools_0.3.6   knitr_1.20       </code></pre>
+ [1] Rcpp_0.12.16      compiler_3.4.3    pillar_1.2.2     
+ [4] git2r_0.21.0      plyr_1.8.4        workflowr_1.0.1  
+ [7] iterators_1.0.9   R.methodsS3_1.7.1 R.utils_2.6.0    
+[10] tools_3.4.3       digest_0.6.15     evaluate_0.10.1  
+[13] tibble_1.4.2      gtable_0.2.0      lattice_0.20-35  
+[16] rlang_0.2.0       foreach_1.4.4     Matrix_1.2-14    
+[19] parallel_3.4.3    yaml_2.1.19       stringr_1.3.1    
+[22] knitr_1.20        locfit_1.5-9.1    rprojroot_1.3-2  
+[25] grid_3.4.3        rmarkdown_1.9     ggplot2_2.2.1    
+[28] reshape2_1.4.3    magrittr_1.5      whisker_0.3-2    
+[31] MASS_7.3-50       codetools_0.2-15  backports_1.1.2  
+[34] scales_0.5.0      htmltools_0.3.6   splines_3.4.3    
+[37] colorspace_1.3-2  stringi_1.2.2     pscl_1.5.2       
+[40] lazyeval_0.2.1    munsell_0.4.3     doParallel_1.0.11
+[43] truncnorm_1.0-8   SQUAREM_2017.10-1 R.oo_1.22.0      </code></pre>
 </div>
 
 <!-- Adjust MathJax settings so that all math formulae are shown using
