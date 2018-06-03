@@ -332,7 +332,7 @@ div.section {
 </div>
 
 
-<p><strong>Last updated:</strong> 2018-06-01</p>
+<p><strong>Last updated:</strong> 2018-06-02</p>
 <strong>workflowr checks:</strong> <small>(Click a bullet for more information)</small>
 <ul>
 <li>
@@ -361,7 +361,7 @@ div.section {
 </li>
 <li>
 <details>
-<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/08b81b637cf3b400e62948bfde595752457b3284" target="_blank">08b81b6</a> </summary></p>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/b7bf225a647f56e559afedc87e48c6bd9fa8a3d1" target="_blank">b7bf225</a> </summary></p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 <pre><code>
 Ignored files:
@@ -461,9 +461,6 @@ Ignored files:
     Ignored:    docs/figure/.DS_Store
     Ignored:    output/fig/
 
-Unstaged changes:
-    Modified:   analysis/cash_plots_2.rmd
-
 </code></pre>
 Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
 </details>
@@ -493,6 +490,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/b7bf225a647f56e559afedc87e48c6bd9fa8a3d1/analysis/gd_w.rmd" target="_blank">b7bf225</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-06-02
+</td>
+<td style="text-align:left;">
+ecdf.avg
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/cf1e8e985b272515c3faee38eb31c244a5b86924/docs/gd_w.html" target="_blank">cf1e8e9</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-06-01
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 rmd
@@ -1445,8 +1476,8 @@ ecdf.tail.avg.conf.int1 &lt;- apply(emp.cdf.Z1, 2, function(x) {t.test(x)$conf.i
 ecdf.tail.avg.conf.int4 &lt;- apply(emp.cdf.Z4, 2, function(x) {t.test(x)$conf.int})</code></pre>
 <pre class="r"><code>pdf(&quot;../output/fig/cor_z_avg_cdf.pdf&quot;, height = 4, width = 4)
 par(mar = c(4.5, 4.5, 1, 1))
-plot(c(qnorm(quantile.vec1), qnorm(quantile.vec2), -qnorm(quantile.vec3)), ecdf.avg, type = &quot;l&quot;, col = &quot;blue&quot;, xlab = &quot;z&quot;, ylab = &quot;CDF&quot;)
-lines(c(qnorm(quantile.vec1), qnorm(quantile.vec2), -qnorm(quantile.vec3)), c(quantile.vec1, quantile.vec2, pnorm(-qnorm(quantile.vec3))), lty = 2)
+plot(c(qnorm(quantile.vec1), qnorm(quantile.vec2), -qnorm(quantile.vec3)), ecdf.avg, type = &quot;l&quot;, xlab = &quot;z&quot;, ylab = &quot;CDF&quot;)
+lines(c(qnorm(quantile.vec1), qnorm(quantile.vec2), -qnorm(quantile.vec3)), c(quantile.vec1, quantile.vec2, pnorm(-qnorm(quantile.vec3))), lty = 2, col = &quot;blue&quot;)
 legend(&quot;bottomright&quot;, lty = c(1, 2), col = c(1, &quot;blue&quot;), legend = c(expression(bar(&quot;F&quot;[n])(z)), expression(Phi(z))))
 rect(xleft = c(range(qnorm(quantile.vec1))[1], range(-qnorm(quantile.vec3))[1]),
      xright = c(range(qnorm(quantile.vec1))[2], range(-qnorm(quantile.vec3))[2]),
@@ -1462,7 +1493,6 @@ par(mar = c(4.5, 4.5, 1, 1))
 plot(qnorm(quantile.vec1), log(ecdf.avg1), type = &quot;l&quot;,
      ylim = range(log(quantile.vec1), log(ecdf.avg1)),
      xlab = &quot;z&quot;, ylab = &quot;log (CDF)&quot;, bty = &quot;n&quot;)
-box(col = &quot;red&quot;)
 lines(qnorm(quantile.vec1), log(quantile.vec1), lty = 2, col = &quot;blue&quot;)
 lines(qnorm(quantile.vec1), log(pnorm(qnorm(quantile.vec1), 0, 1.1)), lty = 2, col = &quot;orange&quot;)
 lines(qnorm(quantile.vec1), log(pnorm(qnorm(quantile.vec1), 0, 1.05)), lty = 2, col = &quot;green&quot;)
@@ -1477,6 +1507,7 @@ polygon(x = c(qnorm(quantile.vec1), rev(qnorm(quantile.vec1))),
   expression(N(0, 1.05^2)),
   expression(N(0, 1.1^2))
 ))
+box(col = &quot;red&quot;)
 dev.off()</code></pre>
 <pre><code>quartz_off_screen 
                 2 </code></pre>
@@ -1485,7 +1516,6 @@ par(mar = c(4.5, 4.5, 1, 1))
 plot(-qnorm(quantile.vec3), log(ecdf.avg4), type = &quot;l&quot;,
      ylim = range(log(quantile.vec3), log(ecdf.avg4)),
      xlab = &quot;z&quot;, ylab = &quot;log (1 - CDF)&quot;, bty = &quot;n&quot;)
-box(col = &quot;red&quot;, lty = 5)
 lines(-qnorm(quantile.vec3), log(quantile.vec3), lty = 2, col = &quot;blue&quot;)
 lines(-qnorm(quantile.vec3), log(pnorm(qnorm(quantile.vec3), 0, 1.1)), lty = 2, col = &quot;orange&quot;)
 lines(-qnorm(quantile.vec3), log(pnorm(qnorm(quantile.vec3), 0, 1.05)), lty = 2, col = &quot;green&quot;)
@@ -1499,6 +1529,7 @@ legend(&quot;bottomleft&quot;, lty = c(1, 2, 2, 2), col = c(&quot;black&quot;, &
   expression(N(0, 1.05^2)),
   expression(N(0, 1.1^2))
 ))
+box(col = &quot;red&quot;, lty = 5)
 dev.off()</code></pre>
 <pre><code>quartz_off_screen 
                 2 </code></pre>
