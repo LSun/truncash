@@ -664,7 +664,7 @@ deconv.ggdata <- rbind.data.frame(
 
 
 ```{r}
-method.name <- c("True", "Fourier", "KW", "Efron", "ASH", "CASH")
+method.name <- c("True", "C-S Fourier", "K-W NPMLE", "Efron g-modeling", "ASH", "CASH")
 method.col <- c("black", scales::hue_pal()(5))
 method.linetype <- c("longdash", rep("solid", 5))
 ```
