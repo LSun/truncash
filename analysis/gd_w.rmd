@@ -165,8 +165,8 @@ ecdf.tail.avg.conf.int4 <- apply(emp.cdf.Z4, 2, function(x) {t.test(x)$conf.int}
 ```{r}
 pdf("../output/fig/cor_z_avg_cdf.pdf", height = 4, width = 4)
 par(mar = c(4.5, 4.5, 1, 1))
-plot(c(qnorm(quantile.vec1), qnorm(quantile.vec2), -qnorm(quantile.vec3)), ecdf.avg, type = "l", col = "blue", xlab = "z", ylab = "CDF")
-lines(c(qnorm(quantile.vec1), qnorm(quantile.vec2), -qnorm(quantile.vec3)), c(quantile.vec1, quantile.vec2, pnorm(-qnorm(quantile.vec3))), lty = 2)
+plot(c(qnorm(quantile.vec1), qnorm(quantile.vec2), -qnorm(quantile.vec3)), ecdf.avg, type = "l", xlab = "z", ylab = "CDF")
+lines(c(qnorm(quantile.vec1), qnorm(quantile.vec2), -qnorm(quantile.vec3)), c(quantile.vec1, quantile.vec2, pnorm(-qnorm(quantile.vec3))), lty = 2, col = "blue")
 legend("bottomright", lty = c(1, 2), col = c(1, "blue"), legend = c(expression(bar("F"[n])(z)), expression(Phi(z))))
 rect(xleft = c(range(qnorm(quantile.vec1))[1], range(-qnorm(quantile.vec3))[1]),
      xright = c(range(qnorm(quantile.vec1))[2], range(-qnorm(quantile.vec3))[2]),
@@ -181,7 +181,6 @@ par(mar = c(4.5, 4.5, 1, 1))
 plot(qnorm(quantile.vec1), log(ecdf.avg1), type = "l",
      ylim = range(log(quantile.vec1), log(ecdf.avg1)),
      xlab = "z", ylab = "log (CDF)", bty = "n")
-box(col = "red")
 lines(qnorm(quantile.vec1), log(quantile.vec1), lty = 2, col = "blue")
 lines(qnorm(quantile.vec1), log(pnorm(qnorm(quantile.vec1), 0, 1.1)), lty = 2, col = "orange")
 lines(qnorm(quantile.vec1), log(pnorm(qnorm(quantile.vec1), 0, 1.05)), lty = 2, col = "green")
@@ -195,6 +194,7 @@ legend("bottomright", lty = c(1, 2, 2, 2), col = c("black", "blue", "green", "or
   expression(N(0, 1.05^2)),
   expression(N(0, 1.1^2))
 ))
+box(col = "red")
 dev.off()
 
 pdf("../output/fig/cor_z_avg_cdf_right.pdf", height = 4, width = 4)
@@ -202,7 +202,6 @@ par(mar = c(4.5, 4.5, 1, 1))
 plot(-qnorm(quantile.vec3), log(ecdf.avg4), type = "l",
      ylim = range(log(quantile.vec3), log(ecdf.avg4)),
      xlab = "z", ylab = "log (1 - CDF)", bty = "n")
-box(col = "red", lty = 5)
 lines(-qnorm(quantile.vec3), log(quantile.vec3), lty = 2, col = "blue")
 lines(-qnorm(quantile.vec3), log(pnorm(qnorm(quantile.vec3), 0, 1.1)), lty = 2, col = "orange")
 lines(-qnorm(quantile.vec3), log(pnorm(qnorm(quantile.vec3), 0, 1.05)), lty = 2, col = "green")
@@ -216,6 +215,7 @@ legend("bottomleft", lty = c(1, 2, 2, 2), col = c("black", "blue", "green", "ora
   expression(N(0, 1.05^2)),
   expression(N(0, 1.1^2))
 ))
+box(col = "red", lty = 5)
 dev.off()
 ```
 
