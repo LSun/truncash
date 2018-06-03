@@ -332,7 +332,7 @@ div.section {
 </div>
 
 
-<p><strong>Last updated:</strong> 2018-06-02</p>
+<p><strong>Last updated:</strong> 2018-06-03</p>
 <strong>workflowr checks:</strong> <small>(Click a bullet for more information)</small>
 <ul>
 <li>
@@ -361,7 +361,7 @@ div.section {
 </li>
 <li>
 <details>
-<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/b7bf225a647f56e559afedc87e48c6bd9fa8a3d1" target="_blank">b7bf225</a> </summary></p>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/7f9e4ff66cb2eb4ddf3460aedc613d2c37e6077b" target="_blank">7f9e4ff</a> </summary></p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 <pre><code>
 Ignored files:
@@ -490,6 +490,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/7f9e4ff66cb2eb4ddf3460aedc613d2c37e6077b/analysis/gd_w.rmd" target="_blank">7f9e4ff</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-06-03
+</td>
+<td style="text-align:left;">
+wflow_publish(“analysis/gd_w.rmd”)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/792751b9428f530b1ec8c9dba5b892335a9ff902/docs/gd_w.html" target="_blank">792751b</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-06-02
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 rmd
@@ -2061,7 +2095,7 @@ replaced by maximum positive value</code></pre>
   deconv.ind.ggdata,
   deconv.inf.ggdata
 )</code></pre>
-<pre class="r"><code>method.name &lt;- c(&quot;True&quot;, &quot;Fourier&quot;, &quot;KW&quot;, &quot;Efron&quot;, &quot;ASH&quot;, &quot;CASH&quot;)
+<pre class="r"><code>method.name &lt;- c(&quot;True&quot;, &quot;C-S Fourier&quot;, &quot;K-W NPMLE&quot;, &quot;Efron g-modeling&quot;, &quot;ASH&quot;, &quot;CASH&quot;)
 method.col &lt;- c(&quot;black&quot;, scales::hue_pal()(5))
 method.linetype &lt;- c(&quot;longdash&quot;, rep(&quot;solid&quot;, 5))</code></pre>
 <pre class="r"><code>## plotting
