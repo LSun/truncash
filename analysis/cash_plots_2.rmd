@@ -2273,7 +2273,7 @@ density.g.ggdata <- rbind.data.frame(
 density.g.plot <- ggplot(data = density.g.ggdata, aes(x = plotx, y = ploty)) +
   geom_line() +
   facet_wrap(~g, nrow = 1) +
-  labs(x = expression(theta), y = expression(g(theta))) +
+  labs(x = expression(theta), y = expression(g[1](theta))) +
   theme(axis.title.x = element_text(size = 15),
         axis.text.x = element_text(size = 10),
         axis.title.y = element_text(size = 15),
