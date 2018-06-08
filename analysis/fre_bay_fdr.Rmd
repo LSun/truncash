@@ -1,0 +1,51 @@
+---
+title: "Frequentist and Bayesian FDR"
+author: "Lei Sun"
+date: "6/8/2018"
+output: html_document
+---
+
+[Prof. Chao Gao](https://galton.uchicago.edu/~chaogao/) asked for a more detailed explanation of the connection between frequentist and Bayesian interpretations of FDR.
+
+In [Storey 2003](https://projecteuclid.org/euclid.aos/1074290335), Storey defined a new concept
+$$
+pFDR := E\left[\frac VR \mid R > 0\right]
+$$
+and argued that it's a more relevant quantity than [Benjamini and Hochberg 1995](https://www.jstor.org/stable/2346101?seq=1#page_scan_tab_contents)'s FDR, which can be written as
+$$
+FDR := E\left[\frac VR \mid R > 0\right]P(R > 0)
+$$
+
+In Storey's Theorem 1, they gave a Bayesian interpretation of pFDR which is
+$$
+pFDR(\Gamma) = Pr(H_T = H_0|T \in \Gamma)
+$$
+where $\Gamma$ is the rejection region and $T$ a test statistic.
+
+In Efron's series of papers, he proposed a concept "Local FDR" as
+$$
+lfdr(t) = Pr(H_T = H_0 | T = t)
+$$
+which can be called more simply as "posterior null probability" or else.
+
+Efron in his unpublished [manuscript](http://statweb.stanford.edu/~ckirby/brad/papers/2005LocalFDR.pdf) (pp 4-5) provided the connection between lfdr and pFDR which can be derived this way
+$$
+\begin{aligned}
+pFDR(\Gamma) &= Pr(H_T = H_0|T \in \Gamma) \\
+&= \frac{Pr(H_T = H_0 \quad \& \quad T \in \Gamma)}{Pr(T \in \Gamma)}\\
+&= \frac{
+\int_\Gamma Pr(H_T= H_0 \quad \& \quad T = t) dt
+}{
+Pr(T \in \Gamma)
+}\\
+&=
+\frac{
+\int_\Gamma lfdr(t) f_T(t)dt
+}{
+Pr(T \in \Gamma)
+}\\
+&=
+\int_\Gamma lfdr(t) f(t|T \in \Gamma) dt\\
+\end{aligned}
+$$
+which is essentially an average of all lfdr in the rejection region, so pFDR, as a tail quantity, can be seen as an average version of lfdr, as a local quantity, which makes sense.
