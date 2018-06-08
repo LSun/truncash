@@ -226,6 +226,8 @@ A close look at Efron's classic BRCA data, used in many of his papers to illustr
 
 * [`CASH`: `lfsr` calculation](gd_lik_3.html)
 
+* [Frequentist and Bayesian interpretations of `FDR`](fre_bay_fdr.html)
+
 ---
 
 Next it's a series of investigation of a number of variable selection and false discovery rate control methods in linear regression.
