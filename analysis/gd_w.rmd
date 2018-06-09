@@ -21,6 +21,8 @@ library(ashr)
 library(plyr)
 library(ggplot2)
 library(reshape2)
+library(decon)
+library(deconvolveR)
 ```
 
 ## Introduction
@@ -605,13 +607,12 @@ for (i in 3 : 5) {
   )
 
   ## kernal deconvolution by Stefanski and Carroll 1990
-  ## implemented by Koenker
-  fit.sc <- KFE(Z)
-  sc.plot <- CDF.KW(fit.sc)
-  SC.data <- cbind.data.frame(
-    Method = "SC-FK",
-    x = fit.sc$x,
-    cdfhat = sc.plot
+  ## implemented by `decon`
+  fit.fk <- decon::DeconCdf(y = X, sig = s, error = "normal")
+  FK.data <- cbind.data.frame(
+    Method = "Fourier-Kernel",
+    x = fit.fk$x,
+    cdfhat = fit.fk$y
   )
   
   if (i == 3) {
@@ -619,7 +620,6 @@ for (i in 3 : 5) {
       Noise = "Inflated Noise",
       rbind.data.frame(
         True.data,
-        SC.data,
         KW.data,
         BD.data,
         ASH.data,
@@ -631,7 +631,6 @@ for (i in 3 : 5) {
       Noise = "Deflated Noise",
       rbind.data.frame(
         True.data,
-        SC.data,
         KW.data,
         BD.data,
         ASH.data,
@@ -643,7 +642,6 @@ for (i in 3 : 5) {
       Noise = "Independent Noise",
       rbind.data.frame(
         True.data,
-        SC.data,
         KW.data,
         BD.data,
         ASH.data,
@@ -664,9 +662,9 @@ deconv.ggdata <- rbind.data.frame(
 
 
 ```{r}
-method.name <- c("True", "C-S Fourier", "K-W NPMLE", "Efron g-modeling", "ASH", "CASH")
-method.col <- c("black", scales::hue_pal()(5))
-method.linetype <- c("longdash", rep("solid", 5))
+method.name <- c("True", "KW NPMLE", "Efron g-modeling", "ASH", "CASH")
+method.col <- scales::hue_pal()(5)
+method.linetype <- c("longdash", rep("solid", 4))
 ```
 
 ```{r}
@@ -690,4 +688,99 @@ ggplot(data = deconv.ggdata, aes(x = x, y = cdfhat, col = Method, linetype = Met
         legend.text = element_text(size = 12)) +
 
 ggsave("../output/fig/deconv.eps", height = 4, width = 9)
+```
+
+## Randomization by permutating labels on GTEx data
+
+```{r}
+r <- readRDS("../data/liver.rds")
+ngene <- 1e4
+```
+
+```{r, cache = TRUE}
+Y = lcpm(r)
+subset = top_genes_index(ngene, Y)
+r = r[subset,]
+```
+
+```{r, cache = TRUE, message = FALSE}
+set.seed(777)
+nsim <- 1e4
+Z.list <- list()
+for (i in seq(nsim)) {
+  ## generate data
+  counts <- r[, sample(ncol(r))]
+  design <- model.matrix(~c(rep(0, 60), rep(1, 59)))
+  summary <- count_to_summary(counts, design)
+  Z <- summary$z
+  Z.list[[i]] <- Z
+}
+z.mat <- matrix(unlist(Z.list), byrow = TRUE, nrow = nsim)
+```
+
+```{r, cache = TRUE}
+png("../output/fig/ecdf_by_dataset.png", width = 5, height = 5, units = "in", res = 600)
+
+par(mar = c(4.5, 4.5, 1, 1))
+
+plot(0, type = "n", xlim = c(-5, 5), ylim = c(0, 1), ylab = "(Empirical) CDF", xlab = "z", cex.lab = 2)
+
+for (i in seq(nrow(z.mat))) {
+  lines(ecdf(z.mat[i, ]), lwd = 1, col = "grey75")
+}
+
+lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01)), lwd = 2, col = "blue")
+
+legend("bottomright", lwd = 1 : 2, col = c("grey75", "blue"), c(expression("F"[n]), expression(Phi)), bty = "n")
+
+dev.off()
+
+png("../output/fig/ecdf_by_gene.png", width = 5, height = 5, units = "in", res = 600)
+
+par(mar = c(4.5, 4.5, 1, 1))
+
+plot(0, type = "n", xlim = c(-5, 5), ylim = c(0, 1), ylab = "(Empirical) CDF", xlab = "z", cex.lab = 2)
+
+for (i in seq(ncol(z.mat))) {
+  lines(ecdf(z.mat[, i]), lwd = 1, col = "grey75")
+}
+
+lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01)), lwd = 2, col = "blue")
+
+legend("bottomright", lwd = 1 : 2, col = c("grey75", "blue"), c(expression("F"[n]), expression(Phi)), bty = "n")
+
+dev.off()
+
+png("../output/fig/ecdf_ind.png", width = 5, height = 5, units = "in", res = 600)
+
+par(mar = c(4.5, 4.5, 1, 1))
+
+plot(0, type = "n", xlim = c(-5, 5), ylim = c(0, 1), ylab = "(Empirical) CDF", xlab = "z", cex.lab = 2)
+
+for (i in seq(ncol(z.mat))) {
+  lines(ecdf(rnorm(nrow(z.mat))), lwd = 1, col = "grey75")
+}
+
+lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01)), lwd = 2, col = "blue")
+
+legend("bottomright", lwd = 1 : 2, col = c("grey75", "blue"), c(expression("F"[n]), expression(Phi)), bty = "n")
+
+dev.off()
+```
+
+## Random by each gene
+
+```{r, cache = TRUE, message = FALSE}
+set.seed(777)
+nsim <- 1e4
+Z.list <- list()
+for (i in seq(nsim)) {
+  ## generate data
+  counts <- r[, sample(ncol(r))]
+  design <- model.matrix(~c(rep(0, 60), rep(1, 59)))
+  summary <- count_to_summary(counts, design)
+  Z <- summary$z
+  Z.list[[i]] <- Z
+}
+z.mat <- matrix(unlist(Z.list), byrow = TRUE, nrow = nsim)
 ```
