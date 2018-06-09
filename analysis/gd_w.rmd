@@ -770,17 +770,50 @@ dev.off()
 
 ## Random by each gene
 
+```{r}
+r <- readRDS("../data/liver.rds")
+ngene <- 1e4
+```
+
+```{r, cache = TRUE}
+Y = lcpm(r)
+subset = top_genes_index(ngene, Y)
+r = r[subset,]
+```
+
+```{r}
+nsamp <- 5
+```
+
 ```{r, cache = TRUE, message = FALSE}
 set.seed(777)
 nsim <- 1e4
 Z.list <- list()
 for (i in seq(nsim)) {
   ## generate data
-  counts <- r[, sample(ncol(r))]
-  design <- model.matrix(~c(rep(0, 60), rep(1, 59)))
+  counts <- t(apply(r, 1, sample, 2 * nsamp))
+  design <- model.matrix(~c(rep(0, nsamp), rep(1, nsamp)))
   summary <- count_to_summary(counts, design)
   Z <- summary$z
   Z.list[[i]] <- Z
 }
-z.mat <- matrix(unlist(Z.list), byrow = TRUE, nrow = nsim)
+z.mat.rand.each.gene <- matrix(unlist(Z.list), byrow = TRUE, nrow = nsim)
+```
+
+```{r, cache = TRUE}
+png("../output/fig/ecdf_cor_rand_gene.png", width = 5, height = 5, units = "in", res = 600)
+
+par(mar = c(4.5, 4.5, 1, 1))
+
+plot(0, type = "n", xlim = c(-5, 5), ylim = c(0, 1), ylab = "(Empirical) CDF", xlab = "z", cex.lab = 2)
+
+for (i in seq(nrow(z.mat.rand.each.gene))) {
+  lines(ecdf(z.mat.rand.each.gene[i, ]), lwd = 1, col = "grey75")
+}
+
+lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01)), lwd = 2, col = "blue")
+
+legend("bottomright", lwd = 1 : 2, col = c("grey75", "blue"), c(expression("F"[n]), expression(Phi)), bty = "n")
+
+dev.off()
 ```
