@@ -332,7 +332,7 @@ div.section {
 </div>
 
 
-<p><strong>Last updated:</strong> 2018-06-03</p>
+<p><strong>Last updated:</strong> 2018-06-10</p>
 <strong>workflowr checks:</strong> <small>(Click a bullet for more information)</small>
 <ul>
 <li>
@@ -361,7 +361,7 @@ div.section {
 </li>
 <li>
 <details>
-<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/7f9e4ff66cb2eb4ddf3460aedc613d2c37e6077b" target="_blank">7f9e4ff</a> </summary></p>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/dc8004808d0c5c3a6e97e96587f21d67859450d1" target="_blank">dc80048</a> </summary></p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 <pre><code>
 Ignored files:
@@ -490,6 +490,57 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/dc8004808d0c5c3a6e97e96587f21d67859450d1/analysis/gd_w.rmd" target="_blank">dc80048</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-06-09
+</td>
+<td style="text-align:left;">
+gene random
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/ee5f1d85f636f5a3ab5de51da970f6aea38f9983/analysis/gd_w.rmd" target="_blank">ee5f1d8</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-06-09
+</td>
+<td style="text-align:left;">
+GD
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/b0f5a28d4e1d135ad9205a3051cd493d7114e72f/docs/gd_w.html" target="_blank">b0f5a28</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-06-03
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 rmd
@@ -1303,7 +1354,9 @@ library(edgeR)
 library(ashr)
 library(plyr)
 library(ggplot2)
-library(reshape2)</code></pre>
+library(reshape2)
+library(decon)
+library(deconvolveR)</code></pre>
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
 </div>
@@ -1969,13 +2022,12 @@ for (i in 3 : 5) {
   )
 
   ## kernal deconvolution by Stefanski and Carroll 1990
-  ## implemented by Koenker
-  fit.sc &lt;- KFE(Z)
-  sc.plot &lt;- CDF.KW(fit.sc)
-  SC.data &lt;- cbind.data.frame(
-    Method = &quot;SC-FK&quot;,
-    x = fit.sc$x,
-    cdfhat = sc.plot
+  ## implemented by `decon`
+  fit.fk &lt;- decon::DeconCdf(y = X, sig = s, error = &quot;normal&quot;)
+  FK.data &lt;- cbind.data.frame(
+    Method = &quot;Fourier-Kernel&quot;,
+    x = fit.fk$x,
+    cdfhat = fit.fk$y
   )
   
   if (i == 3) {
@@ -1983,7 +2035,6 @@ for (i in 3 : 5) {
       Noise = &quot;Inflated Noise&quot;,
       rbind.data.frame(
         True.data,
-        SC.data,
         KW.data,
         BD.data,
         ASH.data,
@@ -1995,7 +2046,6 @@ for (i in 3 : 5) {
       Noise = &quot;Deflated Noise&quot;,
       rbind.data.frame(
         True.data,
-        SC.data,
         KW.data,
         BD.data,
         ASH.data,
@@ -2007,7 +2057,6 @@ for (i in 3 : 5) {
       Noise = &quot;Independent Noise&quot;,
       rbind.data.frame(
         True.data,
-        SC.data,
         KW.data,
         BD.data,
         ASH.data,
@@ -2095,9 +2144,9 @@ replaced by maximum positive value</code></pre>
   deconv.ind.ggdata,
   deconv.inf.ggdata
 )</code></pre>
-<pre class="r"><code>method.name &lt;- c(&quot;True&quot;, &quot;C-S Fourier&quot;, &quot;K-W NPMLE&quot;, &quot;Efron g-modeling&quot;, &quot;ASH&quot;, &quot;CASH&quot;)
-method.col &lt;- c(&quot;black&quot;, scales::hue_pal()(5))
-method.linetype &lt;- c(&quot;longdash&quot;, rep(&quot;solid&quot;, 5))</code></pre>
+<pre class="r"><code>method.name &lt;- c(&quot;True&quot;, &quot;KW NPMLE&quot;, &quot;Efron g-modeling&quot;, &quot;ASH&quot;, &quot;CASH&quot;)
+method.col &lt;- scales::hue_pal()(5)
+method.linetype &lt;- c(&quot;longdash&quot;, rep(&quot;solid&quot;, 4))</code></pre>
 <pre class="r"><code>## plotting
 ggplot(data = deconv.ggdata, aes(x = x, y = cdfhat, col = Method, linetype = Method)) + 
   geom_line() +
@@ -2118,9 +2167,9 @@ ggplot(data = deconv.ggdata, aes(x = x, y = cdfhat, col = Method, linetype = Met
         legend.text = element_text(size = 12)) +
 
 ggsave(&quot;../output/fig/deconv.eps&quot;, height = 4, width = 9)</code></pre>
-<pre><code>Warning: Removed 1153 rows containing missing values (geom_path).
+<pre><code>Warning: Removed 1000 rows containing missing values (geom_path).
 
-Warning: Removed 1153 rows containing missing values (geom_path).</code></pre>
+Warning: Removed 1000 rows containing missing values (geom_path).</code></pre>
 <p><img src="figure/gd_w.rmd/unnamed-chunk-26-1.png" width="672" style="display: block; margin: auto;" /></p>
 <details>
 <summary><em>Expand here to see past versions of unnamed-chunk-26-1.png:</em></summary>
@@ -2141,6 +2190,17 @@ Date
 <tbody>
 <tr>
 <td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/b0f5a28d4e1d135ad9205a3051cd493d7114e72f/docs/figure/gd_w.rmd/unnamed-chunk-26-1.png" target="_blank">b0f5a28</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-06-03
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
 <a href="https://github.com/LSun/truncash/blob/b4bd5d85c79bd8ed80e53d2153ad28c5b291a6d4/docs/figure/gd_w.rmd/unnamed-chunk-26-1.png" target="_blank">b4bd5d8</a>
 </td>
 <td style="text-align:left;">
@@ -2154,12 +2214,121 @@ LSun
 </table>
 </details>
 </div>
+<div id="randomization-by-permutating-labels-on-gtex-data" class="section level2">
+<h2>Randomization by permutating labels on GTEx data</h2>
+<pre class="r"><code>r &lt;- readRDS(&quot;../data/liver.rds&quot;)
+ngene &lt;- 1e4</code></pre>
+<pre class="r"><code>Y = lcpm(r)
+subset = top_genes_index(ngene, Y)
+r = r[subset,]</code></pre>
+<pre class="r"><code>set.seed(777)
+nsim &lt;- 1e4
+Z.list &lt;- list()
+for (i in seq(nsim)) {
+  ## generate data
+  counts &lt;- r[, sample(ncol(r))]
+  design &lt;- model.matrix(~c(rep(0, 60), rep(1, 59)))
+  summary &lt;- count_to_summary(counts, design)
+  Z &lt;- summary$z
+  Z.list[[i]] &lt;- Z
+}
+z.mat &lt;- matrix(unlist(Z.list), byrow = TRUE, nrow = nsim)</code></pre>
+<pre class="r"><code>png(&quot;../output/fig/ecdf_by_dataset.png&quot;, width = 5, height = 5, units = &quot;in&quot;, res = 600)
+
+par(mar = c(4.5, 4.5, 1, 1))
+
+plot(0, type = &quot;n&quot;, xlim = c(-5, 5), ylim = c(0, 1), ylab = &quot;(Empirical) CDF&quot;, xlab = &quot;z&quot;, cex.lab = 2)
+
+for (i in seq(nrow(z.mat))) {
+  lines(ecdf(z.mat[i, ]), lwd = 1, col = &quot;grey75&quot;)
+}
+
+lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01)), lwd = 2, col = &quot;blue&quot;)
+
+legend(&quot;bottomright&quot;, lwd = 1 : 2, col = c(&quot;grey75&quot;, &quot;blue&quot;), c(expression(&quot;F&quot;[n]), expression(Phi)), bty = &quot;n&quot;)
+
+dev.off()</code></pre>
+<pre><code>quartz_off_screen 
+                2 </code></pre>
+<pre class="r"><code>png(&quot;../output/fig/ecdf_by_gene.png&quot;, width = 5, height = 5, units = &quot;in&quot;, res = 600)
+
+par(mar = c(4.5, 4.5, 1, 1))
+
+plot(0, type = &quot;n&quot;, xlim = c(-5, 5), ylim = c(0, 1), ylab = &quot;(Empirical) CDF&quot;, xlab = &quot;z&quot;, cex.lab = 2)
+
+for (i in seq(ncol(z.mat))) {
+  lines(ecdf(z.mat[, i]), lwd = 1, col = &quot;grey75&quot;)
+}
+
+lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01)), lwd = 2, col = &quot;blue&quot;)
+
+legend(&quot;bottomright&quot;, lwd = 1 : 2, col = c(&quot;grey75&quot;, &quot;blue&quot;), c(expression(&quot;F&quot;[n]), expression(Phi)), bty = &quot;n&quot;)
+
+dev.off()</code></pre>
+<pre><code>quartz_off_screen 
+                2 </code></pre>
+<pre class="r"><code>png(&quot;../output/fig/ecdf_ind.png&quot;, width = 5, height = 5, units = &quot;in&quot;, res = 600)
+
+par(mar = c(4.5, 4.5, 1, 1))
+
+plot(0, type = &quot;n&quot;, xlim = c(-5, 5), ylim = c(0, 1), ylab = &quot;(Empirical) CDF&quot;, xlab = &quot;z&quot;, cex.lab = 2)
+
+for (i in seq(ncol(z.mat))) {
+  lines(ecdf(rnorm(nrow(z.mat))), lwd = 1, col = &quot;grey75&quot;)
+}
+
+lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01)), lwd = 2, col = &quot;blue&quot;)
+
+legend(&quot;bottomright&quot;, lwd = 1 : 2, col = c(&quot;grey75&quot;, &quot;blue&quot;), c(expression(&quot;F&quot;[n]), expression(Phi)), bty = &quot;n&quot;)
+
+dev.off()</code></pre>
+<pre><code>quartz_off_screen 
+                2 </code></pre>
+</div>
+<div id="random-by-each-gene" class="section level2">
+<h2>Random by each gene</h2>
+<pre class="r"><code>r &lt;- readRDS(&quot;../data/liver.rds&quot;)
+ngene &lt;- 1e4</code></pre>
+<pre class="r"><code>Y = lcpm(r)
+subset = top_genes_index(ngene, Y)
+r = r[subset,]</code></pre>
+<pre class="r"><code>nsamp &lt;- 5</code></pre>
+<pre class="r"><code>set.seed(777)
+nsim &lt;- 1e4
+Z.list &lt;- list()
+for (i in seq(nsim)) {
+  ## generate data
+  counts &lt;- t(apply(r, 1, sample, 2 * nsamp))
+  design &lt;- model.matrix(~c(rep(0, nsamp), rep(1, nsamp)))
+  summary &lt;- count_to_summary(counts, design)
+  Z &lt;- summary$z
+  Z.list[[i]] &lt;- Z
+}
+z.mat.rand.each.gene &lt;- matrix(unlist(Z.list), byrow = TRUE, nrow = nsim)</code></pre>
+<pre class="r"><code>png(&quot;../output/fig/ecdf_cor_rand_gene.png&quot;, width = 5, height = 5, units = &quot;in&quot;, res = 600)
+
+par(mar = c(4.5, 4.5, 1, 1))
+
+plot(0, type = &quot;n&quot;, xlim = c(-5, 5), ylim = c(0, 1), ylab = &quot;(Empirical) CDF&quot;, xlab = &quot;z&quot;, cex.lab = 2)
+
+for (i in seq(nrow(z.mat.rand.each.gene))) {
+  lines(ecdf(z.mat.rand.each.gene[i, ]), lwd = 1, col = &quot;grey75&quot;)
+}
+
+lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01)), lwd = 2, col = &quot;blue&quot;)
+
+legend(&quot;bottomright&quot;, lwd = 1 : 2, col = c(&quot;grey75&quot;, &quot;blue&quot;), c(expression(&quot;F&quot;[n]), expression(Phi)), bty = &quot;n&quot;)
+
+dev.off()</code></pre>
+<pre><code>quartz_off_screen 
+                2 </code></pre>
+</div>
 <div id="session-information" class="section level2">
 <h2>Session information</h2>
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS High Sierra 10.13.4
+Running under: macOS High Sierra 10.13.5
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -2172,11 +2341,12 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] deconvolveR_1.1   reshape2_1.4.3    ggplot2_2.2.1    
- [4] plyr_1.8.4        edgeR_3.20.9      limma_3.34.9     
- [7] ashr_2.2-7        Rmosek_8.0.69     PolynomF_1.0-2   
-[10] CVXR_0.95         REBayes_1.3       Matrix_1.2-14    
-[13] SQUAREM_2017.10-1 EQL_1.0-0         ttutils_1.0-1    
+ [1] deconvolveR_1.1   decon_1.2-4       reshape2_1.4.3   
+ [4] ggplot2_2.2.1     plyr_1.8.4        edgeR_3.20.9     
+ [7] limma_3.34.9      ashr_2.2-7        Rmosek_8.0.69    
+[10] PolynomF_1.0-2    CVXR_0.95         REBayes_1.3      
+[13] Matrix_1.2-14     SQUAREM_2017.10-1 EQL_1.0-0        
+[16] ttutils_1.0-1    
 
 loaded via a namespace (and not attached):
  [1] qvalue_2.10.0     locfit_1.5-9.1    splines_3.4.3    
