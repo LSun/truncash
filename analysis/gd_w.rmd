@@ -308,7 +308,7 @@ W.gtex.gd <- sapply(Z.gtex, function (z) {fit.z <- gdfit(z, L = 10); return(
   list(w = fit.z$w, status = fit.z$status))})
 ```
 
-## Correlated null
+## Selected correlated null
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 source("../code/gdash_lik.R")
@@ -368,6 +368,24 @@ mtext('Density', side = 2, outer = TRUE, line = 1)
 mtext("Histograms of correlated N(0,1) z-scores", line = -2, outer = TRUE)
 
 legend("topleft", inset = c(-0.85, -0.225), legend = c("N(0, 1)", "Gaussian Derivatives"), lty = 1, lwd = 2, xpd = NA, col = c("blue", "red"), ncol = 2, cex = 1.25)
+
+dev.off()
+```
+
+```{r cdf_sel_cor, cache = TRUE}
+png("../output/fig/ecdf_cor_sel.eps", width = 5, height = 5)
+
+par(mar = c(4.5, 4.5, 1, 1))
+
+plot(0, type = "n", xlim = c(-5, 5), ylim = c(0, 1), ylab = "(Empirical) CDF", xlab = "z", cex.lab = 2)
+
+for (i in seq(nrow(z.mat.sel))) {
+  lines(ecdf(z.mat.sel[i, ]), lwd = 1, col = "grey75")
+}
+
+lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01)), lwd = 2, col = "blue")
+
+legend("bottomright", lwd = 1 : 2, col = c("grey75", "blue"), c(expression("F"[n]), expression(Phi)), bty = "n")
 
 dev.off()
 ```
