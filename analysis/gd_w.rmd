@@ -373,7 +373,8 @@ dev.off()
 ```
 
 ```{r cdf_sel_cor, cache = TRUE}
-png("../output/fig/ecdf_cor_sel.eps", width = 5, height = 5)
+setEPS()
+postscript("../output/fig/ecdf_cor_sel.eps", width = 5, height = 5)
 
 par(mar = c(4.5, 4.5, 1, 1))
 
