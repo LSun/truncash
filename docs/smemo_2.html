@@ -13,7 +13,7 @@
 
 <meta name="date" content="2017-06-17" />
 
-<title>Gaussian derivatives applied to Smemo’s data</title>
+<title>Gaussian derivatives applied to Smemo's data</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -25,6 +25,7 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
 <link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
@@ -165,6 +166,14 @@ $(document).ready(function () {
 </script>
 
 <!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
 
 
 
@@ -306,6 +315,14 @@ div.section {
 
 <div class="fluid-row" id="header">
 
+<div class="btn-group pull-right">
+<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
 
 
 <h1 class="title toc-ignore">Gaussian derivatives applied to Smemo’s data</h1>
@@ -315,7 +332,7 @@ div.section {
 </div>
 
 
-<p><strong>Last updated:</strong> 2018-05-15</p>
+<p><strong>Last updated:</strong> 2018-09-05</p>
 <strong>workflowr checks:</strong> <small>(Click a bullet for more information)</small>
 <ul>
 <li>
@@ -344,7 +361,7 @@ div.section {
 </li>
 <li>
 <details>
-<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/388e65e06000e313c170a82f3ed57346f6024897" target="_blank">388e65e</a> </summary></p>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/653748bf8ec65226b766a4e86f00b9527bd118bf" target="_blank">653748b</a> </summary></p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 <pre><code>
 Ignored files:
@@ -370,6 +387,8 @@ Ignored files:
     Ignored:    analysis/cash_fdr_4_cache/
     Ignored:    analysis/cash_fdr_5_cache/
     Ignored:    analysis/cash_fdr_6_cache/
+    Ignored:    analysis/cash_plots_2_cache/
+    Ignored:    analysis/cash_plots_3_cache/
     Ignored:    analysis/cash_plots_cache/
     Ignored:    analysis/cash_sim_1_cache/
     Ignored:    analysis/cash_sim_2_cache/
@@ -443,6 +462,13 @@ Ignored files:
     Ignored:    docs/figure/.DS_Store
     Ignored:    output/fig/
 
+Untracked files:
+    Untracked:  analysis/cash_plots_3.rmd
+    Untracked:  docs/figure/cash_plots_3.rmd/
+
+Unstaged changes:
+    Modified:   code/count_to_summary.R
+
 </code></pre>
 Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
 </details>
@@ -472,6 +498,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/653748bf8ec65226b766a4e86f00b9527bd118bf/analysis/smemo_2.rmd" target="_blank">653748b</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-09-05
+</td>
+<td style="text-align:left;">
+wflow_publish(“analysis/smemo_2.rmd”)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/4d653b1ae6bf3ff8cebb37187f586c52433d74ed/docs/smemo_2.html" target="_blank">4d653b1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-05-15
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 html
@@ -706,7 +766,7 @@ z &lt;- summary$z</code></pre>
 <h2>Fitting <span class="math inline">\(z\)</span> with Gaussian derivatives</h2>
 <p>With stretch GD can fit <span class="math inline">\(z\)</span> scores, but it seems there should be signals.</p>
 <pre><code>GD Coefficients:</code></pre>
-<pre><code>0 : 1 ; 1 : 0.011943001812549 ; 2 : 1.61071078428794 ; 3 : 0.366170906280825 ; 4 : 1.70110410088397 ; 5 : 0.676196157714041 ; 6 : 0.938754567207026 ; 7 : 0.550191966320357 ; 8 : 0.238942600377754 ; 9 : 0.161306266268357 ; 10 : 0.0430996146901972 ;</code></pre>
+<pre><code>0 : 1 ; 1 : 0.0119430018126296 ; 2 : 1.61071078428823 ; 3 : 0.366170906281441 ; 4 : 1.70110410088524 ; 5 : 0.676196157715947 ; 6 : 0.938754567209366 ; 7 : 0.550191966323002 ; 8 : 0.238942600379678 ; 9 : 0.161306266269737 ; 10 : 0.0430996146907588 ;</code></pre>
 <p><img src="figure/smemo_2.rmd/fitting%20gaussian%20derivatives-1.png" width="672" style="display: block; margin: auto;" /></p>
 <details>
 <summary><em>Expand here to see past versions of fitting gaussian derivatives-1.png:</em></summary>
@@ -911,12 +971,74 @@ LSun
 </table>
 </details>
 </div>
+<div id="fitting-cash" class="section level2">
+<h2>Fitting CASH</h2>
+<pre class="r"><code>source(&quot;../code/gdash_lik.R&quot;)
+source(&quot;../code/gdfit.R&quot;)
+library(edgeR)</code></pre>
+<pre><code>Loading required package: limma</code></pre>
+<pre class="r"><code>library(limma)
+library(locfdr)</code></pre>
+<pre class="r"><code>counts.mat = read.table(&quot;../data/smemo.txt&quot;, header = T, row.name = 1)
+counts.mat = counts.mat[, -5]
+counts = counts.mat[rowSums(counts.mat) &gt;= 5, ]
+design = model.matrix(~c(0, 0, 1, 1))
+dgecounts = edgeR::calcNormFactors(edgeR::DGEList(counts = counts, group = design[, 2]))
+v = limma::voom(dgecounts, design, plot = FALSE)
+lim = limma::lmFit(v)
+r.ebayes = limma::eBayes(lim)
+p = r.ebayes$p.value[, 2]
+t = r.ebayes$t[, 2]
+z = -sign(t) * qnorm(p/2)</code></pre>
+<pre class="r"><code>fit.locfdr &lt;- locfdr(z)</code></pre>
+<p><img src="figure/smemo_2.rmd/analysis-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>fit.qvalue &lt;- qvalue::qvalue(p)</code></pre>
+<pre class="r"><code>betahat = lim$coefficients[, 2]
+sebetahat = betahat / z
+fit.cash &lt;- gdash(betahat, sebetahat, gd.ord = 10)</code></pre>
+<pre class="r"><code>x.plot &lt;- seq(-10, 10, length = 1000)
+gd.ord &lt;- 10
+hermite = Hermite(gd.ord)
+gd0.std = dnorm(x.plot)
+matrix_lik_plot = cbind(gd0.std)
+for (i in 1 : gd.ord) {
+  gd.std = (-1)^i * hermite[[i]](x.plot) * gd0.std / sqrt(factorial(i))
+  matrix_lik_plot = cbind(matrix_lik_plot, gd.std)
+}
+y.plot = matrix_lik_plot %*% fit.cash$w * fit.cash$fitted_g$pi[1]
+
+method.col &lt;- scales::hue_pal()(5)
+# method.col &lt;- c(&quot;#377eb8&quot;, &quot;#984ea3&quot;, &quot;#4daf4a&quot;, &quot;#ff7f00&quot;, &quot;#e41a1c&quot;)
+
+setEPS()
+postscript(&quot;../output/fig/mouseheart.eps&quot;, height = 5, width = 12)
+
+par(mfrow = c(1, 2))
+hist(z, prob = TRUE, main = &quot;&quot;, xlab = expression(paste(z, &quot;-scores&quot;)), cex.lab = 1.25)
+lines(x.plot, y.plot, col = method.col[5], lwd = 2)
+lines(x.plot, dnorm(x.plot), col = 
+       &quot;orange&quot;
+      #  method.col[2]
+      , lty = 2, lwd = 2)
+lines(x.plot, dnorm(x.plot, fit.locfdr$fp0[3, 1], fit.locfdr$fp0[3, 2]) * fit.locfdr$fp0[3, 3], col = method.col[3], lty = 2, lwd = 2)
+legend(&quot;topleft&quot;, col = c(&quot;orange&quot;, method.col[3], method.col[5]), lty = c(2, 2, 1), legend = c(&quot;N(0, 1)&quot;, &quot;Empirical null&quot;, expression(pi[0]~hat(f))), bty = &quot;n&quot;, cex = 1.25)
+
+par(mar = par(&quot;mar&quot;) + c(0, 1, 0, 0))
+g1 &lt;- fit.cash$fitted_g
+g1.plot.x &lt;- seq(-0.5, 0.5, length = 1000)
+g1.plot.y &lt;- rowSums(sapply(2 : length(g1$pi), function (i) {g1$pi[i] * dnorm(g1.plot.x, g1$mean[i], g1$sd[i])}))
+plot(g1.plot.x, g1.plot.y, xlim = c(-0.35, 0.35), type = &quot;l&quot;, xlab = expression(paste(theta, &quot; (&quot;, log[2], &quot; fold change)&quot;)), ylab = expression(hat(g)[1](theta)), cex.lab = 1.25)
+
+dev.off()</code></pre>
+<pre><code>quartz_off_screen 
+                2 </code></pre>
+</div>
 <div id="session-information" class="section level2">
 <h2>Session information</h2>
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS High Sierra 10.13.4
+Running under: macOS High Sierra 10.13.6
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -929,25 +1051,30 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] ashr_2.2-2        Rmosek_8.0.69     PolynomF_1.0-1    CVXR_0.95        
-[5] REBayes_1.2       Matrix_1.2-12     SQUAREM_2017.10-1 EQL_1.0-0        
-[9] ttutils_1.0-1    
+ [1] locfdr_1.1-8      edgeR_3.20.9      limma_3.34.9     
+ [4] ashr_2.2-7        Rmosek_8.0.69     PolynomF_1.0-2   
+ [7] CVXR_0.95         REBayes_1.3       Matrix_1.2-14    
+[10] SQUAREM_2017.10-1 EQL_1.0-0         ttutils_1.0-1    
 
 loaded via a namespace (and not attached):
- [1] gmp_0.5-13.1      Rcpp_0.12.16      compiler_3.4.3   
- [4] git2r_0.21.0      workflowr_1.0.1   R.methodsS3_1.7.1
- [7] R.utils_2.6.0     iterators_1.0.9   tools_3.4.3      
-[10] digest_0.6.15     bit_1.1-12        evaluate_0.10.1  
-[13] lattice_0.20-35   foreach_1.4.4     parallel_3.4.3   
-[16] yaml_2.1.18       Rmpfr_0.6-1       ECOSolveR_0.4    
-[19] stringr_1.3.0     knitr_1.20        locfit_1.5-9.1   
-[22] rprojroot_1.3-2   bit64_0.9-7       grid_3.4.3       
-[25] R6_2.2.2          rmarkdown_1.9     limma_3.34.4     
-[28] edgeR_3.20.2      magrittr_1.5      whisker_0.3-2    
-[31] MASS_7.3-47       codetools_0.2-15  backports_1.1.2  
-[34] htmltools_0.3.6   scs_1.1-1         assertthat_0.2.0 
-[37] stringi_1.1.6     pscl_1.5.2        doParallel_1.0.11
-[40] truncnorm_1.0-7   R.oo_1.21.0      </code></pre>
+ [1] qvalue_2.10.0     locfit_1.5-9.1    reshape2_1.4.3   
+ [4] splines_3.4.3     lattice_0.20-35   colorspace_1.3-2 
+ [7] htmltools_0.3.6   yaml_2.1.19       gmp_0.5-13.1     
+[10] rlang_0.2.0       R.oo_1.22.0       pillar_1.2.2     
+[13] Rmpfr_0.7-0       R.utils_2.6.0     bit64_0.9-7      
+[16] scs_1.1-1         foreach_1.4.4     plyr_1.8.4       
+[19] stringr_1.3.1     munsell_0.4.3     gtable_0.2.0     
+[22] workflowr_1.1.1   R.methodsS3_1.7.1 codetools_0.2-15 
+[25] evaluate_0.10.1   knitr_1.20        doParallel_1.0.11
+[28] pscl_1.5.2        parallel_3.4.3    Rcpp_0.12.16     
+[31] backports_1.1.2   scales_0.5.0      truncnorm_1.0-8  
+[34] bit_1.1-13        ggplot2_2.2.1     digest_0.6.15    
+[37] stringi_1.2.2     grid_3.4.3        rprojroot_1.3-2  
+[40] ECOSolveR_0.4     tools_3.4.3       magrittr_1.5     
+[43] lazyeval_0.2.1    tibble_1.4.2      whisker_0.3-2    
+[46] MASS_7.3-50       assertthat_0.2.0  rmarkdown_1.9    
+[49] iterators_1.0.9   R6_2.2.2          git2r_0.21.0     
+[52] compiler_3.4.3   </code></pre>
 </div>
 
 <!-- Adjust MathJax settings so that all math formulae are shown using
@@ -966,7 +1093,7 @@ footer is added to webpages before the MathJax javascript. -->
 <p>
   This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a>
   analysis was created with
-  <a href="https://github.com/jdblischak/workflowr">workflowr</a> 1.0.1
+  <a href="https://github.com/jdblischak/workflowr">workflowr</a> 1.1.1
 </p>
 <hr>
 
