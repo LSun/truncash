@@ -213,8 +213,9 @@ First public presentation of `CASH`.
 
 A very important quantity for the shape of the empirical distribution of a large number of correlated null is **average pairwise correlation** $=\sqrt{\overline{\rho_{ij}^2}}$.
 
-* [Plots for the `CASH` Paper](cash_plots.html)
-* [Plots for the `CASH` Paper: `lfsr` & `svalue`](cash_plots_2.html)
+* [Plots for the `CASH` paper](cash_plots.html)
+* [Plots for the `CASH` paper: `lfsr` & `svalue`](cash_plots_2.html)
+* [Plots for the `CASH` paper: homoskedastic noise](cash_plots_2.html)
 
 * [Data analysis: Efron's Leukemia data](efron_leukemia.html)
 
