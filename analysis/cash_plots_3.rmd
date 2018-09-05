@@ -1,0 +1,2322 @@
+---
+title: "`CASH` Simulations: Homogeneity"
+author: "Lei Sun"
+date: 2018-08-28
+output:
+  workflowr::wflow_html:
+    code_folding: hide
+---
+
+```{r packages, message = FALSE, warning = FALSE}
+source("../code/gdfit.R")
+source("../code/gdash_lik.R")
+source("../code/count_to_summary.R")
+library(ashr)
+library(locfdr)
+library(qvalue)
+library(reshape2)
+library(ggplot2)
+```
+
+```{r functions}
+mean_sdp <- function (x) {
+   m <- mean(x)
+   ymax <- m + sd(x)
+   return(c(y = m, ymax = ymax, ymin = m))
+}
+mad.mean <- function (x) {
+  return(mean(abs(x - median(x))))
+}
+FDP <- function (FDR, qvalue, beta) {
+  return(sum(qvalue <= FDR & beta == 0) / max(sum(qvalue <= FDR), 1))
+}
+pFDP <- function (FDR, qvalue, beta) {
+  return(sum(qvalue <= FDR & beta == 0) / sum(qvalue <= FDR))
+}
+TDP <- function (FDR, qvalue, beta) {
+  return(sum(qvalue <= FDR & beta != 0) / sum(beta != 0))
+}
+FSP <- function (FSR, svalue, beta, betahat) {
+  return(sum(sign(betahat[svalue <= FSR]) != sign(beta[svalue <= FSR])) / max(sum(svalue <= FSR), 1))
+}
+boxplot.quantile <- function(x) {
+  r <- quantile(x, probs = c(0.05, 0.25, 0.5, 0.75, 0.95))
+  names(r) <- c("ymin", "lower", "middle", "upper", "ymax")
+  r
+}
+```
+
+```{r}
+r <- readRDS("../data/liver.rds")
+```
+
+```{r, cache = TRUE}
+ngene <- 1e4
+top_genes_index = function (g, X) {
+  return(order(rowSums(X), decreasing = TRUE)[1 : g])
+}
+lcpm = function (r) {
+  R = colSums(r)
+  t(log2(((t(r) + 0.5) / (R + 1)) * 10^6))
+}
+Y = lcpm(r)
+subset = top_genes_index(ngene, Y)
+r = r[subset,]
+```
+
+```{r}
+nsamp <- 5
+pi0.vec <- c(0.5, 0.9, 0.99)
+q.vec <- seq(0.001, 0.20, by = 0.001)
+q <- 0.1
+z.over <- 1.05
+z.under <- 0.95
+method.name.FDR <- c("BHq", "qvalue", "locfdr", "ASH", "CASH")
+method.name.FSR <- c("ASH", "CASH")
+method.col.FDR <- scales::hue_pal()(length(method.name.FDR))
+method.col.pi0hat <- method.col.FDR[-1]
+method.col.FSR <- method.col.FDR[4 : 5]
+```
+
+```{r}
+FXP.ggdata <- function (FXP.list, Noise) {
+  
+  FXP.mean <- lapply(FXP.list, function (FXP.mat, Noise) {
+    rbind(
+      All = colMeans(FXP.mat, na.rm = TRUE),
+      apply(FXP.mat, 2, tapply, Noise, mean, na.rm = TRUE)
+    )
+  }, Noise)
+  
+  FXP.ggdata <- melt(FXP.mean, value.name = "mean", varnames = c("Noise", "Method"))
+
+  FXP.q975 <- lapply(FXP.list, function (FXP.mat, Noise) {
+    rbind(
+      All = apply(FXP.mat, 2, quantile, probs = 0.975, na.rm = TRUE),
+      apply(FXP.mat, 2, tapply, Noise, quantile, probs = 0.975, na.rm = TRUE)
+    )
+  }, Noise)
+
+  FXP.q975.ggdata <- melt(FXP.q975, value.name = "q975")
+  
+  FXP.q025 <- lapply(FXP.list, function (FXP.mat, Noise) {
+    rbind(
+      All = apply(FXP.mat, 2, quantile, probs = 0.025, na.rm = TRUE),
+      apply(FXP.mat, 2, tapply, Noise, quantile, probs = 0.025, na.rm = TRUE)
+    )
+  }, Noise)
+
+  FXP.q025.ggdata <- melt(FXP.q025, value.name = "q025")
+  
+  FXP.ggdata <- cbind.data.frame(
+    FXP.ggdata,
+    q975 = FXP.q975.ggdata$q975,
+    q025 = FXP.q025.ggdata$q025
+  )
+  
+  FXP.ggdata$L1 <- as.numeric(FXP.ggdata$L1)
+  
+  return(FXP.ggdata)
+}
+```
+
+## Normal
+
+$$
+g_1 = N\left(0, 2^2\right)
+$$
+
+```{r g1}
+plotx <- seq(-6, 6, by = 0.01)
+plot(plotx, plotx, ylim = c(0, dnorm(0)),
+     xlab = expression(theta), ylab = expression(g(theta)),
+     type = "n")
+lines(plotx, dnorm(plotx), lty = 2)
+lines(plotx, dnorm(plotx, 0, 2), col = "blue")
+legend("topright", lty = c(1, 2), col = c(4, 1), c("g", "N(0, 1)"))
+
+density.ggdata.normal <- cbind.data.frame(
+  g = "Normal",
+  plotx,
+  ploty = dnorm(plotx, 0, 2)
+)
+```
+
+```{r gtex_z_1, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
+set.seed(777)
+
+nsim <- 1000
+
+z.list <- sebetahat.list <- pi0.list <- beta.list <- betahat.list <- list()
+pi0hat.list <- qvalue.list <- svalue.list <- list()
+
+for (i in 1 : nsim) {
+  ## simulate data
+  counts <- r[, sample(ncol(r), 2 * nsamp)]
+  design <- model.matrix(~c(rep(0, nsamp), rep(1, nsamp)))
+  summary <- count_to_summary(counts, design)
+  z <- summary$z
+  sebetahat <- rep(1, length(summary$sebetahat))
+  pi0 <- sample(pi0.vec, 1)
+  beta <- sample(c(
+    rep(0, round(pi0 * ngene)),
+    rnorm(round((1 - pi0) * ngene), 0, 2)
+    ))
+  betahat <- beta + sebetahat * z
+  
+  ## summary statistics
+  zscore <- betahat / sebetahat
+  pvalue = pnorm(-abs(zscore)) * 2
+
+  ## different methods
+  fit.ash = ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+  fit.locfdr <- tryCatch(locfdr::locfdr(zscore, plot = 0), error = function(e) {NA})
+  if (!is.na(fit.locfdr)) {
+    w.rho <- ifelse(
+      fit.locfdr$fp0[3, 2] > 1.05 & mad.mean(zscore) > sqrt(2 / pi) * 1.05, 0.5, 0.1
+    )
+  } else {
+    w.rho <- ifelse(mad.mean(zscore) > sqrt(2 / pi), 0.5, 0.1)
+  }
+  fit.gdash = gdash(betahat, sebetahat, lfsr = TRUE)
+  fit.qvalue = qvalue::qvalue(pvalue)
+  fit.BH = p.adjust(pvalue, method = "BH")
+
+  ## pi0
+  pi0hat.list[[i]] <- c(
+    qvalue = fit.qvalue$pi0,
+    locfdr = tryCatch(fit.locfdr$fp0[3, 3], error = function(e) {NA}),
+    ASH = ashr::get_pi0(fit.ash),
+    CASH = fit.gdash$fitted_g$pi[1]
+  )
+
+  ## FDR
+  qvalue.list[[i]] <- cbind(
+    BHq = fit.BH,
+    qvalue = fit.qvalue$qvalues,
+    locfdr = tryCatch(ashr::qval.from.lfdr(fit.locfdr$fdr), error = function(e) {rep(NA, ngene)}),
+    ASH = ashr::get_qvalue(fit.ash),
+    CASH = fit.gdash$qvalue
+  )
+  
+  ## FSR
+  svalue.list[[i]] <- cbind(
+    ASH = ashr::get_svalue(fit.ash),
+    CASH = fit.gdash$svalue
+  )
+  
+  ## data storage
+  z.list[[i]] <- z
+  sebetahat.list[[i]] <- sebetahat
+  pi0.list[[i]] <- c(pi0 = pi0)
+  beta.list[[i]] <- beta
+  betahat.list[[i]] <- betahat
+}
+```
+
+```{r, cache = TRUE}
+pi0hat.mat <- cbind.data.frame(
+  pi0 = factor(do.call(rbind, pi0.list)),
+  do.call(rbind, pi0hat.list)
+)
+
+##================================================================
+
+sd.z <- sapply(z.list, sd)
+Noise <- cut(sd.z, breaks = c(0, quantile(sd.z, probs = 1 : 2 / 3), Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
+# Noise <- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
+
+##================================================================
+
+FDP.list <- lapply(q.vec, function (q) {
+  t(mapply(function (qvalue.mat, beta, q) {
+    apply(qvalue.mat, 2, function (qvalue, q, beta) {
+      FDP(q, qvalue, beta)
+    }, q, beta)
+  }, qvalue.list, beta.list, q))
+})
+names(FDP.list) <- q.vec
+
+FSP.list <- lapply(q.vec, function (s) {
+  t(mapply(function (svalue.mat, beta, betahat, s) {
+    apply(svalue.mat, 2, function (svalue, s, beta, betahat) {
+      FSP(s, svalue, beta, betahat)
+    }, s, beta, betahat)
+  }, svalue.list, beta.list, betahat.list, s))
+})
+names(FSP.list) <- q.vec
+
+TDP.list <- lapply(q.vec, function(q) {
+  t(mapply(function(qvalue.mat, beta, q) {
+    apply(qvalue.mat, 2, function (qvalue, q, beta) {
+      TDP(q, qvalue, beta)
+    }, q, beta)
+  }, qvalue.list, beta.list, q))
+})
+names(TDP.list) <- q.vec
+```
+
+```{r, cache = TRUE, message = FALSE, warning = FALSE}
+##=================================================
+
+pi0hat.noise.mat <- rbind.data.frame(
+  cbind.data.frame(Noise = rep("All", length(Noise)), pi0hat.mat),
+  cbind.data.frame(Noise, pi0hat.mat)
+)
+
+pi0hat.ggdata <- melt(pi0hat.noise.mat, id.vars = c("Noise", "pi0"), variable.name = "Method", value.name = "pi0hat")
+
+pi0hat.plot <- ggplot(data = pi0hat.ggdata, aes(x = pi0, y = pi0hat)) +
+  geom_boxplot(aes(fill = Method, color = Method), outlier.color = NULL, outlier.size = 0.5
+            # , outlier.shape = NA
+               ) +
+  scale_color_manual(values = method.col.pi0hat) +
+  scale_fill_manual(values = alpha(method.col.pi0hat, 0.35)) +
+  facet_wrap(~Noise, nrow = 1, ncol = 4) +
+  geom_hline(yintercept = pi0.vec, col = "black", linetype = "dashed", size = 1) +
+  labs(x = expression(pi[0]), y = expression(hat(pi)[0])) +
+  theme(axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
+        axis.title.y = element_text(size = 15),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "top",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+
+##==================================================
+
+FDP.calib.ggdata <- FXP.ggdata(FDP.list, Noise)
+
+FDR.calib.plot <- ggplot(data = FDP.calib.ggdata, aes(x = L1, y = mean, group = Method, col = Method)) +
+  geom_line() +
+  geom_ribbon(aes(ymin = q025, ymax = q975, fill = Method), alpha = 0.35, linetype = "blank") +
+  scale_color_manual(labels = method.name.FDR, values = method.col.FDR) +
+  scale_fill_manual(labels = method.name.FDR, values = method.col.FDR) +
+  facet_wrap(~Noise, nrow = 1, ncol = 4) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", size = 1, col = "black") +
+  labs(x = "Nominal FDR", y = "FDP") +
+  theme(axis.title.x = element_text(size = 12),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
+        axis.title.y = element_text(size = 12),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "top",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+
+##==================================================
+
+FSP.calib.ggdata <- FXP.ggdata(FSP.list, Noise)
+
+FSR.calib.plot <- ggplot(data = FSP.calib.ggdata, aes(x = L1, y = mean, group = Method, col = Method)) +
+  geom_line() +
+  geom_ribbon(aes(ymin = q025, ymax = q975, fill = Method), alpha = 0.35, linetype = "blank") +
+  scale_color_manual(labels = method.name.FSR, values = method.col.FSR) +
+  scale_fill_manual(labels = method.name.FSR, values = method.col.FSR) +
+  facet_wrap(~Noise, nrow = 1, ncol = 4) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", size = 1, col = "black") +
+  labs(x = "Nominal FSR", y = "FSP") +
+  theme(axis.title.x = element_text(size = 12),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
+        axis.title.y = element_text(size = 12),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "top",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+
+##============================================================
+
+FDP.q <- FDP.list[[which(q.vec == q)]]
+FDP.q.noise.mat <- rbind.data.frame(
+  cbind.data.frame(Noise = rep("All", length(Noise)),
+                   pi0 = factor(do.call(rbind, pi0.list)),
+                   FDP.q),
+  cbind.data.frame(Noise,
+                   pi0 = factor(do.call(rbind, pi0.list)),
+                   FDP.q)
+)
+FDP.q.ggdata <- melt(FDP.q.noise.mat, id.vars = c("Noise", "pi0"), variable.name = "Method", value.name = "FDP")
+
+FDP.q.plot <- ggplot(data = FDP.q.ggdata, aes(x = pi0, y = FDP)) +
+  geom_boxplot(aes(fill = Method, color = Method), outlier.color = NULL, outlier.size = 0.5
+            # , outlier.shape = NA
+               ) +
+  scale_color_manual(values = method.col.FDR) +
+  scale_fill_manual(values = alpha(method.col.FDR, 0.35)) +
+  facet_wrap(~Noise, nrow = 1, ncol = 4) +
+  geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
+  labs(x = expression(pi[0]), y = "FDP") +
+  theme(axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
+        axis.title.y = element_text(size = 12),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "top",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+
+##====================================================================
+
+TDP.q <- TDP.list[[which(q.vec == q)]]
+TDP.q.noise.mat <- rbind.data.frame(
+  cbind.data.frame(Noise = rep("All", length(Noise)),
+                   pi0 = factor(do.call(rbind, pi0.list)),
+                   TDP.q),
+  cbind.data.frame(Noise,
+                   pi0 = factor(do.call(rbind, pi0.list)),
+                   TDP.q)
+)
+TDP.q.ggdata <- melt(TDP.q.noise.mat, id.vars = c("Noise", "pi0"), variable.name = "Method", value.name = "TDP")
+
+TDP.q.plot <- ggplot(data = TDP.q.ggdata, aes(x = pi0, y = TDP)) +
+  geom_boxplot(aes(fill = Method, color = Method), outlier.color = NULL, outlier.size = 0.5
+            # , outlier.shape = NA
+               ) +
+  scale_color_manual(values = method.col.FDR) +
+  scale_fill_manual(values = alpha(method.col.FDR, 0.35)) +
+  facet_wrap(~Noise, nrow = 1, ncol = 4) +
+  labs(x = expression(pi[0]), y = "TDP") +
+  theme(axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
+        axis.title.y = element_text(size = 12),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "top",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+
+##=================================================
+
+FDP.q.all.mat <- cbind.data.frame(
+  pi0 = factor(do.call(rbind, pi0.list)),
+  FDP.q
+  )
+FDP.q.all.ggdata <- melt(FDP.q.all.mat, id.vars = c("pi0"), variable.name = "Method", value.name = "FDP")
+FDP.q.all.ggdata.normal <- cbind.data.frame(
+  g = "Normal",
+  FDP.q.all.ggdata
+)
+
+##============================================================
+
+FDP.q.noise.sep <- cbind.data.frame(
+  Noise,
+  pi0 = factor(do.call(rbind, pi0.list)),
+  FDP.q
+)
+  
+FDP.q.ggdata.sep <- melt(FDP.q.noise.sep, id.vars = c("Noise", "pi0"), variable.name = "Method", value.name = "FDP")
+
+FDP.q.sep.plot <- ggplot(data = FDP.q.ggdata.sep, aes(x = pi0, y = FDP)) +
+  geom_boxplot(aes(fill = Method, color = Method), outlier.color = NULL, outlier.size = 0.5) +
+  scale_color_manual(labels = method.name.FDR, values = method.col.FDR) +
+  scale_fill_manual(labels = method.name.FDR, values = alpha(method.col.FDR, 0.35)) +
+  facet_wrap(~Noise, nrow = 1) +
+  geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
+  labs(x = expression(pi[0]), y = "FDP", title = bquote(paste("At nominal FDR = ", .(q)))) +
+  theme(plot.title = element_text(size = 12),
+        axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10),
+        axis.title.y = element_text(size = 15),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "bottom",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+
+FDP.q.all.sep.plot <- ggplot(data = FDP.q.ggdata, aes(x = pi0, y = FDP, fill = Method, color = Method)) +
+  stat_summary(fun.data = boxplot.quantile, geom = "boxplot", position = "dodge") +
+  stat_summary(fun.y = mean, geom = "point", position = position_dodge(width = 0.9), show.legend = TRUE) +
+  scale_color_manual(labels = method.name.FDR, values = method.col.FDR) +
+  scale_fill_manual(labels = method.name.FDR, values = alpha(method.col.FDR, 0.35)) +
+  facet_wrap(~Noise, nrow = 1) +
+  geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
+  labs(x = expression(pi[0]), y = "FDP", title = bquote(paste("At nominal FDR = ", .(q)))) +
+  theme(plot.title = element_text(size = 12, hjust = 0),
+        axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10),
+        axis.title.y = element_text(size = 15),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "bottom",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+
+##====================================================
+
+pi0.0.9 <- which(pi0.list == 0.9)
+sd.z.0.9 <- sd.z[pi0.0.9]
+typical.noise <- pi0.0.9[order(sd.z.0.9)[floor(quantile(seq(sd.z.0.9), c(0.15, 0.5, 0.91)))]]
+
+z.list.sel <- z.list[typical.noise]
+names(z.list.sel) <- c("Deflated Noise", "In-between", "Inflated Noise")
+z.sep.ggdata <- melt(z.list.sel, value.name = "z")
+z.sep.plot <- ggplot(data = z.sep.ggdata, aes(x = z)) +
+  geom_histogram(aes(y = ..density..), binwidth = 0.2) +
+  facet_wrap(~L1, nrow = 1) +
+  stat_function(fun = dnorm, aes(color = "N(0, 1)"), lwd = 1.5, show.legend = TRUE) +
+  scale_color_manual(values = "blue") +
+  theme(axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10),
+        axis.title.y = element_text(size = 15),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "left",
+        legend.title = element_blank(),
+        legend.text = element_text(size = 12))
+
+##===========================================================
+
+qvalue.list.sel <- qvalue.list[typical.noise]
+beta.list.sel <- beta.list[typical.noise]
+D <- mapply(function (X, y, q) {
+  apply(X, 2, function (x, y, q) {
+    c(FD = sum(y[x <= q] == 0), TD = sum(y[x <= q] != 0))
+  }, y, q)
+}, qvalue.list.sel, beta.list.sel, MoreArgs = list(q = q), SIMPLIFY = FALSE)
+names(D) <- c("Deflated Noise", "In-between", "Inflated Noise")
+```
+
+### Overall
+
+```{r, fig.asp = 0.5, message = FALSE, warning = FALSE}
+pi0hat.plot
+FDR.calib.plot
+FSR.calib.plot
+```
+
+### At nominal FDR = $0.1$
+
+```{r, fig.asp = 0.5, message = FALSE, warning = FALSE}
+FDP.q.plot
+TDP.q.plot
+```
+
+## Big normal
+
+$$
+g_2 = N\left(0, 5^2\right)
+$$
+
+```{r g2}
+plotx <- seq(-6, 6, by = 0.01)
+plot(plotx, plotx, ylim = c(0, dnorm(0)),
+     xlab = expression(theta), ylab = expression(g(theta)),
+     type = "n")
+lines(plotx, dnorm(plotx), lty = 2)
+lines(plotx, dnorm(plotx, 0, 5), col = "blue")
+legend("topright", lty = c(1, 2), col = c(4, 1), c("g", "N(0, 1)"))
+
+density.ggdata.bignormal <- cbind.data.frame(
+  g = "Big Normal",
+  plotx,
+  ploty = dnorm(plotx, 0, 5)
+)
+```
+
+```{r gtex_z_2, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
+set.seed(777)
+
+nsim <- 1000
+
+z.list <- sebetahat.list <- pi0.list <- beta.list <- betahat.list <- list()
+pi0hat.list <- qvalue.list <- svalue.list <- list()
+
+for (i in 1 : nsim) {
+  ## simulate data
+  counts <- r[, sample(ncol(r), 2 * nsamp)]
+  design <- model.matrix(~c(rep(0, nsamp), rep(1, nsamp)))
+  summary <- count_to_summary(counts, design)
+  z <- summary$z
+  sebetahat <- rep(1, length(summary$sebetahat))
+  pi0 <- sample(pi0.vec, 1)
+  beta <- sample(c(
+    rep(0, round(pi0 * ngene)),
+    rnorm(round((1 - pi0) * ngene), 0, 5)
+    ))
+  betahat <- beta + sebetahat * z
+  
+  ## summary statistics
+  zscore <- betahat / sebetahat
+  pvalue = pnorm(-abs(zscore)) * 2
+
+  ## different methods
+  fit.ash = ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+  w.rho <- ifelse(mad.mean(zscore) > sqrt(2 / pi), 0.5, 0.1)
+  fit.gdash = gdash(betahat, sebetahat, w.rho = w.rho, lfsr = TRUE)
+  fit.qvalue = qvalue::qvalue(pvalue)
+  fit.BH = p.adjust(pvalue, method = "BH")
+  fit.locfdr <- tryCatch(locfdr::locfdr(zscore, plot = 0), error = function(e) {NA})
+
+  ## pi0
+  pi0hat.list[[i]] <- c(
+    qvalue = fit.qvalue$pi0,
+    locfdr = tryCatch(fit.locfdr$fp0[3, 3], error = function(e) {NA}),
+    ASH = ashr::get_pi0(fit.ash),
+    CASH = fit.gdash$fitted_g$pi[1]
+  )
+
+  ## FDR
+  qvalue.list[[i]] <- cbind(
+    BH = fit.BH,
+    qvalue = fit.qvalue$qvalues,
+    locfdr = tryCatch(ashr::qval.from.lfdr(fit.locfdr$fdr), error = function(e) {rep(NA, ngene)}),
+    ASH = ashr::get_qvalue(fit.ash),
+    CASH = fit.gdash$qvalue
+  )
+  
+  ## FSR
+  svalue.list[[i]] <- cbind(
+    ASH = ashr::get_svalue(fit.ash),
+    CASH = fit.gdash$svalue
+  )
+  
+  ## data storage
+  z.list[[i]] <- z
+  sebetahat.list[[i]] <- sebetahat
+  pi0.list[[i]] <- c(pi0 = pi0)
+  beta.list[[i]] <- beta
+  betahat.list[[i]] <- betahat
+}
+```
+
+```{r, cache = TRUE}
+pi0hat.mat <- cbind.data.frame(pi0 = factor(do.call(rbind, pi0.list)), do.call(rbind, pi0hat.list))
+
+FDP.list <- lapply(q.vec, function (q) {
+  t(mapply(function (qvalue.mat, beta, q) {
+    apply(qvalue.mat, 2, function (qvalue, q, beta) {
+      FDP(q, qvalue, beta)
+    }, q, beta)
+  }, qvalue.list, beta.list, q))
+})
+names(FDP.list) <- q.vec
+
+FSP.list <- lapply(q.vec, function (s) {
+  t(mapply(function (svalue.mat, beta, betahat, s) {
+    apply(svalue.mat, 2, function (svalue, s, beta, betahat) {
+      FSP(s, svalue, beta, betahat)
+    }, s, beta, betahat)
+  }, svalue.list, beta.list, betahat.list, s))
+})
+names(FSP.list) <- q.vec
+
+TDP.list <- lapply(q.vec, function(q) {
+  t(mapply(function(qvalue.mat, beta, q) {
+    apply(qvalue.mat, 2, function (qvalue, q, beta) {
+      TDP(q, qvalue, beta)
+    }, q, beta)
+  }, qvalue.list, beta.list, q))
+})
+names(TDP.list) <- q.vec
+```
+
+```{r, cache = TRUE, message = FALSE, warning = FALSE}
+sd.z <- sapply(z.list, sd)
+Noise <- cut(sd.z, breaks = c(0, quantile(sd.z, probs = 1 : 2 / 3), Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
+# Noise <- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
+
+##=================================================
+
+pi0hat.noise.mat <- rbind.data.frame(
+  cbind.data.frame(Noise = rep("All", length(Noise)), pi0hat.mat),
+  cbind.data.frame(Noise, pi0hat.mat)
+)
+
+pi0hat.ggdata <- melt(pi0hat.noise.mat, id.vars = c("Noise", "pi0"), variable.name = "Method", value.name = "pi0hat")
+
+pi0hat.plot <- ggplot(data = pi0hat.ggdata, aes(x = pi0, y = pi0hat)) +
+  geom_boxplot(aes(fill = Method, color = Method), outlier.color = NULL, outlier.size = 0.5
+            # , outlier.shape = NA
+               ) +
+  scale_color_manual(values = method.col.pi0hat) +
+  scale_fill_manual(values = alpha(method.col.pi0hat, 0.35)) +
+  facet_wrap(~Noise, nrow = 1, ncol = 4) +
+  geom_hline(yintercept = pi0.vec, col = "black", linetype = "dashed", size = 1) +
+  labs(x = expression(pi[0]), y = expression(hat(pi)[0])) +
+  theme(axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
+        axis.title.y = element_text(size = 15),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "top",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+
+##==================================================
+
+FDP.calib.ggdata <- FXP.ggdata(FDP.list, Noise)
+
+FDR.calib.plot <- ggplot(data = FDP.calib.ggdata, aes(x = L1, y = mean, group = Method, col = Method)) +
+  geom_line() +
+  geom_ribbon(aes(ymin = q025, ymax = q975, fill = Method), alpha = 0.35, linetype = "blank") +
+  scale_color_manual(labels = method.name.FDR, values = method.col.FDR) +
+  scale_fill_manual(labels = method.name.FDR, values = method.col.FDR) +
+  facet_wrap(~Noise, nrow = 1, ncol = 4) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", size = 1, col = "black") +
+  labs(x = "Nominal FDR", y = "FDP") +
+  theme(axis.title.x = element_text(size = 12),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
+        axis.title.y = element_text(size = 12),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "top",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+
+##==================================================
+
+FSP.calib.ggdata <- FXP.ggdata(FSP.list, Noise)
+
+FSR.calib.plot <- ggplot(data = FSP.calib.ggdata, aes(x = L1, y = mean, group = Method, col = Method)) +
+  geom_line() +
+  geom_ribbon(aes(ymin = q025, ymax = q975, fill = Method), alpha = 0.35, linetype = "blank") +
+  scale_color_manual(labels = method.name.FSR, values = method.col.FSR) +
+  scale_fill_manual(labels = method.name.FSR, values = method.col.FSR) +
+  facet_wrap(~Noise, nrow = 1, ncol = 4) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", size = 1, col = "black") +
+  labs(x = "Nominal FSR", y = "FSP") +
+  theme(axis.title.x = element_text(size = 12),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
+        axis.title.y = element_text(size = 12),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "top",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+
+##============================================================
+
+FDP.q <- FDP.list[[which(q.vec == q)]]
+FDP.q.noise.mat <- rbind.data.frame(
+  cbind.data.frame(Noise = rep("All", length(Noise)),
+                   pi0 = factor(do.call(rbind, pi0.list)),
+                   FDP.q),
+  cbind.data.frame(Noise,
+                   pi0 = factor(do.call(rbind, pi0.list)),
+                   FDP.q)
+)
+FDP.q.ggdata <- melt(FDP.q.noise.mat, id.vars = c("Noise", "pi0"), variable.name = "Method", value.name = "FDP")
+
+FDP.q.plot <- ggplot(data = FDP.q.ggdata, aes(x = pi0, y = FDP)) +
+  geom_boxplot(aes(fill = Method, color = Method), outlier.color = NULL, outlier.size = 0.5
+            # , outlier.shape = NA
+               ) +
+  scale_color_manual(values = method.col.FDR) +
+  scale_fill_manual(values = alpha(method.col.FDR, 0.35)) +
+  facet_wrap(~Noise, nrow = 1, ncol = 4) +
+  geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
+  labs(x = expression(pi[0]), y = "FDP") +
+  theme(axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
+        axis.title.y = element_text(size = 12),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "top",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+
+##====================================================================
+
+TDP.q <- TDP.list[[which(q.vec == q)]]
+TDP.q.noise.mat <- rbind.data.frame(
+  cbind.data.frame(Noise = rep("All", length(Noise)),
+                   pi0 = factor(do.call(rbind, pi0.list)),
+                   TDP.q),
+  cbind.data.frame(Noise,
+                   pi0 = factor(do.call(rbind, pi0.list)),
+                   TDP.q)
+)
+TDP.q.ggdata <- melt(TDP.q.noise.mat, id.vars = c("Noise", "pi0"), variable.name = "Method", value.name = "TDP")
+
+TDP.q.plot <- ggplot(data = TDP.q.ggdata, aes(x = pi0, y = TDP)) +
+  geom_boxplot(aes(fill = Method, color = Method), outlier.color = NULL, outlier.size = 0.5
+            # , outlier.shape = NA
+               ) +
+  scale_color_manual(values = method.col.FDR) +
+  scale_fill_manual(values = alpha(method.col.FDR, 0.35)) +
+  facet_wrap(~Noise, nrow = 1, ncol = 4) +
+  labs(x = expression(pi[0]), y = "TDP") +
+  theme(axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
+        axis.title.y = element_text(size = 12),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "top",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+
+##=================================================
+
+FDP.q.all.mat <- cbind.data.frame(
+  pi0 = factor(do.call(rbind, pi0.list)),
+  FDP.q
+  )
+FDP.q.all.ggdata <- melt(FDP.q.all.mat, id.vars = c("pi0"), variable.name = "Method", value.name = "FDP")
+FDP.q.all.ggdata.bignormal <- cbind.data.frame(
+  g = "Big Normal",
+  FDP.q.all.ggdata
+)
+```
+
+### Overall
+
+```{r, fig.asp = 0.5, message = FALSE, warning = FALSE}
+pi0hat.plot
+FDR.calib.plot
+FSR.calib.plot
+```
+
+### At nominal FDR = $0.1$
+
+```{r, fig.asp = 0.5, message = FALSE, warning = FALSE}
+FDP.q.plot
+TDP.q.plot
+```
+
+## Near normal
+
+$$
+g_3 = 0.6 N\left(0, 1^2\right) + 0.4 N\left(0, 3^2\right)
+$$
+
+```{r g3}
+plotx <- seq(-6, 6, by = 0.01)
+plot(plotx, plotx, ylim = c(0, dnorm(0)),
+     xlab = expression(theta), ylab = expression(g(theta)),
+     type = "n")
+lines(plotx, dnorm(plotx), lty = 2)
+lines(plotx, 0.6 * dnorm(plotx) + 0.4 * dnorm(plotx, 0, 3), col = "blue")
+legend("topright", lty = c(1, 2), col = c(4, 1), c("g", "N(0, 1)"))
+
+density.ggdata.nearnormal <- cbind.data.frame(
+  g = "Near Normal",
+  plotx,
+  ploty = 0.6 * dnorm(plotx) + 0.4 * dnorm(plotx, 0, 3)
+)
+```
+
+```{r gtex_z_3, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
+set.seed(777)
+
+nsim <- 1000
+
+z.list <- sebetahat.list <- pi0.list <- beta.list <- betahat.list <- list()
+pi0hat.list <- qvalue.list <- svalue.list <- list()
+
+for (i in 1 : nsim) {
+  ## simulate data
+  counts <- r[, sample(ncol(r), 2 * nsamp)]
+  design <- model.matrix(~c(rep(0, nsamp), rep(1, nsamp)))
+  summary <- count_to_summary(counts, design)
+  z <- summary$z
+  sebetahat <- rep(1, length(summary$sebetahat))
+  pi0 <- sample(pi0.vec, 1)
+  beta <- sample(c(
+    rep(0, round(pi0 * ngene)),
+    rnorm(round((1 - pi0) * 0.6 * ngene)),
+    rnorm(round((1 - pi0) * 0.4 * ngene), 0, 3)
+    ))
+  betahat <- beta + sebetahat * z
+  
+  ## summary statistics
+  zscore <- betahat / sebetahat
+  pvalue = pnorm(-abs(zscore)) * 2
+
+  ## different methods
+  fit.ash = ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+  w.rho <- ifelse(mad.mean(zscore) > sqrt(2 / pi), 0.5, 0.1)
+  fit.gdash = gdash(betahat, sebetahat, w.rho = w.rho, lfsr = TRUE)
+  fit.qvalue = qvalue::qvalue(pvalue)
+  fit.BH = p.adjust(pvalue, method = "BH")
+  fit.locfdr <- tryCatch(locfdr::locfdr(zscore, plot = 0), error = function(e) {NA})
+
+  ## pi0
+  pi0hat.list[[i]] <- c(
+    qvalue = fit.qvalue$pi0,
+    locfdr = tryCatch(fit.locfdr$fp0[3, 3], error = function(e) {NA}),
+    ASH = ashr::get_pi0(fit.ash),
+    CASH = fit.gdash$fitted_g$pi[1]
+  )
+
+  ## FDR
+  qvalue.list[[i]] <- cbind(
+    BH = fit.BH,
+    qvalue = fit.qvalue$qvalues,
+    locfdr = tryCatch(ashr::qval.from.lfdr(fit.locfdr$fdr), error = function(e) {rep(NA, ngene)}),
+    ASH = ashr::get_qvalue(fit.ash),
+    CASH = fit.gdash$qvalue
+  )
+  
+  ## FSR
+  svalue.list[[i]] <- cbind(
+    ASH = ashr::get_svalue(fit.ash),
+    CASH = fit.gdash$svalue
+  )
+  
+  ## data storage
+  z.list[[i]] <- z
+  sebetahat.list[[i]] <- sebetahat
+  pi0.list[[i]] <- c(pi0 = pi0)
+  beta.list[[i]] <- beta
+  betahat.list[[i]] <- betahat
+}
+```
+
+```{r, cache = TRUE}
+pi0hat.mat <- cbind.data.frame(pi0 = factor(do.call(rbind, pi0.list)), do.call(rbind, pi0hat.list))
+
+FDP.list <- lapply(q.vec, function (q) {
+  t(mapply(function (qvalue.mat, beta, q) {
+    apply(qvalue.mat, 2, function (qvalue, q, beta) {
+      FDP(q, qvalue, beta)
+    }, q, beta)
+  }, qvalue.list, beta.list, q))
+})
+names(FDP.list) <- q.vec
+
+FSP.list <- lapply(q.vec, function (s) {
+  t(mapply(function (svalue.mat, beta, betahat, s) {
+    apply(svalue.mat, 2, function (svalue, s, beta, betahat) {
+      FSP(s, svalue, beta, betahat)
+    }, s, beta, betahat)
+  }, svalue.list, beta.list, betahat.list, s))
+})
+names(FSP.list) <- q.vec
+
+TDP.list <- lapply(q.vec, function(q) {
+  t(mapply(function(qvalue.mat, beta, q) {
+    apply(qvalue.mat, 2, function (qvalue, q, beta) {
+      TDP(q, qvalue, beta)
+    }, q, beta)
+  }, qvalue.list, beta.list, q))
+})
+names(TDP.list) <- q.vec
+```
+
+```{r, cache = TRUE, message = FALSE, warning = FALSE}
+sd.z <- sapply(z.list, sd)
+Noise <- cut(sd.z, breaks = c(0, quantile(sd.z, probs = 1 : 2 / 3), Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
+# Noise <- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
+
+##=================================================
+
+pi0hat.noise.mat <- rbind.data.frame(
+  cbind.data.frame(Noise = rep("All", length(Noise)), pi0hat.mat),
+  cbind.data.frame(Noise, pi0hat.mat)
+)
+
+pi0hat.ggdata <- melt(pi0hat.noise.mat, id.vars = c("Noise", "pi0"), variable.name = "Method", value.name = "pi0hat")
+
+pi0hat.plot <- ggplot(data = pi0hat.ggdata, aes(x = pi0, y = pi0hat)) +
+  geom_boxplot(aes(fill = Method, color = Method), outlier.color = NULL, outlier.size = 0.5
+            # , outlier.shape = NA
+               ) +
+  scale_color_manual(values = method.col.pi0hat) +
+  scale_fill_manual(values = alpha(method.col.pi0hat, 0.35)) +
+  facet_wrap(~Noise, nrow = 1, ncol = 4) +
+  geom_hline(yintercept = pi0.vec, col = "black", linetype = "dashed", size = 1) +
+  labs(x = expression(pi[0]), y = expression(hat(pi)[0])) +
+  theme(axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
+        axis.title.y = element_text(size = 15),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "top",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+
+##==================================================
+
+FDP.calib.ggdata <- FXP.ggdata(FDP.list, Noise)
+
+FDR.calib.plot <- ggplot(data = FDP.calib.ggdata, aes(x = L1, y = mean, group = Method, col = Method)) +
+  geom_line() +
+  geom_ribbon(aes(ymin = q025, ymax = q975, fill = Method), alpha = 0.35, linetype = "blank") +
+  scale_color_manual(labels = method.name.FDR, values = method.col.FDR) +
+  scale_fill_manual(labels = method.name.FDR, values = method.col.FDR) +
+  facet_wrap(~Noise, nrow = 1, ncol = 4) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", size = 1, col = "black") +
+  labs(x = "Nominal FDR", y = "FDP") +
+  theme(axis.title.x = element_text(size = 12),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
+        axis.title.y = element_text(size = 12),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "top",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+
+##==================================================
+
+FSP.calib.ggdata <- FXP.ggdata(FSP.list, Noise)
+
+FSR.calib.plot <- ggplot(data = FSP.calib.ggdata, aes(x = L1, y = mean, group = Method, col = Method)) +
+  geom_line() +
+  geom_ribbon(aes(ymin = q025, ymax = q975, fill = Method), alpha = 0.35, linetype = "blank") +
+  scale_color_manual(labels = method.name.FSR, values = method.col.FSR) +
+  scale_fill_manual(labels = method.name.FSR, values = method.col.FSR) +
+  facet_wrap(~Noise, nrow = 1, ncol = 4) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", size = 1, col = "black") +
+  labs(x = "Nominal FSR", y = "FSP") +
+  theme(axis.title.x = element_text(size = 12),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
+        axis.title.y = element_text(size = 12),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "top",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+
+##============================================================
+
+FDP.q <- FDP.list[[which(q.vec == q)]]
+FDP.q.noise.mat <- rbind.data.frame(
+  cbind.data.frame(Noise = rep("All", length(Noise)),
+                   pi0 = factor(do.call(rbind, pi0.list)),
+                   FDP.q),
+  cbind.data.frame(Noise,
+                   pi0 = factor(do.call(rbind, pi0.list)),
+                   FDP.q)
+)
+FDP.q.ggdata <- melt(FDP.q.noise.mat, id.vars = c("Noise", "pi0"), variable.name = "Method", value.name = "FDP")
+
+FDP.q.plot <- ggplot(data = FDP.q.ggdata, aes(x = pi0, y = FDP)) +
+  geom_boxplot(aes(fill = Method, color = Method), outlier.color = NULL, outlier.size = 0.5
+            # , outlier.shape = NA
+               ) +
+  scale_color_manual(values = method.col.FDR) +
+  scale_fill_manual(values = alpha(method.col.FDR, 0.35)) +
+  facet_wrap(~Noise, nrow = 1, ncol = 4) +
+  geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
+  labs(x = expression(pi[0]), y = "FDP") +
+  theme(axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
+        axis.title.y = element_text(size = 12),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "top",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+
+##====================================================================
+
+TDP.q <- TDP.list[[which(q.vec == q)]]
+TDP.q.noise.mat <- rbind.data.frame(
+  cbind.data.frame(Noise = rep("All", length(Noise)),
+                   pi0 = factor(do.call(rbind, pi0.list)),
+                   TDP.q),
+  cbind.data.frame(Noise,
+                   pi0 = factor(do.call(rbind, pi0.list)),
+                   TDP.q)
+)
+TDP.q.ggdata <- melt(TDP.q.noise.mat, id.vars = c("Noise", "pi0"), variable.name = "Method", value.name = "TDP")
+
+TDP.q.plot <- ggplot(data = TDP.q.ggdata, aes(x = pi0, y = TDP)) +
+  geom_boxplot(aes(fill = Method, color = Method), outlier.color = NULL, outlier.size = 0.5
+            # , outlier.shape = NA
+               ) +
+  scale_color_manual(values = method.col.FDR) +
+  scale_fill_manual(values = alpha(method.col.FDR, 0.35)) +
+  facet_wrap(~Noise, nrow = 1, ncol = 4) +
+  labs(x = expression(pi[0]), y = "TDP") +
+  theme(axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
+        axis.title.y = element_text(size = 12),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "top",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+
+##=================================================
+
+FDP.q.all.mat <- cbind.data.frame(
+  pi0 = factor(do.call(rbind, pi0.list)),
+  FDP.q
+  )
+FDP.q.all.ggdata <- melt(FDP.q.all.mat, id.vars = c("pi0"), variable.name = "Method", value.name = "FDP")
+FDP.q.all.ggdata.nearnormal <- cbind.data.frame(
+  g = "Near Normal",
+  FDP.q.all.ggdata
+)
+```
+
+### Overall
+
+```{r, fig.asp = 0.5, message = FALSE, warning = FALSE}
+pi0hat.plot
+FDR.calib.plot
+FSR.calib.plot
+```
+
+### At nominal FDR = $0.1$
+
+```{r, fig.asp = 0.5, message = FALSE, warning = FALSE}
+FDP.q.plot
+TDP.q.plot
+```
+
+## Spiky
+
+$$
+g_4 = 0.4 N\left(0, 0.5^2\right) + 0.2 N\left(0, 1^2\right) + 0.2 N\left(0, 2^2\right) + 0.2 N\left(0, 3^2\right)
+$$
+
+```{r g4}
+plotx <- seq(-6, 6, by = 0.01)
+plot(plotx, plotx, ylim = c(0,
+        0.4 * dnorm(0, 0, 0.5) + 
+        0.2 * dnorm(0) +
+        0.2 * dnorm(0, 0, 2) +
+        0.2 * dnorm(0, 0, 3)),
+     xlab = expression(theta), ylab = expression(g(theta)),
+     type = "n")
+lines(plotx, dnorm(plotx), lty = 2)
+lines(plotx, 0.4 * dnorm(plotx, 0, 0.5) + 
+        0.2 * dnorm(plotx) +
+        0.2 * dnorm(plotx, 0, 2) +
+        0.2 * dnorm(plotx, 0, 3), col = "blue")
+legend("topright", lty = c(1, 2), col = c(4, 1), c("g", "N(0, 1)"))
+
+density.ggdata.spiky <- cbind.data.frame(
+  g = "Spiky",
+  plotx,
+  ploty = 0.4 * dnorm(plotx, 0, 0.5) + 
+        0.2 * dnorm(plotx) +
+        0.2 * dnorm(plotx, 0, 2) +
+        0.2 * dnorm(plotx, 0, 3)
+)
+```
+
+```{r gtex_z_4, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
+set.seed(777)
+
+nsim <- 1000
+
+z.list <- sebetahat.list <- pi0.list <- beta.list <- betahat.list <- list()
+pi0hat.list <- qvalue.list <- svalue.list <- list()
+
+for (i in 1 : nsim) {
+  ## simulate data
+  counts <- r[, sample(ncol(r), 2 * nsamp)]
+  design <- model.matrix(~c(rep(0, nsamp), rep(1, nsamp)))
+  summary <- count_to_summary(counts, design)
+  z <- summary$z
+  sebetahat <- rep(1, length(summary$sebetahat))
+  pi0 <- sample(pi0.vec, 1)
+  beta <- sample(c(
+    rep(0, round(pi0 * ngene)),
+    rnorm(round((1 - pi0) * 0.4 * ngene), 0, 0.5),
+    rnorm(round((1 - pi0) * 0.2 * ngene)),
+    rnorm(round((1 - pi0) * 0.2 * ngene), 0, 2),
+    rnorm(round((1 - pi0) * 0.2 * ngene), 0, 3)
+    ))
+  betahat <- beta + sebetahat * z
+  
+  ## summary statistics
+  zscore <- betahat / sebetahat
+  pvalue = pnorm(-abs(zscore)) * 2
+
+  ## different methods
+  fit.ash = ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+  w.rho <- ifelse(mad.mean(zscore) > sqrt(2 / pi), 0.5, 0.1)
+  fit.gdash = gdash(betahat, sebetahat, w.rho = w.rho, lfsr = TRUE)
+  fit.qvalue = qvalue::qvalue(pvalue)
+  fit.BH = p.adjust(pvalue, method = "BH")
+  fit.locfdr <- tryCatch(locfdr::locfdr(zscore, plot = 0), error = function(e) {NA})
+
+  ## pi0
+  pi0hat.list[[i]] <- c(
+    qvalue = fit.qvalue$pi0,
+    locfdr = tryCatch(fit.locfdr$fp0[3, 3], error = function(e) {NA}),
+    ASH = ashr::get_pi0(fit.ash),
+    CASH = fit.gdash$fitted_g$pi[1]
+  )
+
+  ## FDR
+  qvalue.list[[i]] <- cbind(
+    BH = fit.BH,
+    qvalue = fit.qvalue$qvalues,
+    locfdr = tryCatch(ashr::qval.from.lfdr(fit.locfdr$fdr), error = function(e) {rep(NA, ngene)}),
+    ASH = ashr::get_qvalue(fit.ash),
+    CASH = fit.gdash$qvalue
+  )
+  
+  ## FSR
+  svalue.list[[i]] <- cbind(
+    ASH = ashr::get_svalue(fit.ash),
+    CASH = fit.gdash$svalue
+  )
+  
+  ## data storage
+  z.list[[i]] <- z
+  sebetahat.list[[i]] <- sebetahat
+  pi0.list[[i]] <- c(pi0 = pi0)
+  beta.list[[i]] <- beta
+  betahat.list[[i]] <- betahat
+}
+```
+
+```{r, cache = TRUE}
+pi0hat.mat <- cbind.data.frame(pi0 = factor(do.call(rbind, pi0.list)), do.call(rbind, pi0hat.list))
+
+FDP.list <- lapply(q.vec, function (q) {
+  t(mapply(function (qvalue.mat, beta, q) {
+    apply(qvalue.mat, 2, function (qvalue, q, beta) {
+      FDP(q, qvalue, beta)
+    }, q, beta)
+  }, qvalue.list, beta.list, q))
+})
+names(FDP.list) <- q.vec
+
+FSP.list <- lapply(q.vec, function (s) {
+  t(mapply(function (svalue.mat, beta, betahat, s) {
+    apply(svalue.mat, 2, function (svalue, s, beta, betahat) {
+      FSP(s, svalue, beta, betahat)
+    }, s, beta, betahat)
+  }, svalue.list, beta.list, betahat.list, s))
+})
+names(FSP.list) <- q.vec
+
+TDP.list <- lapply(q.vec, function(q) {
+  t(mapply(function(qvalue.mat, beta, q) {
+    apply(qvalue.mat, 2, function (qvalue, q, beta) {
+      TDP(q, qvalue, beta)
+    }, q, beta)
+  }, qvalue.list, beta.list, q))
+})
+names(TDP.list) <- q.vec
+```
+
+```{r, cache = TRUE, message = FALSE, warning = FALSE}
+sd.z <- sapply(z.list, sd)
+Noise <- cut(sd.z, breaks = c(0, quantile(sd.z, probs = 1 : 2 / 3), Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
+# Noise <- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
+
+##=================================================
+
+pi0hat.noise.mat <- rbind.data.frame(
+  cbind.data.frame(Noise = rep("All", length(Noise)), pi0hat.mat),
+  cbind.data.frame(Noise, pi0hat.mat)
+)
+
+pi0hat.ggdata <- melt(pi0hat.noise.mat, id.vars = c("Noise", "pi0"), variable.name = "Method", value.name = "pi0hat")
+
+pi0hat.plot <- ggplot(data = pi0hat.ggdata, aes(x = pi0, y = pi0hat)) +
+  geom_boxplot(aes(fill = Method, color = Method), outlier.color = NULL, outlier.size = 0.5
+            # , outlier.shape = NA
+               ) +
+  scale_color_manual(values = method.col.pi0hat) +
+  scale_fill_manual(values = alpha(method.col.pi0hat, 0.35)) +
+  facet_wrap(~Noise, nrow = 1, ncol = 4) +
+  geom_hline(yintercept = pi0.vec, col = "black", linetype = "dashed", size = 1) +
+  labs(x = expression(pi[0]), y = expression(hat(pi)[0])) +
+  theme(axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
+        axis.title.y = element_text(size = 15),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "top",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+
+##==================================================
+
+FDP.calib.ggdata <- FXP.ggdata(FDP.list, Noise)
+
+FDR.calib.plot <- ggplot(data = FDP.calib.ggdata, aes(x = L1, y = mean, group = Method, col = Method)) +
+  geom_line() +
+  geom_ribbon(aes(ymin = q025, ymax = q975, fill = Method), alpha = 0.35, linetype = "blank") +
+  scale_color_manual(labels = method.name.FDR, values = method.col.FDR) +
+  scale_fill_manual(labels = method.name.FDR, values = method.col.FDR) +
+  facet_wrap(~Noise, nrow = 1, ncol = 4) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", size = 1, col = "black") +
+  labs(x = "Nominal FDR", y = "FDP") +
+  theme(axis.title.x = element_text(size = 12),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
+        axis.title.y = element_text(size = 12),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "top",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+
+##==================================================
+
+FSP.calib.ggdata <- FXP.ggdata(FSP.list, Noise)
+
+FSR.calib.plot <- ggplot(data = FSP.calib.ggdata, aes(x = L1, y = mean, group = Method, col = Method)) +
+  geom_line() +
+  geom_ribbon(aes(ymin = q025, ymax = q975, fill = Method), alpha = 0.35, linetype = "blank") +
+  scale_color_manual(labels = method.name.FSR, values = method.col.FSR) +
+  scale_fill_manual(labels = method.name.FSR, values = method.col.FSR) +
+  facet_wrap(~Noise, nrow = 1, ncol = 4) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", size = 1, col = "black") +
+  labs(x = "Nominal FSR", y = "FSP") +
+  theme(axis.title.x = element_text(size = 12),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
+        axis.title.y = element_text(size = 12),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "top",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+
+##============================================================
+
+FDP.q <- FDP.list[[which(q.vec == q)]]
+FDP.q.noise.mat <- rbind.data.frame(
+  cbind.data.frame(Noise = rep("All", length(Noise)),
+                   pi0 = factor(do.call(rbind, pi0.list)),
+                   FDP.q),
+  cbind.data.frame(Noise,
+                   pi0 = factor(do.call(rbind, pi0.list)),
+                   FDP.q)
+)
+FDP.q.ggdata <- melt(FDP.q.noise.mat, id.vars = c("Noise", "pi0"), variable.name = "Method", value.name = "FDP")
+
+FDP.q.plot <- ggplot(data = FDP.q.ggdata, aes(x = pi0, y = FDP)) +
+  geom_boxplot(aes(fill = Method, color = Method), outlier.color = NULL, outlier.size = 0.5
+            # , outlier.shape = NA
+               ) +
+  scale_color_manual(values = method.col.FDR) +
+  scale_fill_manual(values = alpha(method.col.FDR, 0.35)) +
+  facet_wrap(~Noise, nrow = 1, ncol = 4) +
+  geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
+  labs(x = expression(pi[0]), y = "FDP") +
+  theme(axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
+        axis.title.y = element_text(size = 12),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "top",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+
+##====================================================================
+
+TDP.q <- TDP.list[[which(q.vec == q)]]
+TDP.q.noise.mat <- rbind.data.frame(
+  cbind.data.frame(Noise = rep("All", length(Noise)),
+                   pi0 = factor(do.call(rbind, pi0.list)),
+                   TDP.q),
+  cbind.data.frame(Noise,
+                   pi0 = factor(do.call(rbind, pi0.list)),
+                   TDP.q)
+)
+TDP.q.ggdata <- melt(TDP.q.noise.mat, id.vars = c("Noise", "pi0"), variable.name = "Method", value.name = "TDP")
+
+TDP.q.plot <- ggplot(data = TDP.q.ggdata, aes(x = pi0, y = TDP)) +
+  geom_boxplot(aes(fill = Method, color = Method), outlier.color = NULL, outlier.size = 0.5
+            # , outlier.shape = NA
+               ) +
+  scale_color_manual(values = method.col.FDR) +
+  scale_fill_manual(values = alpha(method.col.FDR, 0.35)) +
+  facet_wrap(~Noise, nrow = 1, ncol = 4) +
+  labs(x = expression(pi[0]), y = "TDP") +
+  theme(axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
+        axis.title.y = element_text(size = 12),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "top",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+
+##=================================================
+
+FDP.q.all.mat <- cbind.data.frame(
+  pi0 = factor(do.call(rbind, pi0.list)),
+  FDP.q
+  )
+FDP.q.all.ggdata <- melt(FDP.q.all.mat, id.vars = c("pi0"), variable.name = "Method", value.name = "FDP")
+FDP.q.all.ggdata.spiky <- cbind.data.frame(
+  g = "Spiky",
+  FDP.q.all.ggdata
+)
+```
+
+### Overall
+
+```{r, fig.asp = 0.5, message = FALSE, warning = FALSE}
+pi0hat.plot
+FDR.calib.plot
+FSR.calib.plot
+```
+
+### At nominal FDR = $0.1$
+
+```{r, fig.asp = 0.5, message = FALSE, warning = FALSE}
+FDP.q.plot
+TDP.q.plot
+```
+
+## Skew
+
+$$
+g_5 = 1/4 N\left(-2, 2^2\right) + 1/4 N\left(-1, 2^2\right) + 1/4 N\left(0, 1^2\right) + 1 / 4 N\left(1, 1^2\right)
+$$
+
+```{r g5}
+plotx <- seq(-6, 6, by = 0.01)
+plot(plotx, plotx, ylim = c(0, dnorm(0)),
+     xlab = expression(theta), ylab = expression(g(theta)),
+     type = "n")
+lines(plotx, dnorm(plotx), lty = 2)
+lines(plotx, 0.25 * dnorm(plotx, -2, 2) + 
+        0.25 * dnorm(plotx, -1, 2) +
+        0.25 * dnorm(plotx, 0, 1) +
+        0.25 * dnorm(plotx, 1, 1), col = "blue")
+legend("topright", lty = c(1, 2), col = c(4, 1), c("g", "N(0, 1)"))
+
+density.ggdata.skew <- cbind.data.frame(
+  g = "Skew",
+  plotx,
+  ploty = 0.25 * dnorm(plotx, -2, 2) + 
+        0.25 * dnorm(plotx, -1, 2) +
+        0.25 * dnorm(plotx, 0, 1) +
+        0.25 * dnorm(plotx, 1, 1)
+)
+```
+
+```{r gtex_z_5, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
+set.seed(777)
+
+nsim <- 1000
+
+z.list <- sebetahat.list <- pi0.list <- beta.list <- betahat.list <- list()
+pi0hat.list <- qvalue.list <- svalue.list <- list()
+
+for (i in 1 : nsim) {
+  ## simulate data
+  counts <- r[, sample(ncol(r), 2 * nsamp)]
+  design <- model.matrix(~c(rep(0, nsamp), rep(1, nsamp)))
+  summary <- count_to_summary(counts, design)
+  z <- summary$z
+  sebetahat <- rep(1, length(summary$sebetahat))
+  pi0 <- sample(pi0.vec, 1)
+  beta <- sample(c(
+    rep(0, round(pi0 * ngene)),
+    rnorm(round((1 - pi0) * 0.25 * ngene), -2, 2),
+    rnorm(round((1 - pi0) * 0.25 * ngene), -1, 2),
+    rnorm(round((1 - pi0) * 0.25 * ngene), 0, 1),
+    rnorm(round((1 - pi0) * 0.25 * ngene), 1, 1)
+    ))
+  betahat <- beta + sebetahat * z
+  
+  ## summary statistics
+  zscore <- betahat / sebetahat
+  pvalue = pnorm(-abs(zscore)) * 2
+
+  ## different methods
+  fit.ash = ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+  w.rho <- ifelse(mad.mean(zscore) > sqrt(2 / pi), 0.5, 0.1)
+  fit.gdash = gdash(betahat, sebetahat, w.rho = w.rho, lfsr = TRUE)
+  fit.qvalue = qvalue::qvalue(pvalue)
+  fit.BH = p.adjust(pvalue, method = "BH")
+  fit.locfdr <- tryCatch(locfdr::locfdr(zscore, plot = 0), error = function(e) {NA})
+
+  ## pi0
+  pi0hat.list[[i]] <- c(
+    qvalue = fit.qvalue$pi0,
+    locfdr = tryCatch(fit.locfdr$fp0[3, 3], error = function(e) {NA}),
+    ASH = ashr::get_pi0(fit.ash),
+    CASH = fit.gdash$fitted_g$pi[1]
+  )
+
+  ## FDR
+  qvalue.list[[i]] <- cbind(
+    BH = fit.BH,
+    qvalue = fit.qvalue$qvalues,
+    locfdr = tryCatch(ashr::qval.from.lfdr(fit.locfdr$fdr), error = function(e) {rep(NA, ngene)}),
+    ASH = ashr::get_qvalue(fit.ash),
+    CASH = fit.gdash$qvalue
+  )
+  
+  ## FSR
+  svalue.list[[i]] <- cbind(
+    ASH = ashr::get_svalue(fit.ash),
+    CASH = fit.gdash$svalue
+  )
+  
+  ## data storage
+  z.list[[i]] <- z
+  sebetahat.list[[i]] <- sebetahat
+  pi0.list[[i]] <- c(pi0 = pi0)
+  beta.list[[i]] <- beta
+  betahat.list[[i]] <- betahat
+}
+```
+
+```{r, cache = TRUE}
+pi0hat.mat <- cbind.data.frame(pi0 = factor(do.call(rbind, pi0.list)), do.call(rbind, pi0hat.list))
+
+FDP.list <- lapply(q.vec, function (q) {
+  t(mapply(function (qvalue.mat, beta, q) {
+    apply(qvalue.mat, 2, function (qvalue, q, beta) {
+      FDP(q, qvalue, beta)
+    }, q, beta)
+  }, qvalue.list, beta.list, q))
+})
+names(FDP.list) <- q.vec
+
+FSP.list <- lapply(q.vec, function (s) {
+  t(mapply(function (svalue.mat, beta, betahat, s) {
+    apply(svalue.mat, 2, function (svalue, s, beta, betahat) {
+      FSP(s, svalue, beta, betahat)
+    }, s, beta, betahat)
+  }, svalue.list, beta.list, betahat.list, s))
+})
+names(FSP.list) <- q.vec
+
+TDP.list <- lapply(q.vec, function(q) {
+  t(mapply(function(qvalue.mat, beta, q) {
+    apply(qvalue.mat, 2, function (qvalue, q, beta) {
+      TDP(q, qvalue, beta)
+    }, q, beta)
+  }, qvalue.list, beta.list, q))
+})
+names(TDP.list) <- q.vec
+```
+
+```{r, cache = TRUE, message = FALSE, warning = FALSE}
+sd.z <- sapply(z.list, sd)
+Noise <- cut(sd.z, breaks = c(0, quantile(sd.z, probs = 1 : 2 / 3), Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
+# Noise <- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
+
+##=================================================
+
+pi0hat.noise.mat <- rbind.data.frame(
+  cbind.data.frame(Noise = rep("All", length(Noise)), pi0hat.mat),
+  cbind.data.frame(Noise, pi0hat.mat)
+)
+
+pi0hat.ggdata <- melt(pi0hat.noise.mat, id.vars = c("Noise", "pi0"), variable.name = "Method", value.name = "pi0hat")
+
+pi0hat.plot <- ggplot(data = pi0hat.ggdata, aes(x = pi0, y = pi0hat)) +
+  geom_boxplot(aes(fill = Method, color = Method), outlier.color = NULL, outlier.size = 0.5
+            # , outlier.shape = NA
+               ) +
+  scale_color_manual(values = method.col.pi0hat) +
+  scale_fill_manual(values = alpha(method.col.pi0hat, 0.35)) +
+  facet_wrap(~Noise, nrow = 1, ncol = 4) +
+  geom_hline(yintercept = pi0.vec, col = "black", linetype = "dashed", size = 1) +
+  labs(x = expression(pi[0]), y = expression(hat(pi)[0])) +
+  theme(axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
+        axis.title.y = element_text(size = 15),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "top",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+
+##==================================================
+
+FDP.calib.ggdata <- FXP.ggdata(FDP.list, Noise)
+
+FDR.calib.plot <- ggplot(data = FDP.calib.ggdata, aes(x = L1, y = mean, group = Method, col = Method)) +
+  geom_line() +
+  geom_ribbon(aes(ymin = q025, ymax = q975, fill = Method), alpha = 0.35, linetype = "blank") +
+  scale_color_manual(labels = method.name.FDR, values = method.col.FDR) +
+  scale_fill_manual(labels = method.name.FDR, values = method.col.FDR) +
+  facet_wrap(~Noise, nrow = 1, ncol = 4) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", size = 1, col = "black") +
+  labs(x = "Nominal FDR", y = "FDP") +
+  theme(axis.title.x = element_text(size = 12),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
+        axis.title.y = element_text(size = 12),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "top",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+
+##==================================================
+
+FSP.calib.ggdata <- FXP.ggdata(FSP.list, Noise)
+
+FSR.calib.plot <- ggplot(data = FSP.calib.ggdata, aes(x = L1, y = mean, group = Method, col = Method)) +
+  geom_line() +
+  geom_ribbon(aes(ymin = q025, ymax = q975, fill = Method), alpha = 0.35, linetype = "blank") +
+  scale_color_manual(labels = method.name.FSR, values = method.col.FSR) +
+  scale_fill_manual(labels = method.name.FSR, values = method.col.FSR) +
+  facet_wrap(~Noise, nrow = 1, ncol = 4) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", size = 1, col = "black") +
+  labs(x = "Nominal FSR", y = "FSP") +
+  theme(axis.title.x = element_text(size = 12),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
+        axis.title.y = element_text(size = 12),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "top",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+
+##============================================================
+
+FDP.q <- FDP.list[[which(q.vec == q)]]
+FDP.q.noise.mat <- rbind.data.frame(
+  cbind.data.frame(Noise = rep("All", length(Noise)),
+                   pi0 = factor(do.call(rbind, pi0.list)),
+                   FDP.q),
+  cbind.data.frame(Noise,
+                   pi0 = factor(do.call(rbind, pi0.list)),
+                   FDP.q)
+)
+FDP.q.ggdata <- melt(FDP.q.noise.mat, id.vars = c("Noise", "pi0"), variable.name = "Method", value.name = "FDP")
+
+FDP.q.plot <- ggplot(data = FDP.q.ggdata, aes(x = pi0, y = FDP)) +
+  geom_boxplot(aes(fill = Method, color = Method), outlier.color = NULL, outlier.size = 0.5
+            # , outlier.shape = NA
+               ) +
+  scale_color_manual(values = method.col.FDR) +
+  scale_fill_manual(values = alpha(method.col.FDR, 0.35)) +
+  facet_wrap(~Noise, nrow = 1, ncol = 4) +
+  geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
+  labs(x = expression(pi[0]), y = "FDP") +
+  theme(axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
+        axis.title.y = element_text(size = 12),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "top",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+
+##====================================================================
+
+TDP.q <- TDP.list[[which(q.vec == q)]]
+TDP.q.noise.mat <- rbind.data.frame(
+  cbind.data.frame(Noise = rep("All", length(Noise)),
+                   pi0 = factor(do.call(rbind, pi0.list)),
+                   TDP.q),
+  cbind.data.frame(Noise,
+                   pi0 = factor(do.call(rbind, pi0.list)),
+                   TDP.q)
+)
+TDP.q.ggdata <- melt(TDP.q.noise.mat, id.vars = c("Noise", "pi0"), variable.name = "Method", value.name = "TDP")
+
+TDP.q.plot <- ggplot(data = TDP.q.ggdata, aes(x = pi0, y = TDP)) +
+  geom_boxplot(aes(fill = Method, color = Method), outlier.color = NULL, outlier.size = 0.5
+            # , outlier.shape = NA
+               ) +
+  scale_color_manual(values = method.col.FDR) +
+  scale_fill_manual(values = alpha(method.col.FDR, 0.35)) +
+  facet_wrap(~Noise, nrow = 1, ncol = 4) +
+  labs(x = expression(pi[0]), y = "TDP") +
+  theme(axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
+        axis.title.y = element_text(size = 12),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "top",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+
+##=================================================
+
+FDP.q.all.mat <- cbind.data.frame(
+  pi0 = factor(do.call(rbind, pi0.list)),
+  FDP.q
+  )
+FDP.q.all.ggdata <- melt(FDP.q.all.mat, id.vars = c("pi0"), variable.name = "Method", value.name = "FDP")
+FDP.q.all.ggdata.skew <- cbind.data.frame(
+  g = "Skew",
+  FDP.q.all.ggdata
+)
+```
+
+### Overall
+
+```{r, fig.asp = 0.5, message = FALSE, warning = FALSE}
+pi0hat.plot
+FDR.calib.plot
+FSR.calib.plot
+```
+
+### At nominal FDR = $0.1$
+
+```{r, fig.asp = 0.5, message = FALSE, warning = FALSE}
+FDP.q.plot
+TDP.q.plot
+```
+
+## Flattop
+
+$$
+g_6 = \frac17\left[N\left(-1.5, 0.5^2\right) + N\left(-1, 0.5^2\right) + N\left(-0.5, 0.5^2\right) + N\left(0, 0.5^2\right) + N\left(0.5, 0.5^2\right) + N\left(1, 0.5^2\right) + N\left(1.5, 0.5^2\right)\right]
+$$
+
+```{r g6}
+plotx <- seq(-6, 6, by = 0.01)
+plot(plotx, plotx, ylim = c(0, dnorm(0)),
+     xlab = expression(theta), ylab = expression(g(theta)),
+     type = "n")
+lines(plotx, dnorm(plotx), lty = 2)
+lines(plotx, sapply(plotx, function(x) {mean(dnorm(x, seq(-1.5, 1.5, by = 0.5), 0.5))}), col = "blue")
+legend("topright", lty = c(1, 2), col = c(4, 1), c("g", "N(0, 1)"))
+
+density.ggdata.flattop <- cbind.data.frame(
+  g = "Flat Top",
+  plotx,
+  ploty = sapply(plotx, function(x) {mean(dnorm(x, seq(-1.5, 1.5, by = 0.5), 0.5))})
+)
+```
+
+```{r gtex_z_6, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
+set.seed(777)
+
+nsim <- 1000
+
+z.list <- sebetahat.list <- pi0.list <- beta.list <- betahat.list <- list()
+pi0hat.list <- qvalue.list <- svalue.list <- list()
+
+for (i in 1 : nsim) {
+  ## simulate data
+  counts <- r[, sample(ncol(r), 2 * nsamp)]
+  design <- model.matrix(~c(rep(0, nsamp), rep(1, nsamp)))
+  summary <- count_to_summary(counts, design)
+  z <- summary$z
+  sebetahat <- rep(1, length(summary$sebetahat))
+  pi0 <- sample(pi0.vec, 1)
+  beta <- as.vector(sapply(seq(-1.5, 1.5, by = 0.5), function (x) {rnorm(round((1 - pi0) * ngene / length(seq(-1.5, 1.5, by = 0.5))), x, 0.5)}))
+  beta <- sample(c(rep(0, ngene - length(beta)), beta))
+  betahat <- beta + sebetahat * z
+  
+  ## summary statistics
+  zscore <- betahat / sebetahat
+  pvalue = pnorm(-abs(zscore)) * 2
+
+  ## different methods
+  fit.ash = ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+  w.rho <- ifelse(mad.mean(zscore) > sqrt(2 / pi), 0.5, 0.1)
+  fit.gdash = gdash(betahat, sebetahat, w.rho = w.rho, lfsr = TRUE)
+  fit.qvalue = qvalue::qvalue(pvalue)
+  fit.BH = p.adjust(pvalue, method = "BH")
+  fit.locfdr <- tryCatch(locfdr::locfdr(zscore, plot = 0), error = function(e) {NA})
+
+  ## pi0
+  pi0hat.list[[i]] <- c(
+    qvalue = fit.qvalue$pi0,
+    locfdr = tryCatch(fit.locfdr$fp0[3, 3], error = function(e) {NA}),
+    ASH = ashr::get_pi0(fit.ash),
+    CASH = fit.gdash$fitted_g$pi[1]
+  )
+
+  ## FDR
+  qvalue.list[[i]] <- cbind(
+    BH = fit.BH,
+    qvalue = fit.qvalue$qvalues,
+    locfdr = tryCatch(ashr::qval.from.lfdr(fit.locfdr$fdr), error = function(e) {rep(NA, ngene)}),
+    ASH = ashr::get_qvalue(fit.ash),
+    CASH = fit.gdash$qvalue
+  )
+  
+  ## FSR
+  svalue.list[[i]] <- cbind(
+    ASH = ashr::get_svalue(fit.ash),
+    CASH = fit.gdash$svalue
+  )
+  
+  ## data storage
+  z.list[[i]] <- z
+  sebetahat.list[[i]] <- sebetahat
+  pi0.list[[i]] <- c(pi0 = pi0)
+  beta.list[[i]] <- beta
+  betahat.list[[i]] <- betahat
+}
+```
+
+```{r, cache = TRUE}
+pi0hat.mat <- cbind.data.frame(pi0 = factor(do.call(rbind, pi0.list)), do.call(rbind, pi0hat.list))
+
+FDP.list <- lapply(q.vec, function (q) {
+  t(mapply(function (qvalue.mat, beta, q) {
+    apply(qvalue.mat, 2, function (qvalue, q, beta) {
+      FDP(q, qvalue, beta)
+    }, q, beta)
+  }, qvalue.list, beta.list, q))
+})
+names(FDP.list) <- q.vec
+
+FSP.list <- lapply(q.vec, function (s) {
+  t(mapply(function (svalue.mat, beta, betahat, s) {
+    apply(svalue.mat, 2, function (svalue, s, beta, betahat) {
+      FSP(s, svalue, beta, betahat)
+    }, s, beta, betahat)
+  }, svalue.list, beta.list, betahat.list, s))
+})
+names(FSP.list) <- q.vec
+
+TDP.list <- lapply(q.vec, function(q) {
+  t(mapply(function(qvalue.mat, beta, q) {
+    apply(qvalue.mat, 2, function (qvalue, q, beta) {
+      TDP(q, qvalue, beta)
+    }, q, beta)
+  }, qvalue.list, beta.list, q))
+})
+names(TDP.list) <- q.vec
+```
+
+```{r, cache = TRUE, message = FALSE, warning = FALSE}
+sd.z <- sapply(z.list, sd)
+Noise <- cut(sd.z, breaks = c(0, quantile(sd.z, probs = 1 : 2 / 3), Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
+# Noise <- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
+
+##=================================================
+
+pi0hat.noise.mat <- rbind.data.frame(
+  cbind.data.frame(Noise = rep("All", length(Noise)), pi0hat.mat),
+  cbind.data.frame(Noise, pi0hat.mat)
+)
+
+pi0hat.ggdata <- melt(pi0hat.noise.mat, id.vars = c("Noise", "pi0"), variable.name = "Method", value.name = "pi0hat")
+
+pi0hat.plot <- ggplot(data = pi0hat.ggdata, aes(x = pi0, y = pi0hat)) +
+  geom_boxplot(aes(fill = Method, color = Method), outlier.color = NULL, outlier.size = 0.5
+            # , outlier.shape = NA
+               ) +
+  scale_color_manual(values = method.col.pi0hat) +
+  scale_fill_manual(values = alpha(method.col.pi0hat, 0.35)) +
+  facet_wrap(~Noise, nrow = 1, ncol = 4) +
+  geom_hline(yintercept = pi0.vec, col = "black", linetype = "dashed", size = 1) +
+  labs(x = expression(pi[0]), y = expression(hat(pi)[0])) +
+  theme(axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
+        axis.title.y = element_text(size = 15),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "top",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+
+##==================================================
+
+FDP.calib.ggdata <- FXP.ggdata(FDP.list, Noise)
+
+FDR.calib.plot <- ggplot(data = FDP.calib.ggdata, aes(x = L1, y = mean, group = Method, col = Method)) +
+  geom_line() +
+  geom_ribbon(aes(ymin = q025, ymax = q975, fill = Method), alpha = 0.35, linetype = "blank") +
+  scale_color_manual(labels = method.name.FDR, values = method.col.FDR) +
+  scale_fill_manual(labels = method.name.FDR, values = method.col.FDR) +
+  facet_wrap(~Noise, nrow = 1, ncol = 4) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", size = 1, col = "black") +
+  labs(x = "Nominal FDR", y = "FDP") +
+  theme(axis.title.x = element_text(size = 12),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
+        axis.title.y = element_text(size = 12),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "top",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+
+##==================================================
+
+FSP.calib.ggdata <- FXP.ggdata(FSP.list, Noise)
+
+FSR.calib.plot <- ggplot(data = FSP.calib.ggdata, aes(x = L1, y = mean, group = Method, col = Method)) +
+  geom_line() +
+  geom_ribbon(aes(ymin = q025, ymax = q975, fill = Method), alpha = 0.35, linetype = "blank") +
+  scale_color_manual(labels = method.name.FSR, values = method.col.FSR) +
+  scale_fill_manual(labels = method.name.FSR, values = method.col.FSR) +
+  facet_wrap(~Noise, nrow = 1, ncol = 4) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", size = 1, col = "black") +
+  labs(x = "Nominal FSR", y = "FSP") +
+  theme(axis.title.x = element_text(size = 12),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
+        axis.title.y = element_text(size = 12),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "top",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+
+##============================================================
+
+FDP.q <- FDP.list[[which(q.vec == q)]]
+FDP.q.noise.mat <- rbind.data.frame(
+  cbind.data.frame(Noise = rep("All", length(Noise)),
+                   pi0 = factor(do.call(rbind, pi0.list)),
+                   FDP.q),
+  cbind.data.frame(Noise,
+                   pi0 = factor(do.call(rbind, pi0.list)),
+                   FDP.q)
+)
+FDP.q.ggdata <- melt(FDP.q.noise.mat, id.vars = c("Noise", "pi0"), variable.name = "Method", value.name = "FDP")
+
+FDP.q.plot <- ggplot(data = FDP.q.ggdata, aes(x = pi0, y = FDP)) +
+  geom_boxplot(aes(fill = Method, color = Method), outlier.color = NULL, outlier.size = 0.5
+            # , outlier.shape = NA
+               ) +
+  scale_color_manual(values = method.col.FDR) +
+  scale_fill_manual(values = alpha(method.col.FDR, 0.35)) +
+  facet_wrap(~Noise, nrow = 1, ncol = 4) +
+  geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
+  labs(x = expression(pi[0]), y = "FDP") +
+  theme(axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
+        axis.title.y = element_text(size = 12),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "top",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+
+##====================================================================
+
+TDP.q <- TDP.list[[which(q.vec == q)]]
+TDP.q.noise.mat <- rbind.data.frame(
+  cbind.data.frame(Noise = rep("All", length(Noise)),
+                   pi0 = factor(do.call(rbind, pi0.list)),
+                   TDP.q),
+  cbind.data.frame(Noise,
+                   pi0 = factor(do.call(rbind, pi0.list)),
+                   TDP.q)
+)
+TDP.q.ggdata <- melt(TDP.q.noise.mat, id.vars = c("Noise", "pi0"), variable.name = "Method", value.name = "TDP")
+
+TDP.q.plot <- ggplot(data = TDP.q.ggdata, aes(x = pi0, y = TDP)) +
+  geom_boxplot(aes(fill = Method, color = Method), outlier.color = NULL, outlier.size = 0.5
+            # , outlier.shape = NA
+               ) +
+  scale_color_manual(values = method.col.FDR) +
+  scale_fill_manual(values = alpha(method.col.FDR, 0.35)) +
+  facet_wrap(~Noise, nrow = 1, ncol = 4) +
+  labs(x = expression(pi[0]), y = "TDP") +
+  theme(axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
+        axis.title.y = element_text(size = 12),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "top",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+
+##=================================================
+
+FDP.q.all.mat <- cbind.data.frame(
+  pi0 = factor(do.call(rbind, pi0.list)),
+  FDP.q
+  )
+FDP.q.all.ggdata <- melt(FDP.q.all.mat, id.vars = c("pi0"), variable.name = "Method", value.name = "FDP")
+FDP.q.all.ggdata.flattop <- cbind.data.frame(
+  g = "Flat Top",
+  FDP.q.all.ggdata
+)
+```
+
+### Overall
+
+```{r, fig.asp = 0.5, message = FALSE, warning = FALSE}
+pi0hat.plot
+FDR.calib.plot
+FSR.calib.plot
+```
+
+### At nominal FDR = $0.1$
+
+```{r, fig.asp = 0.5, message = FALSE, warning = FALSE}
+FDP.q.plot
+TDP.q.plot
+```
+
+## Bimodal
+
+$$
+g_7 = 0.5 N\left(-1.5, 1\right) + 0.5 N\left(1.5, 1\right)
+$$
+
+```{r g7}
+plotx <- seq(-6, 6, by = 0.01)
+plot(plotx, plotx, ylim = c(0, dnorm(0)),
+     xlab = expression(theta), ylab = expression(g(theta)),
+     type = "n")
+lines(plotx, dnorm(plotx), lty = 2)
+lines(plotx, 0.5 * dnorm(plotx, -1.5, 1) + 
+        0.5 * dnorm(plotx, 1.5, 1), col = "blue")
+legend("topright", lty = c(1, 2), col = c(4, 1), c("g", "N(0, 1)"))
+
+density.ggdata.bimodal <- cbind.data.frame(
+  g = "Bimodal",
+  plotx,
+  ploty = 0.5 * dnorm(plotx, -1.5, 1) + 
+        0.5 * dnorm(plotx, 1.5, 1)
+)
+```
+
+```{r gtex_z_7, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
+set.seed(777)
+
+nsim <- 1000
+
+z.list <- sebetahat.list <- pi0.list <- beta.list <- betahat.list <- list()
+pi0hat.list <- qvalue.list <- svalue.list <- list()
+
+for (i in 1 : nsim) {
+  ## simulate data
+  counts <- r[, sample(ncol(r), 2 * nsamp)]
+  design <- model.matrix(~c(rep(0, nsamp), rep(1, nsamp)))
+  summary <- count_to_summary(counts, design)
+  z <- summary$z
+  sebetahat <- rep(1, length(summary$sebetahat))
+  pi0 <- sample(pi0.vec, 1)
+  beta <- sample(c(
+    rep(0, round(pi0 * ngene)),
+    rnorm(round((1 - pi0) * 0.5 * ngene), -1.5, 1),
+    rnorm(round((1 - pi0) * 0.5 * ngene), 1.5, 1)
+    ))
+  betahat <- beta + sebetahat * z
+  
+  ## summary statistics
+  zscore <- betahat / sebetahat
+  pvalue = pnorm(-abs(zscore)) * 2
+
+  ## different methods
+  fit.ash = ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
+  w.rho <- ifelse(mad.mean(zscore) > sqrt(2 / pi), 0.5, 0.1)
+  fit.gdash = gdash(betahat, sebetahat, w.rho = w.rho, lfsr = TRUE)
+  fit.qvalue = qvalue::qvalue(pvalue)
+  fit.BH = p.adjust(pvalue, method = "BH")
+  fit.locfdr <- tryCatch(locfdr::locfdr(zscore, plot = 0), error = function(e) {NA})
+
+  ## pi0
+  pi0hat.list[[i]] <- c(
+    qvalue = fit.qvalue$pi0,
+    locfdr = tryCatch(fit.locfdr$fp0[3, 3], error = function(e) {NA}),
+    ASH = ashr::get_pi0(fit.ash),
+    CASH = fit.gdash$fitted_g$pi[1]
+  )
+
+  ## FDR
+  qvalue.list[[i]] <- cbind(
+    BH = fit.BH,
+    qvalue = fit.qvalue$qvalues,
+    locfdr = tryCatch(ashr::qval.from.lfdr(fit.locfdr$fdr), error = function(e) {rep(NA, ngene)}),
+    ASH = ashr::get_qvalue(fit.ash),
+    CASH = fit.gdash$qvalue
+  )
+  
+  ## FSR
+  svalue.list[[i]] <- cbind(
+    ASH = ashr::get_svalue(fit.ash),
+    CASH = fit.gdash$svalue
+  )
+  
+  ## data storage
+  z.list[[i]] <- z
+  sebetahat.list[[i]] <- sebetahat
+  pi0.list[[i]] <- c(pi0 = pi0)
+  beta.list[[i]] <- beta
+  betahat.list[[i]] <- betahat
+}
+```
+
+```{r, cache = TRUE}
+pi0hat.mat <- cbind.data.frame(pi0 = factor(do.call(rbind, pi0.list)), do.call(rbind, pi0hat.list))
+
+FDP.list <- lapply(q.vec, function (q) {
+  t(mapply(function (qvalue.mat, beta, q) {
+    apply(qvalue.mat, 2, function (qvalue, q, beta) {
+      FDP(q, qvalue, beta)
+    }, q, beta)
+  }, qvalue.list, beta.list, q))
+})
+names(FDP.list) <- q.vec
+
+FSP.list <- lapply(q.vec, function (s) {
+  t(mapply(function (svalue.mat, beta, betahat, s) {
+    apply(svalue.mat, 2, function (svalue, s, beta, betahat) {
+      FSP(s, svalue, beta, betahat)
+    }, s, beta, betahat)
+  }, svalue.list, beta.list, betahat.list, s))
+})
+names(FSP.list) <- q.vec
+
+TDP.list <- lapply(q.vec, function(q) {
+  t(mapply(function(qvalue.mat, beta, q) {
+    apply(qvalue.mat, 2, function (qvalue, q, beta) {
+      TDP(q, qvalue, beta)
+    }, q, beta)
+  }, qvalue.list, beta.list, q))
+})
+names(TDP.list) <- q.vec
+```
+
+```{r, cache = TRUE, message = FALSE, warning = FALSE}
+sd.z <- sapply(z.list, sd)
+Noise <- cut(sd.z, breaks = c(0, quantile(sd.z, probs = 1 : 2 / 3), Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
+# Noise <- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
+
+##=================================================
+
+pi0hat.noise.mat <- rbind.data.frame(
+  cbind.data.frame(Noise = rep("All", length(Noise)), pi0hat.mat),
+  cbind.data.frame(Noise, pi0hat.mat)
+)
+
+pi0hat.ggdata <- melt(pi0hat.noise.mat, id.vars = c("Noise", "pi0"), variable.name = "Method", value.name = "pi0hat")
+
+pi0hat.plot <- ggplot(data = pi0hat.ggdata, aes(x = pi0, y = pi0hat)) +
+  geom_boxplot(aes(fill = Method, color = Method), outlier.color = NULL, outlier.size = 0.5
+            # , outlier.shape = NA
+               ) +
+  scale_color_manual(values = method.col.pi0hat) +
+  scale_fill_manual(values = alpha(method.col.pi0hat, 0.35)) +
+  facet_wrap(~Noise, nrow = 1, ncol = 4) +
+  geom_hline(yintercept = pi0.vec, col = "black", linetype = "dashed", size = 1) +
+  labs(x = expression(pi[0]), y = expression(hat(pi)[0])) +
+  theme(axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
+        axis.title.y = element_text(size = 15),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "top",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+
+##==================================================
+
+FDP.calib.ggdata <- FXP.ggdata(FDP.list, Noise)
+
+FDR.calib.plot <- ggplot(data = FDP.calib.ggdata, aes(x = L1, y = mean, group = Method, col = Method)) +
+  geom_line() +
+  geom_ribbon(aes(ymin = q025, ymax = q975, fill = Method), alpha = 0.35, linetype = "blank") +
+  scale_color_manual(labels = method.name.FDR, values = method.col.FDR) +
+  scale_fill_manual(labels = method.name.FDR, values = method.col.FDR) +
+  facet_wrap(~Noise, nrow = 1, ncol = 4) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", size = 1, col = "black") +
+  labs(x = "Nominal FDR", y = "FDP") +
+  theme(axis.title.x = element_text(size = 12),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
+        axis.title.y = element_text(size = 12),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "top",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+
+##==================================================
+
+FSP.calib.ggdata <- FXP.ggdata(FSP.list, Noise)
+
+FSR.calib.plot <- ggplot(data = FSP.calib.ggdata, aes(x = L1, y = mean, group = Method, col = Method)) +
+  geom_line() +
+  geom_ribbon(aes(ymin = q025, ymax = q975, fill = Method), alpha = 0.35, linetype = "blank") +
+  scale_color_manual(labels = method.name.FSR, values = method.col.FSR) +
+  scale_fill_manual(labels = method.name.FSR, values = method.col.FSR) +
+  facet_wrap(~Noise, nrow = 1, ncol = 4) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", size = 1, col = "black") +
+  labs(x = "Nominal FSR", y = "FSP") +
+  theme(axis.title.x = element_text(size = 12),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
+        axis.title.y = element_text(size = 12),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "top",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+
+##============================================================
+
+FDP.q <- FDP.list[[which(q.vec == q)]]
+FDP.q.noise.mat <- rbind.data.frame(
+  cbind.data.frame(Noise = rep("All", length(Noise)),
+                   pi0 = factor(do.call(rbind, pi0.list)),
+                   FDP.q),
+  cbind.data.frame(Noise,
+                   pi0 = factor(do.call(rbind, pi0.list)),
+                   FDP.q)
+)
+FDP.q.ggdata <- melt(FDP.q.noise.mat, id.vars = c("Noise", "pi0"), variable.name = "Method", value.name = "FDP")
+
+FDP.q.plot <- ggplot(data = FDP.q.ggdata, aes(x = pi0, y = FDP)) +
+  geom_boxplot(aes(fill = Method, color = Method), outlier.color = NULL, outlier.size = 0.5
+            # , outlier.shape = NA
+               ) +
+  scale_color_manual(values = method.col.FDR) +
+  scale_fill_manual(values = alpha(method.col.FDR, 0.35)) +
+  facet_wrap(~Noise, nrow = 1, ncol = 4) +
+  geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
+  labs(x = expression(pi[0]), y = "FDP") +
+  theme(axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
+        axis.title.y = element_text(size = 12),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "top",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+
+##====================================================================
+
+TDP.q <- TDP.list[[which(q.vec == q)]]
+TDP.q.noise.mat <- rbind.data.frame(
+  cbind.data.frame(Noise = rep("All", length(Noise)),
+                   pi0 = factor(do.call(rbind, pi0.list)),
+                   TDP.q),
+  cbind.data.frame(Noise,
+                   pi0 = factor(do.call(rbind, pi0.list)),
+                   TDP.q)
+)
+TDP.q.ggdata <- melt(TDP.q.noise.mat, id.vars = c("Noise", "pi0"), variable.name = "Method", value.name = "TDP")
+
+TDP.q.plot <- ggplot(data = TDP.q.ggdata, aes(x = pi0, y = TDP)) +
+  geom_boxplot(aes(fill = Method, color = Method), outlier.color = NULL, outlier.size = 0.5
+            # , outlier.shape = NA
+               ) +
+  scale_color_manual(values = method.col.FDR) +
+  scale_fill_manual(values = alpha(method.col.FDR, 0.35)) +
+  facet_wrap(~Noise, nrow = 1, ncol = 4) +
+  labs(x = expression(pi[0]), y = "TDP") +
+  theme(axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
+        axis.title.y = element_text(size = 12),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "top",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+
+##=================================================
+
+FDP.q.all.mat <- cbind.data.frame(
+  pi0 = factor(do.call(rbind, pi0.list)),
+  FDP.q
+  )
+FDP.q.all.ggdata <- melt(FDP.q.all.mat, id.vars = c("pi0"), variable.name = "Method", value.name = "FDP")
+FDP.q.all.ggdata.bimodal <- cbind.data.frame(
+  g = "Bimodal",
+  FDP.q.all.ggdata
+)
+```
+
+### Overall
+
+```{r, fig.asp = 0.5, message = FALSE, warning = FALSE}
+pi0hat.plot
+FDR.calib.plot
+FSR.calib.plot
+```
+
+### At nominal FDR = $0.1$
+
+```{r, fig.asp = 0.5, message = FALSE, warning = FALSE}
+FDP.q.plot
+TDP.q.plot
+```
+
+## Put together
+
+```{r, eval = FALSE}
+pi0.list <- list()
+for (i in seq(1000)) {pi0.list[[i]] <- sample(c(0.5, 0.9, 0.99), 1)}
+
+FDP.q <- cbind.data.frame(
+  BH = runif(1e3, 0, 0.2),
+  qvalue = runif(1e3, 0, 0.2),
+  locfdr = runif(1e3, 0, 0.2),
+  ASH = runif(1e3, 0, 0.2),
+  CASH = runif(1e3, 0, 0.2)
+)
+
+Noise <- sample(c("Deflated Noise", "In-between", "Inflated Noise"), 1e3, replace = TRUE)
+
+z.list <- list()
+for (i in seq(1000)) {z.list[[i]] <- rnorm(1e4)}
+
+qvalue.list.sel <- list()
+for (i in 1 : 3) {
+qvalue.list.sel[[i]] <- cbind(
+  BH = runif(1e4, 0, 0.2),
+  qvalue = runif(1e4, 0, 0.2),
+  locfdr = runif(1e4, 0, 0.2),
+  ASH = runif(1e4, 0, 0.2),
+  CASH = runif(1e4, 0, 0.2)
+)
+}
+
+beta.list.sel <- list()
+for (i in 1 : 3) {
+beta.list.sel[[i]] <- sample(c(rep(0, 9e3), rnorm(1e3)))
+}
+```
+
+```{r}
+density.g.ggdata <- rbind.data.frame(
+  density.ggdata.normal,
+  density.ggdata.nearnormal,
+  density.ggdata.spiky,
+  density.ggdata.flattop,
+  density.ggdata.skew,
+  density.ggdata.bimodal
+)
+
+density.g.plot <- ggplot(data = density.g.ggdata, aes(x = plotx, y = ploty)) +
+  geom_line() +
+  facet_wrap(~g, nrow = 1) +
+  labs(x = expression(theta), y = expression(g[1](theta))) +
+  theme(axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10),
+        axis.title.y = element_text(size = 15),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "none",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+
+##===========================================================
+
+FDP.q.g.ggdata <- rbind.data.frame(
+  FDP.q.all.ggdata.normal,
+  FDP.q.all.ggdata.nearnormal,
+  FDP.q.all.ggdata.spiky,
+  FDP.q.all.ggdata.flattop,
+  FDP.q.all.ggdata.skew,
+  FDP.q.all.ggdata.bimodal
+)
+
+FDP.q.g.ggdata$Method[FDP.q.g.ggdata$Method == "BH"] = "BHq"
+
+FDP.q.g.plot <- ggplot(data = FDP.q.g.ggdata, aes(x = pi0, y = FDP, fill = Method, color = Method)) +
+  stat_summary(fun.data = boxplot.quantile, geom = "boxplot", position = "dodge") +
+  stat_summary(fun.y = mean, geom = "point", position = position_dodge(width = 0.9), show.legend = TRUE) +
+  scale_color_manual(labels = method.name.FDR, values = method.col.FDR) +
+  scale_fill_manual(labels = method.name.FDR, values = alpha(method.col.FDR, 0.35)) +
+  facet_wrap(~g, nrow = 1) +
+  geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
+  labs(x = expression(pi[0]), y = "FDP", title = bquote(paste("At nominal FDR = ", .(q)))) +
+  theme(plot.title = element_text(size = 12, hjust = 0),
+        axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10),
+        axis.title.y = element_text(size = 15),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "bottom",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+
+FDP.q.g.plot.save <- gridExtra::arrangeGrob(density.g.plot, FDP.q.g.plot, heights = c(1, 1.5))
+
+ggsave("../output/fig/homo/FDP.q.g.pdf", FDP.q.g.plot.save, height = 6, width = 9)
+
+##=========================================================
+
+blank.ggdata <- data.frame()
+blank.plot <- ggplot(data = blank.ggdata) + 
+  geom_blank()
+
+z.sep.plot.save <- gridExtra::arrangeGrob(blank.plot, z.sep.plot, nrow = 1, widths = c(0.4, 3.8))
+
+FDP.q.sep.plot.save <- gridExtra::arrangeGrob(z.sep.plot.save, FDP.q.all.sep.plot, heights = c(1, 1.5))
+
+ggsave("../output/fig/homo/FDP.q.sep.pdf", FDP.q.sep.plot.save, height = 6, width = 8)
+
+##============================================================
+knitr::kable(D)
+# saveRDS(D, "../output/homo/D.rds")
+```
