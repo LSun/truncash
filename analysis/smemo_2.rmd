@@ -2,7 +2,9 @@
 title: "Gaussian derivatives applied to Smemo's data"
 author: "Lei Sun"
 date: 2017-06-17
-output: workflowr::wflow_html
+output:
+  workflowr::wflow_html:
+    code_folding: hide
 ---
 
 
@@ -120,5 +122,74 @@ hist(z[fit.gdash.ASH$qvalue <= 0.05], breaks = 100, prob = TRUE,
      )
 ```
 
+## Fitting CASH
 
+```{r packages}
+source("../code/gdash_lik.R")
+source("../code/gdfit.R")
+library(edgeR)
+library(limma)
+library(locfdr)
+```
 
+```{r summary statistics}
+counts.mat = read.table("../data/smemo.txt", header = T, row.name = 1)
+counts.mat = counts.mat[, -5]
+counts = counts.mat[rowSums(counts.mat) >= 5, ]
+design = model.matrix(~c(0, 0, 1, 1))
+dgecounts = edgeR::calcNormFactors(edgeR::DGEList(counts = counts, group = design[, 2]))
+v = limma::voom(dgecounts, design, plot = FALSE)
+lim = limma::lmFit(v)
+r.ebayes = limma::eBayes(lim)
+p = r.ebayes$p.value[, 2]
+t = r.ebayes$t[, 2]
+z = -sign(t) * qnorm(p/2)
+```
+
+```{r analysis}
+fit.locfdr <- locfdr(z)
+fit.qvalue <- qvalue::qvalue(p)
+```
+
+```{r cash}
+betahat = lim$coefficients[, 2]
+sebetahat = betahat / z
+fit.cash <- gdash(betahat, sebetahat, gd.ord = 10)
+```
+
+```{r plotting}
+x.plot <- seq(-10, 10, length = 1000)
+gd.ord <- 10
+hermite = Hermite(gd.ord)
+gd0.std = dnorm(x.plot)
+matrix_lik_plot = cbind(gd0.std)
+for (i in 1 : gd.ord) {
+  gd.std = (-1)^i * hermite[[i]](x.plot) * gd0.std / sqrt(factorial(i))
+  matrix_lik_plot = cbind(matrix_lik_plot, gd.std)
+}
+y.plot = matrix_lik_plot %*% fit.cash$w * fit.cash$fitted_g$pi[1]
+
+method.col <- scales::hue_pal()(5)
+# method.col <- c("#377eb8", "#984ea3", "#4daf4a", "#ff7f00", "#e41a1c")
+
+setEPS()
+postscript("../output/fig/mouseheart.eps", height = 5, width = 12)
+
+par(mfrow = c(1, 2))
+hist(z, prob = TRUE, main = "", xlab = expression(paste(z, "-scores")), cex.lab = 1.25)
+lines(x.plot, y.plot, col = method.col[5], lwd = 2)
+lines(x.plot, dnorm(x.plot), col = 
+       "orange"
+      #  method.col[2]
+      , lty = 2, lwd = 2)
+lines(x.plot, dnorm(x.plot, fit.locfdr$fp0[3, 1], fit.locfdr$fp0[3, 2]) * fit.locfdr$fp0[3, 3], col = method.col[3], lty = 2, lwd = 2)
+legend("topleft", col = c("orange", method.col[3], method.col[5]), lty = c(2, 2, 1), legend = c("N(0, 1)", "Empirical null", expression(pi[0]~hat(f))), bty = "n", cex = 1.25)
+
+par(mar = par("mar") + c(0, 1, 0, 0))
+g1 <- fit.cash$fitted_g
+g1.plot.x <- seq(-0.5, 0.5, length = 1000)
+g1.plot.y <- rowSums(sapply(2 : length(g1$pi), function (i) {g1$pi[i] * dnorm(g1.plot.x, g1$mean[i], g1$sd[i])}))
+plot(g1.plot.x, g1.plot.y, xlim = c(-0.35, 0.35), type = "l", xlab = expression(paste(theta, " (", log[2], " fold change)")), ylab = expression(hat(g)[1](theta)), cex.lab = 1.25)
+
+dev.off()
+```
