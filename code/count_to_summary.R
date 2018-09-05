@@ -8,7 +8,7 @@ count_to_summary = function (counts, design) {
   r.ebayes = limma::eBayes(lim)
   p = r.ebayes$p.value[, 2]
   t = r.ebayes$t[, 2]
-  z = sign(t) * qnorm(1 - p/2)
+  z = -sign(t) * qnorm(p/2)
   betahat = lim$coefficients[,2]
   sebetahat = betahat / z
   return (list(betahat = betahat, sebetahat = sebetahat, z = z))
