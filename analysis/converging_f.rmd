@@ -1,0 +1,51 @@
+---
+title: "The limiting empirical distribution of correlated $N(0, 1)$"
+author: "Lei Sun"
+date: "2018-09-09"
+output: workflowr::wflow_html
+---
+
+## Introduction
+
+Some theoretical justification.
+
+## A concrete example
+
+Let's start with a simple example. Let $(Z_1, Z_2, \ldots, Z_p)' \sim N_p(0, \Sigma)$, where
+$$\Sigma = \begin{bmatrix}
+1 & 0.5 & \cdots & 0.5 \\
+0.5 & 1 & \cdots & 0.5 \\
+\vdots & \vdots & \ddots & \vdots \\
+0.5 & 0.5 & \cdots & 1
+\end{bmatrix} \ .
+$$
+In other words, $Z_1, \ldots, Z_p$ are $p$ correlated $N(0, 1)$ random variables, with equal pairwise correlation of $0.5$.
+
+It's easy to see that the limiting distribution of the empirical distribution of $Z_1, \ldots, Z_p$ is $f = N(\sqrt{1/2}Z, \sqrt{1/2}^2)$, where $Z$ is a $N(0, 1)$ random variable. $f$ has some properties:
+
+1. $f$ can be decomposed by Gaussian derivatives.
+
+2. $f$ is a random normal distribution; the randomness comes from the fact that $f$ has a random parameter, this case a random mean $\sqrt{1/2}Z$.
+
+3. The distribution of this random mean is $N(0, \sqrt{1/2}^2)$ whose shape and parameters are supposed to be determined by $\Sigma$.
+
+4. The actual value of this random mean is determined by the realization of $Z$, or eventually, the realization of $Z_1, \ldots, Z_p$.
+
+## Generalization
+
+In a generalization of the aforementioned example, we have $Z_1, \ldots, Z_p$
+
+- correlated $N(0, 1)$,
+- every two $(Z_i, Z_j)$ bivariate normal with pairwise correlation $\rho_{ij}$.
+
+Let $f$ be the limiting distribution of the empirical distribution of $Z_1, \ldots, Z_p$. We should have
+
+1. $Z_1, \ldots, Z_p$ are exchangeable.
+
+2. $Z_1, \ldots, Z_p | W \overset{iid}{\sim} f(\cdot|W)$, where $W := W_1, W_2, \ldots$ are the random parameters of $f$.
+
+3. The joint distribution of $W$ should be determined by $\Sigma = [\rho_{ij}]_{p \times p}$, or at least we know that the first two moments of $W$ are determined by $\Sigma$.
+
+4. The actual values of $W$ should be determined by the realization of $Z_1, \ldots, Z_p$.
+
+## Can we justify this using de Finetti?
