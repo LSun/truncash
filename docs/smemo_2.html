@@ -332,7 +332,7 @@ div.section {
 </div>
 
 
-<p><strong>Last updated:</strong> 2018-09-05</p>
+<p><strong>Last updated:</strong> 2018-10-05</p>
 <strong>workflowr checks:</strong> <small>(Click a bullet for more information)</small>
 <ul>
 <li>
@@ -361,7 +361,7 @@ div.section {
 </li>
 <li>
 <details>
-<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/653748bf8ec65226b766a4e86f00b9527bd118bf" target="_blank">653748b</a> </summary></p>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/dce4d3b48aa605a84f06e75bb3a74eb8094debad" target="_blank">dce4d3b</a> </summary></p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 <pre><code>
 Ignored files:
@@ -387,6 +387,7 @@ Ignored files:
     Ignored:    analysis/cash_fdr_4_cache/
     Ignored:    analysis/cash_fdr_5_cache/
     Ignored:    analysis/cash_fdr_6_cache/
+    Ignored:    analysis/cash_paper_fig_leukemia_cache/
     Ignored:    analysis/cash_plots_2_cache/
     Ignored:    analysis/cash_plots_3_cache/
     Ignored:    analysis/cash_plots_cache/
@@ -462,13 +463,6 @@ Ignored files:
     Ignored:    docs/figure/.DS_Store
     Ignored:    output/fig/
 
-Untracked files:
-    Untracked:  analysis/cash_plots_3.rmd
-    Untracked:  docs/figure/cash_plots_3.rmd/
-
-Unstaged changes:
-    Modified:   code/count_to_summary.R
-
 </code></pre>
 Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
 </details>
@@ -498,6 +492,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/dce4d3b48aa605a84f06e75bb3a74eb8094debad/analysis/smemo_2.rmd" target="_blank">dce4d3b</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-10-05
+</td>
+<td style="text-align:left;">
+smemo
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/07bc761dacb155d52d6ecf2f8d8aabfdc8757989/docs/smemo_2.html" target="_blank">07bc761</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-09-05
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 rmd
@@ -766,7 +794,7 @@ z &lt;- summary$z</code></pre>
 <h2>Fitting <span class="math inline">\(z\)</span> with Gaussian derivatives</h2>
 <p>With stretch GD can fit <span class="math inline">\(z\)</span> scores, but it seems there should be signals.</p>
 <pre><code>GD Coefficients:</code></pre>
-<pre><code>0 : 1 ; 1 : 0.0119430018126296 ; 2 : 1.61071078428823 ; 3 : 0.366170906281441 ; 4 : 1.70110410088524 ; 5 : 0.676196157715947 ; 6 : 0.938754567209366 ; 7 : 0.550191966323002 ; 8 : 0.238942600379678 ; 9 : 0.161306266269737 ; 10 : 0.0430996146907588 ;</code></pre>
+<pre><code>0 : 1 ; 1 : 9.38194912994929e-05 ; 2 : 1.5379335123459 ; 3 : 0.292831264364913 ; 4 : 1.43125454770929 ; 5 : 0.470871356054445 ; 6 : 0.541466442665842 ; 7 : 0.277227258172747 ; 8 : -9.35856044783229e-07 ; 9 : 0.0205987809594603 ; 10 : -3.85399012090005e-08 ;</code></pre>
 <p><img src="figure/smemo_2.rmd/fitting%20gaussian%20derivatives-1.png" width="672" style="display: block; margin: auto;" /></p>
 <details>
 <summary><em>Expand here to see past versions of fitting gaussian derivatives-1.png:</em></summary>
@@ -992,10 +1020,42 @@ t = r.ebayes$t[, 2]
 z = -sign(t) * qnorm(p/2)</code></pre>
 <pre class="r"><code>fit.locfdr &lt;- locfdr(z)</code></pre>
 <p><img src="figure/smemo_2.rmd/analysis-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details>
+<summary><em>Expand here to see past versions of analysis-1.png:</em></summary>
+<table style = "border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/07bc761dacb155d52d6ecf2f8d8aabfdc8757989/docs/figure/smemo_2.rmd/analysis-1.png" target="_blank">07bc761</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-09-05
+</td>
+</tr>
+</tbody>
+</table>
+</details>
 <pre class="r"><code>fit.qvalue &lt;- qvalue::qvalue(p)</code></pre>
 <pre class="r"><code>betahat = lim$coefficients[, 2]
 sebetahat = betahat / z
-fit.cash &lt;- gdash(betahat, sebetahat, gd.ord = 10)</code></pre>
+fit.cash &lt;- gdash(betahat, sebetahat, gd.ord = 10)
+fit.ash &lt;- ashr::ash(betahat, sebetahat, mixcompdist = &quot;normal&quot;, method = &quot;fdr&quot;)</code></pre>
 <pre class="r"><code>x.plot &lt;- seq(-10, 10, length = 1000)
 gd.ord &lt;- 10
 hermite = Hermite(gd.ord)
