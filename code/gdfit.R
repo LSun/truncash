@@ -1,6 +1,6 @@
 library(PolynomF)
 
-gdfit = function (z, L, w.lambda = NULL, w.rho = 0.5) {
+gdfit = function (z, L, w.lambda = 10, w.rho = 0.5) {
   if (is.null(w.lambda)) {
     w_prior = rep(0, L)
   } else {
