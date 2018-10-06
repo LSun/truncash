@@ -213,7 +213,7 @@ div.section {
 </div>
 
 
-<p><strong>Last updated:</strong> 2018-09-05</p>
+<p><strong>Last updated:</strong> 2018-10-05</p>
 <strong>workflowr checks:</strong> <small>(Click a bullet for more information)</small>
 <ul>
 <li>
@@ -224,7 +224,7 @@ div.section {
 </li>
 <li>
 <details>
-<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/814582e7cc0df7dc3775e4e8ba04b0b46ae3c61a" target="_blank">814582e</a> </summary></p>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/49f870a51558d3812fe5c5eec832c5e49786475d" target="_blank">49f870a</a> </summary></p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 <pre><code>
 Ignored files:
@@ -250,6 +250,7 @@ Ignored files:
     Ignored:    analysis/cash_fdr_4_cache/
     Ignored:    analysis/cash_fdr_5_cache/
     Ignored:    analysis/cash_fdr_6_cache/
+    Ignored:    analysis/cash_paper_fig_leukemia_cache/
     Ignored:    analysis/cash_plots_2_cache/
     Ignored:    analysis/cash_plots_3_cache/
     Ignored:    analysis/cash_plots_cache/
@@ -325,6 +326,12 @@ Ignored files:
     Ignored:    docs/figure/.DS_Store
     Ignored:    output/fig/
 
+Untracked files:
+    Untracked:  docs/figure/cash_paper_fig_leukemia.rmd/
+
+Unstaged changes:
+    Modified:   code/gdfit.R
+
 </code></pre>
 Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
 </details>
@@ -354,6 +361,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/49f870a51558d3812fe5c5eec832c5e49786475d/analysis/index.Rmd" target="_blank">49f870a</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-10-05
+</td>
+<td style="text-align:left;">
+wflow_publish(c(“cash_paper_fig_leukemia.rmd”, “cash_paper_fig1.rmd”,
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/f576ac126f4eb9d5e07b12479c6994db275ac55f/docs/index.html" target="_blank">f576ac1</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-09-05
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 Rmd
@@ -3206,6 +3247,14 @@ First Commit
 <li><p><a href="BH_robustness.html">The underappreciated and surprising robustness of <code>BH</code> for correlation</a>. See more systemic explorations at <a href="https://github.com/LSun/BHq">BHq</a></p></li>
 <li><p><a href="gd_lik_3.html"><code>CASH</code>: <code>lfsr</code> calculation</a></p></li>
 <li><p><a href="fre_bay_fdr.html">Frequentist and Bayesian interpretations of <code>FDR</code></a></p></li>
+</ul>
+<hr />
+<p><code>cashr</code> paper material</p>
+<ul>
+<li><a href="converging_f.html">ECSN: exchangeable correlated standard normal</a></li>
+<li><a href="cash_paper_fig1.html">The correlated <span class="math inline">\(N(0, 1)\)</span> histograms figure</a></li>
+<li><a href="cash_paper_fig_leukemia.html">The lukemia study figure</a></li>
+<li><a href="cash_paper_fig_noisesep.html">The separation by inflation vs deflation figure</a></li>
 </ul>
 <hr />
 <p>Next it’s a series of investigation of a number of variable selection and false discovery rate control methods in linear regression.</p>
