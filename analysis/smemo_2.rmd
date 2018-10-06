@@ -155,6 +155,7 @@ fit.qvalue <- qvalue::qvalue(p)
 betahat = lim$coefficients[, 2]
 sebetahat = betahat / z
 fit.cash <- gdash(betahat, sebetahat, gd.ord = 10)
+fit.ash <- ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
 ```
 
 ```{r plotting}
