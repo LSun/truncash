@@ -19,13 +19,6 @@ sel = c(32, 327, 355, 483)
 z.sel <- z.mat[sel, ]
 gd.ord <- 10
 
-setEPS()
-postscript("../output/fig/paper/cor_z_hist.eps", width = 8, height = 6)
-
-par(mfrow = c(2, 2)) # 2-by-2 grid of plots
-par(oma = c(0.5, 2.5, 0, 0)) # make room (i.e. the 4's) for the overall x and y axis titles
-par(mar = c(2, 2, 3.5, 1)) # make the plots be closer together
-
 x.plot = seq(- max(abs(z.sel)) - 2, max(abs(z.sel)) + 2, length = 1000)
 hermite = Hermite(gd.ord)
 gd0.std = dnorm(x.plot)
@@ -40,6 +33,13 @@ w <- gdfit(z, gd.ord, w.lambda = 10, w.rho = 0.5)$w
 y.plot = matrix_lik_plot %*% w
 z.hist = hist(z, breaks = 100, plot = FALSE)
 y.max = max(z.hist$density, y.plot, dnorm(0))
+
+setEPS()
+postscript("../output/paper/cor_z_hist.eps", width = 8, height = 6)
+
+par(mfrow = c(2, 2)) # 2-by-2 grid of plots
+par(oma = c(0.5, 2.5, 0, 0)) # make room (i.e. the 4's) for the overall x and y axis titles
+par(mar = c(2, 2, 3.5, 1)) # make the plots be closer together
 
 # now plot the graphs with the appropriate axes removed (via xaxt and yaxt),
 # remove axis labels (so that they are not redundant with overall labels,
