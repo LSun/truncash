@@ -11,9 +11,9 @@
 
 <meta name="author" content="Lei Sun" />
 
-<meta name="date" content="2018-10-04" />
+<meta name="date" content="2018-10-06" />
 
-<title>The leukemia figure in `cashr`</title>
+<title>The FDP for different $g_1$ figure in `cashr`</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -325,9 +325,9 @@ div.section {
 
 
 
-<h1 class="title toc-ignore">The leukemia figure in <code>cashr</code></h1>
+<h1 class="title toc-ignore">The FDP for different <span class="math inline">\(g_1\)</span> figure in <code>cashr</code></h1>
 <h4 class="author"><em>Lei Sun</em></h4>
-<h4 class="date"><em>2018-10-04</em></h4>
+<h4 class="date"><em>2018-10-06</em></h4>
 
 </div>
 
@@ -409,7 +409,7 @@ Message
 rmd
 </td>
 <td style="text-align:left;">
-<a href="https://github.com/LSun/truncash/blob/3b81007482b26da48dd48c8e06a60d82cbe2da64/analysis/cash_paper_fig_leukemia.rmd" target="_blank">3b81007</a>
+<a href="https://github.com/LSun/truncash/blob/3b81007482b26da48dd48c8e06a60d82cbe2da64/analysis/cash_paper_fig_g1sep.rmd" target="_blank">3b81007</a>
 </td>
 <td style="text-align:left;">
 Lei Sun
@@ -421,40 +421,6 @@ Lei Sun
 wflow_publish(c(“analysis/cash_paper_fig_g1sep.rmd”,
 </td>
 </tr>
-<tr>
-<td style="text-align:left;">
-html
-</td>
-<td style="text-align:left;">
-<a href="https://cdn.rawgit.com/LSun/truncash/133541a11b7b16b631e66ea3fbe8d46826a818e6/docs/cash_paper_fig_leukemia.html" target="_blank">133541a</a>
-</td>
-<td style="text-align:left;">
-LSun
-</td>
-<td style="text-align:left;">
-2018-10-05
-</td>
-<td style="text-align:left;">
-Build site.
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-rmd
-</td>
-<td style="text-align:left;">
-<a href="https://github.com/LSun/truncash/blob/49f870a51558d3812fe5c5eec832c5e49786475d/analysis/cash_paper_fig_leukemia.rmd" target="_blank">49f870a</a>
-</td>
-<td style="text-align:left;">
-LSun
-</td>
-<td style="text-align:left;">
-2018-10-05
-</td>
-<td style="text-align:left;">
-wflow_publish(c(“cash_paper_fig_leukemia.rmd”, “cash_paper_fig1.rmd”,
-</td>
-</tr>
 </tbody>
 </table>
 </ul>
@@ -462,127 +428,132 @@ wflow_publish(c(“cash_paper_fig_leukemia.rmd”, “cash_paper_fig1.rmd”,
 <hr />
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
-<p>Document the leukemia figure in the <code>cashr</code> paper.</p>
-</div>
-<div id="load-data" class="section level2">
-<h2>Load data</h2>
-<pre class="r"><code>source(&quot;../code/gdash_lik.R&quot;)
-source(&quot;../code/gdfit.R&quot;)</code></pre>
-<pre class="r"><code>load(url(&quot;http://statweb.stanford.edu/~ckirby/brad/LSI/datasets-and-programs/data/leukdata.RData&quot;))</code></pre>
-</div>
-<div id="use-smyths-pipeline-to-obtain-summary-statistics" class="section level2">
-<h2>Use Smyth’s pipeline to obtain summary statistics</h2>
-<pre class="r"><code>design &lt;- c(rep(0, 47), rep(1, 25))
-lim = limma::lmFit(leukdata, model.matrix(~design))
-r.ebayes = limma::eBayes(lim)
-p = r.ebayes$p.value[, 2]
-t = r.ebayes$t[, 2]
-z = -sign(t) * qnorm(p/2)
-x = lim$coefficients[, 2]
-s = x / z</code></pre>
-</div>
-<div id="locfdr" class="section level2">
-<h2><code>locfdr</code></h2>
-<pre class="r"><code>fit.locfdr &lt;- locfdr::locfdr(z)</code></pre>
-<p><img src="figure/cash_paper_fig_leukemia.rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
-<details>
-<summary><em>Expand here to see past versions of unnamed-chunk-4-1.png:</em></summary>
-<table style = "border-collapse:separate; border-spacing:5px;">
-<thead>
-<tr>
-<th style="text-align:left;">
-Version
-</th>
-<th style="text-align:left;">
-Author
-</th>
-<th style="text-align:left;">
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-<a href="https://github.com/LSun/truncash/blob/133541a11b7b16b631e66ea3fbe8d46826a818e6/docs/figure/cash_paper_fig_leukemia.rmd/unnamed-chunk-4-1.png" target="_blank">133541a</a>
-</td>
-<td style="text-align:left;">
-LSun
-</td>
-<td style="text-align:left;">
-2018-10-05
-</td>
-</tr>
-</tbody>
-</table>
-</details>
-</div>
-<div id="qvalue" class="section level2">
-<h2><code>qvalue</code></h2>
-<pre class="r"><code>fit.qvalue &lt;- qvalue::qvalue(p)</code></pre>
-</div>
-<div id="ashr" class="section level2">
-<h2><code>ashr</code></h2>
-<pre class="r"><code>fit.ash &lt;- ashr::ash(x, s, mixcompdist = &quot;normal&quot;, method = &quot;fdr&quot;)</code></pre>
-</div>
-<div id="cashr" class="section level2">
-<h2><code>cashr</code></h2>
-<pre class="r"><code>fit.cash &lt;- gdash(x, s, gd.ord = 10)</code></pre>
-</div>
-<div id="plotting" class="section level2">
-<h2>Plotting</h2>
-<pre class="r"><code>x.plot &lt;- seq(-10, 10, length = 1000)
-gd.ord &lt;- 10
-hermite = Hermite(gd.ord)
-gd0.std = dnorm(x.plot)
-matrix_lik_plot = cbind(gd0.std)
-for (i in 1 : gd.ord) {
-  gd.std = (-1)^i * hermite[[i]](x.plot) * gd0.std / sqrt(factorial(i))
-  matrix_lik_plot = cbind(matrix_lik_plot, gd.std)
+<pre class="r"><code>library(ggplot2)</code></pre>
+<pre class="r"><code>boxplot.quantile &lt;- function(x) {
+  r &lt;- quantile(x, probs = c(0.10, 0.25, 0.5, 0.75, 0.90))
+  names(r) &lt;- c(&quot;ymin&quot;, &quot;lower&quot;, &quot;middle&quot;, &quot;upper&quot;, &quot;ymax&quot;)
+  return(r)
 }
-y.plot = matrix_lik_plot %*% fit.cash$w * fit.cash$fitted_g$pi[1]
 
-method.col &lt;- scales::hue_pal()(5)
+boxplot.quantile.sq &lt;- function (x) {
+  r &lt;- sqrt(quantile(x^2, probs = c(0.10, 0.25, 0.5, 0.75, 0.90)))
+  names(r) &lt;- c(&quot;ymin&quot;, &quot;lower&quot;, &quot;middle&quot;, &quot;upper&quot;, &quot;ymax&quot;)
+  return(r)
+}
 
-setEPS()
-postscript(&quot;../output/paper/leukemia.eps&quot;, height = 5, width = 12)
-# pdf(&quot;../output/paper/leukemia.pdf&quot;, height = 5, width = 12)
+mean.sq &lt;- function (x) {
+  r &lt;- sqrt(mean(x^2))
+  return(r)
+}
 
-par(mfrow = c(1, 2))
+mysqrt_trans &lt;- function() {
+  scales::trans_new(&quot;mysqrt&quot;, 
+                    transform = base::sqrt,
+                    inverse = function(x) ifelse(x&lt;0, 0, x^2),
+                    domain = c(0, Inf))
+}</code></pre>
+<pre class="r"><code>q &lt;- 0.1
+method.name.FDR &lt;- c(&quot;cashr&quot;, &quot;BH&quot;, &quot;qvalue&quot;, &quot;ashr&quot;, &quot;locfdr&quot;)
+method.col.FDR &lt;- scales::hue_pal()(length(method.name.FDR))[c(5, 1, 2, 4, 3)]</code></pre>
+<pre class="r"><code>density.ggdata.normal &lt;- readRDS(&quot;../output/paper/simulation/density.ggdata.normal.rds&quot;)
+density.ggdata.nearnormal &lt;- readRDS(&quot;../output/paper/simulation/density.ggdata.nearnormal.rds&quot;)
+density.ggdata.spiky &lt;- readRDS(&quot;../output/paper/simulation/density.ggdata.spiky.rds&quot;)
+density.ggdata.flattop &lt;- readRDS(&quot;../output/paper/simulation/density.ggdata.flattop.rds&quot;)
+density.ggdata.skew &lt;- readRDS(&quot;../output/paper/simulation/density.ggdata.skew.rds&quot;)
+density.ggdata.bimodal &lt;- readRDS(&quot;../output/paper/simulation/density.ggdata.bimodal.rds&quot;)</code></pre>
+<pre class="r"><code>density.g.ggdata &lt;- rbind.data.frame(
+  density.ggdata.normal,
+  density.ggdata.nearnormal,
+  density.ggdata.spiky,
+  density.ggdata.flattop,
+  density.ggdata.skew,
+  density.ggdata.bimodal
+)
 
-#####
+density.g.plot &lt;- ggplot(data = density.g.ggdata, aes(x = plotx, y = ploty)) +
+  geom_line() +
+  facet_wrap(~g, nrow = 1) +
+  labs(x = expression(theta), y = expression(g[1](theta))) +
+  theme(axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10),
+        axis.title.y = element_text(size = 15),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = &quot;none&quot;,
+        legend.background = element_rect(color = &quot;grey&quot;),
+        legend.text = element_text(size = 12))</code></pre>
+<pre class="r"><code>FDP.q.all.ggdata.normal &lt;- readRDS(&quot;../output/paper/simulation/FDP.q.all.ggdata.normal.rds&quot;)
+FDP.q.all.ggdata.nearnormal &lt;- readRDS(&quot;../output/paper/simulation/FDP.q.all.ggdata.nearnormal.rds&quot;)
+FDP.q.all.ggdata.spiky &lt;- readRDS(&quot;../output/paper/simulation/FDP.q.all.ggdata.spiky.rds&quot;)
+FDP.q.all.ggdata.flattop &lt;- readRDS(&quot;../output/paper/simulation/FDP.q.all.ggdata.flattop.rds&quot;)
+FDP.q.all.ggdata.skew &lt;- readRDS(&quot;../output/paper/simulation/FDP.q.all.ggdata.skew.rds&quot;)
+FDP.q.all.ggdata.bimodal &lt;- readRDS(&quot;../output/paper/simulation/FDP.q.all.ggdata.bimodal.rds&quot;)</code></pre>
+<pre class="r"><code>FDP.q.g.ggdata &lt;- rbind.data.frame(
+  FDP.q.all.ggdata.normal,
+  FDP.q.all.ggdata.nearnormal,
+  FDP.q.all.ggdata.spiky,
+  FDP.q.all.ggdata.flattop,
+  FDP.q.all.ggdata.skew,
+  FDP.q.all.ggdata.bimodal
+)
 
-hist(z, prob = TRUE, main = &quot;&quot;, xlab = expression(paste(z, &quot;-scores&quot;)), cex.lab = 1.25)
+FDP.q.g.ggdata$Method &lt;- plyr::mapvalues(FDP.q.g.ggdata$Method, from = c(&quot;CASH&quot;, &quot;BHq&quot;, &quot;ASH&quot;), to = c(&quot;cashr&quot;, &quot;BH&quot;, &quot;ashr&quot;))
 
-lines(x.plot, y.plot, col = method.col[5], lwd = 2)
-lines(x.plot, dnorm(x.plot), col = &quot;orange&quot;, lty = 2, lwd = 2)
-lines(x.plot, dnorm(x.plot, fit.locfdr$fp0[3, 1], fit.locfdr$fp0[3, 2]) * fit.locfdr$fp0[3, 3], col = method.col[3], lty = 2, lwd = 2)
+FDP.q.g.ggdata$Method &lt;- factor(FDP.q.g.ggdata$Method, levels = c(&quot;cashr&quot;, &quot;BH&quot;, &quot;qvalue&quot;, &quot;ashr&quot;, &quot;locfdr&quot;))
 
-text(-3.5, 0.188, &quot;N(0,1)&quot;, col = &quot;orange&quot;)
-arrows(-2.2, 0.188, -1.3, 0.183, length = 0.1, angle = 20, col = &quot;orange&quot;)
+FDP.q.g.ggdata$pi0 &lt;- as.numeric(levels(FDP.q.g.ggdata$pi0))[FDP.q.g.ggdata$pi0]</code></pre>
+<pre class="r"><code>FDP.q.g.plot &lt;- ggplot(data = FDP.q.g.ggdata, aes(x = Method, y = FDP, fill = Method, color = Method)) +
+  stat_summary(fun.data = boxplot.quantile, geom = &quot;boxplot&quot;, position = &quot;dodge&quot;, aes(width = 0.5), show.legend = FALSE) +
+  stat_summary(fun.y = mean, geom = &quot;point&quot;, position = position_dodge(width = 0.9), show.legend = FALSE) +
+  scale_color_manual(labels = method.name.FDR, values = method.col.FDR) +
+  scale_fill_manual(labels = method.name.FDR, values = alpha(method.col.FDR, 0.35)) +
+  scale_y_continuous(trans = &quot;mysqrt&quot;, breaks = c(0, 0.1, 0.2, 0.4, 0.6, 0.8)) +
+  facet_grid(pi0 ~ g, labeller = label_bquote(rows = pi[0] == .(pi0))) +
+  scale_x_discrete(limits = rev(levels(FDP.q.g.ggdata$Method))) +
+  coord_flip() +
+  geom_hline(yintercept = q, col = &quot;black&quot;, linetype = &quot;dashed&quot;, size = 1) +
+  labs(y = &quot;FDP&quot;, title = bquote(paste(&quot;Nominal FDR = &quot;, .(q)))) +
+  theme(plot.title = element_text(size = 12, hjust = 0),
+        axis.title.y = element_blank(),
+        axis.text.y = element_text(size = 15),
+        axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = &quot;bottom&quot;,
+        legend.background = element_rect(color = &quot;grey&quot;),
+        legend.text = element_text(size = 12))</code></pre>
+<pre><code>Warning: Ignoring unknown aesthetics: width</code></pre>
+<pre class="r"><code>FDP.q.g.plot.save &lt;- gridExtra::arrangeGrob(density.g.plot, FDP.q.g.plot, heights = c(1, 2.5))</code></pre>
+<pre><code>Warning: Removed 8 rows containing non-finite values (stat_summary).
 
-text(-6.5, 0.11, bquote(atop(&quot; locfdr empirical null&quot;, .(round(fit.locfdr$fp0[3, 3], 2)) %*% N(.(round(fit.locfdr$fp0[3, 1], 2)), .(round(fit.locfdr$fp0[3, 2], 2))^2))), col = method.col[3])
-arrows(-2.8, 0.1115, -1.9, 0.1065, length = 0.1, angle = 20, col = method.col[3])
+Warning: Removed 8 rows containing non-finite values (stat_summary).</code></pre>
+<pre class="r"><code>ggsave(&quot;../output/paper/FDP.q.g.pdf&quot;, FDP.q.g.plot.save, height = 6, width = 12)</code></pre>
+<pre class="r"><code>pi0.plot &lt;- 0.9
 
-text(4.8, 0.1025, &quot;cashr null&quot;, col = method.col[5])
-arrows(2.9, 0.10, 2, 0.095, length = 0.1, angle = 20, col = method.col[5])
+FDP.q.g.pi0.plot &lt;- ggplot(data = FDP.q.g.ggdata[FDP.q.g.ggdata$pi0 == pi0.plot, ], aes(x = Method, y = FDP, fill = Method, color = Method)) +
+  stat_summary(fun.data = boxplot.quantile, geom = &quot;boxplot&quot;, position = &quot;dodge&quot;, aes(width = 0.5), show.legend = FALSE) +
+  stat_summary(fun.y = mean, geom = &quot;point&quot;, position = position_dodge(width = 0.9), show.legend = FALSE) +
+  scale_color_manual(labels = method.name.FDR, values = method.col.FDR) +
+  scale_fill_manual(labels = method.name.FDR, values = alpha(method.col.FDR, 0.35)) +
+  scale_y_continuous(trans = &quot;mysqrt&quot;, breaks = c(0, 0.1, 0.2, 0.4, 0.6, 0.8)) +
+  facet_wrap(~ g, nrow = 1) +
+  scale_x_discrete(limits = rev(levels(FDP.q.g.ggdata$Method))) +
+  coord_flip() +
+  geom_hline(yintercept = q, col = &quot;black&quot;, linetype = &quot;dashed&quot;, size = 1) +
+  labs(y = &quot;FDP&quot;, title = bquote(paste(&quot;Nominal FDR = &quot;, .(q), &quot;(&quot;, pi[0] == .(pi0.plot), &quot;)&quot;))) +
+  theme(plot.title = element_text(size = 12, hjust = 0),
+        axis.title.y = element_blank(),
+        axis.text.y = element_text(size = 15),
+        axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = &quot;bottom&quot;,
+        legend.background = element_rect(color = &quot;grey&quot;),
+        legend.text = element_text(size = 12))</code></pre>
+<pre><code>Warning: Ignoring unknown aesthetics: width</code></pre>
+<pre class="r"><code>FDP.q.g.pi0.plot.save &lt;- gridExtra::arrangeGrob(density.g.plot, FDP.q.g.pi0.plot, heights = c(1, 1.1))
 
-####
-
-plot(z, z, type = &quot;n&quot;, ylim = c(0, 1), ylab = &quot;Local FDR&quot;, xlab = expression(paste(z, &quot;-scores&quot;)), cex.lab = 1.25)
-
-points(z, fit.cash$lfdr, pch = 15, cex = 0.5, col = method.col[5])
-points(z, fit.locfdr$fdr, pch = 16, cex = 0.5, col = method.col[3])
-points(z, fit.qvalue$lfdr, pch = 17, cex = 0.5, col = method.col[2])
-points(z, ashr::get_lfdr(fit.ash), pch = 18, cex = 0.5, col = method.col[4])
-
-abline(h = 0.2, lty = 2)
-
-legend(&quot;topright&quot;, bty = &quot;n&quot;, pch = 15 : 18, col = method.col[c(5, 3, 2, 4)], c(&quot;cashr&quot;, &quot;locfdr&quot;, &quot;qvalue&quot;, &quot;ashr&quot;))
-
-dev.off()</code></pre>
-<pre><code>quartz_off_screen 
-                2 </code></pre>
+ggsave(&quot;../output/paper/FDP.q.g.pi0.pdf&quot;, FDP.q.g.pi0.plot.save, height = 4, width = 12)</code></pre>
 </div>
 <div id="session-information" class="section level2">
 <h2>Session information</h2>
@@ -602,29 +573,20 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] ashr_2.2-3        Rmosek_8.0.69     PolynomF_1.0-2    CVXR_0.99        
-[5] REBayes_1.2       Matrix_1.2-12     SQUAREM_2017.10-1 EQL_1.0-0        
-[9] ttutils_1.0-1    
+[1] ggplot2_2.2.1
 
 loaded via a namespace (and not attached):
- [1] gmp_0.5-13.2      Rcpp_0.12.18      pillar_1.1.0     
- [4] plyr_1.8.4        compiler_3.4.3    git2r_0.21.0     
- [7] workflowr_1.1.1   R.methodsS3_1.7.1 R.utils_2.7.0    
-[10] iterators_1.0.9   tools_3.4.3       digest_0.6.15    
-[13] bit_1.1-12        tibble_1.4.2      gtable_0.2.0     
-[16] evaluate_0.10.1   lattice_0.20-35   rlang_0.1.6      
-[19] foreach_1.4.4     yaml_2.1.18       parallel_3.4.3   
-[22] Rmpfr_0.7-1       ECOSolveR_0.4     stringr_1.3.0    
-[25] knitr_1.20        rprojroot_1.3-2   bit64_0.9-7      
-[28] grid_3.4.3        qvalue_2.10.0     R6_2.2.2         
-[31] rmarkdown_1.9     limma_3.34.7      reshape2_1.4.3   
-[34] ggplot2_2.2.1     locfdr_1.1-8      magrittr_1.5     
-[37] whisker_0.3-2     scales_0.5.0      splines_3.4.3    
-[40] MASS_7.3-50       backports_1.1.2   codetools_0.2-15 
-[43] htmltools_0.3.6   scs_1.1-1         assertthat_0.2.0 
-[46] colorspace_1.3-2  stringi_1.1.6     lazyeval_0.2.1   
-[49] munsell_0.4.3     pscl_1.5.2        doParallel_1.0.11
-[52] truncnorm_1.0-7   R.oo_1.22.0      </code></pre>
+ [1] Rcpp_0.12.18      knitr_1.20        whisker_0.3-2    
+ [4] magrittr_1.5      workflowr_1.1.1   munsell_0.4.3    
+ [7] colorspace_1.3-2  rlang_0.1.6       stringr_1.3.0    
+[10] plyr_1.8.4        tools_3.4.3       grid_3.4.3       
+[13] gtable_0.2.0      R.oo_1.22.0       git2r_0.21.0     
+[16] htmltools_0.3.6   yaml_2.1.18       lazyeval_0.2.1   
+[19] rprojroot_1.3-2   digest_0.6.15     tibble_1.4.2     
+[22] gridExtra_2.3     reshape2_1.4.3    R.utils_2.7.0    
+[25] evaluate_0.10.1   rmarkdown_1.9     labeling_0.3     
+[28] stringi_1.1.6     pillar_1.1.0      compiler_3.4.3   
+[31] scales_0.5.0      backports_1.1.2   R.methodsS3_1.7.1</code></pre>
 </div>
 
 <!-- Adjust MathJax settings so that all math formulae are shown using
