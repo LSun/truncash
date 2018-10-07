@@ -9,14 +9,17 @@ output:
 
 ## Introduction
 
+Generate the inflated vs in-between vs deflated noise figure in the paper.
+
 ```{r}
 library(ggplot2)
 ```
 
 ```{r}
-FDP.list <- readRDS("~/Desktop/temp1/FDP.list.rds")
-z.list <- readRDS("~/Desktop/temp1/z.list.rds")
-pi0.list <- readRDS("~/Desktop/temp1/pi0.list.rds")
+FDP.list <- readRDS("../output/paper/simulation/FDP.list.rds")
+TDP.list <- readRDS("../output/paper/simulation/TDP.list.rds")
+z.list <- readRDS("../output/paper/simulation/z.list.rds")
+pi0.list <- readRDS("../output/paper/simulation/pi0.list.rds")
 ```
 
 ```{r}
@@ -31,7 +34,25 @@ method.col.FDR <- scales::hue_pal()(length(method.name.FDR))[c(5, 1, 2, 4, 3)]
 boxplot.quantile <- function(x) {
   r <- quantile(x, probs = c(0.10, 0.25, 0.5, 0.75, 0.90))
   names(r) <- c("ymin", "lower", "middle", "upper", "ymax")
-  r
+  return(r)
+}
+
+boxplot.quantile.sq <- function (x) {
+  r <- sqrt(quantile(x^2, probs = c(0.10, 0.25, 0.5, 0.75, 0.90)))
+  names(r) <- c("ymin", "lower", "middle", "upper", "ymax")
+  return(r)
+}
+
+mean.sq <- function (x) {
+  r <- sqrt(mean(x^2))
+  return(r)
+}
+
+mysqrt_trans <- function() {
+  scales::trans_new("mysqrt", 
+                    transform = base::sqrt,
+                    inverse = function(x) ifelse(x<0, 0, x^2),
+                    domain = c(0, Inf))
 }
 
 ###############################
@@ -43,7 +64,7 @@ Noise <- cut(sd.z, breaks = c(0, quantile(sd.z, probs = 1 : 2 / 3), Inf), labels
 
 pi0.0.9 <- which(pi0.list == 0.9)
 sd.z.0.9 <- sd.z[pi0.0.9]
-typical.noise <- pi0.0.9[order(sd.z.0.9)[floor(quantile(seq(sd.z.0.9), c(0.15, 0.5, 0.91)))]]
+typical.noise <- pi0.0.9[order(sd.z.0.9)[floor(quantile(seq(sd.z.0.9), c(0.1, 0.5, 0.9)))]]
 
 z.list.sel <- z.list[typical.noise]
 names(z.list.sel) <- c("Deflated Noise", "In-between", "Inflated Noise")
@@ -83,6 +104,26 @@ FDP.q.ggdata$Method <- plyr::mapvalues(FDP.q.ggdata$Method, from = c("CASH", "BH
 
 FDP.q.ggdata.0.9 <- FDP.q.ggdata[FDP.q.ggdata$pi0 == 0.9, ]
 
+################################################
+
+TDP.q <- TDP.list[[which(q.vec == q)]]
+TDP.q.noise.mat <- rbind.data.frame(
+  cbind.data.frame(Noise = rep("All", length(Noise)),
+                   pi0 = factor(do.call(rbind, pi0.list)),
+                   TDP.q),
+  cbind.data.frame(Noise,
+                   pi0 = factor(do.call(rbind, pi0.list)),
+                   TDP.q)
+)
+TDP.q.ggdata <- reshape2::melt(TDP.q.noise.mat, id.vars = c("Noise", "pi0"), variable.name = "Method", value.name = "TDP")
+
+TDP.q.ggdata$Method <- factor(TDP.q.ggdata$Method, levels = c("CASH", "BHq", "qvalue", "ASH", "locfdr"))
+TDP.q.ggdata$Method <- plyr::mapvalues(TDP.q.ggdata$Method, from = c("CASH", "BHq", "qvalue", "ASH", "locfdr"), to = c("cashr", "BH", "qvalue", "ashr", "locfdr"))
+
+TDP.q.ggdata.0.9 <- TDP.q.ggdata[TDP.q.ggdata$pi0 == 0.9, ]
+
+##############################################################
+
 # FDP.q.all.sep.plot <- ggplot(data = FDP.q.ggdata, aes(x = pi0, y = FDP, fill = Method, color = Method)) +
 #   stat_summary(fun.data = boxplot.quantile, geom = "boxplot", position = "dodge") +
 #   stat_summary(fun.y = mean, geom = "point", position = position_dodge(width = 0.9), show.legend = TRUE) +
@@ -104,14 +145,15 @@ FDP.q.ggdata.0.9 <- FDP.q.ggdata[FDP.q.ggdata$pi0 == 0.9, ]
 
 FDP.q.all.sep.plot <- ggplot(data = FDP.q.ggdata.0.9, aes(x = Method, y = FDP, fill = Method, color = Method)) +
   stat_summary(fun.data = boxplot.quantile, geom = "boxplot", aes(width = 0.5), position = position_dodge(), show.legend = FALSE) +
-  coord_flip() +
   stat_summary(fun.y = mean, geom = "point", position = position_dodge(width = 0.9), show.legend = FALSE) +
   scale_x_discrete(limits = rev(levels(FDP.q.ggdata.0.9$Method))) +
+  coord_flip() +
   scale_color_manual(labels = method.name.FDR, values = method.col.FDR) +
   scale_fill_manual(labels = method.name.FDR, values = alpha(method.col.FDR, 0.35)) +
   facet_wrap(~Noise, nrow = 1) +
   geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
-  labs(x = expression(pi[0]), y = "FDP", title = bquote(paste("Nominal FDR = ", .(q), " (", g[1], " is Gaussian; ", pi[0] == 0.9, ")"))) +
+  labs(y = "FDP", title = bquote(paste("Nominal FDR = ", .(q), " (", g[1], " is Gaussian; ", pi[0] == 0.9, ")"))) +
+  expand_limits(y = 0) +
   theme(plot.title = element_text(size = 12, hjust = 0),
         axis.title.y = element_blank(),
         axis.text.y = element_text(size = 15),
@@ -122,6 +164,30 @@ FDP.q.all.sep.plot <- ggplot(data = FDP.q.ggdata.0.9, aes(x = Method, y = FDP, f
         legend.background = element_rect(color = "grey"),
         legend.text = element_text(size = 12)
         )
+
+FDP.sqrt.q.all.sep.plot <- ggplot(data = FDP.q.ggdata.0.9, aes(x = Method, y = FDP, fill = Method, color = Method)) +
+  stat_summary(fun.data = boxplot.quantile.sq, geom = "boxplot", aes(width = 0.5), position = position_dodge(), show.legend = FALSE) +
+  stat_summary(fun.y = mean.sq, geom = "point", position = position_dodge(width = 0.9), show.legend = FALSE) +
+  scale_x_discrete(limits = rev(levels(FDP.q.ggdata.0.9$Method))) +
+  scale_y_continuous(trans = "mysqrt", breaks = c(0, 0.1, 0.2, 0.4, 0.6, 0.8)) +
+  coord_flip() +
+  scale_color_manual(labels = method.name.FDR, values = method.col.FDR) +
+  scale_fill_manual(labels = method.name.FDR, values = alpha(method.col.FDR, 0.35)) +
+  facet_wrap(~Noise, nrow = 1) +
+  geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
+  labs(x = expression(pi[0]), y = "FDP", title = bquote(paste("Nominal FDR = ", .(q), " (", g[1], " is Gaussian; ", pi[0] == 0.9, ")"))) +
+  expand_limits(y = 0) +
+  theme(plot.title = element_text(size = 12, hjust = 0),
+        axis.title.y = element_blank(),
+        axis.text.y = element_text(size = 15),
+        axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "bottom",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12)
+        )
+
 
 ###############################################
 
@@ -138,6 +204,40 @@ z.sep.plot.save <- gridExtra::arrangeGrob(blank.plot, z.sep.plot, nrow = 1, widt
 
 FDP.q.sep.plot.save <- gridExtra::arrangeGrob(z.sep.plot.save, FDP.q.all.sep.plot, heights = c(1, 1.2))
 
-ggsave("../output/fig/paper/FDP.q.sep.pdf", FDP.q.sep.plot.save, height = 5, width = 10)
+FDP.sqrt.q.sep.plot.save <- gridExtra::arrangeGrob(z.sep.plot.save, FDP.sqrt.q.all.sep.plot, heights = c(1, 1.2))
+
+ggsave("../output/paper/FDP.q.sep.pdf", FDP.q.sep.plot.save, height = 4.5, width = 10)
+
+ggsave("../output/paper/FDP.sqrt.q.sep.pdf", FDP.sqrt.q.sep.plot.save, height = 4.5, width = 10)
+
+##############################################
+
+TDP.q.all.sep.plot <- ggplot(data = TDP.q.ggdata.0.9, aes(x = Method, y = TDP, fill = Method, color = Method)) +
+  stat_summary(fun.data = boxplot.quantile, geom = "boxplot", aes(width = 0.5), position = position_dodge(), show.legend = FALSE) +
+  coord_flip() +
+  stat_summary(fun.y = mean, geom = "point", position = position_dodge(width = 0.9), show.legend = FALSE) +
+  scale_x_discrete(limits = rev(levels(FDP.q.ggdata.0.9$Method))) +
+  scale_color_manual(labels = method.name.FDR, values = method.col.FDR) +
+  scale_fill_manual(labels = method.name.FDR, values = alpha(method.col.FDR, 0.35)) +
+  facet_wrap(~Noise, nrow = 1) +
+  labs(x = expression(pi[0]), y = "TDP") +
+  expand_limits(y = 0) +
+  theme(axis.title.y = element_blank(),
+        axis.text.y = element_text(size = 15),
+        axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "bottom",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12)
+        )
+
+FDP.TDP.q.sep.plot.save <- gridExtra::arrangeGrob(z.sep.plot.save, FDP.q.all.sep.plot + theme(plot.title = element_text(size = 15, hjust = 0)), TDP.q.all.sep.plot, heights = c(1, 1.2, 1.1))
+
+FDP.sqrt.TDP.q.sep.plot.save <- gridExtra::arrangeGrob(z.sep.plot.save, FDP.sqrt.q.all.sep.plot + theme(plot.title = element_text(size = 15, hjust = 0)), TDP.q.all.sep.plot, heights = c(1, 1.2, 1.1))
+
+ggsave("../output/paper/FDP.TDP.q.sep.pdf", FDP.TDP.q.sep.plot.save, height = 6.5, width = 10)
+
+ggsave("../output/paper/FDP.sqrt.TDP.q.sep.pdf", FDP.sqrt.TDP.q.sep.plot.save, height = 6.5, width = 10)
 ```
 

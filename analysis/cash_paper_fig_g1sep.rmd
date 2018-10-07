@@ -1,0 +1,165 @@
+---
+title: "The FDP for different $g_1$ figure in `cashr`"
+author: "Lei Sun"
+date: "2018-10-06"
+output:
+  workflowr::wflow_html:
+    code_folding: hide
+---
+
+## Introduction
+
+```{r}
+library(ggplot2)
+```
+
+```{r}
+boxplot.quantile <- function(x) {
+  r <- quantile(x, probs = c(0.10, 0.25, 0.5, 0.75, 0.90))
+  names(r) <- c("ymin", "lower", "middle", "upper", "ymax")
+  return(r)
+}
+
+boxplot.quantile.sq <- function (x) {
+  r <- sqrt(quantile(x^2, probs = c(0.10, 0.25, 0.5, 0.75, 0.90)))
+  names(r) <- c("ymin", "lower", "middle", "upper", "ymax")
+  return(r)
+}
+
+mean.sq <- function (x) {
+  r <- sqrt(mean(x^2))
+  return(r)
+}
+
+mysqrt_trans <- function() {
+  scales::trans_new("mysqrt", 
+                    transform = base::sqrt,
+                    inverse = function(x) ifelse(x<0, 0, x^2),
+                    domain = c(0, Inf))
+}
+```
+
+```{r}
+q <- 0.1
+method.name.FDR <- c("cashr", "BH", "qvalue", "ashr", "locfdr")
+method.col.FDR <- scales::hue_pal()(length(method.name.FDR))[c(5, 1, 2, 4, 3)]
+```
+
+```{r}
+density.ggdata.normal <- readRDS("../output/paper/simulation/density.ggdata.normal.rds")
+density.ggdata.nearnormal <- readRDS("../output/paper/simulation/density.ggdata.nearnormal.rds")
+density.ggdata.spiky <- readRDS("../output/paper/simulation/density.ggdata.spiky.rds")
+density.ggdata.flattop <- readRDS("../output/paper/simulation/density.ggdata.flattop.rds")
+density.ggdata.skew <- readRDS("../output/paper/simulation/density.ggdata.skew.rds")
+density.ggdata.bimodal <- readRDS("../output/paper/simulation/density.ggdata.bimodal.rds")
+```
+
+```{r}
+density.g.ggdata <- rbind.data.frame(
+  density.ggdata.normal,
+  density.ggdata.nearnormal,
+  density.ggdata.spiky,
+  density.ggdata.flattop,
+  density.ggdata.skew,
+  density.ggdata.bimodal
+)
+
+density.g.plot <- ggplot(data = density.g.ggdata, aes(x = plotx, y = ploty)) +
+  geom_line() +
+  facet_wrap(~g, nrow = 1) +
+  labs(x = expression(theta), y = expression(g[1](theta))) +
+  theme(axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10),
+        axis.title.y = element_text(size = 15),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "none",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+```
+
+```{r}
+FDP.q.all.ggdata.normal <- readRDS("../output/paper/simulation/FDP.q.all.ggdata.normal.rds")
+FDP.q.all.ggdata.nearnormal <- readRDS("../output/paper/simulation/FDP.q.all.ggdata.nearnormal.rds")
+FDP.q.all.ggdata.spiky <- readRDS("../output/paper/simulation/FDP.q.all.ggdata.spiky.rds")
+FDP.q.all.ggdata.flattop <- readRDS("../output/paper/simulation/FDP.q.all.ggdata.flattop.rds")
+FDP.q.all.ggdata.skew <- readRDS("../output/paper/simulation/FDP.q.all.ggdata.skew.rds")
+FDP.q.all.ggdata.bimodal <- readRDS("../output/paper/simulation/FDP.q.all.ggdata.bimodal.rds")
+```
+
+```{r}
+FDP.q.g.ggdata <- rbind.data.frame(
+  FDP.q.all.ggdata.normal,
+  FDP.q.all.ggdata.nearnormal,
+  FDP.q.all.ggdata.spiky,
+  FDP.q.all.ggdata.flattop,
+  FDP.q.all.ggdata.skew,
+  FDP.q.all.ggdata.bimodal
+)
+
+FDP.q.g.ggdata$Method <- plyr::mapvalues(FDP.q.g.ggdata$Method, from = c("CASH", "BHq", "ASH"), to = c("cashr", "BH", "ashr"))
+
+FDP.q.g.ggdata$Method <- factor(FDP.q.g.ggdata$Method, levels = c("cashr", "BH", "qvalue", "ashr", "locfdr"))
+
+FDP.q.g.ggdata$pi0 <- as.numeric(levels(FDP.q.g.ggdata$pi0))[FDP.q.g.ggdata$pi0]
+```
+
+```{r}
+FDP.q.g.plot <- ggplot(data = FDP.q.g.ggdata, aes(x = Method, y = FDP, fill = Method, color = Method)) +
+  stat_summary(fun.data = boxplot.quantile, geom = "boxplot", position = "dodge", aes(width = 0.5), show.legend = FALSE) +
+  stat_summary(fun.y = mean, geom = "point", position = position_dodge(width = 0.9), show.legend = FALSE) +
+  scale_color_manual(labels = method.name.FDR, values = method.col.FDR) +
+  scale_fill_manual(labels = method.name.FDR, values = alpha(method.col.FDR, 0.35)) +
+  scale_y_continuous(trans = "mysqrt", breaks = c(0, 0.1, 0.2, 0.4, 0.6, 0.8)) +
+  facet_grid(pi0 ~ g, labeller = label_bquote(rows = pi[0] == .(pi0))) +
+  scale_x_discrete(limits = rev(levels(FDP.q.g.ggdata$Method))) +
+  coord_flip() +
+  geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
+  labs(y = "FDP", title = bquote(paste("Nominal FDR = ", .(q)))) +
+  theme(plot.title = element_text(size = 12, hjust = 0),
+        axis.title.y = element_blank(),
+        axis.text.y = element_text(size = 15),
+        axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "bottom",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+```
+
+```{r}
+FDP.q.g.plot.save <- gridExtra::arrangeGrob(density.g.plot, FDP.q.g.plot, heights = c(1, 2.5))
+
+ggsave("../output/paper/FDP.q.g.pdf", FDP.q.g.plot.save, height = 6, width = 12)
+```
+
+```{r}
+pi0.plot <- 0.9
+
+FDP.q.g.pi0.plot <- ggplot(data = FDP.q.g.ggdata[FDP.q.g.ggdata$pi0 == pi0.plot, ], aes(x = Method, y = FDP, fill = Method, color = Method)) +
+  stat_summary(fun.data = boxplot.quantile, geom = "boxplot", position = "dodge", aes(width = 0.5), show.legend = FALSE) +
+  stat_summary(fun.y = mean, geom = "point", position = position_dodge(width = 0.9), show.legend = FALSE) +
+  scale_color_manual(labels = method.name.FDR, values = method.col.FDR) +
+  scale_fill_manual(labels = method.name.FDR, values = alpha(method.col.FDR, 0.35)) +
+  scale_y_continuous(trans = "mysqrt", breaks = c(0, 0.1, 0.2, 0.4, 0.6, 0.8)) +
+  facet_wrap(~ g, nrow = 1) +
+  scale_x_discrete(limits = rev(levels(FDP.q.g.ggdata$Method))) +
+  coord_flip() +
+  geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
+  labs(y = "FDP", title = bquote(paste("Nominal FDR = ", .(q), "(", pi[0] == .(pi0.plot), ")"))) +
+  theme(plot.title = element_text(size = 12, hjust = 0),
+        axis.title.y = element_blank(),
+        axis.text.y = element_text(size = 15),
+        axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "bottom",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+```
+
+```{r}
+FDP.q.g.pi0.plot.save <- gridExtra::arrangeGrob(density.g.plot, FDP.q.g.pi0.plot, heights = c(1, 1.1))
+
+ggsave("../output/paper/FDP.q.g.pi0.pdf", FDP.q.g.pi0.plot.save, height = 4, width = 12)
+```
