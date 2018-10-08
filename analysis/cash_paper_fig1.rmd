@@ -33,9 +33,12 @@ w <- gdfit(z, gd.ord, w.lambda = 10, w.rho = 0.5)$w
 y.plot = matrix_lik_plot %*% w
 z.hist = hist(z, breaks = 100, plot = FALSE)
 y.max = max(z.hist$density, y.plot, dnorm(0))
+```
 
+```{r}
 setEPS()
 postscript("../output/paper/cor_z_hist.eps", width = 8, height = 6)
+#pdf("../output/paper/cor_z_hist.pdf", width = 8, height = 6)
 
 par(mfrow = c(2, 2)) # 2-by-2 grid of plots
 par(oma = c(0.5, 2.5, 0, 0)) # make room (i.e. the 4's) for the overall x and y axis titles
@@ -52,6 +55,7 @@ for (i in 1 : 4) {
   hist(z, breaks = 100, prob = TRUE, ylim = c(0, y.max), main = NULL, xlab = "", xlim = range(c(abs(z.sel), -abs(z.sel))))
   lines(x.plot, dnorm(x.plot), col = "blue", lwd = 2)
   lines(x.plot, y.plot, col = "red", lwd = 2)
+  legend("topleft", bty = "n", paste0('(', letters[i], ')'), cex = 1.25)
 }
 
 # print the overall labels
