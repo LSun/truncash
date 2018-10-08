@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+<meta name="author" content="Lei Sun" />
+
+<meta name="date" content="2018-10-07" />
+
+<title>The decorrelation of posterior</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/readable.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">truncash</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/LSun/truncash">
+    <span class="fa fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+<div class="fluid-row" id="header">
+
+<div class="btn-group pull-right">
+<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">The decorrelation of posterior</h1>
+<h4 class="author"><em>Lei Sun</em></h4>
+<h4 class="date"><em>2018-10-07</em></h4>
+
+</div>
+
+
+<p><strong>Last updated:</strong> 2018-10-07</p>
+<strong>workflowr checks:</strong> <small>(Click a bullet for more information)</small>
+<ul>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>R Markdown file:</strong> up-to-date </summary></p>
+<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Environment:</strong> empty </summary></p>
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Seed:</strong> <code>set.seed(12345)</code> </summary></p>
+<p>The command <code>set.seed(12345)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Session information:</strong> recorded </summary></p>
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</details>
+</li>
+<li>
+<details>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/490e0ab2e40514866aff476d16dbfb29ca3f91f5" target="_blank">490e0ab</a> </summary></p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    analysis/.DS_Store
+    Ignored:    analysis/cash_paper_fig_leukemia_cache/
+    Ignored:    data/LSI/
+    Ignored:    docs/.DS_Store
+    Ignored:    docs/figure/.DS_Store
+    Ignored:    output/fig/
+    Ignored:    output/paper/
+
+</code></pre>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</details>
+</li>
+</ul>
+<details>
+<summary> <small><strong>Expand here to see past versions:</strong></small> </summary>
+<ul>
+<table style="border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+File
+</th>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+<th style="text-align:left;">
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/490e0ab2e40514866aff476d16dbfb29ca3f91f5/analysis/decor_post.rmd" target="_blank">490e0ab</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-10-07
+</td>
+<td style="text-align:left;">
+wflow_publish(c(“decor_post.rmd”, “cash_paper_fig1.rmd”))
+</td>
+</tr>
+</tbody>
+</table>
+</ul>
+</details>
+<hr />
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>There is a under-appreciated aspect of <code>cashr</code>: the decorrelation of posterior helps make FDP less variable.</p>
+<p>In a hierarchical Bayesian model with correlated likelihoods, <span class="math display">\[\begin{align}
+\theta_j &amp;\overset{iid}{\sim} g(\cdot) \\
+X_j \mid \theta_j &amp;\sim p(X_j \mid \theta_j) \text{ correlated} \ ,
+\end{align}\]</span> the posterior <span class="math inline">\(p(\theta_j\mid X_j)\)</span> should also be correlated. Actually, the joint posterior distribution should be written as <span class="math inline">\(p(\theta_1, \ldots, \theta_p \mid X_1, \ldots, X_p)\)</span>, where <span class="math inline">\(\theta_1, \ldots, \theta_p\)</span> are not independent.</p>
+<p>In many high dimensional statistical inference, the selection statement is based on the marginal distribution, such as “select <span class="math inline">\(j\)</span> if <span class="math inline">\(p(\theta_j = 0\mid X_j) \le 0.1\)</span>.” However, FDP is concerned with simultaneous validity; that is, how many events <span class="math inline">\(\theta_j = 0\mid X_j\)</span> actually happened in the discovery set? With a correlated joint posterior, even the joint posterior, and therefore the marginals, are perfectly correct, the number of events <span class="math inline">\(\theta_j = 0\mid X_j\)</span> happening in a given set (now for convenience let’s suppose the discovery set is given) could be far more variable than a Binomial. It may lead to a very variable FDP.</p>
+</div>
+<div id="an-analogy-credible-intervals" class="section level2">
+<h2>An analogy: credible intervals</h2>
+<p>Let’s say we have a posterior distribution <span class="math inline">\(p(\theta_1, \ldots, \theta_p \mid X_1, \ldots, X_p)\)</span> which is absolutely continuous, with no point mass at the origin or elsewhere. We want to come up with <span class="math inline">\(p\)</span> <span class="math inline">\(95\%\)</span> credible intervals, each for each <span class="math inline">\(\theta_j\)</span>. Now we are concerned with the simultaneous coverage of these intervals; that is, out of <span class="math inline">\(p\)</span>, how many of them actually cover their true <span class="math inline">\(\theta_j\)</span>? Let’s assume the data are indeed generated from a Bayesian mechanism and the priors are exact, so that the credible intervals are valid marginally for each <span class="math inline">\(j\)</span>.</p>
+<p>If we have an independent joint posterior, it’s clear that the number of false coverage should be a Bernoulli<span class="math inline">\((p, 0.05)\)</span> random variable. But if the joint posterior is not independent and the correlation cannot be ignored in some sense, the number of false coverage would be much more variable than that.</p>
+<p>Of course in this setting, the solution is to use a <span class="math inline">\(p\)</span>-dimensional credible set or credible region to get a valid simultaneous coverage. But it has two problems. First, there seems no counterpart concept in variable selection or multiple testing, like “select 1, 3, 5 if also select 2, 6 but no 3 if 4 is selected.” Second, in a high dimensional setting with <span class="math inline">\(p = 10^4\)</span> and the joint posterior is complicated, a <span class="math inline">\(p\)</span>-dimensional credible set wouldn’t be very practical anyway. Thus, validly decorrelating the posterior would be very helpful. With the exchangeable correlated standard normal model, <code>cashr</code> offers a way.</p>
+</div>
+<div id="an-example" class="section level2">
+<h2>An example</h2>
+<p>Suppose we know <span class="math display">\[\begin{align}
+\theta_1, \ldots, \theta_{p} &amp;\overset{iid}{\sim} g := 0.9\delta_0 + 0.1N(0, 1) \\
+[X_1, \ldots, X_p]&#39; &amp;\sim N
+\left(
+[\theta_1, \theta_p]&#39;, \Sigma = 
+\begin{bmatrix}
+1   &amp; 0.5 &amp; \cdots &amp; 0.5 \\
+0.5 &amp;   1 &amp; \cdots &amp; 0.5 \\
+\vdots &amp; \vdots &amp; \ddots &amp; \vdots \\
+0.5 &amp; 0.5 &amp; \cdots &amp; 1 \\
+\end{bmatrix}
+\right)
+\end{align}\]</span> where <span class="math inline">\(p = 10^4\)</span>. The goal is to choose those <span class="math inline">\(\theta_j \neq 0\)</span> at the nominal FDR <span class="math inline">\(= 0.1\)</span>.</p>
+<p>Now we consider three approaches.</p>
+<ol style="list-style-type: decimal">
+<li>Condition <span class="math inline">\(\theta_j\)</span> individually on <span class="math inline">\(X_j\)</span> individually, and base selection on <span class="math display">\[
+p(\theta_j = 0 \mid X_j, g, \Sigma) = \frac{
+0.9\varphi(X_j)
+}{
+0.9\varphi(X_j) + 0.1\varphi(X_j / \sqrt{2})
+}
+\]</span></li>
+</ol>
+<p>This is a valid posterior null probability, but it has two issues: (1) it doesn’t consider other observations <span class="math inline">\(X_k\)</span>; (2) the event <span class="math inline">\(\theta_j \mid X_j\)</span> and <span class="math inline">\(\theta_k \mid X_k\)</span> are highly dependent. So for a given nominal FDR or local FDR, the false discovery proportion would be highly variable.</p>
+<p>For example, let’s say</p>
+<ol start="2" style="list-style-type: decimal">
+<li>Condition <span class="math inline">\(\theta_1, \ldots, \theta_p\)</span> jointly on <span class="math inline">\(X_1, \ldots, X_p\)</span>.</li>
+</ol>
+<p>Mathematically the joint posterior <span class="math inline">\(p(\theta_1, \ldots, \theta_p \mid X_1, \ldots, X_p, g, \Sigma)\)</span> is hard to write. In the literature one approach is to introduce the indicator variable <span class="math inline">\(I_j := I(\theta_j \neq 0)\)</span> and write the marginal local FDR as <span class="math display">\[
+p(\theta_j = 0\mid X_1, \ldots, X_p, g, \Sigma) = p(I_j = 0\mid X_1, \ldots, X_p, g, \Sigma) = \frac{
+\sum_{I_1, \ldots, I_j = 0, \ldots, I_p}0.9^{p - \sum I_j}0.1^{\sum I_j}N\left(X \mid 0, \Sigma + \begin{bmatrix}I_1 &amp; &amp; \\ &amp; \ddots &amp; \\ &amp; &amp; I_p\end{bmatrix}\right)
+}{
+\sum_{I_1, \ldots, I_j, \ldots, I_p}0.9^{p - \sum I_j}0.1^{\sum I_j}N\left(X \mid 0, \Sigma + \begin{bmatrix}I_1 &amp; &amp; \\ &amp; \ddots &amp; \\ &amp; &amp; I_p\end{bmatrix}\right)
+}
+\]</span></p>
+<p>This approach should be better than the first but also has two issues: (1) it is impossible to compute as it needs to sum up <span class="math inline">\(2^p\)</span> terms; (2) it is only the marginal local FDR, where the happenstance of <span class="math inline">\(\theta_i = 0\mid X, g, \Sigma\)</span> would affect the probability of the happenstance of <span class="math inline">\(\theta_j = 0\mid X, g, \Sigma\)</span>, so the simultaneous false discovery proportion of a discovery set formed based on this would be variable.</p>
+<ol start="3" style="list-style-type: decimal">
+<li>Decorrelate the posterior.</li>
+</ol>
+<p>In the spirit of <code>cashr</code>, the model can be re-written as <span class="math display">\[\begin{align}
+\theta_1, \ldots, \theta_{p} &amp;\overset{iid}{\sim} g := 0.9\delta_0 + 0.1N(0, 1) \\
+X_j &amp;= \theta_j + Z_j \\
+\end{align}\]</span> And, the empirical distribution of realized <span class="math inline">\(Z_1, \ldots, Z_n\)</span> should be <span class="math inline">\(N(Z/\sqrt{2}, 1/\sqrt{2}^2)\)</span> with <span class="math inline">\(Z\)</span> being a <span class="math inline">\(N(0, 1)\)</span> random variable.</p>
+<p>Now suppose we are told by an oracle the value of <span class="math inline">\(Z\)</span>, essentially the correlated noise distribution, in our data set, and then the model becomes <span class="math display">\[\begin{align}
+\theta_1, \ldots, \theta_{p} &amp;\overset{iid}{\sim} g := 0.9\delta_0 + 0.1N(0, 1) \\
+X_j &amp;\sim N(\theta_j + Z/\sqrt{2}, 1/\sqrt{2}^2)
+\end{align}\]</span> Note that the likelihoods are no longer correlated, and we can base our inference on <span class="math display">\[
+p(\theta_j \mid X_j, g, \Sigma, Z) = \frac{
+0.9 N(X_j\mid Z/\sqrt{2}, \sqrt{1 / 2}^2)
+}{
+0.9 N(X_j\mid Z/\sqrt{2}, \sqrt{1 / 2}^2) + 0.1 N(X_j\mid Z/\sqrt{2}, \sqrt{3 / 2}^2)
+}
+\]</span></p>
+<p>It’s easy to compute, and because of the decorrelation, the FDP should be less variable.</p>
+</div>
+<div id="simulation" class="section level2">
+<h2>Simulation</h2>
+<p>Since Approach 2 is hard to compute, we now only compare Approach 1 and 3.</p>
+<pre class="r"><code>lfdr_1 &lt;- function (X) {
+  return((0.9 * dnorm(X)) / (0.9 * dnorm(X) + 0.1 * dnorm(X, 0, sqrt(2))))
+}
+
+lfdr_3 &lt;- function (X, Z) {
+  return((0.9 * dnorm(X, Z / sqrt(2), sqrt(1 / 2))) / (0.9 * dnorm(X, Z / sqrt(2), sqrt(1 / 2)) + 0.1 * dnorm(X, Z / sqrt(2), sqrt(3 / 2))))
+}
+
+FDP_lfdr &lt;- function (lfdr, q, theta) {
+  qval &lt;- ashr::qval.from.lfdr(lfdr)
+  sel &lt;- (qval &lt;= q)
+  FDP &lt;- sum(theta[sel] == 0) / length(theta[sel])
+  return(FDP)
+}
+
+LFDP_lfdr &lt;- function (lfdr, q, theta, lower = 0.95, upper = 1.05) {
+  sel &lt;- (lfdr &gt;= q * lower) &amp; (lfdr &lt;= q * upper)
+  LFDP &lt;- sum(theta[sel] == 0) / length(theta[sel])
+  return(LFDP)
+}</code></pre>
+<pre class="r"><code>FDP_comparison &lt;- function (nominal.FDR) {
+theta &lt;- sample(c(rep(0, 9e3), rnorm(1e3)))
+Z &lt;- rnorm(1)
+E &lt;- Z / sqrt(2) + rnorm(1e4, 0, 1 / sqrt(2))
+X &lt;- theta + E
+lfdr_1_res &lt;- lfdr_1(X)
+FDP_1 &lt;- FDP_lfdr(lfdr_1_res, nominal.FDR, theta)
+lfdr_3_res &lt;- lfdr_3(X, Z)
+FDP_3 &lt;- FDP_lfdr(lfdr_3_res, nominal.FDR, theta)
+return(c(FDP_1 = FDP_1, FDP_3 = FDP_3))
+}
+LFDP_comparison &lt;- function (nominal.lfdr) {
+theta &lt;- sample(c(rep(0, 9e3), rnorm(1e3)))
+Z &lt;- rnorm(1)
+E &lt;- Z / sqrt(2) + rnorm(1e4, 0, 1 / sqrt(2))
+X &lt;- theta + E
+lfdr_1_res &lt;- lfdr_1(X)
+LFDP_1 &lt;- LFDP_lfdr(lfdr_1_res, nominal.lfdr, theta)
+lfdr_3_res &lt;- lfdr_3(X, Z)
+LFDP_3 &lt;- LFDP_lfdr(lfdr_3_res, nominal.lfdr, theta)
+return(c(LFDP_1 = LFDP_1, LFDP_3 = LFDP_3))
+}
+
+set.seed(777)
+nominal.FDR &lt;- 0.2
+FDP_res &lt;- replicate(1e3, FDP_comparison(nominal.FDR))
+nominal.lfdr &lt;- 0.5
+LFDP_res &lt;- replicate(1e3, LFDP_comparison(nominal.lfdr))</code></pre>
+<p>Indeed, Approach 3 is much more accurate than Approach 1.</p>
+<pre class="r"><code>library(ggplot2)
+
+FDP_data &lt;- reshape2::melt(as.data.frame(t(FDP_res)), value.name = &quot;FDP&quot;, variable.name = &quot;Approach&quot;, id.vars = NULL)
+
+FDP_data$Approach &lt;- plyr::mapvalues(FDP_data$Approach, from = c(&quot;FDP_1&quot;, &quot;FDP_3&quot;), to = c(&quot;Approach 1&quot;, &quot;Approach 3&quot;))
+
+FDP_plot &lt;- ggplot(FDP_data, aes(x = FDP, color = Approach, fill = Approach)) +
+  geom_histogram() +
+  geom_vline(xintercept = nominal.FDR, col = &quot;black&quot;, linetype = &quot;dashed&quot;, size = 1) +
+  facet_wrap(~ Approach, nrow = 2, strip.position = &quot;top&quot;) +
+  labs(x = &quot;Positive FDP&quot;, title = bquote(paste(&quot;Nominal FDR =&quot;, .(nominal.FDR)))) +
+  theme(legend.position = &#39;none&#39;
+        )
+FDP_plot</code></pre>
+<pre><code>Warning: Removed 114 rows containing non-finite values (stat_bin).</code></pre>
+<p><img src="figure/decor_post.rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>LFDP_data &lt;- reshape2::melt(as.data.frame(t(LFDP_res)), value.name = &quot;LFDP&quot;, variable.name = &quot;Approach&quot;, id.vars = NULL)
+
+LFDP_data$Approach &lt;- plyr::mapvalues(LFDP_data$Approach, from = c(&quot;LFDP_1&quot;, &quot;LFDP_3&quot;), to = c(&quot;Approach 1&quot;, &quot;Approach 3&quot;))
+
+LFDP_plot &lt;- ggplot(LFDP_data, aes(x = LFDP, color = Approach, fill = Approach)) +
+  geom_histogram() +
+  geom_vline(xintercept = nominal.lfdr, col = &quot;black&quot;, linetype = &quot;dashed&quot;, size = 1) +
+  facet_wrap(~ Approach, nrow = 2, strip.position = &quot;top&quot;) +
+  labs(x = &quot;Positive Local FDP&quot;, title = bquote(paste(&quot;Nominal Local FDR =&quot;, .(nominal.lfdr)))) +
+  theme(legend.position = &#39;none&#39;
+        )
+LFDP_plot</code></pre>
+<pre><code>Warning: Removed 26 rows containing non-finite values (stat_bin).</code></pre>
+<p><img src="figure/decor_post.rmd/unnamed-chunk-3-2.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="remarks" class="section level2">
+<h2>Remarks</h2>
+<ol style="list-style-type: decimal">
+<li><p>Note that in this comparison, there is no estimation involved. All 3 approaches use oracle information, including the prior, the full joint distribution of the observation, and Approach 3 also uses the empirical distribution of correlated noise. That is to say, the improvement of Approach 3 only comes from the decorrelation of posterior.</p></li>
+<li><p>In practice, what kind of information do these approaches need? Approach 1 only needs some assumption of the prior and the marginal distribution of observations. Approach 2 needs what Approach 1 needs, plus the full knowledge of the joint distribution of observations. Approach 3 needs what Approach 1 needs, plus the knowledge of the empirical distribution of the correlated noise. In many situations, what Approach 2 needs is far more difficult to know or satisfactorily estimated, whereas what Approach 3 needs is easier, in <code>cashr</code> settings.</p></li>
+<li><p>Therefore, <code>cashr</code> is good in three aspects. (1) by controlling distortions by correlation, <code>cashr</code> estimates <span class="math inline">\(\hat g\)</span> more accurately. (3) it provides a way to bypass estimating the correlation structure or making more assumption on the joint distribution of observations, and directly estimates the empirical distribution of the correlated noise, arguably more valuable information. (3) even if we know the exact <span class="math inline">\(g\)</span> and exact joint distributio, <code>cashr</code> decorrelates the posterior and makes the simultaneous inference more accurate.</p></li>
+</ol>
+</div>
+<div id="session-information" class="section level2">
+<h2>Session information</h2>
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 3.4.3 (2017-11-30)
+Platform: x86_64-apple-darwin15.6.0 (64-bit)
+Running under: macOS High Sierra 10.13.6
+
+Matrix products: default
+BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
+LAPACK: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRlapack.dylib
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] ggplot2_2.2.1
+
+loaded via a namespace (and not attached):
+ [1] Rcpp_0.12.18      pillar_1.1.0      compiler_3.4.3   
+ [4] git2r_0.21.0      plyr_1.8.4        workflowr_1.1.1  
+ [7] R.methodsS3_1.7.1 R.utils_2.7.0     iterators_1.0.9  
+[10] tools_3.4.3       digest_0.6.15     evaluate_0.10.1  
+[13] tibble_1.4.2      gtable_0.2.0      lattice_0.20-35  
+[16] rlang_0.1.6       Matrix_1.2-12     foreach_1.4.4    
+[19] yaml_2.1.18       parallel_3.4.3    stringr_1.3.0    
+[22] knitr_1.20        rprojroot_1.3-2   grid_3.4.3       
+[25] rmarkdown_1.9     reshape2_1.4.3    ashr_2.2-3       
+[28] magrittr_1.5      whisker_0.3-2     backports_1.1.2  
+[31] scales_0.5.0      codetools_0.2-15  htmltools_0.3.6  
+[34] MASS_7.3-50       colorspace_1.3-2  labeling_0.3     
+[37] stringi_1.1.6     lazyeval_0.2.1    doParallel_1.0.11
+[40] pscl_1.5.2        munsell_0.4.3     truncnorm_1.0-7  
+[43] SQUAREM_2017.10-1 R.oo_1.22.0      </code></pre>
+</div>
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+<hr>
+<p>
+  This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a>
+  analysis was created with
+  <a href="https://github.com/jdblischak/workflowr">workflowr</a> 1.1.1
+</p>
+<hr>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
