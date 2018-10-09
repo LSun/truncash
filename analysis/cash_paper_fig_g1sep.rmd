@@ -68,7 +68,8 @@ density.g.plot <- ggplot(data = density.g.ggdata, aes(x = plotx, y = ploty)) +
   geom_line() +
   facet_wrap(~g, nrow = 1) +
   labs(x = expression(theta), y = expression(g[1](theta))) +
-  theme(axis.title.x = element_text(size = 15),
+  theme(# axis.title.x = element_text(size = 15),
+        axis.title.x = element_blank(),
         axis.text.x = element_text(size = 10),
         axis.title.y = element_text(size = 15),
         axis.text.y = element_text(size = 10),
@@ -128,9 +129,16 @@ FDP.q.g.plot <- ggplot(data = FDP.q.g.ggdata, aes(x = Method, y = FDP, fill = Me
 ```
 
 ```{r}
-FDP.q.g.plot.save <- gridExtra::arrangeGrob(density.g.plot, FDP.q.g.plot, heights = c(1, 2.5))
+FDP.q.g.plot.save <- gridExtra::arrangeGrob(
+  density.g.plot + 
+    theme(plot.margin = grid::unit(c(5.5, 30, 5.5, 10), "points")) +
+    labs(title = bquote(paste("Nominal FDR = ", .(q)))) +
+    theme(plot.title = element_text(size = 15)),
+  FDP.q.g.plot + theme(strip.text.x = element_blank(), plot.title = element_blank()),
+  heights = c(1, 2)
+)
 
-ggsave("../output/paper/FDP.q.g.pdf", FDP.q.g.plot.save, height = 6, width = 12)
+ggsave("../output/paper/FDP.q.g.pdf", FDP.q.g.plot.save, height = 6, width = 9)
 ```
 
 ```{r}
@@ -159,7 +167,11 @@ FDP.q.g.pi0.plot <- ggplot(data = FDP.q.g.ggdata[FDP.q.g.ggdata$pi0 == pi0.plot,
 ```
 
 ```{r}
-FDP.q.g.pi0.plot.save <- gridExtra::arrangeGrob(density.g.plot, FDP.q.g.pi0.plot, heights = c(1, 1.1))
+FDP.q.g.pi0.plot.save <- gridExtra::arrangeGrob(
+  density.g.plot,
+  FDP.q.g.pi0.plot,
+  heights = c(1, 1.1)
+)
 
 ggsave("../output/paper/FDP.q.g.pi0.pdf", FDP.q.g.pi0.plot.save, height = 4, width = 12)
 ```
