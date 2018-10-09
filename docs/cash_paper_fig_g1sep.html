@@ -332,7 +332,7 @@ div.section {
 </div>
 
 
-<p><strong>Last updated:</strong> 2018-10-06</p>
+<p><strong>Last updated:</strong> 2018-10-09</p>
 <strong>workflowr checks:</strong> <small>(Click a bullet for more information)</small>
 <ul>
 <li>
@@ -361,7 +361,7 @@ div.section {
 </li>
 <li>
 <details>
-<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/3b81007482b26da48dd48c8e06a60d82cbe2da64" target="_blank">3b81007</a> </summary></p>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/c4693992280ecfcdf9e5adff8d24f6922c8e07a2" target="_blank">c469399</a> </summary></p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 <pre><code>
 Ignored files:
@@ -369,6 +369,7 @@ Ignored files:
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
     Ignored:    analysis/.DS_Store
+    Ignored:    analysis/cash_paper_fig_leukemia_cache/
     Ignored:    data/LSI/
     Ignored:    docs/.DS_Store
     Ignored:    docs/figure/.DS_Store
@@ -404,6 +405,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/c4693992280ecfcdf9e5adff8d24f6922c8e07a2/analysis/cash_paper_fig_g1sep.rmd" target="_blank">c469399</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-10-09
+</td>
+<td style="text-align:left;">
+wflow_publish(c(“analysis/cash_paper_fig_g1sep.rmd”,
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/f7bde81209368d1ff02a509cab17d045dfa57364/docs/cash_paper_fig_g1sep.html" target="_blank">f7bde81</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-10-06
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 rmd
@@ -474,7 +509,8 @@ density.g.plot &lt;- ggplot(data = density.g.ggdata, aes(x = plotx, y = ploty)) 
   geom_line() +
   facet_wrap(~g, nrow = 1) +
   labs(x = expression(theta), y = expression(g[1](theta))) +
-  theme(axis.title.x = element_text(size = 15),
+  theme(# axis.title.x = element_text(size = 15),
+        axis.title.x = element_blank(),
         axis.text.x = element_text(size = 10),
         axis.title.y = element_text(size = 15),
         axis.text.y = element_text(size = 10),
@@ -523,11 +559,18 @@ FDP.q.g.ggdata$pi0 &lt;- as.numeric(levels(FDP.q.g.ggdata$pi0))[FDP.q.g.ggdata$p
         legend.background = element_rect(color = &quot;grey&quot;),
         legend.text = element_text(size = 12))</code></pre>
 <pre><code>Warning: Ignoring unknown aesthetics: width</code></pre>
-<pre class="r"><code>FDP.q.g.plot.save &lt;- gridExtra::arrangeGrob(density.g.plot, FDP.q.g.plot, heights = c(1, 2.5))</code></pre>
+<pre class="r"><code>FDP.q.g.plot.save &lt;- gridExtra::arrangeGrob(
+  density.g.plot + 
+    theme(plot.margin = grid::unit(c(5.5, 30, 5.5, 10), &quot;points&quot;)) +
+    labs(title = bquote(paste(&quot;Nominal FDR = &quot;, .(q)))) +
+    theme(plot.title = element_text(size = 15)),
+  FDP.q.g.plot + theme(strip.text.x = element_blank(), plot.title = element_blank()),
+  heights = c(1, 2)
+)</code></pre>
 <pre><code>Warning: Removed 8 rows containing non-finite values (stat_summary).
 
 Warning: Removed 8 rows containing non-finite values (stat_summary).</code></pre>
-<pre class="r"><code>ggsave(&quot;../output/paper/FDP.q.g.pdf&quot;, FDP.q.g.plot.save, height = 6, width = 12)</code></pre>
+<pre class="r"><code>ggsave(&quot;../output/paper/FDP.q.g.pdf&quot;, FDP.q.g.plot.save, height = 6, width = 9)</code></pre>
 <pre class="r"><code>pi0.plot &lt;- 0.9
 
 FDP.q.g.pi0.plot &lt;- ggplot(data = FDP.q.g.ggdata[FDP.q.g.ggdata$pi0 == pi0.plot, ], aes(x = Method, y = FDP, fill = Method, color = Method)) +
@@ -551,7 +594,11 @@ FDP.q.g.pi0.plot &lt;- ggplot(data = FDP.q.g.ggdata[FDP.q.g.ggdata$pi0 == pi0.pl
         legend.background = element_rect(color = &quot;grey&quot;),
         legend.text = element_text(size = 12))</code></pre>
 <pre><code>Warning: Ignoring unknown aesthetics: width</code></pre>
-<pre class="r"><code>FDP.q.g.pi0.plot.save &lt;- gridExtra::arrangeGrob(density.g.plot, FDP.q.g.pi0.plot, heights = c(1, 1.1))
+<pre class="r"><code>FDP.q.g.pi0.plot.save &lt;- gridExtra::arrangeGrob(
+  density.g.plot,
+  FDP.q.g.pi0.plot,
+  heights = c(1, 1.1)
+)
 
 ggsave(&quot;../output/paper/FDP.q.g.pi0.pdf&quot;, FDP.q.g.pi0.plot.save, height = 4, width = 12)</code></pre>
 </div>

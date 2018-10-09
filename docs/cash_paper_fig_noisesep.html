@@ -332,7 +332,7 @@ div.section {
 </div>
 
 
-<p><strong>Last updated:</strong> 2018-10-06</p>
+<p><strong>Last updated:</strong> 2018-10-09</p>
 <strong>workflowr checks:</strong> <small>(Click a bullet for more information)</small>
 <ul>
 <li>
@@ -361,7 +361,7 @@ div.section {
 </li>
 <li>
 <details>
-<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/3b81007482b26da48dd48c8e06a60d82cbe2da64" target="_blank">3b81007</a> </summary></p>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/c4693992280ecfcdf9e5adff8d24f6922c8e07a2" target="_blank">c469399</a> </summary></p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 <pre><code>
 Ignored files:
@@ -405,6 +405,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/c4693992280ecfcdf9e5adff8d24f6922c8e07a2/analysis/cash_paper_fig_noisesep.rmd" target="_blank">c469399</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-10-09
+</td>
+<td style="text-align:left;">
+wflow_publish(c(“analysis/cash_paper_fig_g1sep.rmd”,
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/f7bde81209368d1ff02a509cab17d045dfa57364/docs/cash_paper_fig_noisesep.html" target="_blank">f7bde81</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-10-06
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 rmd
@@ -504,7 +538,7 @@ mysqrt_trans &lt;- function() {
 ###############################
 
 sd.z &lt;- sapply(z.list, sd)
-Noise &lt;- cut(sd.z, breaks = c(0, quantile(sd.z, probs = 1 : 2 / 3), Inf), labels = c(&quot;Deflated Noise&quot;, &quot;In-between&quot;, &quot;Inflated Noise&quot;))
+Noise &lt;- cut(sd.z, breaks = c(0, quantile(sd.z, probs = 1 : 2 / 3), Inf), labels = c(&quot;Pseudo Deflation&quot;, &quot;In-between&quot;, &quot;Pseudo Inflation&quot;))
 
 ###############################
 
@@ -513,13 +547,14 @@ sd.z.0.9 &lt;- sd.z[pi0.0.9]
 typical.noise &lt;- pi0.0.9[order(sd.z.0.9)[floor(quantile(seq(sd.z.0.9), c(0.1, 0.5, 0.9)))]]
 
 z.list.sel &lt;- z.list[typical.noise]
-names(z.list.sel) &lt;- c(&quot;Deflated Noise&quot;, &quot;In-between&quot;, &quot;Inflated Noise&quot;)
+names(z.list.sel) &lt;- c(&quot;Pseudo Deflation&quot;, &quot;In-between&quot;, &quot;Pseudo Inflation&quot;)
 z.sep.ggdata &lt;- reshape2::melt(z.list.sel, value.name = &quot;z&quot;)
+z.sep.ggdata$L1 &lt;- factor(z.sep.ggdata$L1, levels = c(&quot;Pseudo Deflation&quot;, &quot;In-between&quot;, &quot;Pseudo Inflation&quot;))
 z.sep.plot &lt;- ggplot(data = z.sep.ggdata, aes(x = z)) +
   geom_histogram(aes(y = ..density..), binwidth = 0.2) +
   facet_wrap(~L1, nrow = 1) +
   stat_function(fun = dnorm, aes(color = &quot;N(0, 1)&quot;), lwd = 1.5, show.legend = TRUE) +
-  scale_color_manual(values = &quot;blue&quot;) +
+#  scale_color_manual(values = &quot;blue&quot;) +
   theme(axis.title.x = element_text(size = 15),
         axis.text.x = element_text(size = 10),
         axis.title.y = element_text(size = 15),
@@ -527,7 +562,7 @@ z.sep.plot &lt;- ggplot(data = z.sep.ggdata, aes(x = z)) +
         strip.text = element_text(size = 15),
       # strip.text = element_blank(),
         legend.position = &quot;left&quot;,
-        legend.title = element_blank(),
+      # legend.title = element_blank(),
         legend.text = element_text(size = 12),
         legend.key = element_blank()
         )
@@ -679,11 +714,39 @@ TDP.q.all.sep.plot &lt;- ggplot(data = TDP.q.ggdata.0.9, aes(x = Method, y = TDP
 <pre><code>Warning: Ignoring unknown aesthetics: width</code></pre>
 <pre class="r"><code>FDP.TDP.q.sep.plot.save &lt;- gridExtra::arrangeGrob(z.sep.plot.save, FDP.q.all.sep.plot + theme(plot.title = element_text(size = 15, hjust = 0)), TDP.q.all.sep.plot, heights = c(1, 1.2, 1.1))
 
-FDP.sqrt.TDP.q.sep.plot.save &lt;- gridExtra::arrangeGrob(z.sep.plot.save, FDP.sqrt.q.all.sep.plot + theme(plot.title = element_text(size = 15, hjust = 0)), TDP.q.all.sep.plot, heights = c(1, 1.2, 1.1))
-
 ggsave(&quot;../output/paper/FDP.TDP.q.sep.pdf&quot;, FDP.TDP.q.sep.plot.save, height = 6.5, width = 10)
 
-ggsave(&quot;../output/paper/FDP.sqrt.TDP.q.sep.pdf&quot;, FDP.sqrt.TDP.q.sep.plot.save, height = 6.5, width = 10)</code></pre>
+FDP.sqrt.TDP.q.sep.plot.save &lt;- gridExtra::arrangeGrob(z.sep.plot.save, FDP.sqrt.q.all.sep.plot + theme(plot.title = element_text(size = 15, hjust = 0)), TDP.q.all.sep.plot, heights = c(1, 1.2, 1.1))</code></pre>
+<pre class="r"><code>FDP.sqrt.TDP.q.sep.plot.save &lt;- gridExtra::arrangeGrob(
+  z.sep.plot +
+    labs(title = &quot;Typical Examples of Realized Correlated Noise&quot;) +
+    scale_color_manual(values = &quot;blue&quot;) +
+    theme(axis.title.x = element_blank(),
+          legend.title = element_blank(),
+         # legend.title = element_text(size = 15),
+          plot.margin = grid::unit(c(5.5, 5.5, 5.5, 70), &quot;points&quot;),
+          plot.title = element_text(size = 15, hjust = 0.5)
+    ),
+  gridExtra::arrangeGrob(
+  FDP.sqrt.q.all.sep.plot +
+    labs(title = &quot;FDP&quot;) +
+    theme(plot.title = element_text(size = 15, hjust = 0.5),
+          axis.title.x = element_blank(),
+          plot.margin = grid::unit(c(5.5, 5.5, 5.5, 5.5), &quot;points&quot;)
+    ),
+  TDP.q.all.sep.plot +
+    labs(title = &quot;TDP&quot;) +
+    theme(plot.margin = grid::unit(c(5.5, 5.5, 5.5, 5.5), &quot;points&quot;),
+          axis.title.x = element_blank(),
+          plot.title = element_text(size = 15, hjust = 0.5)
+    ),
+  heights = c(1, 1),
+  top = grid::textGrob(bquote(paste(&quot;Nominal FDR = &quot;, .(q), &quot; (&quot;, g[1], &quot; is Gaussian; &quot;, pi[0] == 0.9, &quot;)&quot;)), gp = grid::gpar(fontsize = 12), hjust = 1)
+  ),
+  heights = c(1, 2)
+)
+
+ggsave(&quot;../output/paper/FDP.sqrt.TDP.q.sep.pdf&quot;, FDP.sqrt.TDP.q.sep.plot.save, height = 6, width = 8)</code></pre>
 </div>
 <div id="session-information" class="section level2">
 <h2>Session information</h2>
