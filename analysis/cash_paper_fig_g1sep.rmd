@@ -107,8 +107,8 @@ FDP.q.g.ggdata$pi0 <- as.numeric(levels(FDP.q.g.ggdata$pi0))[FDP.q.g.ggdata$pi0]
 
 ```{r}
 FDP.q.g.plot <- ggplot(data = FDP.q.g.ggdata, aes(x = Method, y = FDP, fill = Method, color = Method)) +
-  stat_summary(fun.data = boxplot.quantile, geom = "boxplot", position = "dodge", aes(width = 0.5), show.legend = FALSE) +
-  stat_summary(fun.y = mean, geom = "point", position = position_dodge(width = 0.9), show.legend = FALSE) +
+  stat_summary(fun.data = boxplot.quantile, geom = "boxplot", position = "dodge", aes(width = 0.75), show.legend = FALSE) +
+  stat_summary(fun.y = mean, geom = "point", position = position_dodge(width = 0.9), show.legend = FALSE, shape = 13, size = 3) +
   scale_color_manual(labels = method.name.FDR, values = method.col.FDR) +
   scale_fill_manual(labels = method.name.FDR, values = alpha(method.col.FDR, 0.35)) +
   scale_y_continuous(trans = "mysqrt", breaks = c(0, 0.1, 0.2, 0.4, 0.6, 0.8)) +
@@ -132,10 +132,10 @@ FDP.q.g.plot <- ggplot(data = FDP.q.g.ggdata, aes(x = Method, y = FDP, fill = Me
 FDP.q.g.plot.save <- gridExtra::arrangeGrob(
   density.g.plot + 
     theme(plot.margin = grid::unit(c(5.5, 30, 5.5, 10), "points")) +
-    labs(title = bquote(paste("Nominal FDR = ", .(q)))) +
-    theme(plot.title = element_text(size = 15)),
+    theme(plot.title = element_blank()),
   FDP.q.g.plot + theme(strip.text.x = element_blank(), plot.title = element_blank()),
-  heights = c(1, 2)
+  heights = c(1, 2),
+  top = grid::textGrob(bquote(paste("Nominal FDR = ", .(q))), gp = grid::gpar(fontsize = 15), hjust = 2.35)
 )
 
 ggsave("../output/paper/FDP.q.g.pdf", FDP.q.g.plot.save, height = 6, width = 9)

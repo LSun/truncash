@@ -28,9 +28,9 @@ q.vec <- seq(0.001, 0.20, by = 0.001)
 q <- 0.1
 method.name.FDR <- c("cashr", "BH", "qvalue", "ashr", "locfdr")
 method.col.FDR <- scales::hue_pal()(length(method.name.FDR))[c(5, 1, 2, 4, 3)]
-```
 
-```{r}
+#####################################
+
 boxplot.quantile <- function(x) {
   r <- quantile(x, probs = c(0.10, 0.25, 0.5, 0.75, 0.90))
   names(r) <- c("ymin", "lower", "middle", "upper", "ymax")
@@ -54,9 +54,9 @@ mysqrt_trans <- function() {
                     inverse = function(x) ifelse(x<0, 0, x^2),
                     domain = c(0, Inf))
 }
-```
 
-```{r}
+###############################
+
 sd.z <- sapply(z.list, sd)
 Noise <- cut(sd.z, breaks = c(0, quantile(sd.z, probs = 1 : 2 / 3), Inf), labels = c("Pseudo Deflation", "In-between", "Pseudo Inflation"))
 
@@ -73,10 +73,10 @@ z.sep.ggdata$L1 <- factor(z.sep.ggdata$L1, levels = c("Pseudo Deflation", "In-be
 z.sep.plot <- ggplot(data = z.sep.ggdata, aes(x = z)) +
   geom_histogram(aes(y = ..density..), binwidth = 0.2) +
   facet_wrap(~L1, nrow = 1) +
-  stat_function(fun = dnorm, aes(color = "N(0, 1)"), lwd = 1.5, show.legend = TRUE) +
+  stat_function(fun = dnorm, aes(color = "N(0,1)"), lwd = 1.5, show.legend = TRUE) +
 #  scale_color_manual(values = "blue") +
-  theme(axis.title.x = element_text(size = 15),
-        axis.text.x = element_text(size = 10),
+  theme(# axis.title.x = element_text(size = 15),
+        # axis.text.x = element_text(size = 10),
         axis.title.y = element_text(size = 15),
         axis.text.y = element_text(size = 10),
         strip.text = element_text(size = 15),
@@ -86,9 +86,9 @@ z.sep.plot <- ggplot(data = z.sep.ggdata, aes(x = z)) +
         legend.text = element_text(size = 12),
         legend.key = element_blank()
         )
-```
 
-```{r}
+#########################################
+
 FDP.q <- FDP.list[[which(q.vec == q)]]
 FDP.q.noise.mat <- rbind.data.frame(
   cbind.data.frame(Noise = rep("All", length(Noise)),
@@ -105,32 +105,8 @@ FDP.q.ggdata$Method <- plyr::mapvalues(FDP.q.ggdata$Method, from = c("CASH", "BH
 
 FDP.q.ggdata.0.9 <- FDP.q.ggdata[FDP.q.ggdata$pi0 == 0.9, ]
 
-FDP.sqrt.q.all.sep.plot <- ggplot(data = FDP.q.ggdata.0.9, aes(x = Method, y = FDP, fill = Method, color = Method)) +
-  stat_summary(fun.data = boxplot.quantile.sq, geom = "boxplot", aes(width = 0.75), position = position_dodge(), show.legend = FALSE) +
-  stat_summary(fun.y = mean.sq, geom = "point", size = 3, aes(shape = "mean.point"), position = position_dodge(width = 0.9), show.legend = FALSE) +
-  scale_x_discrete(limits = rev(levels(FDP.q.ggdata.0.9$Method))) +
-  scale_y_continuous(trans = "mysqrt", breaks = c(0, 0.1, 0.2, 0.4, 0.6, 0.8)) +
-  coord_flip() +
-  scale_color_manual(labels = method.name.FDR, values = method.col.FDR) +
-  scale_fill_manual(labels = method.name.FDR, values = alpha(method.col.FDR, 0.35)) +
-  scale_shape_manual(name = "mean.point", values = 13) +
-  facet_wrap(~Noise, nrow = 1) +
-  geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
-  labs(x = expression(pi[0]), y = "FDP", title = bquote(paste("Nominal FDR = ", .(q), " (", g[1], " is Gaussian; ", pi[0] == 0.9, ")"))) +
-  expand_limits(y = 0) +
-  theme(plot.title = element_text(size = 12, hjust = 0),
-        axis.title.y = element_blank(),
-        axis.text.y = element_text(size = 15),
-        axis.title.x = element_text(size = 15),
-        axis.text.x = element_text(size = 10),
-        strip.text = element_text(size = 15),
-        legend.position = "bottom",
-        legend.background = element_rect(color = "grey"),
-        legend.text = element_text(size = 12)
-        )
-```
+################################################
 
-```{r}
 TDP.q <- TDP.list[[which(q.vec == q)]]
 TDP.q.noise.mat <- rbind.data.frame(
   cbind.data.frame(Noise = rep("All", length(Noise)),
@@ -147,62 +123,8 @@ TDP.q.ggdata$Method <- plyr::mapvalues(TDP.q.ggdata$Method, from = c("CASH", "BH
 
 TDP.q.ggdata.0.9 <- TDP.q.ggdata[TDP.q.ggdata$pi0 == 0.9, ]
 
-TDP.q.all.sep.plot <- ggplot(data = TDP.q.ggdata.0.9, aes(x = Method, y = TDP, fill = Method, color = Method)) +
-  stat_summary(fun.data = boxplot.quantile, geom = "boxplot", aes(width = 0.5), position = position_dodge(), show.legend = FALSE) +
-  coord_flip() +
-  stat_summary(fun.y = mean, geom = "point", position = position_dodge(width = 0.9), show.legend = FALSE) +
-  scale_x_discrete(limits = rev(levels(FDP.q.ggdata.0.9$Method))) +
-  scale_color_manual(labels = method.name.FDR, values = method.col.FDR) +
-  scale_fill_manual(labels = method.name.FDR, values = alpha(method.col.FDR, 0.35)) +
-  facet_wrap(~Noise, nrow = 1) +
-  labs(x = expression(pi[0]), y = "TDP") +
-  expand_limits(y = 0) +
-  theme(axis.title.y = element_blank(),
-        axis.text.y = element_text(size = 15),
-        axis.title.x = element_text(size = 15),
-        axis.text.x = element_text(size = 10),
-        strip.text = element_text(size = 15),
-        legend.position = "bottom",
-        legend.background = element_rect(color = "grey"),
-        legend.text = element_text(size = 12)
-        )
-```
+##############################################################
 
-```{r}
-FDP.sqrt.TDP.q.sep.plot.save <- gridExtra::arrangeGrob(
-  z.sep.plot +
-    labs(title = "Typical Examples of Realized Correlated Noise") +
-    scale_color_manual(values = "blue") +
-    theme(axis.title.x = element_blank(),
-          legend.title = element_blank(),
-         # legend.title = element_text(size = 15),
-          plot.margin = grid::unit(c(5.5, 5.5, 5.5, 70), "points"),
-          plot.title = element_text(size = 15, hjust = 0.5)
-    ),
-  gridExtra::arrangeGrob(
-  FDP.sqrt.q.all.sep.plot +
-    labs(title = "FDP") +
-    theme(plot.title = element_text(size = 15, hjust = 0.5),
-          axis.title.x = element_blank(),
-          plot.margin = grid::unit(c(5.5, 5.5, 5.5, 5.5), "points")
-    ),
-  TDP.q.all.sep.plot +
-    labs(title = "TDP") +
-    theme(plot.margin = grid::unit(c(5.5, 5.5, 5.5, 5.5), "points"),
-          axis.title.x = element_blank(),
-          plot.title = element_text(size = 15, hjust = 0.5)
-    ),
-  heights = c(1, 1),
-  top = grid::textGrob(bquote(paste("Nominal FDR = ", .(q), " (", g[1], " is Gaussian; ", pi[0] == 0.9, ")")), gp = grid::gpar(fontsize = 12), hjust = 1)
-  ),
-  heights = c(1, 2)
-)
-
-ggsave("../output/paper/FDP.sqrt.TDP.q.sep.pdf", FDP.sqrt.TDP.q.sep.plot.save, height = 6, width = 8)
-```
-
-
-```{r}
 # FDP.q.all.sep.plot <- ggplot(data = FDP.q.ggdata, aes(x = pi0, y = FDP, fill = Method, color = Method)) +
 #   stat_summary(fun.data = boxplot.quantile, geom = "boxplot", position = "dodge") +
 #   stat_summary(fun.y = mean, geom = "point", position = position_dodge(width = 0.9), show.legend = TRUE) +
@@ -244,6 +166,28 @@ FDP.q.all.sep.plot <- ggplot(data = FDP.q.ggdata.0.9, aes(x = Method, y = FDP, f
         legend.text = element_text(size = 12)
         )
 
+FDP.sqrt.q.all.sep.plot <- ggplot(data = FDP.q.ggdata.0.9, aes(x = Method, y = FDP, fill = Method, color = Method)) +
+  stat_summary(fun.data = boxplot.quantile.sq, geom = "boxplot", aes(width = 0.75), position = position_dodge(), show.legend = FALSE) +
+  stat_summary(fun.y = mean.sq, geom = "point", position = position_dodge(width = 0.9), show.legend = FALSE, shape = 13, size = 3) +
+  scale_x_discrete(limits = rev(levels(FDP.q.ggdata.0.9$Method))) +
+  scale_y_continuous(trans = "mysqrt", breaks = c(0, 0.1, 0.2, 0.4, 0.6, 0.8)) +
+  coord_flip() +
+  scale_color_manual(labels = method.name.FDR, values = method.col.FDR) +
+  scale_fill_manual(labels = method.name.FDR, values = alpha(method.col.FDR, 0.35)) +
+  facet_wrap(~Noise, nrow = 1) +
+  geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
+  labs(x = expression(pi[0]), y = "FDP", title = bquote(paste("Nominal FDR = ", .(q), " (", g[1], " is Gaussian; ", pi[0] == 0.9, ")"))) +
+  expand_limits(y = 0) +
+  theme(plot.title = element_text(size = 12, hjust = 0),
+        axis.title.y = element_blank(),
+        axis.text.y = element_text(size = 15),
+        axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "bottom",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12)
+        )
 
 
 ###############################################
@@ -269,6 +213,25 @@ ggsave("../output/paper/FDP.sqrt.q.sep.pdf", FDP.sqrt.q.sep.plot.save, height = 
 
 ##############################################
 
+TDP.q.all.sep.plot <- ggplot(data = TDP.q.ggdata.0.9, aes(x = Method, y = TDP, fill = Method, color = Method)) +
+  stat_summary(fun.data = boxplot.quantile, geom = "boxplot", aes(width = 0.75), position = position_dodge(), show.legend = FALSE) +
+  coord_flip() +
+  stat_summary(fun.y = mean, geom = "point", position = position_dodge(width = 0.9), show.legend = FALSE, shape = 13, size = 3) +
+  scale_x_discrete(limits = rev(levels(FDP.q.ggdata.0.9$Method))) +
+  scale_color_manual(labels = method.name.FDR, values = method.col.FDR) +
+  scale_fill_manual(labels = method.name.FDR, values = alpha(method.col.FDR, 0.35)) +
+  facet_wrap(~Noise, nrow = 1) +
+  labs(x = expression(pi[0]), y = "TDP") +
+  expand_limits(y = 0) +
+  theme(axis.title.y = element_blank(),
+        axis.text.y = element_text(size = 15),
+        axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "bottom",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12)
+        )
 ```
 
 ```{r}
@@ -277,5 +240,45 @@ FDP.TDP.q.sep.plot.save <- gridExtra::arrangeGrob(z.sep.plot.save, FDP.q.all.sep
 ggsave("../output/paper/FDP.TDP.q.sep.pdf", FDP.TDP.q.sep.plot.save, height = 6.5, width = 10)
 
 FDP.sqrt.TDP.q.sep.plot.save <- gridExtra::arrangeGrob(z.sep.plot.save, FDP.sqrt.q.all.sep.plot + theme(plot.title = element_text(size = 15, hjust = 0)), TDP.q.all.sep.plot, heights = c(1, 1.2, 1.1))
+```
+
+```{r}
+FDP.sqrt.TDP.q.sep.plot.save <- gridExtra::arrangeGrob(
+  z.sep.plot +
+    labs(title = "Typical Examples of Realized Correlated N(0,1) Noise") +
+    scale_color_manual(values = "blue") +
+    theme(legend.title = element_blank(),
+         # legend.title = element_text(size = 15),
+         plot.margin = grid::unit(c(5.5, 5.5, 5.5, 67.5), "points"),
+         plot.title = element_text(size = 12, hjust = 0.5),
+         strip.text = element_text(size = 12),
+         axis.title.x = element_blank(),
+         axis.text.x = element_text(size = 10),
+         axis.title.y = element_text(size = 12)
+    ),
+  gridExtra::arrangeGrob(
+  FDP.sqrt.q.all.sep.plot +
+    labs(title = "FDP") +
+    theme(plot.title = element_text(size = 12, hjust = 0.5),
+          axis.title.x = element_blank(),
+          strip.text = element_text(size = 12),
+          plot.margin = grid::unit(c(5.5, 5.5, 5.5, 5.5), "points"),
+          axis.text.y = element_text(size = 12)
+    ),
+  TDP.q.all.sep.plot +
+    labs(title = "TDP") +
+    theme(plot.margin = grid::unit(c(5.5, 5.5, 5.5, 5.5), "points"),
+          axis.title.x = element_blank(),
+          strip.text = element_text(size = 12),
+          plot.title = element_text(size = 12, hjust = 0.5),
+          axis.text.y = element_text(size = 12)
+    ),
+  heights = c(1, 1),
+  top = grid::textGrob(bquote(paste("Nominal FDR = ", .(q), " (", g[1], " is Gaussian; ", pi[0] == 0.9, ")")), gp = grid::gpar(fontsize = 12), hjust = 1.15)
+  ),
+  heights = c(1, 2)
+)
+
+ggsave("../output/paper/FDP.sqrt.TDP.q.sep.pdf", FDP.sqrt.TDP.q.sep.plot.save, height = 6, width = 8)
 ```
 
