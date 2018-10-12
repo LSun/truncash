@@ -14,8 +14,6 @@ Following [previous investigations](cash_plots_4.html), we take a look at
 2. What's happening when the median FDP given by `cashr` is better than other methods with $\pi_0 = 0.99$.
 
 ```{r packages, message = FALSE, warning = FALSE}
-source("../code/gdash_lik.R")
-source("../code/count_to_summary.R")
 library(ggplot2)
 ```
 
@@ -53,85 +51,19 @@ mysqrt_trans <- function() {
 }
 ```
 
-```{r}
-r <- readRDS("../data/liver.rds")
-```
 
-```{r, cache = TRUE}
-ngene <- 1e4
-top_genes_index = function (g, X) {
-  return(order(rowSums(X), decreasing = TRUE)[1 : g])
-}
-lcpm = function (r) {
-  R = colSums(r)
-  t(log2(((t(r) + 0.5) / (R + 1)) * 10^6))
-}
-Y = lcpm(r)
-subset = top_genes_index(ngene, Y)
-r = r[subset,]
+```{r}
+beta.list <- readRDS("~/Desktop/g/beta.list.nearnormal.rds")
+pi0.list <- readRDS("~/Desktop/g/pi0.list.nearnormal.rds")
+z.list <- readRDS("~/Desktop/g/z.list.nearnormal.rds")
+qvalue.list <- readRDS("~/Desktop/g/qvalue.list.nearnormal.rds")
 ```
 
 ```{r}
-nsamp <- 5
-pi0 <- 0.9
-q.vec <- seq(0.001, 0.20, by = 0.001)
+q.vec <- 0.1
 q <- 0.1
-method.name.FDR <- c("cashr", "BH", "qvalue", "ashr.n", "ashr.u", "locfdr")
-method.col.FDR <- scales::hue_pal()(length(method.name.FDR))
-```
-
-```{r gtex_z_3, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE}
-set.seed(777)
-
-nsim <- 500
-
-z.list <- sebetahat.list <- beta.list <- betahat.list <- list()
-pi0hat.list <- qvalue.list <- svalue.list <- list()
-
-for (i in 1 : nsim) {
-  ## simulate data
-  counts <- r[, sample(ncol(r), 2 * nsamp)]
-  design <- model.matrix(~c(rep(0, nsamp), rep(1, nsamp)))
-  summary <- count_to_summary(counts, design)
-  z <- summary$z
-  sebetahat <- summary$sebetahat
-  se <- sqrt(mean(sebetahat^2))
-  sebetahat <- sebetahat / se
-  beta <- sample(c(
-    rep(0, round(pi0 * ngene)),
-    rnorm(round((1 - pi0) * 0.6 * ngene)),
-    rnorm(round((1 - pi0) * 0.4 * ngene), 0, 3)
-    ))
-  betahat <- beta + sebetahat * z
-  
-  ## summary statistics
-  zscore <- betahat / sebetahat
-  pvalue = pnorm(-abs(zscore)) * 2
-
-  ## different methods
-  fit.ash <- ashr::ash(betahat, sebetahat, mixcompdist = "normal", method = "fdr")
-  fit.ash.unif <- ashr::ash(betahat, sebetahat, method = "fdr")
-  fit.locfdr <- tryCatch(locfdr::locfdr(zscore, plot = 0), error = function(e) {NA})
-  fit.gdash = gdash(betahat, sebetahat)
-  fit.qvalue = qvalue::qvalue(pvalue)
-  fit.BH = p.adjust(pvalue, method = "BH")
-
-  ## FDR
-  qvalue.list[[i]] <- cbind(
-    cashr = fit.gdash$qvalue,
-    BH = fit.BH,
-    qvalue = fit.qvalue$qvalues,
-    locfdr = tryCatch(ashr::qval.from.lfdr(fit.locfdr$fdr), error = function(e) {rep(NA, ngene)}),
-    ashr.n = ashr::get_qvalue(fit.ash),
-    ashr.u = ashr::get_qvalue(fit.ash.unif)
-  )
-  
-  ## data storage
-  z.list[[i]] <- z
-  sebetahat.list[[i]] <- sebetahat
-  beta.list[[i]] <- beta
-  betahat.list[[i]] <- betahat
-}
+method.name.FDR <- c("cashr", "BH", "qvalue", "ashr", "locfdr")
+method.col.FDR <- scales::hue_pal()(length(method.name.FDR))[c(5, 1, 2, 4, 3)]
 ```
 
 ```{r, cache = TRUE}
@@ -161,44 +93,22 @@ names(TDP.list) <- q.vec
 ```
 
 ```{r}
-z.list.sel <- z.list[typical.noise]
-names(z.list.sel) <- c("Pseudo Deflation", "In-between", "Pseudo Inflation")
-z.sep.ggdata <- reshape2::melt(z.list.sel, value.name = "z")
-z.sep.ggdata$L1 <- factor(z.sep.ggdata$L1, levels = c("Pseudo Deflation", "In-between", "Pseudo Inflation"))
-z.sep.plot <- ggplot(data = z.sep.ggdata, aes(x = z)) +
-  geom_histogram(aes(y = ..density..), binwidth = 0.2) +
-  facet_wrap(~L1, nrow = 1) +
-  stat_function(fun = dnorm, aes(color = "N(0,1)"), lwd = 1.5, show.legend = TRUE) +
-  theme(axis.title.y = element_text(size = 15),
-        axis.text.y = element_text(size = 10),
-        strip.text = element_text(size = 15),
-        legend.position = "left",
-        legend.text = element_text(size = 12),
-        legend.key = element_blank()
-        )
-```
-
-```{r}
-FDP.q <- FDP.list[[which(q.vec == q)]]
+FDP.q <- data.frame(FDP.list[[which(q.vec == q)]])
+colnames(FDP.q)[4 : 5] <- c("ashr", "cashr")
+FDP.q <- FDP.q[, c(5, 1, 2, 4, 3)]
 FDP.q.noise.mat <- rbind.data.frame(
   cbind.data.frame(Noise = rep("All", length(Noise)),
+                   pi0 = do.call(rbind, pi0.list),
                    FDP.q),
   cbind.data.frame(Noise,
+                   pi0 = do.call(rbind, pi0.list),
                    FDP.q)
 )
-FDP.q.ggdata <- reshape2::melt(FDP.q.noise.mat, id.vars = c("Noise"), variable.name = "Method", value.name = "FDP")
 
-################################################
-
-TDP.q <- TDP.list[[which(q.vec == q)]]
-TDP.q.noise.mat <- rbind.data.frame(
-  cbind.data.frame(Noise = rep("All", length(Noise)),
-                   TDP.q),
-  cbind.data.frame(Noise,
-                   TDP.q)
-)
-TDP.q.ggdata <- reshape2::melt(TDP.q.noise.mat, id.vars = c("Noise"), variable.name = "Method", value.name = "TDP")
+FDP.q.ggdata <- reshape2::melt(FDP.q.noise.mat, id.vars = c("Noise", "pi0"), variable.name = "Method", value.name = "FDP")
 ```
+
+## Replicating [the previous results](cash_paper_fig_g1sep.html)
 
 ```{r}
 FDP.sqrt.q.all.sep.plot <- ggplot(data = FDP.q.ggdata, aes(x = Method, y = FDP, fill = Method, color = Method)) +
@@ -209,7 +119,7 @@ FDP.sqrt.q.all.sep.plot <- ggplot(data = FDP.q.ggdata, aes(x = Method, y = FDP, 
   coord_flip() +
   scale_color_manual(labels = method.name.FDR, values = method.col.FDR) +
   scale_fill_manual(labels = method.name.FDR, values = alpha(method.col.FDR, 0.35)) +
-  facet_wrap(~Noise, nrow = 1) +
+  facet_grid(pi0 ~ Noise) +
   geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
   labs(y = "FDP") +
   expand_limits(y = 0) +
@@ -223,65 +133,39 @@ FDP.sqrt.q.all.sep.plot <- ggplot(data = FDP.q.ggdata, aes(x = Method, y = FDP, 
         legend.background = element_rect(color = "grey"),
         legend.text = element_text(size = 12)
         )
+
+FDP.sqrt.q.all.sep.plot
 ```
 
 ```{r}
-TDP.q.all.sep.plot <- ggplot(data = TDP.q.ggdata, aes(x = Method, y = TDP, fill = Method, color = Method)) +
-  stat_summary(fun.data = boxplot.quantile, geom = "boxplot", aes(width = 0.75), position = position_dodge(), show.legend = FALSE) +
-  coord_flip() +
-  stat_summary(fun.y = mean, geom = "point", position = position_dodge(width = 0.9), show.legend = FALSE, shape = 13, size = 3) +
-  scale_x_discrete(limits = rev(levels(TDP.q.ggdata$Method))) +
-  scale_color_manual(labels = method.name.FDR, values = method.col.FDR) +
-  scale_fill_manual(labels = method.name.FDR, values = alpha(method.col.FDR, 0.35)) +
-  facet_wrap(~Noise, nrow = 1) +
-  labs(y = "TDP") +
-  expand_limits(y = 0) +
-  theme(axis.title.y = element_blank(),
-        axis.text.y = element_text(size = 15),
-        axis.title.x = element_text(size = 15),
-        axis.text.x = element_text(size = 10),
-        strip.text = element_text(size = 15),
-        legend.position = "bottom",
-        legend.background = element_rect(color = "grey"),
-        legend.text = element_text(size = 12)
-        )
-```
-
-```{r}
-FDP.sqrt.TDP.q.sep.plot.save <- gridExtra::arrangeGrob(
-  z.sep.plot +
-    labs(title = "Typical Examples of Realized Correlated N(0,1) Noise") +
-    scale_color_manual(values = "blue") +
-    theme(legend.title = element_blank(),
-         plot.margin = grid::unit(c(5.5, 5.5, 5.5, 67.5), "points"),
-         plot.title = element_text(size = 12, hjust = 0.5),
-         strip.text = element_text(size = 12),
-         axis.title.x = element_blank(),
-         axis.text.x = element_text(size = 10),
-         axis.title.y = element_text(size = 12)
-    ),
-  gridExtra::arrangeGrob(
-  FDP.sqrt.q.all.sep.plot +
-    labs(title = "FDP") +
-    theme(plot.title = element_text(size = 12, hjust = 0.5),
-          axis.title.x = element_blank(),
-          strip.text = element_text(size = 12),
-          plot.margin = grid::unit(c(5.5, 5.5, 5.5, 5.5), "points"),
-          axis.text.y = element_text(size = 12)
-    ),
-  TDP.q.all.sep.plot +
-    labs(title = "TDP") +
-    theme(plot.margin = grid::unit(c(5.5, 5.5, 5.5, 5.5), "points"),
-          axis.title.x = element_blank(),
-          strip.text = element_text(size = 12),
-          plot.title = element_text(size = 12, hjust = 0.5),
-          axis.text.y = element_text(size = 12)
-    ),
-  heights = c(1, 1),
-  top = grid::textGrob(bquote(paste("Nominal FDR = ", .(q), " (", g[1], " is Gaussian; ", pi[0] == 0.9, ")")), gp = grid::gpar(fontsize = 12), hjust = 1.15)
-  ),
-  heights = c(1, 2)
+num.d <- lapply(qvalue.list, function (x) {apply(x, 2, function (y) sum(y <= q))})
+BH.fdp.0 <- pi0.list == 0.99 & FDP.q$cashr != 0 & FDP.q$BH == 0
+temp <- data.frame(t(sapply(num.d[BH.fdp.0], c)))
+BH.fdp.0.mat <- cbind.data.frame(
+ Noise = Noise[BH.fdp.0],
+ BH = temp$BH,
+ cashr = temp$CASH,
+ cashr.TD = temp$CASH * (1 - FDP.q$cashr[BH.fdp.0]),
+ cashr.FD = temp$CASH * FDP.q$cashr[BH.fdp.0],
+ cashr.FDP = FDP.q$cashr[BH.fdp.0]
 )
+plot(BH.fdp.0.mat$BH, BH.fdp.0.mat$cashr.TD, xlab = "Number of True Discoveries by BH", ylab = "Number of True Discoveries by cashr", xlim = c(0, 31), ylim = c(0, 31), col = BH.fdp.0.mat$Noise, type = "n")
+abline(0, 1)
+text(BH.fdp.0.mat$BH, BH.fdp.0.mat$cashr.TD, labels = BH.fdp.0.mat$cashr.FD, cex = 0.75, col = as.numeric(BH.fdp.0.mat$Noise))
+legend("bottomright", col = c("black", "red", "green"), pch = 19, c("Pseudo Deflation", "In-between", "Pseudo Inflation"))
 
-ggsave("../output/fig/FDP.TDP.q.sep.unif.0.99.pdf", FDP.sqrt.TDP.q.sep.plot.save, height = 6, width = 8)
+cashr.fdp.0 <- pi0.list == 0.99 & FDP.q$cashr == 0 & FDP.q$BH != 0
+temp <- data.frame(t(sapply(num.d[cashr.fdp.0], c)))
+cashr.fdp.0.mat <- cbind.data.frame(
+ Noise = Noise[cashr.fdp.0],
+ BH = temp$BH,
+ BH.TD = temp$BH * (1 - FDP.q$BH[cashr.fdp.0]),
+ BH.FD = temp$BH * FDP.q$BH[cashr.fdp.0],
+ BH.FDP = FDP.q$BH[cashr.fdp.0],
+ cashr = temp$CASH
+)
+plot(cashr.fdp.0.mat$BH.TD, cashr.fdp.0.mat$cashr, xlab = "Number of True Discoveries by BH", ylab = "Number of True Discoveries by cashr", xlim = c(0, 36), ylim = c(0, 36), col = cashr.fdp.0.mat$Noise, type = "n")
+abline(0, 1)
+text(cashr.fdp.0.mat$BH.TD, cashr.fdp.0.mat$cashr, labels = cashr.fdp.0.mat$BH.FD, cex = 0.75, col = as.numeric(cashr.fdp.0.mat$Noise))
+legend("topleft", col = c("black", "red", "green"), pch = 19, c("Pseudo Deflation", "In-between", "Pseudo Inflation"))
 ```

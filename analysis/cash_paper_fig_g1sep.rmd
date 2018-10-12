@@ -107,8 +107,8 @@ FDP.q.g.ggdata$pi0 <- as.numeric(levels(FDP.q.g.ggdata$pi0))[FDP.q.g.ggdata$pi0]
 
 ```{r}
 FDP.q.g.plot <- ggplot(data = FDP.q.g.ggdata, aes(x = Method, y = FDP, fill = Method, color = Method)) +
-  stat_summary(fun.data = boxplot.quantile, geom = "boxplot", position = "dodge", aes(width = 0.75), show.legend = FALSE) +
-  stat_summary(fun.y = mean, geom = "point", position = position_dodge(width = 0.9), show.legend = FALSE, shape = 13, size = 3) +
+  stat_summary(fun.data = boxplot.quantile.sq, geom = "boxplot", position = "dodge", aes(width = 0.75), show.legend = FALSE) +
+  stat_summary(fun.y = mean.sq, geom = "point", position = position_dodge(width = 0.9), show.legend = FALSE, shape = 13, size = 3) +
   scale_color_manual(labels = method.name.FDR, values = method.col.FDR) +
   scale_fill_manual(labels = method.name.FDR, values = alpha(method.col.FDR, 0.35)) +
   scale_y_continuous(trans = "mysqrt", breaks = c(0, 0.1, 0.2, 0.4, 0.6, 0.8)) +

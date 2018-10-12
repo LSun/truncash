@@ -216,6 +216,8 @@ A very important quantity for the shape of the empirical distribution of a large
 * [Plots for the `CASH` paper](cash_plots.html)
 * [Plots for the `CASH` paper: `lfsr` & `svalue`](cash_plots_2.html)
 * [Plots for the `CASH` paper: homoskedastic noise](cash_plots_3.html)
+* [Plots for the `CASH` paper: `ashr` with `uniform` vs `normal`](cash_plots_4.html)
+* [Plots for the `CASH` paper: median FDP when $\pi_0 = 0.99$](cash_plots_5.html)
 
 * [Data analysis: Efron's Leukemia data](efron_leukemia.html)
 

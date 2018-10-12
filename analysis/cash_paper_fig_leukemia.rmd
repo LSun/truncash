@@ -51,18 +51,38 @@ fit.qvalue <- qvalue::qvalue(p)
 
 ```{r, cache = TRUE}
 fit.ash <- ashr::ash(x, s, mixcompdist = "normal", method = "fdr")
+lfdr.ash.n <- ashr::get_lfdr(fit.ash)
+num.ash.n <- sum(lfdr.ash.n <= 0.2)
 
 pdf("../output/fig/ashr_diag_norm_leukemia.pdf", height = 6, width = 8)
 par(mfrow = c(2, 2))
 ashr::plot_diagnostic(fit.ash, plot.hist = TRUE, breaks = 50)
 dev.off()
 
-fit.ash.n <- ashr::ash(x, s, method = "fdr")
+fit.ash.u <- ashr::ash(x, s, method = "fdr")
+lfdr.ash.u <- ashr::get_lfdr(fit.ash.u)
+num.ash.u <- sum(lfdr.ash.u <= 0.2)
 
 pdf("../output/fig/ashr_diag_unif_leukemia.pdf", height = 6, width = 8)
 par(mfrow = c(2, 2))
-ashr::plot_diagnostic(fit.ash.n, plot.hist = TRUE, breaks = 50)
+ashr::plot_diagnostic(fit.ash.u, plot.hist = TRUE, breaks = 50)
 dev.off()
+
+fit.ash.hu <- ashr::ash(x, s, method = "fdr", mixcompdist = "halfuniform")
+lfdr.ash.hu <- ashr::get_lfdr(fit.ash.hu)
+num.ash.hu <- sum(lfdr.ash.hu <= 0.2)
+
+xplot <- seq(-2, 2, length = 1000)
+plot(xplot, ashr:::dens(get_fitted_g(fit.ash), xplot), type = "l", xlim = c(-1, 1),
+     xlab = expression(theta), ylab = expression(pi[1]~g(theta)))
+yplot.u <- yplot.hu <- c()
+for (i in seq(xplot)) {
+  yplot.u[i] <- sum(dunif(xplot[i], get_fitted_g(fit.ash.u)$a[-1], get_fitted_g(fit.ash.u)$b[-1]) * get_fitted_g(fit.ash.u)$pi[-1])
+  yplot.hu[i] <- sum(dunif(xplot[i], get_fitted_g(fit.ash.hu)$a[-1], get_fitted_g(fit.ash.hu)$b[-1]) * get_fitted_g(fit.ash.hu)$pi[-1])
+}
+lines(xplot, yplot.u, col = "blue", lty = 2)
+lines(xplot, yplot.hu, col = "red", lty = 3)
+legend("topleft", lty = 1:3, col = c("black", "blue", "red"), c("normal", "uniform", "halfuniform"))
 ```
 
 ## `cashr`
