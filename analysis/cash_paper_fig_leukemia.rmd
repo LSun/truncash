@@ -49,8 +49,20 @@ fit.qvalue <- qvalue::qvalue(p)
 
 ## `ashr`
 
-```{r}
+```{r, cache = TRUE}
 fit.ash <- ashr::ash(x, s, mixcompdist = "normal", method = "fdr")
+
+pdf("../output/fig/ashr_diag_norm_leukemia.pdf", height = 6, width = 8)
+par(mfrow = c(2, 2))
+ashr::plot_diagnostic(fit.ash, plot.hist = TRUE, breaks = 50)
+dev.off()
+
+fit.ash.n <- ashr::ash(x, s, method = "fdr")
+
+pdf("../output/fig/ashr_diag_unif_leukemia.pdf", height = 6, width = 8)
+par(mfrow = c(2, 2))
+ashr::plot_diagnostic(fit.ash.n, plot.hist = TRUE, breaks = 50)
+dev.off()
 ```
 
 ## `cashr`
