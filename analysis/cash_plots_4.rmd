@@ -20,6 +20,7 @@ Investigation on some finer points:
 ```{r packages, message = FALSE, warning = FALSE}
 source("../code/gdash_lik.R")
 source("../code/count_to_summary.R")
+library(ggplot2)
 ```
 
 ```{r functions}
@@ -206,7 +207,7 @@ TDP.q.ggdata <- reshape2::melt(TDP.q.noise.mat, id.vars = c("Noise"), variable.n
 FDP.sqrt.q.all.sep.plot <- ggplot(data = FDP.q.ggdata, aes(x = Method, y = FDP, fill = Method, color = Method)) +
   stat_summary(fun.data = boxplot.quantile.sq, geom = "boxplot", aes(width = 0.75), position = position_dodge(), show.legend = FALSE) +
   stat_summary(fun.y = mean.sq, geom = "point", position = position_dodge(width = 0.9), show.legend = FALSE, shape = 13, size = 3) +
-  scale_x_discrete(limits = rev(levels(FDP.q.ggdata.0.9$Method))) +
+  scale_x_discrete(limits = rev(levels(FDP.q.ggdata$Method))) +
   scale_y_continuous(trans = "mysqrt", breaks = c(0, 0.1, 0.2, 0.4, 0.6, 0.8)) +
   coord_flip() +
   scale_color_manual(labels = method.name.FDR, values = method.col.FDR) +
@@ -232,7 +233,7 @@ TDP.q.all.sep.plot <- ggplot(data = TDP.q.ggdata, aes(x = Method, y = TDP, fill 
   stat_summary(fun.data = boxplot.quantile, geom = "boxplot", aes(width = 0.75), position = position_dodge(), show.legend = FALSE) +
   coord_flip() +
   stat_summary(fun.y = mean, geom = "point", position = position_dodge(width = 0.9), show.legend = FALSE, shape = 13, size = 3) +
-  scale_x_discrete(limits = rev(levels(FDP.q.ggdata.0.9$Method))) +
+  scale_x_discrete(limits = rev(levels(TDP.q.ggdata$Method))) +
   scale_color_manual(labels = method.name.FDR, values = method.col.FDR) +
   scale_fill_manual(labels = method.name.FDR, values = alpha(method.col.FDR, 0.35)) +
   facet_wrap(~Noise, nrow = 1) +
@@ -285,5 +286,5 @@ FDP.sqrt.TDP.q.sep.plot.save <- gridExtra::arrangeGrob(
   heights = c(1, 2)
 )
 
-ggsave("../output/paper/FDP.sqrt.TDP.q.sep.pdf", FDP.sqrt.TDP.q.sep.plot.save, height = 6, width = 8)
+ggsave("../output/fig/FDP.TDP.q.sep.unif.pdf", FDP.sqrt.TDP.q.sep.plot.save, height = 6, width = 8)
 ```
