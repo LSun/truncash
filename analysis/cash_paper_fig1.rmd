@@ -69,18 +69,23 @@ dev.off()
 
 ## `ashr::plot_diagnostic` on these correlated noise
 
-```{r, cache = TRUE}
+```{r, cache = TRUE, message = FALSE, warning = FALSE}
 for (i in 1 : 4) {
   par(mfrow = c(1, 1))
+  z = z.sel[i, ]
   hist(z, breaks = 100, prob = TRUE, ylim = c(0, y.max), main = NULL, xlab = "", xlim = range(c(abs(z.sel), -abs(z.sel))))
+  lines(x.plot, dnorm(x.plot), col = "green", lwd = 2)
   par(mfrow = c(2, 2))
   fit.ash.n <- ashr::ash(z, 1, mixcompdist = "normal", method = "fdr")
+  cat("mixcompdist = normal")
   ashr::plot_diagnostic(fit.ash.n, breaks = 100, plot.hist = TRUE)
   par(mfrow = c(2, 2))
   fit.ash.u <- ashr::ash(z, 1, mixcompdist = "uniform", method = "fdr")
-  ashr::plot_diagnostic(fit.ash.n, breaks = 100, plot.hist = TRUE)
+  cat("mixcompdist = uniform")
+  ashr::plot_diagnostic(fit.ash.u, breaks = 100, plot.hist = TRUE)
   par(mfrow = c(2, 2))
   fit.ash.hu <- ashr::ash(z, 1, mixcompdist = "halfuniform", method = "fdr")
-  ashr::plot_diagnostic(fit.ash.n, breaks = 100, plot.hist = TRUE)
+  cat("mixcompdist = halfuniform")
+  ashr::plot_diagnostic(fit.ash.hu, breaks = 100, plot.hist = TRUE)
 }
 ```
