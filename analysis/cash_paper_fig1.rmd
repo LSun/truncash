@@ -66,3 +66,21 @@ legend("topleft", inset = c(-0.65, -0.25), legend = c("N(0, 1)", "Gaussian Deriv
 
 dev.off()
 ```
+
+## `ashr::plot_diagnostic` on these correlated noise
+
+```{r, cache = TRUE}
+for (i in 1 : 4) {
+  par(mfrow = c(1, 1))
+  hist(z, breaks = 100, prob = TRUE, ylim = c(0, y.max), main = NULL, xlab = "", xlim = range(c(abs(z.sel), -abs(z.sel))))
+  par(mfrow = c(2, 2))
+  fit.ash.n <- ashr::ash(z, 1, mixcompdist = "normal", method = "fdr")
+  ashr::plot_diagnostic(fit.ash.n, breaks = 100, plot.hist = TRUE)
+  par(mfrow = c(2, 2))
+  fit.ash.u <- ashr::ash(z, 1, mixcompdist = "uniform", method = "fdr")
+  ashr::plot_diagnostic(fit.ash.n, breaks = 100, plot.hist = TRUE)
+  par(mfrow = c(2, 2))
+  fit.ash.hu <- ashr::ash(z, 1, mixcompdist = "halfuniform", method = "fdr")
+  ashr::plot_diagnostic(fit.ash.n, breaks = 100, plot.hist = TRUE)
+}
+```
