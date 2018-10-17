@@ -241,6 +241,7 @@ A close look at Efron's classic BRCA data, used in many of his papers to illustr
 * [The FDP in different $g_1$ figure](cash_paper_fig_g1sep.html)
 * [The separation by inflation vs deflation figure](cash_paper_fig_noisesep.html)
 * [The lukemia study figure](cash_paper_fig_leukemia.html)
+* [The mouse heart data figure](cash_paper_fig_mouseheart.html)
 
 ---
 
