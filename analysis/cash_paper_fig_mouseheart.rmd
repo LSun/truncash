@@ -1,0 +1,78 @@
+---
+title: "The mouse heart figure in `cashr`"
+author: "Lei Sun"
+date: "2018-10-17"
+output:
+  workflowr::wflow_html:
+    code_folding: hide
+---
+
+## Introduction
+
+Analysis of a mouse heart gene expression data set with 2 vs 2 samples.
+
+```{r packages}
+source("../code/gdash_lik.R")
+```
+
+```{r summary statistics}
+counts.mat = read.table("../data/smemo.txt", header = T, row.name = 1)
+counts.mat = counts.mat[, -5]
+counts = counts.mat[rowSums(counts.mat) >= 5, ]
+design = model.matrix(~c(0, 0, 1, 1))
+dgecounts = edgeR::calcNormFactors(edgeR::DGEList(counts = counts, group = design[, 2]))
+v = limma::voom(dgecounts, design, plot = FALSE)
+lim = limma::lmFit(v)
+r.ebayes = limma::eBayes(lim)
+p = r.ebayes$p.value[, 2]
+t = r.ebayes$t[, 2]
+z = -sign(t) * qnorm(p/2)
+```
+
+```{r analysis}
+fit.locfdr <- locfdr::locfdr(z)
+fit.qvalue <- qvalue::qvalue(p)
+```
+
+```{r cash}
+x = lim$coefficients[, 2]
+s = x / z
+fit.cash <- gdash(x, s)
+fit.ash <- ashr::ash(x, s, mixcompdist = "normal", method = "fdr")
+```
+
+```{r}
+x.plot <- seq(-10, 10, length = 1000)
+gd.ord <- 10
+hermite = Hermite(gd.ord)
+gd0.std = dnorm(x.plot)
+matrix_lik_plot = cbind(gd0.std)
+for (i in 1 : gd.ord) {
+  gd.std = (-1)^i * hermite[[i]](x.plot) * gd0.std / sqrt(factorial(i))
+  matrix_lik_plot = cbind(matrix_lik_plot, gd.std)
+}
+y.plot = matrix_lik_plot %*% fit.cash$w * fit.cash$fitted_g$pi[1]
+
+method.col <- scales::hue_pal()(5)
+```
+
+```{r plotting}
+setEPS()
+postscript("../output/paper/mouseheart.eps", height = 5, width = 7)
+
+hist(z, prob = TRUE, main = "", xlab = expression(paste(z, "-scores")), cex.lab = 1.25, breaks = 20)
+lines(x.plot, y.plot, col = method.col[5], lwd = 2)
+lines(x.plot, dnorm(x.plot), col = "orange", lty = 2, lwd = 2)
+lines(x.plot, dnorm(x.plot, fit.locfdr$fp0[3, 1], fit.locfdr$fp0[3, 2]) * fit.locfdr$fp0[3, 3], col = method.col[3], lty = 2, lwd = 2)
+
+text(-2.7, 0.2, "N(0,1)", col = "orange")
+arrows(-2.1, 0.2, -1.2, 0.195, length = 0.1, angle = 20, col = "orange")
+
+text(-4.4, 0.13, bquote(atop(" locfdr empirical null", .(round(fit.locfdr$fp0[3, 3], 2)) %*% N(.(round(fit.locfdr$fp0[3, 1], 2)), .(round(fit.locfdr$fp0[3, 2], 2))^2))), col = method.col[3])
+arrows(-2.9, 0.13, -2, 0.125, length = 0.1, angle = 20, col = method.col[3])
+
+text(4.2, 0.08, "cashr", col = method.col[5])
+arrows(3.7, 0.08, 2.8, 0.075, length = 0.1, angle = 20, col = method.col[5])
+
+dev.off()
+```
