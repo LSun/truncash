@@ -106,16 +106,18 @@ for (i in 1 : gd.ord) {
 y.plot = matrix_lik_plot %*% fit.cash$w * fit.cash$fitted_g$pi[1]
 
 method.col <- scales::hue_pal()(5)
+```
 
+```{r}
 setEPS()
 postscript("../output/paper/leukemia.eps", height = 5, width = 12)
-# pdf("../output/paper/leukemia.pdf", height = 5, width = 12)
+#pdf("../output/paper/leukemia.pdf", height = 5, width = 12)
 
 par(mfrow = c(1, 2))
 
 #####
 
-hist(z, prob = TRUE, main = "", xlab = expression(paste(z, "-scores")), cex.lab = 1.25)
+hist(z, prob = TRUE, main = "", xlab = expression(paste(z, "-scores")), cex.lab = 1.25, breaks = 50)
 
 lines(x.plot, y.plot, col = method.col[5], lwd = 2)
 lines(x.plot, dnorm(x.plot), col = "orange", lty = 2, lwd = 2)
@@ -124,10 +126,12 @@ lines(x.plot, dnorm(x.plot, fit.locfdr$fp0[3, 1], fit.locfdr$fp0[3, 2]) * fit.lo
 text(-3.5, 0.188, "N(0,1)", col = "orange")
 arrows(-2.2, 0.188, -1.3, 0.183, length = 0.1, angle = 20, col = "orange")
 
-text(-6.5, 0.11, bquote(atop(" locfdr empirical null", .(round(fit.locfdr$fp0[3, 3], 2)) %*% N(.(round(fit.locfdr$fp0[3, 1], 2)), .(round(fit.locfdr$fp0[3, 2], 2))^2))), col = method.col[3])
+text(-6.5, 0.11, bquote(atop(" locfdr empirical null:", .(round(fit.locfdr$fp0[3, 3], 2)) %*% N(.(round(fit.locfdr$fp0[3, 1], 2)), .(round(fit.locfdr$fp0[3, 2], 2))^2))), col = method.col[3])
 arrows(-2.8, 0.1115, -1.9, 0.1065, length = 0.1, angle = 20, col = method.col[3])
 
-text(4.8, 0.1025, "cashr null", col = method.col[5])
+text(5.6, 0.105,
+     bquote(paste("cashr: ", .(round(fit.cash$fitted_g$pi[1], 2)) %*% hat(f))),
+     col = method.col[5])
 arrows(2.9, 0.10, 2, 0.095, length = 0.1, angle = 20, col = method.col[5])
 
 ####
@@ -139,9 +143,18 @@ points(z, fit.locfdr$fdr, pch = 16, cex = 0.5, col = method.col[3])
 points(z, fit.qvalue$lfdr, pch = 17, cex = 0.5, col = method.col[2])
 points(z, ashr::get_lfdr(fit.ash), pch = 18, cex = 0.5, col = method.col[4])
 
-abline(h = 0.2, lty = 2)
+#abline(h = 0.2, lty = 2)
 
 legend("topright", bty = "n", pch = 15 : 18, col = method.col[c(5, 3, 2, 4)], c("cashr", "locfdr", "qvalue", "ashr"))
 
 dev.off()
+```
+
+```{r}
+fit.BH <- p.adjust(p, method = "BH")
+sum(fit.cash$qvalue <= 0.1)
+sum(fit.BH <= 0.1)
+sum(fit.qvalue$qvalues <= 0.1)
+sum(ashr::get_qvalue(fit.ash) <= 0.1)
+sum(ashr::qval.from.lfdr(fit.locfdr$fdr) <= 0.1)
 ```

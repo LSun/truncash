@@ -1,0 +1,63 @@
+---
+title: "cash_paper_fig_gd"
+author: "Lei Sun"
+date: "2018-10-21"
+output: workflowr::wflow_html
+---
+
+## Introduction
+
+Plotting the standard Gaussian and its standardized derivatives.
+
+```{r}
+source("../code/gdash_lik.R")
+```
+
+```{r}
+plotx <- seq(-10, 10, length = 1000)
+gd.ord <- 10
+hermite = Hermite(gd.ord)
+gd0.std = dnorm(plotx)
+matrix_lik_plot = cbind(gd0.std)
+for (i in 1 : gd.ord) {
+  gd.std = (-1)^i * hermite[[i]](plotx) * gd0.std / sqrt(factorial(i))
+  matrix_lik_plot = cbind(matrix_lik_plot, gd.std)
+}
+method.col <- scales::hue_pal()(gd.ord)
+```
+
+```{r}
+setEPS()
+postscript("../output/paper/GD.eps", height = 4.5, width = 15)
+#pdf("../output/paper/GD.pdf", height = 4.5, width = 15)
+
+par(mfrow = c(1, 2))
+par(mar = c(3, 6.5, 1, 1.5))
+plot(plotx, gd0.std, type = "l", xlim = c(-5, 5), ylim = range(matrix_lik_plot), xlab = "", ylab = '', main = '', bty = 'n', lwd = 2)
+title(ylab = latex2exp::TeX('$\\frac{1}{\\sqrt{\\textit{l}!}}\\varphi^{(\\textit{l})}(\\cdot)$'), line = 2.5, cex.lab = 1.5)
+for (i in 1 : 4) {
+  lines(plotx, matrix_lik_plot[, (i + 1)], col = method.col[i], lty = i + 1, lwd = 2)
+}
+legend("topright", col = c(1, method.col[1 : 4]), lty = 1 : 5, lwd = 2, bty = "n", cex = 1.5,
+       c(latex2exp::TeX('$\\varphi$'), 
+         latex2exp::TeX('$\\textit{l} = 1$'), 
+         latex2exp::TeX('$\\textit{l} = 2$'), 
+         latex2exp::TeX('$\\textit{l} = 3$'), 
+         latex2exp::TeX('$\\textit{l} = 4$')
+       ))
+
+plot(plotx, gd0.std, type = "l", xlim = c(-5, 5), ylim = range(matrix_lik_plot), xlab = "", ylab = '', main = '', bty = 'n', lwd = 2)
+title(ylab = latex2exp::TeX('$\\frac{1}{\\sqrt{\\textit{l}!}}\\varphi^{(\\textit{l})}(\\cdot)$'), line = 2.5, font = 1, cex.lab = 1.5)
+for (i in 7 : 10) {
+  lines(plotx, matrix_lik_plot[, (i + 1)], col = method.col[i], lty = i + 1, lwd = 2)
+}
+legend("topright", col = c(1, method.col[7 : 10]), lty = c(1, 8 : 11), lwd = 2, bty = "n", cex = 1.5,
+       c(latex2exp::TeX('$\\varphi$'), 
+         latex2exp::TeX('$\\textit{l} = 7$'), 
+         latex2exp::TeX('$\\textit{l} = 8$'), 
+         latex2exp::TeX('$\\textit{l} = 9$'), 
+         latex2exp::TeX('$\\textit{l} = 10$')
+       ))
+
+dev.off()
+```

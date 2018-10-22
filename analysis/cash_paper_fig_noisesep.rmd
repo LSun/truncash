@@ -54,11 +54,13 @@ mysqrt_trans <- function() {
                     inverse = function(x) ifelse(x<0, 0, x^2),
                     domain = c(0, Inf))
 }
+```
 
+```{r}
 ###############################
 
 sd.z <- sapply(z.list, sd)
-Noise <- cut(sd.z, breaks = c(0, quantile(sd.z, probs = 1 : 2 / 3), Inf), labels = c("Pseudo Deflation", "In-between", "Pseudo Inflation"))
+Noise <- cut(sd.z, breaks = c(0, quantile(sd.z, probs = 1 : 2 / 3), Inf), labels = c("pseudo-deflation", "in-between", "pseudo-inflation"))
 
 ###############################
 
@@ -67,9 +69,9 @@ sd.z.0.9 <- sd.z[pi0.0.9]
 typical.noise <- pi0.0.9[order(sd.z.0.9)[floor(quantile(seq(sd.z.0.9), c(0.1, 0.5, 0.9)))]]
 
 z.list.sel <- z.list[typical.noise]
-names(z.list.sel) <- c("Pseudo Deflation", "In-between", "Pseudo Inflation")
+names(z.list.sel) <- levels(Noise)
 z.sep.ggdata <- reshape2::melt(z.list.sel, value.name = "z")
-z.sep.ggdata$L1 <- factor(z.sep.ggdata$L1, levels = c("Pseudo Deflation", "In-between", "Pseudo Inflation"))
+z.sep.ggdata$L1 <- factor(z.sep.ggdata$L1, levels = levels(Noise))
 z.sep.plot <- ggplot(data = z.sep.ggdata, aes(x = z)) +
   geom_histogram(aes(y = ..density..), binwidth = 0.2) +
   facet_wrap(~L1, nrow = 1) +
@@ -245,7 +247,7 @@ FDP.sqrt.TDP.q.sep.plot.save <- gridExtra::arrangeGrob(z.sep.plot.save, FDP.sqrt
 ```{r}
 FDP.sqrt.TDP.q.sep.plot.save <- gridExtra::arrangeGrob(
   z.sep.plot +
-    labs(title = "Typical Examples of Realized Correlated N(0,1) Noise") +
+    labs(title = "Examples of realized correlated N(0,1) noise") +
     scale_color_manual(values = "blue") +
     theme(legend.title = element_blank(),
          # legend.title = element_text(size = 15),
