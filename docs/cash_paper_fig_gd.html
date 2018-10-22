@@ -11,9 +11,9 @@
 
 <meta name="author" content="Lei Sun" />
 
-<meta name="date" content="2018-10-17" />
+<meta name="date" content="2018-10-21" />
 
-<title>The mouse heart figure in `cashr`</title>
+<title>cash_paper_fig_gd</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -25,7 +25,6 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<script src="site_libs/navigation-1.1/codefolding.js"></script>
 <link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
@@ -166,14 +165,6 @@ $(document).ready(function () {
 </script>
 
 <!-- code folding -->
-<style type="text/css">
-.code-folding-btn { margin-bottom: 4px; }
-</style>
-<script>
-$(document).ready(function () {
-  window.initializeCodeFolding("hide" === "show");
-});
-</script>
 
 
 
@@ -315,19 +306,11 @@ div.section {
 
 <div class="fluid-row" id="header">
 
-<div class="btn-group pull-right">
-<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
-<ul class="dropdown-menu" style="min-width: 50px;">
-<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
-<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
-</ul>
-</div>
 
 
-
-<h1 class="title toc-ignore">The mouse heart figure in <code>cashr</code></h1>
+<h1 class="title toc-ignore">cash_paper_fig_gd</h1>
 <h4 class="author"><em>Lei Sun</em></h4>
-<h4 class="date"><em>2018-10-17</em></h4>
+<h4 class="date"><em>2018-10-21</em></h4>
 
 </div>
 
@@ -369,7 +352,6 @@ Ignored files:
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
     Ignored:    analysis/.DS_Store
-    Ignored:    analysis/cash_paper_fig_leukemia_cache/
     Ignored:    code/.Rapp.history
     Ignored:    data/LSI/
     Ignored:    docs/.DS_Store
@@ -408,36 +390,19 @@ Message
 <tbody>
 <tr>
 <td style="text-align:left;">
-html
-</td>
-<td style="text-align:left;">
-<a href="https://cdn.rawgit.com/LSun/truncash/f655dcb0246752d27c5f15649bfcf1e1576f4242/docs/cash_paper_fig_mouseheart.html" target="_blank">f655dcb</a>
-</td>
-<td style="text-align:left;">
-LSun
-</td>
-<td style="text-align:left;">
-2018-10-17
-</td>
-<td style="text-align:left;">
-Build site.
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
 rmd
 </td>
 <td style="text-align:left;">
-<a href="https://github.com/LSun/truncash/blob/2bc9fa8ed39cd8cf134e48e45d4c3044362eee57/analysis/cash_paper_fig_mouseheart.rmd" target="_blank">2bc9fa8</a>
+<a href="https://github.com/LSun/truncash/blob/7b6b664652192ae86bcdcc144e6fb4a2b6d2722a/analysis/cash_paper_fig_gd.rmd" target="_blank">7b6b664</a>
 </td>
 <td style="text-align:left;">
-LSun
+Lei Sun
 </td>
 <td style="text-align:left;">
-2018-10-17
+2018-10-21
 </td>
 <td style="text-align:left;">
-wflow_publish(“cash_paper_fig_mouseheart.rmd”)
+wflow_publish(c(“analysis/cash_paper_fig_gd.rmd”,
 </td>
 </tr>
 </tbody>
@@ -447,7 +412,7 @@ wflow_publish(“cash_paper_fig_mouseheart.rmd”)
 <hr />
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
-<p>Analysis of a mouse heart gene expression data set with 2 vs 2 samples.</p>
+<p>Plotting the standard Gaussian and its standardized derivatives.</p>
 <pre class="r"><code>source(&quot;../code/gdash_lik.R&quot;)</code></pre>
 <pre><code>Loading required package: EQL</code></pre>
 <pre><code>Loading required package: ttutils</code></pre>
@@ -469,103 +434,51 @@ Attaching package: &#39;ashr&#39;</code></pre>
 <pre><code>The following object is masked from &#39;package:CVXR&#39;:
 
     get_np</code></pre>
-<pre class="r"><code>counts.mat = read.table(&quot;../data/smemo.txt&quot;, header = T, row.name = 1)
-counts.mat = counts.mat[, -5]
-counts = counts.mat[rowSums(counts.mat) &gt;= 5, ]
-design = model.matrix(~c(0, 0, 1, 1))
-dgecounts = edgeR::calcNormFactors(edgeR::DGEList(counts = counts, group = design[, 2]))
-v = limma::voom(dgecounts, design, plot = FALSE)
-lim = limma::lmFit(v)
-r.ebayes = limma::eBayes(lim)
-p = r.ebayes$p.value[, 2]
-t = r.ebayes$t[, 2]
-z = -sign(t) * qnorm(p/2)</code></pre>
-<pre class="r"><code>fit.locfdr &lt;- locfdr::locfdr(z)</code></pre>
-<p><img src="figure/cash_paper_fig_mouseheart.rmd/analysis-1.png" width="672" style="display: block; margin: auto;" /></p>
-<details>
-<summary><em>Expand here to see past versions of analysis-1.png:</em></summary>
-<table style = "border-collapse:separate; border-spacing:5px;">
-<thead>
-<tr>
-<th style="text-align:left;">
-Version
-</th>
-<th style="text-align:left;">
-Author
-</th>
-<th style="text-align:left;">
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-<a href="https://github.com/LSun/truncash/blob/f655dcb0246752d27c5f15649bfcf1e1576f4242/docs/figure/cash_paper_fig_mouseheart.rmd/analysis-1.png" target="_blank">f655dcb</a>
-</td>
-<td style="text-align:left;">
-LSun
-</td>
-<td style="text-align:left;">
-2018-10-17
-</td>
-</tr>
-</tbody>
-</table>
-</details>
-<pre class="r"><code>fit.qvalue &lt;- qvalue::qvalue(p)</code></pre>
-<pre class="r"><code>x = lim$coefficients[, 2]
-s = x / z
-fit.cash &lt;- gdash(x, s)
-fit.ash &lt;- ashr::ash(x, s, mixcompdist = &quot;normal&quot;, method = &quot;fdr&quot;)</code></pre>
-<pre class="r"><code>x.plot &lt;- seq(-10, 10, length = 1000)
+<pre class="r"><code>plotx &lt;- seq(-10, 10, length = 1000)
 gd.ord &lt;- 10
 hermite = Hermite(gd.ord)
-gd0.std = dnorm(x.plot)
+gd0.std = dnorm(plotx)
 matrix_lik_plot = cbind(gd0.std)
 for (i in 1 : gd.ord) {
-  gd.std = (-1)^i * hermite[[i]](x.plot) * gd0.std / sqrt(factorial(i))
+  gd.std = (-1)^i * hermite[[i]](plotx) * gd0.std / sqrt(factorial(i))
   matrix_lik_plot = cbind(matrix_lik_plot, gd.std)
 }
-y.plot = matrix_lik_plot %*% fit.cash$w * fit.cash$fitted_g$pi[1]
-
-method.col &lt;- scales::hue_pal()(5)</code></pre>
+method.col &lt;- scales::hue_pal()(gd.ord)</code></pre>
 <pre class="r"><code>setEPS()
-postscript(&quot;../output/paper/mouseheart.eps&quot;, height = 5, width = 7)
-#pdf(&quot;../output/paper/mouseheart.pdf&quot;, height = 5, width = 7)
+postscript(&quot;../output/paper/GD.eps&quot;, height = 4.5, width = 15)
+#pdf(&quot;../output/paper/GD.pdf&quot;, height = 4.5, width = 15)
 
-hist(z, prob = TRUE, main = &quot;&quot;, xlab = expression(paste(z, &quot;-scores&quot;)), cex.lab = 1.25, xlim = c(-max(abs(z)), max(abs(z))))
-lines(x.plot, y.plot, col = method.col[5], lwd = 2)
-lines(x.plot, dnorm(x.plot), col = &quot;orange&quot;, lty = 2, lwd = 2)
-lines(x.plot, dnorm(x.plot, fit.locfdr$fp0[3, 1], fit.locfdr$fp0[3, 2]) * fit.locfdr$fp0[3, 3], col = method.col[3], lty = 2, lwd = 2)
+par(mfrow = c(1, 2))
+par(mar = c(3, 6.5, 1, 1.5))
+plot(plotx, gd0.std, type = &quot;l&quot;, xlim = c(-5, 5), ylim = range(matrix_lik_plot), xlab = &quot;&quot;, ylab = &#39;&#39;, main = &#39;&#39;, bty = &#39;n&#39;, lwd = 2)
+title(ylab = latex2exp::TeX(&#39;$\\frac{1}{\\sqrt{\\textit{l}!}}\\varphi^{(\\textit{l})}(\\cdot)$&#39;), line = 2.5, cex.lab = 1.5)
+for (i in 1 : 4) {
+  lines(plotx, matrix_lik_plot[, (i + 1)], col = method.col[i], lty = i + 1, lwd = 2)
+}
+legend(&quot;topright&quot;, col = c(1, method.col[1 : 4]), lty = 1 : 5, lwd = 2, bty = &quot;n&quot;, cex = 1.5,
+       c(latex2exp::TeX(&#39;$\\varphi$&#39;), 
+         latex2exp::TeX(&#39;$\\textit{l} = 1$&#39;), 
+         latex2exp::TeX(&#39;$\\textit{l} = 2$&#39;), 
+         latex2exp::TeX(&#39;$\\textit{l} = 3$&#39;), 
+         latex2exp::TeX(&#39;$\\textit{l} = 4$&#39;)
+       ))
 
-text(-2.3, 0.2, &quot;N(0,1)&quot;, col = &quot;orange&quot;)
-arrows(-1.7, 0.2, -1.2, 0.195, length = 0.1, angle = 20, col = &quot;orange&quot;)
-
-text(-4.2, 0.13, bquote(atop(&quot; locfdr empirical null:&quot;, .(round(fit.locfdr$fp0[3, 3], 2)) %*% N(.(round(fit.locfdr$fp0[3, 1], 2)), .(round(fit.locfdr$fp0[3, 2], 2))^2))), col = method.col[3])
-arrows(-2.5, 0.13, -2, 0.125, length = 0.1, angle = 20, col = method.col[3])
-
-text(4.6, 0.085,
-     bquote(paste(&quot;cashr: &quot;, .(round(fit.cash$fitted_g$pi[1], 2)) %*% hat(f))),
-     col = method.col[5])
-arrows(3.3, 0.08, 2.8, 0.075, length = 0.1, angle = 20, col = method.col[5])
+plot(plotx, gd0.std, type = &quot;l&quot;, xlim = c(-5, 5), ylim = range(matrix_lik_plot), xlab = &quot;&quot;, ylab = &#39;&#39;, main = &#39;&#39;, bty = &#39;n&#39;, lwd = 2)
+title(ylab = latex2exp::TeX(&#39;$\\frac{1}{\\sqrt{\\textit{l}!}}\\varphi^{(\\textit{l})}(\\cdot)$&#39;), line = 2.5, font = 1, cex.lab = 1.5)
+for (i in 7 : 10) {
+  lines(plotx, matrix_lik_plot[, (i + 1)], col = method.col[i], lty = i + 1, lwd = 2)
+}
+legend(&quot;topright&quot;, col = c(1, method.col[7 : 10]), lty = c(1, 8 : 11), lwd = 2, bty = &quot;n&quot;, cex = 1.5,
+       c(latex2exp::TeX(&#39;$\\varphi$&#39;), 
+         latex2exp::TeX(&#39;$\\textit{l} = 7$&#39;), 
+         latex2exp::TeX(&#39;$\\textit{l} = 8$&#39;), 
+         latex2exp::TeX(&#39;$\\textit{l} = 9$&#39;), 
+         latex2exp::TeX(&#39;$\\textit{l} = 10$&#39;)
+       ))
 
 dev.off()</code></pre>
 <pre><code>quartz_off_screen 
                 2 </code></pre>
-<pre class="r"><code>fit.BH &lt;- p.adjust(p, method = &quot;BH&quot;)
-sum(fit.cash$qvalue &lt;= 0.1)</code></pre>
-<pre><code>[1] 0</code></pre>
-<pre class="r"><code>sum(fit.BH &lt;= 0.1)</code></pre>
-<pre><code>[1] 4130</code></pre>
-<pre class="r"><code>sum(fit.qvalue$qvalues &lt;= 0.1)</code></pre>
-<pre><code>[1] 6502</code></pre>
-<pre class="r"><code>sum(ashr::get_qvalue(fit.ash) &lt;= 0.1)</code></pre>
-<pre><code>[1] 17191</code></pre>
-<pre class="r"><code>sum(ashr::qval.from.lfdr(fit.locfdr$fdr) &lt;= 0.1)</code></pre>
-<pre><code>[1] 0</code></pre>
-<pre class="r"><code>1 - sum(pnorm(-log2(1.2), fit.cash$fitted_g$mean[-1], fit.cash$fitted_g$sd[-1]) * 2 * fit.cash$fitted_g$pi[-1]) / (1 - fit.cash$fitted_g$pi[1])</code></pre>
-<pre><code>[1] 0.9981602</code></pre>
 </div>
 <div id="session-information" class="section level2">
 <h2>Session information</h2>
@@ -590,25 +503,20 @@ other attached packages:
 [9] ttutils_1.0-1    
 
 loaded via a namespace (and not attached):
- [1] qvalue_2.10.0     locfit_1.5-9.1    reshape2_1.4.3   
- [4] splines_3.4.3     lattice_0.20-35   colorspace_1.3-2 
- [7] htmltools_0.3.6   yaml_2.1.18       gmp_0.5-13.2     
-[10] rlang_0.1.6       R.oo_1.22.0       pillar_1.1.0     
-[13] Rmpfr_0.7-1       R.utils_2.7.0     bit64_0.9-7      
-[16] scs_1.1-1         foreach_1.4.4     plyr_1.8.4       
-[19] stringr_1.3.0     munsell_0.4.3     gtable_0.2.0     
-[22] workflowr_1.1.1   R.methodsS3_1.7.1 codetools_0.2-15 
-[25] evaluate_0.10.1   knitr_1.20        doParallel_1.0.11
-[28] pscl_1.5.2        parallel_3.4.3    Rcpp_0.12.18     
-[31] edgeR_3.20.8      backports_1.1.2   scales_0.5.0     
-[34] limma_3.34.7      locfdr_1.1-8      truncnorm_1.0-7  
-[37] bit_1.1-12        ggplot2_2.2.1     digest_0.6.15    
-[40] stringi_1.1.6     grid_3.4.3        rprojroot_1.3-2  
-[43] ECOSolveR_0.4     tools_3.4.3       magrittr_1.5     
-[46] lazyeval_0.2.1    tibble_1.4.2      whisker_0.3-2    
-[49] MASS_7.3-50       assertthat_0.2.0  rmarkdown_1.9    
-[52] iterators_1.0.9   R6_2.2.2          git2r_0.21.0     
-[55] compiler_3.4.3   </code></pre>
+ [1] latex2exp_0.4.0   gmp_0.5-13.2      Rcpp_0.12.18     
+ [4] plyr_1.8.4        compiler_3.4.3    git2r_0.21.0     
+ [7] workflowr_1.1.1   R.methodsS3_1.7.1 R.utils_2.7.0    
+[10] iterators_1.0.9   tools_3.4.3       digest_0.6.15    
+[13] bit_1.1-12        evaluate_0.10.1   lattice_0.20-35  
+[16] foreach_1.4.4     yaml_2.1.18       parallel_3.4.3   
+[19] Rmpfr_0.7-1       ECOSolveR_0.4     stringr_1.3.0    
+[22] knitr_1.20        rprojroot_1.3-2   bit64_0.9-7      
+[25] grid_3.4.3        R6_2.2.2          rmarkdown_1.9    
+[28] magrittr_1.5      whisker_0.3-2     scales_0.5.0     
+[31] MASS_7.3-50       backports_1.1.2   codetools_0.2-15 
+[34] htmltools_0.3.6   scs_1.1-1         colorspace_1.3-2 
+[37] stringi_1.1.6     munsell_0.4.3     pscl_1.5.2       
+[40] doParallel_1.0.11 truncnorm_1.0-7   R.oo_1.22.0      </code></pre>
 </div>
 
 <!-- Adjust MathJax settings so that all math formulae are shown using
