@@ -332,7 +332,7 @@ div.section {
 </div>
 
 
-<p><strong>Last updated:</strong> 2018-10-12</p>
+<p><strong>Last updated:</strong> 2018-10-23</p>
 <strong>workflowr checks:</strong> <small>(Click a bullet for more information)</small>
 <ul>
 <li>
@@ -361,7 +361,7 @@ div.section {
 </li>
 <li>
 <details>
-<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/f68e9c4604eb4248c97da795d2e310de98b3a832" target="_blank">f68e9c4</a> </summary></p>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/6ecb4ff579ec1f02c3e982bc6aea1c14c4de6000" target="_blank">6ecb4ff</a> </summary></p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 <pre><code>
 Ignored files:
@@ -496,6 +496,91 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/6ecb4ff579ec1f02c3e982bc6aea1c14c4de6000/analysis/cash_paper_fig1.rmd" target="_blank">6ecb4ff</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-10-23
+</td>
+<td style="text-align:left;">
+wflow_publish(“analysis/cash_paper_fig1.rmd”)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/999e2806d9db3f9998a747dd2ff04a13729b2858/analysis/cash_paper_fig1.rmd" target="_blank">999e280</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-10-23
+</td>
+<td style="text-align:left;">
+pvalue shoulder
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/d77af2c44eff6ba744478c4468d6a6eb63986534/analysis/cash_paper_fig1.rmd" target="_blank">d77af2c</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-10-22
+</td>
+<td style="text-align:left;">
+shoulder
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/1928392836cf161327125e891ec88726a067c961/analysis/cash_paper_fig1.rmd" target="_blank">1928392</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-10-22
+</td>
+<td style="text-align:left;">
+fig1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/f0d9829873d049c8746aaabe4fc52b78f7bb4c68/docs/cash_paper_fig1.html" target="_blank">f0d9829</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-10-12
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 rmd
@@ -658,9 +743,11 @@ Attaching package: &#39;CVXR&#39;</code></pre>
 <pre><code>Loading required package: ashr</code></pre>
 <pre class="r"><code>source(&quot;../code/gdfit.R&quot;)
 z.mat &lt;- readRDS(&quot;../output/z_null_liver_777.rds&quot;)
-sel = c(32, 327, 355, 483)
+Z.gtex &lt;- readRDS(&quot;../output/paper/simulation/Z.gtex.rds&quot;)</code></pre>
+<pre class="r"><code>sel = c(32, 327, 23, 459)
 z.sel &lt;- z.mat[sel, ]
-gd.ord &lt;- 10
+z.sel[3, ] &lt;- Z.gtex[[4503]]</code></pre>
+<pre class="r"><code>gd.ord &lt;- 10
 
 x.plot = seq(- max(abs(z.sel)) - 2, max(abs(z.sel)) + 2, length = 1000)
 hermite = Hermite(gd.ord)
@@ -692,7 +779,7 @@ for (i in 1 : 4) {
   w &lt;- gdfit(z, gd.ord)$w
   y.plot = matrix_lik_plot %*% w
   z.hist = hist(z, breaks = 100, plot = FALSE)
-  hist(z, breaks = 100, prob = TRUE, ylim = c(0, y.max), main = NULL, xlab = &quot;&quot;, xlim = range(c(abs(z.sel), -abs(z.sel))))
+  hist(z, breaks = seq(-10, 10, by = 0.1), prob = TRUE, ylim = c(0, y.max), main = NULL, xlab = &quot;&quot;, xlim = range(c(abs(z.sel), -abs(z.sel))))
   lines(x.plot, dnorm(x.plot), col = &quot;blue&quot;, lwd = 2)
   lines(x.plot, y.plot, col = &quot;red&quot;, lwd = 2)
   legend(&quot;topleft&quot;, bty = &quot;n&quot;, paste0(&#39;(&#39;, letters[i], &#39;)&#39;), cex = 1.25)
@@ -700,7 +787,7 @@ for (i in 1 : 4) {
 
 # print the overall labels
 mtext(&#39;Density&#39;, side = 2, outer = TRUE, line = 1)
-mtext(&quot;Histograms of Correlated N(0,1) Variates&quot;, line = -2, outer = TRUE)
+mtext(latex2exp::TeX(&#39;Histograms of $10^4$ Correlated N(0,1) z-scores&#39;), line = -2, outer = TRUE)
 
 legend(&quot;topleft&quot;, inset = c(-0.65, -0.25), legend = c(&quot;N(0, 1)&quot;, &quot;Gaussian Derivatives&quot;), lty = 1, lwd = 2, xpd = NA, col = c(&quot;blue&quot;, &quot;red&quot;), ncol = 2)
 
@@ -728,74 +815,206 @@ dev.off()</code></pre>
   cat(&quot;mixcompdist = halfuniform&quot;)
   ashr::plot_diagnostic(fit.ash.hu, breaks = 100, plot.hist = TRUE)
 }</code></pre>
-<p><img src="figure/cash_paper_fig1.rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/cash_paper_fig1.rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre><code>mixcompdist = normal</code></pre>
 <pre><code>Press [enter] to see next plot</code></pre>
 <pre><code>Press [enter] to see next plot</code></pre>
 <pre><code>Press [enter] to see next plot</code></pre>
-<p><img src="figure/cash_paper_fig1.rmd/unnamed-chunk-3-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/cash_paper_fig1.rmd/unnamed-chunk-5-2.png" width="672" style="display: block; margin: auto;" /></p>
 <pre><code>mixcompdist = uniform</code></pre>
 <pre><code>Press [enter] to see next plot</code></pre>
 <pre><code>Press [enter] to see next plot</code></pre>
 <pre><code>Press [enter] to see next plot</code></pre>
-<p><img src="figure/cash_paper_fig1.rmd/unnamed-chunk-3-3.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/cash_paper_fig1.rmd/unnamed-chunk-5-3.png" width="672" style="display: block; margin: auto;" /></p>
 <pre><code>mixcompdist = halfuniform</code></pre>
 <pre><code>Press [enter] to see next plot</code></pre>
 <pre><code>Press [enter] to see next plot</code></pre>
 <pre><code>Press [enter] to see next plot</code></pre>
-<p><img src="figure/cash_paper_fig1.rmd/unnamed-chunk-3-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_paper_fig1.rmd/unnamed-chunk-3-5.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/cash_paper_fig1.rmd/unnamed-chunk-5-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_paper_fig1.rmd/unnamed-chunk-5-5.png" width="672" style="display: block; margin: auto;" /></p>
 <pre><code>mixcompdist = normal</code></pre>
 <pre><code>Press [enter] to see next plot</code></pre>
 <pre><code>Press [enter] to see next plot</code></pre>
 <pre><code>Press [enter] to see next plot</code></pre>
-<p><img src="figure/cash_paper_fig1.rmd/unnamed-chunk-3-6.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/cash_paper_fig1.rmd/unnamed-chunk-5-6.png" width="672" style="display: block; margin: auto;" /></p>
 <pre><code>mixcompdist = uniform</code></pre>
 <pre><code>Press [enter] to see next plot</code></pre>
 <pre><code>Press [enter] to see next plot</code></pre>
 <pre><code>Press [enter] to see next plot</code></pre>
-<p><img src="figure/cash_paper_fig1.rmd/unnamed-chunk-3-7.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/cash_paper_fig1.rmd/unnamed-chunk-5-7.png" width="672" style="display: block; margin: auto;" /></p>
 <pre><code>mixcompdist = halfuniform</code></pre>
 <pre><code>Press [enter] to see next plot</code></pre>
 <pre><code>Press [enter] to see next plot</code></pre>
 <pre><code>Press [enter] to see next plot</code></pre>
-<p><img src="figure/cash_paper_fig1.rmd/unnamed-chunk-3-8.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_paper_fig1.rmd/unnamed-chunk-3-9.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/cash_paper_fig1.rmd/unnamed-chunk-5-8.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_paper_fig1.rmd/unnamed-chunk-5-9.png" width="672" style="display: block; margin: auto;" /></p>
 <pre><code>mixcompdist = normal</code></pre>
 <pre><code>Press [enter] to see next plot</code></pre>
 <pre><code>Press [enter] to see next plot</code></pre>
 <pre><code>Press [enter] to see next plot</code></pre>
-<p><img src="figure/cash_paper_fig1.rmd/unnamed-chunk-3-10.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/cash_paper_fig1.rmd/unnamed-chunk-5-10.png" width="672" style="display: block; margin: auto;" /></p>
 <pre><code>mixcompdist = uniform</code></pre>
 <pre><code>Press [enter] to see next plot</code></pre>
 <pre><code>Press [enter] to see next plot</code></pre>
 <pre><code>Press [enter] to see next plot</code></pre>
-<p><img src="figure/cash_paper_fig1.rmd/unnamed-chunk-3-11.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/cash_paper_fig1.rmd/unnamed-chunk-5-11.png" width="672" style="display: block; margin: auto;" /></p>
 <pre><code>mixcompdist = halfuniform</code></pre>
 <pre><code>Press [enter] to see next plot</code></pre>
 <pre><code>Press [enter] to see next plot</code></pre>
 <pre><code>Press [enter] to see next plot</code></pre>
-<p><img src="figure/cash_paper_fig1.rmd/unnamed-chunk-3-12.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_paper_fig1.rmd/unnamed-chunk-3-13.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/cash_paper_fig1.rmd/unnamed-chunk-5-12.png" width="672" style="display: block; margin: auto;" /><img src="figure/cash_paper_fig1.rmd/unnamed-chunk-5-13.png" width="672" style="display: block; margin: auto;" /></p>
 <pre><code>mixcompdist = normal</code></pre>
 <pre><code>Press [enter] to see next plot</code></pre>
 <pre><code>Press [enter] to see next plot</code></pre>
 <pre><code>Press [enter] to see next plot</code></pre>
-<p><img src="figure/cash_paper_fig1.rmd/unnamed-chunk-3-14.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/cash_paper_fig1.rmd/unnamed-chunk-5-14.png" width="672" style="display: block; margin: auto;" /></p>
 <pre><code>mixcompdist = uniform</code></pre>
 <pre><code>Press [enter] to see next plot</code></pre>
 <pre><code>Press [enter] to see next plot</code></pre>
 <pre><code>Press [enter] to see next plot</code></pre>
-<p><img src="figure/cash_paper_fig1.rmd/unnamed-chunk-3-15.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/cash_paper_fig1.rmd/unnamed-chunk-5-15.png" width="672" style="display: block; margin: auto;" /></p>
 <pre><code>mixcompdist = halfuniform</code></pre>
 <pre><code>Press [enter] to see next plot</code></pre>
 <pre><code>Press [enter] to see next plot</code></pre>
 <pre><code>Press [enter] to see next plot</code></pre>
-<p><img src="figure/cash_paper_fig1.rmd/unnamed-chunk-3-16.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/cash_paper_fig1.rmd/unnamed-chunk-5-16.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="different-methods-applied-to-c" class="section level2">
+<h2>different methods applied to (c)</h2>
+<pre class="r"><code>q &lt;- 0.1
+z &lt;- z.sel[3, ]
+p &lt;- pnorm(-abs(z)) * 2
+## under 0.005
+sum(p &lt;= 0.005)</code></pre>
+<pre><code>[1] 809</code></pre>
+<pre class="r"><code>pnorm(qnorm(0.0025), 0, 1.6) * 2 * 1e4</code></pre>
+<pre><code>[1] 793.6266</code></pre>
+<pre class="r"><code>p.bh &lt;- p.adjust(p, method = &quot;BH&quot;)
+## BHq at FDR 0.05
+sum(p.bh &lt;= q)</code></pre>
+<pre><code>[1] 1822</code></pre>
+<pre class="r"><code>fit.q &lt;- qvalue::qvalue(p)
+## pi0 by qvalue
+fit.q$pi0</code></pre>
+<pre><code>[1] 0.433538</code></pre>
+<pre class="r"><code>## qvalue at FDR 0.05
+sum(fit.q$qvalues &lt;= q)</code></pre>
+<pre><code>[1] 3818</code></pre>
+<pre class="r"><code>## pi0 by ashr
+fit.a &lt;- ashr::ash(z, 1, mixcompdist = &quot;normal&quot;, method = &quot;fdr&quot;)
+ashr::get_pi0(fit.a)</code></pre>
+<pre><code>[1] 0.01512495</code></pre>
+<pre class="r"><code>## ashr at FDR 0.05
+sum(ashr::get_qvalue(fit.a) &lt;= q)</code></pre>
+<pre><code>[1] 10000</code></pre>
+</div>
+<div id="shoulder-inflation-figure" class="section level2">
+<h2>shoulder inflation figure</h2>
+<pre class="r"><code>## the image is 7.5 * 3
+setEPS()
+postscript(&quot;../output/paper/cor_z_cdf.eps&quot;, width = 8, height = 2.5)
+#pdf(&quot;../output/paper/cor_z_cdf.pdf&quot;, width = 8, height = 2.5)
+
+par(mfrow = c(1, 3))
+par(oma = c(1, 2.5, 0, 8)) # make room (i.e. the 4&#39;s) for the overall x and y axis titles
+par(mar = c(2, 2, 2.5, 1)) # make the plots be closer together
+
+plot(ecdf(z), xlab = &quot;&quot;, ylab = &quot;&quot;, lwd = 2, main = expression(&quot;panel (c) z-scores&quot;), cex.main = 1.5)
+lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01)), col = &quot;blue&quot;, lwd = 2)
+lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01), 0, 1.6), col = &quot;green&quot;, lwd = 2)
+rect(xleft = c(-5, 2.5),
+     xright = c(-2.5, 5),
+     ytop = c(0.05, 1),
+     ybottom = c(0, 0.95), border = &quot;red&quot;, lty = c(1, 5))
+
+plot(ecdf(z), xlab = &quot;&quot;, ylab = &quot;&quot;, main = expression(&quot;left tail&quot;), lwd = 2, xlim = c(-5, -2.5), ylim = c(0, 0.05), cex.main = 1.5, bty = &quot;n&quot;)
+box(col = &quot;red&quot;)
+lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01)), col = &quot;blue&quot;, lwd = 2)
+lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01), 0, 1.6), col = &quot;green&quot;, lwd = 2)
+
+plot(ecdf(z), xlab = &quot;&quot;, ylab = &quot;&quot;, main = expression(&quot;right tail&quot;), lwd = 2, xlim = c(2.5, 5), ylim = c(0.95, 1), cex.main = 1.5, bty = &quot;n&quot;)
+box(col = &quot;red&quot;, lty = 5)
+lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01)), col = &quot;blue&quot;, lwd = 2)
+lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01), 0, 1.6), col = &quot;green&quot;, lwd = 2)
+
+mtext(&#39;CDF&#39;, side = 2, outer = TRUE, line = 1)
+
+legend(&quot;topright&quot;, inset = c(-0.68, 0.3), legend = c(&#39;panel (c)&#39;, &#39;N(0, 1)&#39;, expression(N(0, 1.6^2))), lty = 1, lwd = 2, xpd = NA, col = c(&#39;black&#39;, &quot;blue&quot;, &quot;green&quot;), ncol = 1, cex = 1.25, bty = &#39;n&#39;)
+
+dev.off()</code></pre>
+<pre><code>quartz_off_screen 
+                2 </code></pre>
+<pre class="r"><code># 7.5 * 3
+setEPS()
+postscript(&quot;../output/paper/cor_z_pval.eps&quot;, width = 12, height = 3)
+#pdf(&quot;../output/paper/cor_z_pval.pdf&quot;, width = 12, height = 3)
+
+thresh.color &lt;- c(&quot;maroon&quot;, &quot;purple&quot;, &quot;orange&quot;)
+#thresh.color &lt;- scales::hue_pal()(10)[5 : 7]
+
+par(mfrow = c(1, 4))
+par(oma = c(0, 0, 0, 11)) # make room (i.e. the 4&#39;s) for the overall x and y axis titles
+
+par(mar = c(4.5, 4, 4.5, 1)) # make the plots be closer together
+p.hist &lt;- hist(p, breaks = seq(0, 1, by = 0.01), plot = FALSE)
+plot(0, 0, xlab = &quot;p-values&quot;, ylab = &quot;&quot;, type = &quot;n&quot;, xlim = c(0, 1), ylim = c(0, max(p.hist$density)), main = expression(atop(&quot;Histogram of p-val of&quot;, &#39;panel (c) z-scores&#39;)), cex.main = 1.5, cex.lab = 1.5)
+title(ylab = &quot;Density&quot;, line = 2.5, cex.lab = 1.5)
+abline(v = c(0.05 / 1e4, pnorm(-sqrt(2 * log(1e4))) * 2, 0.005), lwd = 2, col = thresh.color[3 : 1], lty = c(4, 2, 1))
+hist(p, prob = TRUE, breaks = seq(0, 1, by = 0.01), xlab = &quot;&quot;, add = TRUE, col = rgb(0, 0, 0, 0.75))</code></pre>
+<pre><code>Warning in rect(x$breaks[-nB], 0, x$breaks[-1L], y, col = col, border =
+border, : semi-transparency is not supported on this device: reported only
+once per page</code></pre>
+<pre class="r"><code>set.seed(5)
+p.norm.1 &lt;- pnorm(-abs(rnorm(1e4))) * 2
+set.seed(25)
+p.norm.1.6 &lt;- pnorm(-abs(rnorm(1e4, 0, 1.6))) * 2
+y.max &lt;- -log(min(p.norm.1, p, p.norm.1.6))
+y.max &lt;- 20
+
+par(mar = c(4.5, 4, 4.5, 1)) # make the plots be closer together
+
+plot(sample(-log(p)), ylim = c(0, y.max), ylab = &quot;&quot;, main = expression(atop(&#39;-log(p-val) of&#39;, &quot;panel (c) z-scores&quot;)), cex.main = 1.5, cex.lab = 1.5)
+title(ylab = &#39;-log(p)&#39;, cex.lab = 1.5, line = 2.5)
+abline(h = -log(c(
+  0.005,
+  pnorm(-sqrt(2 * log(1e4))) * 2,
+  0.05 / 1e4
+)), lwd = 2, col = thresh.color, lty = c(1, 2, 4))
+
+plot(-log(p.norm.1), ylim = c(0, y.max), ylab = &quot;&quot;, main = expression(atop(&#39;-log(p-val) of&#39;, &quot;indep N(0,1) samples&quot;)), col = &quot;blue&quot;, cex.main = 1.5, cex.lab = 1.5)
+title(ylab = &#39;-log(p)&#39;, cex.lab = 1.5, line = 2.5)
+abline(h = -log(c(
+  0.005,
+  pnorm(-sqrt(2 * log(1e4))) * 2,
+  0.05 / 1e4
+)), lwd = 2, col = thresh.color, lty = c(1, 2, 4))
+
+plot(-log(p.norm.1.6), ylim = c(0, y.max), ylab = &quot;&quot;, main = expression(atop(&#39;-log(p-val) of&#39;, paste(&quot;indep &quot;, N(0, 1.6^2), &quot; samples&quot;))), col = &quot;green&quot;, cex.main = 1.5, cex.lab = 1.5)
+title(ylab = &#39;-log(p)&#39;, cex.lab = 1.5, line = 2.5)
+abline(h = -log(c(
+  0.005,
+  pnorm(-sqrt(2 * log(1e4))) * 2,
+  0.05 / 1e4
+)), lwd = 2, col = thresh.color, lty = c(1, 2, 4))
+
+#legend(&quot;topright&quot;, inset = c(-0.5, 0), legend = c(&quot;p = 0.005&quot;, &quot;Universal Threshold&quot;, &quot;Bonferroni&quot;), lty = 1, lwd = 2, xpd = NA, col = c(&quot;red&quot;, &quot;orange&quot;, &quot;yellow&quot;), ncol = 1, cex = 1.25)
+
+legend(&quot;topright&quot;, inset = c(-0.82, 0.3),
+       legend = c(
+         latex2exp::TeX(&#39;p-val = $0.05 / 10^4$&#39;),
+         &#39;Univ Thresh&#39;,
+         &quot;p-val = 0.005&quot;
+         ), lty = c(4, 2, 1), lwd = 2, xpd = NA,
+       col = thresh.color[3 : 1], ncol = 1, cex = 1.25, bty = &quot;n&quot;)
+
+dev.off()</code></pre>
+<pre><code>quartz_off_screen 
+                2 </code></pre>
 </div>
 <div id="session-information" class="section level2">
 <h2>Session information</h2>
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS High Sierra 10.13.6
+Running under: macOS  10.14
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -813,19 +1032,24 @@ other attached packages:
 [9] ttutils_1.0-1    
 
 loaded via a namespace (and not attached):
- [1] gmp_0.5-13.1      Rcpp_0.12.16      compiler_3.4.3   
- [4] git2r_0.21.0      workflowr_1.1.1   R.methodsS3_1.7.1
- [7] R.utils_2.6.0     iterators_1.0.9   tools_3.4.3      
-[10] digest_0.6.15     bit_1.1-13        evaluate_0.10.1  
-[13] lattice_0.20-35   foreach_1.4.4     yaml_2.1.19      
-[16] parallel_3.4.3    Rmpfr_0.7-0       ECOSolveR_0.4    
-[19] stringr_1.3.1     knitr_1.20        rprojroot_1.3-2  
-[22] bit64_0.9-7       grid_3.4.3        R6_2.2.2         
-[25] rmarkdown_1.9     magrittr_1.5      whisker_0.3-2    
-[28] MASS_7.3-50       backports_1.1.2   codetools_0.2-15 
-[31] htmltools_0.3.6   scs_1.1-1         assertthat_0.2.0 
-[34] stringi_1.2.2     pscl_1.5.2        doParallel_1.0.11
-[37] truncnorm_1.0-8   R.oo_1.22.0      </code></pre>
+ [1] latex2exp_0.4.0   gmp_0.5-13.1      Rcpp_0.12.16     
+ [4] pillar_1.2.2      plyr_1.8.4        compiler_3.4.3   
+ [7] git2r_0.21.0      workflowr_1.1.1   R.methodsS3_1.7.1
+[10] R.utils_2.6.0     iterators_1.0.9   tools_3.4.3      
+[13] digest_0.6.15     bit_1.1-13        tibble_1.4.2     
+[16] gtable_0.2.0      evaluate_0.10.1   lattice_0.20-35  
+[19] rlang_0.2.0       foreach_1.4.4     yaml_2.1.19      
+[22] parallel_3.4.3    Rmpfr_0.7-0       ECOSolveR_0.4    
+[25] stringr_1.3.1     knitr_1.20        rprojroot_1.3-2  
+[28] bit64_0.9-7       grid_3.4.3        qvalue_2.10.0    
+[31] R6_2.2.2          rmarkdown_1.9     reshape2_1.4.3   
+[34] ggplot2_2.2.1     magrittr_1.5      whisker_0.3-2    
+[37] splines_3.4.3     scales_0.5.0      MASS_7.3-50      
+[40] backports_1.1.2   codetools_0.2-15  htmltools_0.3.6  
+[43] scs_1.1-1         assertthat_0.2.0  colorspace_1.3-2 
+[46] stringi_1.2.2     lazyeval_0.2.1    munsell_0.4.3    
+[49] pscl_1.5.2        doParallel_1.0.11 truncnorm_1.0-8  
+[52] R.oo_1.22.0      </code></pre>
 </div>
 
 <!-- Adjust MathJax settings so that all math formulae are shown using
