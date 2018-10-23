@@ -158,17 +158,18 @@ dev.off()
 
 ```{r}
 # 7.5 * 3
-#setEPS()
-#postscript("../output/paper/cor_z_pval.eps", width = 7.5, height = 3.3)
-pdf("../output/paper/cor_z_pval.pdf", width = 10, height = 3.3)
+setEPS()
+postscript("../output/paper/cor_z_pval.eps", width = 7.5, height = 3.3)
+#pdf("../output/paper/cor_z_pval.pdf", width = 12, height = 3, compress = )
 
 par(mfrow = c(1, 4))
-par(oma = c(4, 2.5, 0, 0)) # make room (i.e. the 4's) for the overall x and y axis titles
-par(mar = c(4.5, 2, 2.5, 1)) # make the plots be closer together
+par(oma = c(0, 0, 0, 10)) # make room (i.e. the 4's) for the overall x and y axis titles
 
+par(mar = c(4.5, 4, 4.5, 1)) # make the plots be closer together
 p.hist <- hist(p, breaks = seq(0, 1, by = 0.01), plot = FALSE)
-plot(0, 0, xlab = "", ylab = "Density", type = "n", xlim = c(0, 1), ylim = c(0, max(p.hist$density)), main = expression("p-values in Figure 1(c)"), cex.main = 1.5, cex.lab = 1.5)
-abline(v = c(0.005, pnorm(-sqrt(2 * log(1e4))) * 2, 1 / 1e4), lwd = 2, col = c("red", "orange", "yellow"))
+plot(0, 0, xlab = "p-values", ylab = "", type = "n", xlim = c(0, 1), ylim = c(0, max(p.hist$density)), main = expression(atop("Histogram of p-values of", 'Figure 1(c) z-scores')), cex.main = 1.5, cex.lab = 1.5)
+title(ylab = "Density", line = 2.5, cex.lab = 1.5)
+abline(v = c(0.005, pnorm(-sqrt(2 * log(1e4))) * 2), lwd = 2, col = c("red", "orange"))
 hist(p, prob = TRUE, breaks = seq(0, 1, by = 0.01), xlab = "", add = TRUE)
 
 set.seed(5)
@@ -178,24 +179,31 @@ p.norm.1.6 <- pnorm(-abs(rnorm(1e4, 0, 1.6))) * 2
 y.max <- -log(min(p.norm.1, p, p.norm.1.6))
 y.max <- 20
 
-plot(sample(-log(p)), ylim = c(0, y.max), ylab = "-log(p)", main = expression("Figure 1(c)"), cex.main = 1.5, cex.lab = 1.5)
+par(mar = c(4.5, 4, 4.5, 1)) # make the plots be closer together
+
+plot(sample(-log(p)), ylim = c(0, y.max), ylab = "", main = expression(atop('-log(p-value) of', "Figure 1(c) z-scores")), cex.main = 1.5, cex.lab = 1.5)
+title(ylab = '-log(p)', cex.lab = 1.5, line = 2.5)
 abline(h = -log(0.005), col = "red", lwd = 2)
 abline(h = -log(pnorm(-sqrt(2 * log(1e4))) * 2), col = "orange", lwd = 2)
-abline(h = -log(1 / (1e4 + 1)), col = "yellow", lwd = 2)
+#abline(h = -log(1 / (1e4 + 1)), col = "yellow", lwd = 2)
 
-plot(-log(p.norm.1), ylim = c(0, y.max), ylab = "-log(p)", main = expression("Independent N(0,1)"), col = "blue", cex.main = 1.5, cex.lab = 1.5)
+plot(-log(p.norm.1), ylim = c(0, y.max), ylab = "", main = expression(atop('-log(p-value) of', "indep N(0,1) samples")), col = "blue", cex.main = 1.5, cex.lab = 1.5)
+title(ylab = '-log(p)', cex.lab = 1.5, line = 2.5)
 abline(h = -log(0.005), col = "red", lwd = 2)
 abline(h = -log(pnorm(-sqrt(2 * log(1e4))) * 2), col = "orange", lwd = 2)
-abline(h = -log(1 / 1e4), col = "yellow", lwd = 2)
+#abline(h = -log(1 / 1e4), col = "yellow", lwd = 2)
 
-plot(-log(p.norm.1.6), ylim = c(0, y.max), ylab = "-log(p)", main = expression(paste("Independent ", N(0, 1.6^2))), col = "green", cex.main = 1.5, cex.lab = 1.5)
+plot(-log(p.norm.1.6), ylim = c(0, y.max), ylab = "", main = expression(atop('-log(p-value) of', paste("indep ", N(0, 1.6^2), " samples"))), col = "green", cex.main = 1.5, cex.lab = 1.5)
+title(ylab = '-log(p)', cex.lab = 1.5, line = 2.5)
 abline(h = -log(0.005), col = "red", lwd = 2)
 abline(h = -log(pnorm(-sqrt(2 * log(1e4))) * 2), col = "orange", lwd = 2)
-abline(h = -log(1 / 1e4), col = "yellow", lwd = 2)
+#abline(h = -log(1 / 1e4), col = "yellow", lwd = 2)
 
-mtext('-log(p)', side = 2, outer = TRUE, line = 1)
+#legend("topright", inset = c(-0.5, 0), legend = c("p = 0.005", "Universal Threshold", "Bonferroni"), lty = 1, lwd = 2, xpd = NA, col = c("red", "orange", "yellow"), ncol = 1, cex = 1.25)
 
-legend("bottomleft", inset = c(-2.01, -0.51), legend = c("0.005", "Universal Threshold", "Bonferroni"), lty = 1, lwd = 2, xpd = NA, col = c("red", "orange", "yellow"), ncol = 3, cex = 1.25)
+legend("topright", inset = c(-0.75, 0.3),
+       legend = c("p-val = 0.005", 'Univ Thresh'), lty = 1, lwd = 2, xpd = NA,
+       col = c("red", "orange"), ncol = 1, cex = 1.25, bty = "n")
 
 dev.off()
 ```
