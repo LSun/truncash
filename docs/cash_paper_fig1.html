@@ -332,7 +332,7 @@ div.section {
 </div>
 
 
-<p><strong>Last updated:</strong> 2018-10-23</p>
+<p><strong>Last updated:</strong> 2018-10-24</p>
 <strong>workflowr checks:</strong> <small>(Click a bullet for more information)</small>
 <ul>
 <li>
@@ -361,7 +361,7 @@ div.section {
 </li>
 <li>
 <details>
-<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/6ecb4ff579ec1f02c3e982bc6aea1c14c4de6000" target="_blank">6ecb4ff</a> </summary></p>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/9d7221fe3d49f883b2bd247cd78fac4f20d69783" target="_blank">9d7221f</a> </summary></p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 <pre><code>
 Ignored files:
@@ -496,6 +496,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/9d7221fe3d49f883b2bd247cd78fac4f20d69783/analysis/cash_paper_fig1.rmd" target="_blank">9d7221f</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-10-24
+</td>
+<td style="text-align:left;">
+wflow_publish(“analysis/cash_paper_fig1.rmd”)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/0d93981fb57e449e5a8e91413d607ca5e4008b61/docs/cash_paper_fig1.html" target="_blank">0d93981</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-10-23
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 rmd
@@ -741,12 +775,13 @@ Attaching package: &#39;CVXR&#39;</code></pre>
 <pre><code>Loading required package: PolynomF</code></pre>
 <pre><code>Loading required package: Rmosek</code></pre>
 <pre><code>Loading required package: ashr</code></pre>
-<pre class="r"><code>source(&quot;../code/gdfit.R&quot;)
-z.mat &lt;- readRDS(&quot;../output/z_null_liver_777.rds&quot;)
-Z.gtex &lt;- readRDS(&quot;../output/paper/simulation/Z.gtex.rds&quot;)</code></pre>
-<pre class="r"><code>sel = c(32, 327, 23, 459)
-z.sel &lt;- z.mat[sel, ]
-z.sel[3, ] &lt;- Z.gtex[[4503]]</code></pre>
+<pre class="r"><code>source(&quot;../code/gdfit.R&quot;)</code></pre>
+<pre class="r"><code>#z.mat &lt;- readRDS(&quot;../output/z_null_liver_777.rds&quot;)
+#Z.gtex &lt;- readRDS(&quot;../output/paper/simulation/Z.gtex.rds&quot;)
+#sel = c(32, 327, 23, 459)
+#z.sel &lt;- z.mat[sel, ]
+#z.sel[3, ] &lt;- Z.gtex[[4503]]
+z.sel &lt;- readRDS(&quot;../output/paper/simulation/z.sel.rds&quot;)</code></pre>
 <pre class="r"><code>gd.ord &lt;- 10
 
 x.plot = seq(- max(abs(z.sel)) - 2, max(abs(z.sel)) + 2, length = 1000)
