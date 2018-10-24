@@ -14,14 +14,15 @@ Document the correlated $N(0, 1)$ figure in the `cashr` paper.
 ```{r}
 source("../code/gdash_lik.R")
 source("../code/gdfit.R")
-z.mat <- readRDS("../output/z_null_liver_777.rds")
-Z.gtex <- readRDS("../output/paper/simulation/Z.gtex.rds")
 ```
 
 ```{r}
-sel = c(32, 327, 23, 459)
-z.sel <- z.mat[sel, ]
-z.sel[3, ] <- Z.gtex[[4503]]
+#z.mat <- readRDS("../output/z_null_liver_777.rds")
+#Z.gtex <- readRDS("../output/paper/simulation/Z.gtex.rds")
+#sel = c(32, 327, 23, 459)
+#z.sel <- z.mat[sel, ]
+#z.sel[3, ] <- Z.gtex[[4503]]
+z.sel <- readRDS("../output/paper/simulation/z.sel.rds")
 ```
 
 ```{r}
