@@ -102,6 +102,7 @@ for (i in 1 : 4) {
 ## different methods applied to (c)
 
 ```{r}
+## Multiple testing
 q <- 0.1
 z <- z.sel[3, ]
 p <- pnorm(-abs(z)) * 2
@@ -121,6 +122,30 @@ fit.a <- ashr::ash(z, 1, mixcompdist = "normal", method = "fdr")
 ashr::get_pi0(fit.a)
 ## ashr at FDR 0.05
 sum(ashr::get_qvalue(fit.a) <= q)
+```
+
+```{r}
+## EBNM
+
+## EbayesThresh
+
+fit.ebayesthresh <- EbayesThresh::ebayesthresh(z, sdev = 1, verbose = TRUE, threshrule = "median")
+1 - fit.ebayesthresh$w
+
+## Efron's g-modeling
+
+fit.deconvolver <- deconvolveR::deconv(tau = seq(-5, 5, by = 0.1), X = z, family = "Normal", deltaAt = 0)
+
+## REBayes
+
+fit.kw <- REBayes::GLmix(x = z, v = seq(-4.95, 4.95, by = 0.1))
+kw.plot <- CDF.KW(fit.kw)
+KW.data <- cbind.data.frame(
+    Method = "KW",
+    x = fit.kw$x,
+    cdfhat = kw.plot
+  )
+
 ```
 
 ## shoulder inflation figure
