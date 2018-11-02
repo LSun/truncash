@@ -127,25 +127,36 @@ sum(ashr::get_qvalue(fit.a) <= q)
 ```{r}
 ## EBNM
 
+a <- 0.5
+
 ## EbayesThresh
 
-fit.ebayesthresh <- EbayesThresh::ebayesthresh(z, sdev = 1, verbose = TRUE, threshrule = "median")
+fit.ebayesthresh <- EbayesThresh::ebayesthresh(z.sel[3, ], sdev = 1, verbose = TRUE, threshrule = "median", prior = "cauchy")
 1 - fit.ebayesthresh$w
 
 ## Efron's g-modeling
 
 fit.deconvolver <- deconvolveR::deconv(tau = seq(-5, 5, by = 0.1), X = z, family = "Normal", deltaAt = 0)
+fit.deconvolver$stats[fit.deconvolver$stats[, 1] == 0, 2]
+sum(fit.deconvolver$stats[fit.deconvolver$stats[, 1] <= 0.5 & fit.deconvolver$stats[, 1] >= -0.5, 2])
 
 ## REBayes
 
 fit.kw <- REBayes::GLmix(x = z, v = seq(-4.95, 4.95, by = 0.1))
-kw.plot <- CDF.KW(fit.kw)
-KW.data <- cbind.data.frame(
-    Method = "KW",
-    x = fit.kw$x,
-    cdfhat = kw.plot
-  )
+fit.kw$y[fit.kw$x == 0] / sum(fit.kw$y)
+sum(fit.kw$y[fit.kw$x <= 0.5 & fit.kw$x >= -0.5] / sum(fit.kw$y))
 
+## ashr
+
+fit.ashr <- ashr::ash(z, 1, mixcompdist = "normal", method = "fdr")
+fit.ashr$fitted_g$pi[1]
+ashr::mixcdf(fit.ashr$fitted_g, a) - ashr::mixcdf(fit.ashr$fitted_g, -a)
+
+## cashr
+
+fit.cashr <- gdash(z, rep(1, 1e4), gd.priority = TRUE)
+fit.cashr$fitted_g$pi[1]
+ashr::mixcdf(fit.cashr$fitted_g, a) - ashr::mixcdf(fit.cashr$fitted_g, -a)
 ```
 
 ## shoulder inflation figure
