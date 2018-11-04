@@ -14,6 +14,7 @@ Document the correlated $N(0, 1)$ figure in the `cashr` paper.
 ```{r}
 source("../code/gdash_lik.R")
 source("../code/gdfit.R")
+source("../code/count_to_summary.R")
 ```
 
 ```{r}
@@ -260,4 +261,189 @@ legend("topright", inset = c(-0.82, 0.3),
        col = thresh.color[3 : 1], ncol = 1, cex = 1.25, bty = "n")
 
 dev.off()
+```
+
+## Deconv
+
+```{r}
+CDF.KW <- function(h, interp = FALSE, eps = 0.001, bw = 0.7){
+    #Wasserstein distance:  ||G-H||_W
+    if(interp == "biweight"){
+	yk = h$x
+	for (j in 1:length(yk))
+	    yk[j] = sum(biweight(h$x[j], h$x, bw = bw)*h$y/sum(h$y))
+	H <- cumsum(yk)
+	H <- H/H[length(H)]
+    }
+    else {
+	H <- cumsum(h$y)
+	H <- H/H[length(H)]
+    }
+    return(H)
+}
+```
+
+```{r}
+G <- function (t) {
+  0.6 * pnorm(t, 0, 0) + 0.3 * pnorm(t, 0, 1) + 0.1 * pnorm(t, 0, 3)
+}
+
+set.seed(777)
+
+theta <- sample(c(
+  rnorm(6e3, 0, 0),
+  rnorm(3e3, 0, 1),
+  rnorm(1e3, 0, 3)
+))
+
+x.plot <- seq(-6, 6, by = 0.1)
+
+G.plot <- G(x.plot)
+```
+
+```{r}
+top_genes_index = function (g, X) {
+  return(order(rowSums(X), decreasing = TRUE)[1 : g])
+}
+lcpm = function (r) {
+  R = colSums(r)
+  t(log2(((t(r) + 0.5) / (R + 1)) * 10^6))
+}
+set.seed(777)
+r <- readRDS("../data/liver.rds")
+nsamp <- 5
+ngene <- 1e4
+Y = lcpm(r)
+subset = top_genes_index(ngene, Y)
+r = r[subset,]
+counts <- r[, sample(ncol(r), 2 * nsamp)]
+design <- model.matrix(~c(rep(0, nsamp), rep(1, nsamp)))
+summary <- count_to_summary(counts, design)
+s <- summary$sebetahat
+s <- s / sqrt(mean(s^2))
+```
+
+```{r, cache = TRUE}
+noise.label <- c(
+  "Figure 1(a) noise",
+  "Figure 1(b) noise",
+  "Figure 1(c) noise",
+  "Figure 1(d) noise",
+  "IID N(0,1) noise"
+)
+deconv.list <- list()
+for (i in 1 : 5) {
+  if (i <= 4) {
+    Z <- z.sel[i, ]
+  } else {
+    Z <- rnorm(1e4)
+  }
+    X <- theta + s * Z
+    z <- theta + Z
+
+  ## Truth
+  true.data <- cbind.data.frame(
+    method = "True g",
+    x = x.plot,
+    cdfhat = G.plot
+  )
+
+  ## ashr
+  fit.ashr <- ashr::ash(X, s, method = "fdr", mixcompdist = "normal")
+  ashr.plot <- as.numeric(ashr::mixcdf(ashr::get_fitted_g(fit.ashr), x.plot))
+  ashr.data <- cbind.data.frame(
+    method = "ashr",
+    x = x.plot,
+    cdfhat = ashr.plot
+  )
+  
+  ## cashr
+  fit.cashr <- gdash(X, s)
+  cashr.plot <- as.numeric(ashr::mixcdf(ashr::get_fitted_g(fit.cashr), x.plot))
+  cashr.data <- cbind.data.frame(
+    method = "cashr",
+    x = x.plot,
+    cdfhat = cashr.plot
+  )
+
+  ## deconvolveR
+  fit.deconvolveR <- deconvolveR::deconv(tau = x.plot, X = z, family = "Normal", deltaAt = 0)
+  deconvolveR.data <- cbind.data.frame(
+    method = "deconvolveR",
+    x = fit.deconvolveR$stats[, 1],
+    cdfhat = fit.deconvolveR$stats[, 4]
+  )
+  
+  ## Kiefer-Wolfowitz's NPMLE (1956)
+  ## implemented by Koenker-Mizera-Gu's REBayes (2016)
+  v = seq(-5.995, 5.995, by = 0.01)
+  fit.REBayes <- REBayes::GLmix(x = X, v = v, sigma = s)
+  REBayes.plot <- CDF.KW(fit.REBayes)
+  REBayes.data <- cbind.data.frame(
+    method = "REBayes",
+    x = fit.REBayes$x,
+    cdfhat = REBayes.plot
+  )
+  
+  deconv.list[[i]] <- cbind.data.frame(
+    noise = noise.label[i],
+    rbind.data.frame(
+      true.data,
+      cashr.data,
+      ashr.data,
+      deconvolveR.data,
+      REBayes.data
+    )
+  )
+}
+```
+
+```{r}
+deconv.ggdata <- do.call(rbind.data.frame, deconv.list)
+deconv.ggdata$noise <- factor(deconv.ggdata$noise,
+                              levels = c("Figure 1(a) noise",
+                                         "Figure 1(b) noise",
+                                         "iid N(0,1) noise",
+                                         "Figure 1(c) noise",
+                                         "Figure 1(d) noise"
+                                         )
+                              )
+```
+
+
+```{r}
+method.col <- c("black", scales::hue_pal()(5)[c(5, 4, 2, 3)])
+method.linetype <- c(1, 2, 4, 5, 6)
+```
+
+```{r}
+## plotting
+deconv.plot <- ggplot(data = deconv.ggdata, aes(x = x, y = cdfhat, col = method, linetype = method)) +
+  geom_line(size = 1) +
+  facet_wrap(~noise, nrow = 2) +
+  xlim(-5, 5) +
+  scale_linetype_manual(values = method.linetype
+                        #, labels = method.name
+                        #, guide = guide_legend(nrow = 1)
+                        ) +
+  scale_color_manual(values = method.col
+                     #, labels = method.name
+                     #, guide = guide_legend(nrow = 1)
+                     ) +
+  labs(y = expression(paste("CDF of estimated ", hat(g)))
+       #, x = expression(theta)
+       #, title = expression(g == 0.6~delta[0] + 0.3~N(0, 1) + 0.1~N(0, 3^2))
+       ) +
+  theme(plot.title = element_text(size = 15, hjust = 0.5),
+        axis.title.x = element_blank(),
+        axis.text.x = element_text(size = 10),
+        axis.title.y = element_text(size = 15),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = c(0.85, 0.25),
+        legend.title = element_blank(),
+        #legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 15))
+
+ggsave("../output/paper/deconv.pdf", height = 6, width = 10)
 ```
