@@ -55,6 +55,17 @@ density.ggdata.bimodal <- readRDS("../output/paper/simulation/density.ggdata.bim
 ```
 
 ```{r}
+g1.names <- c(
+  'Gaussian',
+  'Near Gaussian',
+  'Spiky',
+  'Flat Top',
+  'Skew',
+  'Bimodal'
+)
+```
+
+```{r}
 density.g.ggdata <- rbind.data.frame(
   density.ggdata.normal,
   density.ggdata.nearnormal,
@@ -63,6 +74,10 @@ density.g.ggdata <- rbind.data.frame(
   density.ggdata.skew,
   density.ggdata.bimodal
 )
+
+density.g.ggdata$g <- plyr::mapvalues(density.g.ggdata$g, from = levels(density.g.ggdata$g), to = g1.names)
+
+density.g.ggdata$g <- factor(density.g.ggdata$g, levels = g1.names[c(1, 2, 3, 5, 6, 4)])
 
 density.g.plot <- ggplot(data = density.g.ggdata, aes(x = plotx, y = ploty)) +
   geom_line() +
@@ -103,6 +118,10 @@ FDP.q.g.ggdata$Method <- plyr::mapvalues(FDP.q.g.ggdata$Method, from = c("CASH",
 FDP.q.g.ggdata$Method <- factor(FDP.q.g.ggdata$Method, levels = c("cashr", "BH", "qvalue", "ashr", "locfdr"))
 
 FDP.q.g.ggdata$pi0 <- as.numeric(levels(FDP.q.g.ggdata$pi0))[FDP.q.g.ggdata$pi0]
+
+FDP.q.g.ggdata$g <- plyr::mapvalues(FDP.q.g.ggdata$g, from = levels(FDP.q.g.ggdata$g), to = g1.names)
+
+FDP.q.g.ggdata$g <- factor(FDP.q.g.ggdata$g, levels = g1.names[c(1, 2, 3, 5, 6, 4)])
 ```
 
 ```{r}
@@ -138,7 +157,7 @@ FDP.q.g.plot.save <- gridExtra::arrangeGrob(
   top = grid::textGrob(bquote(paste("Nominal FDR = ", .(q))), gp = grid::gpar(fontsize = 15), hjust = 2.35)
 )
 
-ggsave("../output/paper/FDP.q.g.pdf", FDP.q.g.plot.save, height = 6, width = 9)
+ggsave("../output/paper/FDP.q.g.pdf", FDP.q.g.plot.save, height = 6, width = 10)
 ```
 
 ```{r}
