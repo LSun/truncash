@@ -1,0 +1,156 @@
+---
+title: "The shoulder inflation figure"
+author: "Lei Sun"
+date: "2018-11-11"
+output: workflowr::wflow_html
+---
+
+```{r}
+z.sel <- readRDS("../output/paper/simulation/z.sel.rds")
+z <- z.sel[3, ]
+p <- pnorm(-abs(z)) * 2
+```
+
+```{r}
+thresh.color <- c("maroon", "purple", "orange")
+#thresh.color <- scales::hue_pal()(10)[5 : 7]
+
+set.seed(5)
+p.norm.1 <- pnorm(-abs(rnorm(1e4))) * 2
+set.seed(25)
+p.norm.1.6 <- pnorm(-abs(rnorm(1e4, 0, 1.6))) * 2
+y.max <- -log(min(p.norm.1, p, p.norm.1.6))
+y.max <- 20
+```
+
+```{r}
+# setEPS()
+# postscript("../output/paper/ecdf_z.eps", width = 5, height = 5)
+pdf("../output/paper/ecdf_z.pdf", width = 5, height = 5)
+
+par(mar = c(4.5, 4.5, 2.5, 1))
+
+plot(ecdf(z), xlab = "z-score", ylab = "CDF", lwd = 2, main = expression("(a): Emp. CDF"), cex.main = 2, cex.lab = 2, xlim = c(-max(abs(z)), max(abs(z))))
+lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01)), col = "blue", lwd = 3, lty = 2)
+lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01), 0, 1.6), col = "green", lwd = 3, lty = 4)
+rect(xleft = c(-5, 2.5),
+     xright = c(-2.5, 5),
+     ytop = c(0.05, 1),
+     ybottom = c(0, 0.95), border = "red", lty = c(1, 5))
+legend("bottomright", c("z-scores", expression(N(0,1)), expression(N(0, 1.6^2))), lty = c(1, 2, 4), col = c("black", "blue", "green"), lwd = 3, cex = 1.75, bty = 'n', seg.len = 1.5, x.intersp = 0.5)
+
+dev.off()
+```
+
+```{r}
+# setEPS()
+# postscript("../output/paper/ecdf_z_left.eps", width = 5, height = 5)
+pdf("../output/paper/ecdf_z_left.pdf", width = 5, height = 5)
+
+par(mar = c(4.5, 4.5, 2.5, 1))
+
+plot(ecdf(z), xlab = "z-score", ylab = "CDF", main = expression("(b): Left Tail"), lwd = 3, xlim = c(-5, -2.5), ylim = c(0, 0.05), cex.main = 2, cex.lab = 2, bty = "n")
+box(col = "red")
+lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01)), col = "blue", lwd = 3, lty = 2)
+lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01), 0, 1.6), col = "green", lwd = 3, lty = 4)
+
+legend("topleft", c("z-scores", expression(N(0,1)), expression(N(0, 1.6^2))), lty = c(1, 2, 4), col = c("black", "blue", "green"), lwd = 3, cex = 1.75, bty = 'n', seg.len = 1.5, x.intersp = 0.5)
+
+dev.off()
+```
+
+```{r}
+# setEPS()
+# postscript("../output/paper/ecdf_z_right.eps", width = 5, height = 5)
+pdf("../output/paper/ecdf_z_right.pdf", width = 5, height = 5)
+
+par(mar = c(4.5, 4.5, 2.5, 1))
+
+plot(ecdf(z), xlab = "z-score", ylab = "CDF", main = expression("(c): Right Tail"), lwd = 3, xlim = c(2.5, 5), ylim = c(0.95, 1), cex.main = 2, cex.lab = 2, bty = "n")
+box(col = "red", lty = 5)
+lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01)), col = "blue", lwd = 3, lty = 2)
+lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01), 0, 1.6), col = "green", lwd = 3, lty = 4)
+
+legend("bottomright", c("z-scores", expression(N(0,1)), expression(N(0, 1.6^2))), lty = c(1, 2, 4), col = c("black", "blue", "green"), lwd = 3, cex = 1.75, bty = 'n', seg.len = 1.5, x.intersp = 0.5)
+
+dev.off()
+```
+
+```{r}
+# setEPS()
+# postscript("../output/paper/pval_z.eps", width = 5, height = 5)
+pdf("../output/paper/pval_z.pdf", width = 5, height = 5)
+
+par(mar = c(4.5, 4.5, 2.5, 1))
+
+hist(p, prob = TRUE, breaks = seq(0, 1, by = 0.01), xlab = "p-value", main = expression("(d): Histogram"), cex.main = 2, cex.lab = 2)
+
+dev.off()
+```
+
+```{r}
+# setEPS()
+# postscript("../output/paper/pval_log_z.eps", width = 5, height = 5)
+pdf("../output/paper/pval_log_z.pdf", width = 5, height = 5)
+
+par(mar = c(4.5, 4.5, 2.5, 1))
+
+plot(sample(-log(p)), ylim = c(0, y.max), ylab = "-log(p-value)", main = expression('(e): correlated z-scores'), cex.main = 2, cex.lab = 2, pch = 19)
+abline(h = -log(c(
+  0.005,
+  pnorm(-sqrt(2 * log(1e4))) * 2,
+  0.05 / 1e4
+)), lwd = 3, col = thresh.color, lty = c(1, 2, 4))
+
+dev.off()
+```
+
+```{r}
+# setEPS()
+# postscript("../output/paper/pval_log_N01.eps", width = 5, height = 5)
+pdf("../output/paper/pval_log_N01.pdf", width = 5, height = 5)
+
+par(mar = c(4.5, 4.5, 2.5, 1))
+
+plot(-log(p.norm.1), ylim = c(0, y.max), ylab = "-log(p-value)", main = expression("(f): iid N(0,1) samples"), col = "blue", cex.main = 2, cex.lab = 2, pch = 19)
+abline(h = -log(c(
+  0.005,
+  pnorm(-sqrt(2 * log(1e4))) * 2,
+  0.05 / 1e4
+)), lwd = 3, col = thresh.color, lty = c(1, 2, 4))
+
+legend("top",
+       legend = c(
+         latex2exp::TeX('p-value$= 0.05 / 10^4$'),
+         'Univsal Threshold',
+         latex2exp::TeX('p-value$= 0.005')
+         ), lty = c(4, 2, 1), lwd = 3, xpd = NA,
+       col = thresh.color[3 : 1], ncol = 1, bty = 'n')
+
+dev.off()
+```
+
+```{r}
+# setEPS()
+# postscript("../output/paper/pval_log_N01.6.eps", width = 5, height = 5)
+pdf("../output/paper/pval_log_N016.pdf", width = 5, height = 5)
+
+par(mar = c(4.5, 4.5, 2.5, 1))
+
+plot(-log(p.norm.1.6), ylim = c(0, y.max), ylab = "-log(p-value)", main = expression(paste("(g): iid ", N(0, 1.6^2), " samples")), col = "green", cex.main = 2, cex.lab = 2, pch = 19)
+abline(h = -log(c(
+  0.005,
+  pnorm(-sqrt(2 * log(1e4))) * 2,
+  0.05 / 1e4
+)), lwd = 3, col = thresh.color, lty = c(1, 2, 4))
+
+# legend("topright", inset = c(-0.52, 0.3),
+#        legend = c(
+#          latex2exp::TeX('$p = 0.05 / 10^4$'),
+#          'Univ Thresh',
+#          "p = 0.005"
+#          ), lty = c(4, 2, 1), lwd = 3, xpd = NA,
+#        col = thresh.color[3 : 1], ncol = 1, cex = 1.5, bty = "n", x.intersp = 0.5, seg.len = 1.5)
+
+dev.off()
+```

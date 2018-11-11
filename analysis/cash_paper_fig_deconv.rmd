@@ -1,0 +1,224 @@
+---
+title: "The deconvolution figure"
+author: "Lei Sun"
+date: "2018-11-11"
+output: workflowr::wflow_html
+---
+
+## Deconv
+
+```{r}
+z.sel <- readRDS("../output/paper/simulation/z.sel.rds")
+```
+
+```{r}
+source('../code/count_to_summary.R')
+source('../code/gdash_lik.R')
+```
+
+```{r}
+library(ggplot2)
+
+CDF.KW <- function(h, interp = FALSE, eps = 0.001, bw = 0.7){
+    #Wasserstein distance:  ||G-H||_W
+    if(interp == "biweight"){
+	yk = h$x
+	for (j in 1:length(yk))
+	    yk[j] = sum(biweight(h$x[j], h$x, bw = bw)*h$y/sum(h$y))
+	H <- cumsum(yk)
+	H <- H/H[length(H)]
+    }
+    else {
+	H <- cumsum(h$y)
+	H <- H/H[length(H)]
+    }
+    return(H)
+}
+```
+
+```{r}
+G <- function (t) {
+  0.6 * pnorm(t, 0, 0) + 0.3 * pnorm(t, 0, 1) + 0.1 * pnorm(t, 0, 3)
+}
+
+set.seed(777)
+
+theta <- sample(c(
+  rnorm(6e3, 0, 0),
+  rnorm(3e3, 0, 1),
+  rnorm(1e3, 0, 3)
+))
+
+x.plot <- seq(-6, 6, by = 0.1)
+
+G.plot <- G(x.plot)
+```
+
+```{r}
+r <- readRDS("../data/liver.rds")
+nsamp <- 5
+ngene <- 1e4
+Y = lcpm(r)
+subset = top_genes_index(ngene, Y)
+r = r[subset,]
+set.seed(777)
+counts <- r[, sample(ncol(r), 2 * nsamp)]
+design <- model.matrix(~c(rep(0, nsamp), rep(1, nsamp)))
+summary <- count_to_summary(counts, design)
+s <- summary$sebetahat
+s <- s / sqrt(mean(s^2))
+```
+
+```{r, cache = TRUE}
+noise.label <- c(
+  'a',
+  'b',
+  'c',
+  'd',
+  'e'
+)
+deconv.list <- list()
+for (i in 1 : 5) {
+  if (i <= 4) {
+    Z <- z.sel[i, ]
+  } else {
+    set.seed(777)
+    Z <- rnorm(1e4)
+  }
+    X <- theta + s * Z
+    z <- theta + Z
+
+  ## Truth
+  true.data <- cbind.data.frame(
+    method = "True g",
+    x = x.plot,
+    cdfhat = G.plot
+  )
+
+  ## ashr
+  fit.ashr <- ashr::ash(X, s, method = "fdr", mixcompdist = "normal")
+  ashr.plot <- as.numeric(ashr::mixcdf(ashr::get_fitted_g(fit.ashr), x.plot))
+  ashr.data <- cbind.data.frame(
+    method = "ashr",
+    x = x.plot,
+    cdfhat = ashr.plot
+  )
+  
+  ## cashr
+  fit.cashr <- gdash(X, s)
+  cashr.plot <- as.numeric(ashr::mixcdf(ashr::get_fitted_g(fit.cashr), x.plot))
+  cashr.data <- cbind.data.frame(
+    method = "cashr",
+    x = x.plot,
+    cdfhat = cashr.plot
+  )
+
+  ## deconvolveR
+  fit.deconvolveR <- deconvolveR::deconv(tau = x.plot, X = z, family = "Normal", deltaAt = 0)
+  deconvolveR.data <- cbind.data.frame(
+    method = "deconvolveR",
+    x = fit.deconvolveR$stats[, 1],
+    cdfhat = fit.deconvolveR$stats[, 4]
+  )
+  
+  ## Kiefer-Wolfowitz's NPMLE (1956)
+  ## implemented by Koenker-Mizera-Gu's REBayes (2016)
+  v = seq(-6.025, 6.025, by = 0.05)
+  fit.REBayes <- REBayes::GLmix(x = X, v = v, sigma = s)
+  REBayes.plot <- CDF.KW(fit.REBayes)
+  REBayes.data <- cbind.data.frame(
+    method = "REBayes",
+    x = fit.REBayes$x,
+    cdfhat = REBayes.plot
+  )
+  
+  ## EbayesThresh
+  fit.EbayesThresh <- EbayesThresh::ebayesthresh(X, sdev = s, verbose = TRUE, prior = "laplace", a = NA)
+  EbayesThresh.plot <- (1 - fit.EbayesThresh$w) * (x.plot >= 0) + fit.EbayesThresh$w * rmutil::plaplace(x.plot, m = 0, s = 1 / fit.EbayesThresh$a)
+  EbayesThresh.data <- cbind.data.frame(
+    method = "EbayesThresh",
+    x = x.plot,
+    cdfhat = EbayesThresh.plot
+  )
+  
+  deconv.list[[i]] <- cbind.data.frame(
+    noise = noise.label[i],
+    rbind.data.frame(
+      true.data,
+      EbayesThresh.data,
+      REBayes.data,
+      ashr.data,
+      deconvolveR.data,
+      cashr.data
+    )
+  )
+}
+```
+
+```{r}
+deconv.ggdata <- do.call(rbind.data.frame, deconv.list)
+noise.level <- c("(a)",
+                  "(b)",
+                  "(c)",
+                  "(d)",
+                  "(e)")
+deconv.ggdata$noise <- plyr::mapvalues(deconv.ggdata$noise,
+                                        from = noise.label,
+                                        to = noise.level
+                                        )
+deconv.ggdata$noise <- factor(deconv.ggdata$noise,
+                              levels = levels(deconv.ggdata$noise)[c(1, 2, 5, 3, 4)]
+                              )
+```
+
+```{r}
+method.col <- c("black", scales::hue_pal()(5)[c(1, 3, 4, 2, 5)])
+method.linetype <- rep(1, 6)
+#method.linetype <- c(1, 2, 4, 5, 6)
+```
+
+```{r}
+## plotting
+deconv.plot <- ggplot(data = deconv.ggdata, aes(x = x, y = cdfhat, col = method, linetype = method)) +
+  geom_line(size = 1) +
+  facet_wrap(~noise, nrow = 2) +
+  xlim(-5, 5) +
+  scale_linetype_manual(values = method.linetype
+                        #, labels = method.name
+                        #, guide = guide_legend(nrow = 1)
+                        ) +
+  scale_color_manual(values = method.col
+                     #, labels = method.name
+                     #, guide = guide_legend(nrow = 1)
+                     ) +
+  labs(y = expression(paste("CDF of estimated ", hat(g)))
+       #, x = expression(theta)
+       #, title = expression(g == 0.6~delta[0] + 0.3~N(0, 1) + 0.1~N(0, 3^2))
+       ) +
+  theme(plot.title = element_text(size = 15, hjust = 0.5),
+        axis.title.x = element_blank(),
+        axis.text.x = element_text(size = 10),
+        axis.title.y = element_text(size = 15),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = c(0.85, 0.25),
+        legend.title = element_blank(),
+        #legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 15))
+
+ggsave("../output/paper/deconv.pdf", height = 5, width = 10)
+```
+
+```{r}
+q <- 0.1
+p.val.3 <- pnorm(-abs((theta + s * z.sel[3, ]) / s)) * 2
+fit.BH.3 <- p.adjust(p.val.3, method = "BH")
+sum(fit.BH.3 <= q)
+sum(theta[fit.BH.3 <= q] == 0)
+sum(theta[fit.BH.3 <= q] == 0) / sum(fit.BH.3 <= q)
+fit.qvalue.3 <- qvalue::qvalue(p.val.3)
+fit.qvalue.3$pi0
+sum(fit.qvalue.3$qvalues <= q)
+sum(theta[fit.qvalue.3$qvalues <= q] == 0)
+sum(theta[fit.qvalue.3$qvalues <= q] == 0) / sum(fit.qvalue.3$qvalues <= q)
+```
