@@ -1,0 +1,123 @@
+---
+title: "Figure to show average empirical CDF is $N(0,1)$"
+author: "Lei Sun"
+date: "2018-11-11"
+output: workflowr::wflow_html
+---
+
+```{r}
+# source("../code/count_to_summary.R")
+# 
+# r <- readRDS("../data/liver.rds")
+# ngene <- 1e4
+# 
+# Y = lcpm(r)
+# subset = top_genes_index(ngene, Y)
+# r = r[subset,]
+# 
+# nsamp <- 5
+# set.seed(7)
+# nsim <- 1e4
+# Z.list <- W <- list()
+# for (i in 1 : nsim) {
+#   ## generate data
+#   counts <- r[, sample(ncol(r), 2 * nsamp)]
+#   design <- model.matrix(~c(rep(0, nsamp), rep(1, nsamp)))
+#   summary <- count_to_summary(counts, design)
+#   Z <- summary$z
+#   Z.list[[i]] <- Z
+#   Z.GD <- gdfit.mom(Z, 100)
+#   W[[i]] <- Z.GD$w
+# }
+# Z.gtex <- Z.list
+# W.gtex <- W
+```
+
+```{r}
+Z.gtex <- readRDS('../output/paper/simulation/Z.gtex.rds')
+```
+
+```{r, cache = TRUE}
+quantile.vec1 <- exp(seq(-21, -5, by = 0.01))
+quantile.vec2 <- seq(0.007, 0.993, by = 0.001)
+quantile.vec3 <- exp(seq(-5, -21, by = -0.01))
+emp.cdf.Z1 <- sapply(quantile.vec1, function(x) {sapply(Z.gtex, function(y) mean(y <= qnorm(x)))})
+emp.cdf.Z2 <- sapply(quantile.vec2, function(x) {sapply(Z.gtex, function(y) mean(y <= qnorm(x)))})
+emp.cdf.Z3 <- sapply(quantile.vec3, function(x) {sapply(Z.gtex, function(y) mean(y <= -qnorm(x)))})
+emp.cdf.Z4 <- sapply(quantile.vec3, function(x) {sapply(Z.gtex, function(y) mean(y > -qnorm(x)))})
+```
+
+```{r}
+ecdf.avg1 <- colMeans(emp.cdf.Z1)
+ecdf.avg2 <- colMeans(emp.cdf.Z2)
+ecdf.avg3 <- colMeans(emp.cdf.Z3)
+ecdf.avg4 <- colMeans(emp.cdf.Z4)
+ecdf.avg <- c(ecdf.avg1, ecdf.avg2, ecdf.avg3)
+ecdf.tail.avg.conf.int1 <- apply(emp.cdf.Z1, 2, function(x) {t.test(x, conf.level = 0.999)$conf.int})
+ecdf.tail.avg.conf.int4 <- apply(emp.cdf.Z4, 2, function(x) {t.test(x, conf.level = 0.999)$conf.int})
+```
+
+```{r}
+pdf("../output/paper/ecdf_avg.pdf", height = 5, width = 5)
+par(mar = c(4.5, 4.5, 2.5, 1))
+plot(c(qnorm(quantile.vec1), qnorm(quantile.vec2), -qnorm(quantile.vec3)), ecdf.avg, type = "l", xlab = "z-scores", ylab = "CDF", cex.lab = 2, lwd = 2)
+title(expression('(a): Avg. Emp. CDF'), cex.main = 2)
+lines(c(qnorm(quantile.vec1), qnorm(quantile.vec2), -qnorm(quantile.vec3)), c(quantile.vec1, quantile.vec2, pnorm(-qnorm(quantile.vec3))), lty = 2, col = "blue", lwd = 2)
+legend("bottomright", lty = c(1, 2), col = c(1, "blue"), legend = c(expression(bar("F"[p])), expression('N(0,1)')), lwd = 2, cex = 2, bty = 'n')
+rect(xleft = c(range(qnorm(quantile.vec1))[1], range(-qnorm(quantile.vec3))[1]),
+     xright = c(range(qnorm(quantile.vec1))[2], range(-qnorm(quantile.vec3))[2]),
+     ybottom = c(range(quantile.vec1, ecdf.avg1)[1], range(1 - quantile.vec3, 1 - ecdf.avg4)[1]),
+     ytop = c(range(quantile.vec1, ecdf.avg1)[2], range(1 - quantile.vec3, 1 - ecdf.avg4)[2]),
+     border = "red", lty = c(1, 5)
+     )
+dev.off()
+```
+
+
+```{r}
+pdf("../output/paper/ecdf_avg_left.pdf", height = 5, width = 5)
+par(mar = c(4.5, 4.5, 2.5, 1))
+plot(qnorm(quantile.vec1), log(ecdf.avg1), type = "l",
+     ylim = range(log(quantile.vec1), log(ecdf.avg1)),
+     xlab = "z-scores", ylab = "log(CDF)", bty = "n", lwd = 2, cex.lab = 2)
+title(expression('(b): Left Tail'), cex.main = 2)
+lines(qnorm(quantile.vec1), log(quantile.vec1), lty = 2, col = "blue", lwd = 2)
+lines(qnorm(quantile.vec1), log(pnorm(qnorm(quantile.vec1), 0, 1.1)), lty = 3, col = "orange", lwd = 2)
+lines(qnorm(quantile.vec1), log(pnorm(qnorm(quantile.vec1), 0, 1.05)), lty = 4, col = "green", lwd = 2)
+polygon(x = c(qnorm(quantile.vec1), rev(qnorm(quantile.vec1))),
+        y = c(pmax(log(pmax(ecdf.tail.avg.conf.int1, 0)[1, ]), -30), rev(log(pmax(ecdf.tail.avg.conf.int1, 0)[2, ]))),
+        border = NA,
+        col = grDevices::adjustcolor("grey75", alpha.f = 0.5))
+legend("bottomright", lty = c(1, 2, 4, 3), col = c("black", "blue", "green", "orange"), legend = c(
+  expression(bar("F"[p])),
+  expression(N(0, 1)),
+  expression(N(0, 1.05^2)),
+  expression(N(0, 1.1^2))
+), bty = 'n', lwd = 2, cex = 1.75)
+box(col = "red")
+dev.off()
+```
+
+```{r}
+pdf("../output/paper/ecdf_avg_right.pdf", height = 5, width = 5)
+par(mar = c(4.5, 4.5, 2.5, 1))
+plot(-qnorm(quantile.vec3), log(ecdf.avg4), type = "l",
+     ylim = range(log(quantile.vec3), log(ecdf.avg4)),
+     xlab = "z-scores", ylab = "log(1-CDF)", bty = "n", lwd = 2, cex.lab = 2)
+title(expression('(c): Right Tail'), cex.main = 2)
+lines(-qnorm(quantile.vec3), log(quantile.vec3), lty = 2, col = "blue", lwd = 2)
+lines(-qnorm(quantile.vec3), log(pnorm(qnorm(quantile.vec3), 0, 1.1)), lty = 3, lwd = 2, col = "orange")
+lines(-qnorm(quantile.vec3), log(pnorm(qnorm(quantile.vec3), 0, 1.05)), lty = 4, lwd = 2, col = "green")
+polygon(x = c(-qnorm(quantile.vec3), rev(-qnorm(quantile.vec3))),
+        y = c(pmax(log(pmax(ecdf.tail.avg.conf.int4[1, ], 0)), -30), rev(log(ecdf.tail.avg.conf.int4[2, ]))),
+        border = NA,
+        col = grDevices::adjustcolor("grey75", alpha.f = 0.5))
+legend("bottomleft", lty = c(1, 2, 4, 3), col = c("black", "blue", "green", "orange"), legend = c(
+  expression(bar("F"[p])),
+  expression(N(0, 1)),
+  expression(N(0, 1.05^2)),
+  expression(N(0, 1.1^2))
+), lwd = 2, cex = 1.75, bty = 'n')
+box(col = "red", lty = 5)
+dev.off()
+```
