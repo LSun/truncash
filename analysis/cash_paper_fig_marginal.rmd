@@ -1,0 +1,144 @@
+---
+title: "Figures to show simulated null $z$-scores are $N(0,1)$"
+author: "Lei Sun"
+date: "2018-11-10"
+output: workflowr::wflow_html
+---
+
+```{r}
+# source("../code/count_to_summary.R")
+# 
+# r <- readRDS("../data/liver.rds")
+# ngene <- 1e4
+# 
+# Y = lcpm(r)
+# subset = top_genes_index(ngene, Y)
+# r = r[subset,]
+# 
+# nsamp <- 5
+# set.seed(7)
+# nsim <- 1e4
+# Z.list <- W <- list()
+# for (i in 1 : nsim) {
+#   ## generate data
+#   counts <- r[, sample(ncol(r), 2 * nsamp)]
+#   design <- model.matrix(~c(rep(0, nsamp), rep(1, nsamp)))
+#   summary <- count_to_summary(counts, design)
+#   Z <- summary$z
+#   Z.list[[i]] <- Z
+#   Z.GD <- gdfit.mom(Z, 100)
+#   W[[i]] <- Z.GD$w
+# }
+# Z.gtex <- Z.list
+# W.gtex <- W
+```
+
+```{r}
+# set.seed(777)
+# nsim <- 1e4
+# Z.list <- list()
+# for (i in seq(nsim)) {
+#   ## generate data
+#   counts <- t(apply(r, 1, sample, 2 * nsamp))
+#   design <- model.matrix(~c(rep(0, nsamp), rep(1, nsamp)))
+#   summary <- count_to_summary(counts, design)
+#   Z <- summary$z
+#   Z.list[[i]] <- Z
+# }
+# z.gtex.rand.gene <- matrix(unlist(Z.list), byrow = TRUE, nrow = nsim)
+```
+
+```{r}
+z.gtex <- readRDS('../output/paper/simulation/Z.gtex.rds')
+z.gtex.rand.gene <- readRDS('../output/paper/simulation/z.gtex.rand.gene.rds')
+```
+
+```{r gtex_rand_gene}
+nsim <- nrow(z.gtex.rand.gene)
+pz <- ncol(z.gtex.rand.gene)
+
+png("../output/paper/ecdf_gtex_rand_gene.png", width = 5, height = 5, units = "in", res = 600)
+
+par(mar = c(4.5, 4.5, 2.5, 1))
+
+plot(0, type = "n", xlim = c(-5, 5), ylim = c(0, 1), ylab = "(Empirical) CDF", xlab = "z-scores", cex.lab = 2)
+title(expression('(b): correlation removed'), cex.main = 2)
+
+for (i in seq(nsim)) {
+  lines(ecdf(z.gtex.rand.gene[i, ]), lwd = 1, col = "grey75")
+}
+
+x.plot <- seq(-6, 6, by = 0.01)
+y.plot.norm <- pnorm(x.plot)
+upper.norm <- y.plot.norm + sqrt(log(2 / (1 / nsim)) / (2 * pz))
+lower.norm <- y.plot.norm - sqrt(log(2 / (1 / nsim)) / (2 * pz))
+
+lines(x.plot, y.plot.norm, lwd = 2, col = "blue")
+
+lines(x.plot[upper.norm <= 1 & upper.norm >= 0], upper.norm[upper.norm <= 1 & upper.norm >= 0], lty = 3, col = "blue")
+lines(x.plot[lower.norm <= 1 & lower.norm >= 0], lower.norm[lower.norm <= 1 & lower.norm >= 0], lty = 3, col = "blue")
+
+legend("bottomright", lwd = 1 : 2, col = c("grey75", "blue"), c(expression("F"[p]), expression('N(0,1)')), bty = "n", cex = 2)
+
+dev.off()
+```
+
+```{r gtex}
+nsim <- length(z.gtex)
+pz <- length(z.gtex[[1]])
+
+png("../output/paper/ecdf_gtex.png", width = 5, height = 5, units = "in", res = 600)
+
+par(mar = c(4.5, 4.5, 2.5, 1))
+
+plot(0, type = "n", xlim = c(-5, 5), ylim = c(0, 1), ylab = "(Empirical) CDF", xlab = "z-scores", cex.lab = 2)
+title(expression('(a): correlation kept'), cex.main = 2)
+
+for (i in seq(nsim)) {
+  lines(ecdf(z.gtex[[i]]), lwd = 1, col = "grey75")
+}
+
+x.plot <- seq(-6, 6, by = 0.01)
+y.plot.norm <- pnorm(x.plot)
+upper.norm <- y.plot.norm + sqrt(log(2 / (1 / nsim)) / (2 * pz))
+lower.norm <- y.plot.norm - sqrt(log(2 / (1 / nsim)) / (2 * pz))
+
+lines(x.plot, y.plot.norm, lwd = 2, col = "blue")
+
+lines(x.plot[upper.norm <= 1 & upper.norm >= 0], upper.norm[upper.norm <= 1 & upper.norm >= 0], lty = 3, col = "blue")
+lines(x.plot[lower.norm <= 1 & lower.norm >= 0], lower.norm[lower.norm <= 1 & lower.norm >= 0], lty = 3, col = "blue")
+
+legend("bottomright", lwd = 1 : 2, col = c("grey75", "blue"), c(expression("F"[p]), expression('N(0,1)')), bty = "n", cex = 2)
+
+dev.off()
+```
+
+```{r iid}
+nsim <- nrow(z.gtex.rand.gene)
+pz <- ncol(z.gtex.rand.gene)
+
+png("../output/paper/ecdf_iid.png", width = 5, height = 5, units = "in", res = 600)
+
+par(mar = c(4.5, 4.5, 2.5, 1))
+
+plot(0, type = "n", xlim = c(-5, 5), ylim = c(0, 1), ylab = "(Empirical) CDF", xlab = "z-scores", cex.lab = 2)
+title(expression('(c): iid N(0,1) samples'), cex.main = 2)
+
+for (i in seq(1)) {
+  lines(ecdf(rnorm(pz)), lwd = 1, col = "grey75")
+}
+
+x.plot <- seq(-6, 6, by = 0.01)
+y.plot.norm <- pnorm(x.plot)
+upper.norm <- y.plot.norm + sqrt(log(2 / (1 / nsim)) / (2 * pz))
+lower.norm <- y.plot.norm - sqrt(log(2 / (1 / nsim)) / (2 * pz))
+
+lines(x.plot, y.plot.norm, lwd = 2, col = "blue")
+
+lines(x.plot[upper.norm <= 1 & upper.norm >= 0], upper.norm[upper.norm <= 1 & upper.norm >= 0], lty = 3, col = "blue")
+lines(x.plot[lower.norm <= 1 & lower.norm >= 0], lower.norm[lower.norm <= 1 & lower.norm >= 0], lty = 3, col = "blue")
+
+legend("bottomright", lwd = 1 : 2, col = c("grey75", "blue"), c(expression("F"[p]), expression('N(0,1)')), bty = "n", cex = 2)
+
+dev.off()
+```
