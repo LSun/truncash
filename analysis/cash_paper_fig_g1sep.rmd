@@ -166,6 +166,34 @@ mse.sqrt.table <- aggregate(FDP ~ Method + pi0 + g, data = FDP.q.g.ggdata, FUN =
 mad.table <- aggregate(FDP ~ Method + pi0 + g, data = FDP.q.g.ggdata, FUN = function (x) {mean(abs(x - 0.1))})
 ```
 
+```{r}
+mse.sqrt.table$pi0 <- factor(mse.sqrt.table$pi0)
+FDP.sqrt.mse.plot <- ggplot(data = mse.sqrt.table,
+                            aes(x = pi0,
+                                y = FDP,
+                                group = Method,
+                                col = Method,
+                                linetype = Method,
+                                shape = Method)) +
+  geom_line() +
+  geom_point() + 
+  scale_color_manual(values = method.col.FDR) +
+  facet_wrap(~ g, nrow = 1) +
+  labs(y = expression(sqrt(MSE)), x = expression(pi[0])) +
+  theme(
+    axis.title.y = element_text(size = 15),
+    axis.text.y = element_text(size = 12),
+    axis.title.x = element_text(size = 15),
+    axis.text.x = element_text(size = 12),
+    strip.text = element_text(size = 15),
+    legend.text = element_text(size = 12)
+  )
+```
+
+```{r}
+ggsave("../output/paper/FDP_sqrtMSE.pdf", FDP.sqrt.mse.plot, height = 3, width = 12)
+```
+
 ------------------------
 
 Not used
