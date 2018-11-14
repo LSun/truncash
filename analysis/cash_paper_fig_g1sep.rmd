@@ -15,13 +15,13 @@ library(ggplot2)
 
 ```{r}
 boxplot.quantile <- function(x) {
-  r <- quantile(x, probs = c(0.10, 0.25, 0.5, 0.75, 0.90))
+  r <- quantile(x, probs = c(0.05, 0.25, 0.5, 0.75, 0.95))
   names(r) <- c("ymin", "lower", "middle", "upper", "ymax")
   return(r)
 }
 
 boxplot.quantile.sq <- function (x) {
-  r <- sqrt(quantile(x^2, probs = c(0.10, 0.25, 0.5, 0.75, 0.90)))
+  r <- sqrt(quantile(x^2, probs = c(0.05, 0.25, 0.5, 0.75, 0.95)))
   names(r) <- c("ymin", "lower", "middle", "upper", "ymax")
   return(r)
 }
@@ -77,7 +77,7 @@ density.g.ggdata <- rbind.data.frame(
 
 density.g.ggdata$g <- plyr::mapvalues(density.g.ggdata$g, from = levels(density.g.ggdata$g), to = g1.names)
 
-density.g.ggdata$g <- factor(density.g.ggdata$g, levels = g1.names[c(1, 2, 3, 5, 6, 4)])
+density.g.ggdata$g <- factor(density.g.ggdata$g, levels = g1.names[c(1, 2, 3, 5, 4, 6)])
 
 density.g.plot <- ggplot(data = density.g.ggdata, aes(x = plotx, y = ploty)) +
   geom_line() +
@@ -121,7 +121,7 @@ FDP.q.g.ggdata$pi0 <- as.numeric(levels(FDP.q.g.ggdata$pi0))[FDP.q.g.ggdata$pi0]
 
 FDP.q.g.ggdata$g <- plyr::mapvalues(FDP.q.g.ggdata$g, from = levels(FDP.q.g.ggdata$g), to = g1.names)
 
-FDP.q.g.ggdata$g <- factor(FDP.q.g.ggdata$g, levels = g1.names[c(1, 2, 3, 5, 6, 4)])
+FDP.q.g.ggdata$g <- factor(FDP.q.g.ggdata$g, levels = g1.names[c(1, 2, 3, 5, 4, 6)])
 ```
 
 ```{r}
@@ -157,40 +157,72 @@ FDP.q.g.plot.save <- gridExtra::arrangeGrob(
   top = grid::textGrob(bquote(paste("Nominal FDR = ", .(q))), gp = grid::gpar(fontsize = 15), hjust = 2.35)
 )
 
-ggsave("../output/paper/FDP.q.g.pdf", FDP.q.g.plot.save, height = 6, width = 10)
+ggsave("../output/paper/FDPqg.pdf", FDP.q.g.plot.save, height = 6, width = 10)
 ```
 
 ```{r}
-pi0.plot <- 0.9
+mean.table <- aggregate(FDP ~ Method + pi0 + g, data = FDP.q.g.ggdata, FUN = "mean")
+mse.sqrt.table <- aggregate(FDP ~ Method + pi0 + g, data = FDP.q.g.ggdata, FUN = function (x) {sqrt(mean((x - 0.1)^2))})
+mad.table <- aggregate(FDP ~ Method + pi0 + g, data = FDP.q.g.ggdata, FUN = function (x) {mean(abs(x - 0.1))})
+```
 
-FDP.q.g.pi0.plot <- ggplot(data = FDP.q.g.ggdata[FDP.q.g.ggdata$pi0 == pi0.plot, ], aes(x = Method, y = FDP, fill = Method, color = Method)) +
-  stat_summary(fun.data = boxplot.quantile, geom = "boxplot", position = "dodge", aes(width = 0.5), show.legend = FALSE) +
-  stat_summary(fun.y = mean, geom = "point", position = position_dodge(width = 0.9), show.legend = FALSE) +
-  scale_color_manual(labels = method.name.FDR, values = method.col.FDR) +
-  scale_fill_manual(labels = method.name.FDR, values = alpha(method.col.FDR, 0.35)) +
-  scale_y_continuous(trans = "mysqrt", breaks = c(0, 0.1, 0.2, 0.4, 0.6, 0.8)) +
-  facet_wrap(~ g, nrow = 1) +
-  scale_x_discrete(limits = rev(levels(FDP.q.g.ggdata$Method))) +
-  coord_flip() +
-  geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
-  labs(y = "FDP", title = bquote(paste("Nominal FDR = ", .(q), "(", pi[0] == .(pi0.plot), ")"))) +
-  theme(plot.title = element_text(size = 12, hjust = 0),
-        axis.title.y = element_blank(),
-        axis.text.y = element_text(size = 15),
-        axis.title.x = element_text(size = 15),
-        axis.text.x = element_text(size = 10),
-        strip.text = element_text(size = 15),
-        legend.position = "bottom",
-        legend.background = element_rect(color = "grey"),
-        legend.text = element_text(size = 12))
+------------------------
+
+Not used
+
+```{r}
+# pi0.plot <- 0.9
+# 
+# FDP.q.g.pi0.plot <- ggplot(data = FDP.q.g.ggdata[FDP.q.g.ggdata$pi0 == pi0.plot, ], aes(x = Method, y = FDP, fill = Method, color = Method)) +
+#   stat_summary(fun.data = boxplot.quantile, geom = "boxplot", position = "dodge", aes(width = 0.5), show.legend = FALSE) +
+#   stat_summary(fun.y = mean, geom = "point", position = position_dodge(width = 0.9), show.legend = FALSE) +
+#   scale_color_manual(labels = method.name.FDR, values = method.col.FDR) +
+#   scale_fill_manual(labels = method.name.FDR, values = alpha(method.col.FDR, 0.35)) +
+#   scale_y_continuous(trans = "mysqrt", breaks = c(0, 0.1, 0.2, 0.4, 0.6, 0.8)) +
+#   facet_wrap(~ g, nrow = 1) +
+#   scale_x_discrete(limits = rev(levels(FDP.q.g.ggdata$Method))) +
+#   coord_flip() +
+#   geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
+#   labs(y = "FDP", title = bquote(paste("Nominal FDR = ", .(q), "(", pi[0] == .(pi0.plot), ")"))) +
+#   theme(plot.title = element_text(size = 12, hjust = 0),
+#         axis.title.y = element_blank(),
+#         axis.text.y = element_text(size = 15),
+#         axis.title.x = element_text(size = 15),
+#         axis.text.x = element_text(size = 10),
+#         strip.text = element_text(size = 15),
+#         legend.position = "bottom",
+#         legend.background = element_rect(color = "grey"),
+#         legend.text = element_text(size = 12))
 ```
 
 ```{r}
-FDP.q.g.pi0.plot.save <- gridExtra::arrangeGrob(
-  density.g.plot,
-  FDP.q.g.pi0.plot,
-  heights = c(1, 1.1)
-)
+# FDP.q.g.pi0.plot.save <- gridExtra::arrangeGrob(
+#   density.g.plot,
+#   FDP.q.g.pi0.plot,
+#   heights = c(1, 1.1)
+# )
+# 
+# ggsave("../output/paper/FDP.q.g.pi0.pdf", FDP.q.g.pi0.plot.save, height = 4, width = 12)
+```
 
-ggsave("../output/paper/FDP.q.g.pi0.pdf", FDP.q.g.pi0.plot.save, height = 4, width = 12)
+```{r}
+# FDP.q.g.plot <- ggplot(data = FDP.q.g.ggdata, aes(x = Method, y = FDP, fill = Method, color = Method)) +
+#   stat_summary(fun.data = boxplot.quantile, geom = "boxplot", position = "dodge", aes(width = 0.75), show.legend = FALSE) +
+#   stat_summary(fun.y = mean, geom = "point", position = position_dodge(width = 0.9), show.legend = FALSE, shape = 13, size = 3) +
+#   scale_color_manual(labels = method.name.FDR, values = method.col.FDR) +
+#   scale_fill_manual(labels = method.name.FDR, values = alpha(method.col.FDR, 0.35)) +
+#   facet_grid(pi0 ~ g, labeller = label_bquote(rows = pi[0] == .(pi0))) +
+#   scale_x_discrete(limits = rev(levels(FDP.q.g.ggdata$Method))) +
+#   coord_flip() +
+#   geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
+#   labs(y = "FDP", title = bquote(paste("Nominal FDR = ", .(q)))) +
+#   theme(plot.title = element_text(size = 12, hjust = 0),
+#         axis.title.y = element_blank(),
+#         axis.text.y = element_text(size = 15),
+#         axis.title.x = element_text(size = 15),
+#         axis.text.x = element_text(size = 10),
+#         strip.text = element_text(size = 15),
+#         legend.position = "bottom",
+#         legend.background = element_rect(color = "grey"),
+#         legend.text = element_text(size = 12))
 ```
