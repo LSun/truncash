@@ -496,6 +496,10 @@ FDP.q.plot
 TDP.q.plot
 ```
 
+```{r temp normal}
+saveRDS(TDP.q.ggdata, '~/Desktop/temp3/TDP.q.normal.rds')
+```
+
 ## Big normal
 
 $$
@@ -1065,35 +1069,37 @@ FDP.q.plot
 TDP.q.plot
 ```
 
+```{r temp nearnormal}
+saveRDS(TDP.q.ggdata, '~/Desktop/temp3/TDP.q.nearnormal.rds')
+```
+
 ## Spiky
 
 $$
-g_4 = 0.4 N\left(0, 0.5^2\right) + 0.2 N\left(0, 1^2\right) + 0.2 N\left(0, 2^2\right) + 0.2 N\left(0, 3^2\right)
+g_4 = 0.4 N\left(0, 0.5^2\right) + 0.2 N\left(0, 2^2\right) + 0.4 N\left(0, 3^2\right)
 $$
 
 ```{r g4}
 plotx <- seq(-6, 6, by = 0.01)
 plot(plotx, plotx, ylim = c(0,
         0.4 * dnorm(0, 0, 0.5) + 
-        0.2 * dnorm(0) +
         0.2 * dnorm(0, 0, 2) +
-        0.2 * dnorm(0, 0, 3)),
+        0.4 * dnorm(0, 0, 3)),
      xlab = expression(theta), ylab = expression(g(theta)),
      type = "n")
 lines(plotx, dnorm(plotx), lty = 2)
-lines(plotx, 0.4 * dnorm(plotx, 0, 0.5) + 
-        0.2 * dnorm(plotx) +
-        0.2 * dnorm(plotx, 0, 2) +
-        0.2 * dnorm(plotx, 0, 3), col = "blue")
+lines(plotx,
+      0.4 * dnorm(plotx, 0, 0.5) + 
+      0.2 * dnorm(plotx, 0, 2) +
+      0.4 * dnorm(plotx, 0, 3), col = "blue")
 legend("topright", lty = c(1, 2), col = c(4, 1), c("g", "N(0, 1)"))
 
 density.ggdata.spiky <- cbind.data.frame(
   g = "Spiky",
   plotx,
   ploty = 0.4 * dnorm(plotx, 0, 0.5) + 
-        0.2 * dnorm(plotx) +
         0.2 * dnorm(plotx, 0, 2) +
-        0.2 * dnorm(plotx, 0, 3)
+        0.4 * dnorm(plotx, 0, 3)
 )
 ```
 
@@ -1118,9 +1124,8 @@ for (i in 1 : nsim) {
   beta <- sample(c(
     rep(0, round(pi0 * ngene)),
     rnorm(round((1 - pi0) * 0.4 * ngene), 0, 0.5),
-    rnorm(round((1 - pi0) * 0.2 * ngene)),
     rnorm(round((1 - pi0) * 0.2 * ngene), 0, 2),
-    rnorm(round((1 - pi0) * 0.2 * ngene), 0, 3)
+    rnorm(round((1 - pi0) * 0.4 * ngene), 0, 3)
     ))
   betahat <- beta + sebetahat * z
   
@@ -1360,6 +1365,10 @@ FSR.calib.plot
 ```{r, fig.asp = 0.5, message = FALSE, warning = FALSE}
 FDP.q.plot
 TDP.q.plot
+```
+
+```{r temp spiky}
+saveRDS(TDP.q.ggdata, '~/Desktop/temp3/TDP.q.spiky.rds')
 ```
 
 ## Skew
@@ -1655,10 +1664,14 @@ FDP.q.plot
 TDP.q.plot
 ```
 
+```{r temp skew}
+saveRDS(TDP.q.ggdata, '~/Desktop/temp3/TDP.q.skew.rds')
+```
+
 ## Flattop
 
 $$
-g_6 = \frac17\left[N\left(-1.5, 0.5^2\right) + N\left(-1, 0.5^2\right) + N\left(-0.5, 0.5^2\right) + N\left(0, 0.5^2\right) + N\left(0.5, 0.5^2\right) + N\left(1, 0.5^2\right) + N\left(1.5, 0.5^2\right)\right]
+g_6 = 0.5N(-1.5,1.5^2) + 0.5N(1.5,1.5^2)
 $$
 
 ```{r g6}
@@ -1667,13 +1680,13 @@ plot(plotx, plotx, ylim = c(0, dnorm(0)),
      xlab = expression(theta), ylab = expression(g(theta)),
      type = "n")
 lines(plotx, dnorm(plotx), lty = 2)
-lines(plotx, sapply(plotx, function(x) {mean(dnorm(x, seq(-1.5, 1.5, by = 0.5), 0.5))}), col = "blue")
+lines(plotx, sapply(plotx, function(x) {mean(dnorm(x, c(-1.5, 1.5), 1.5))}), col = "blue")
 legend("topright", lty = c(1, 2), col = c(4, 1), c("g", "N(0, 1)"))
 
 density.ggdata.flattop <- cbind.data.frame(
   g = "Flat Top",
   plotx,
-  ploty = sapply(plotx, function(x) {mean(dnorm(x, seq(-1.5, 1.5, by = 0.5), 0.5))})
+  ploty = sapply(plotx, function(x) {mean(dnorm(x, c(-1.5, 1.5), 1.5))})
 )
 ```
 
@@ -1695,7 +1708,7 @@ for (i in 1 : nsim) {
   se <- sqrt(mean(sebetahat^2))
   sebetahat <- sebetahat / se
   pi0 <- sample(pi0.vec, 1)
-  beta <- as.vector(sapply(seq(-1.5, 1.5, by = 0.5), function (x) {rnorm(round((1 - pi0) * ngene / length(seq(-1.5, 1.5, by = 0.5))), x, 0.5)}))
+  beta <- as.vector(sapply(c(-1.5, 1.5), function (x) {rnorm(round((1 - pi0) * ngene / length(c(-1.5, 1.5))), x, 1.5)}))
   beta <- sample(c(rep(0, ngene - length(beta)), beta))
   betahat <- beta + sebetahat * z
   
@@ -1935,6 +1948,10 @@ FSR.calib.plot
 ```{r, fig.asp = 0.5, message = FALSE, warning = FALSE}
 FDP.q.plot
 TDP.q.plot
+```
+
+```{r temp flattop}
+saveRDS(TDP.q.ggdata, '~/Desktop/temp3/TDP.q.flattop.rds')
 ```
 
 ## Bimodal
@@ -2222,6 +2239,10 @@ FSR.calib.plot
 ```{r, fig.asp = 0.5, message = FALSE, warning = FALSE}
 FDP.q.plot
 TDP.q.plot
+```
+
+```{r temp bimodal}
+saveRDS(TDP.q.ggdata, '~/Desktop/temp3/TDP.q.bimodal.rds')
 ```
 
 ## Put together
