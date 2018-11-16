@@ -175,23 +175,124 @@ FDP.sqrt.mse.plot <- ggplot(data = mse.sqrt.table,
                                 col = Method,
                                 linetype = Method,
                                 shape = Method)) +
-  geom_line() +
-  geom_point() + 
+  geom_line(size = 1.25) +
+  geom_point(size = 3) + 
   scale_color_manual(values = method.col.FDR) +
   facet_wrap(~ g, nrow = 1) +
-  labs(y = expression(sqrt(MSE)), x = expression(pi[0])) +
+  labs(y = 'Root MSE', x = expression(pi[0])) +
   theme(
     axis.title.y = element_text(size = 15),
     axis.text.y = element_text(size = 12),
     axis.title.x = element_text(size = 15),
     axis.text.x = element_text(size = 12),
     strip.text = element_text(size = 15),
-    legend.text = element_text(size = 12)
+    legend.text = element_text(size = 15),
+    legend.title = element_blank()
   )
 ```
 
 ```{r}
-ggsave("../output/paper/FDP_sqrtMSE.pdf", FDP.sqrt.mse.plot, height = 3, width = 12)
+FDPqgplot.save <- gridExtra::arrangeGrob(
+  density.g.plot + 
+    labs(title = expression(paste('Distribution ', g[1], ' of non-null effects'))) +
+    theme(plot.margin = grid::unit(c(5.5, 92, 25, 10), "points")) +
+    theme(plot.title = element_text(size = 15)),
+  FDP.q.g.plot +
+    labs(title = bquote(paste('Distribution of empirical FDP at nominal FDR = ', .(q)))) +
+    theme(strip.text.x = element_blank(),
+          plot.title = element_text(size = 15),
+          plot.margin = grid::unit(c(5.5, 67.5, 20, 5.5), 'points'),
+          axis.text.x = element_text(size = 12)
+    ),
+  FDP.sqrt.mse.plot +
+    labs(title = 'Root MSE of empirical FDP from nominal value') +
+    theme(strip.text = element_blank(),
+          plot.title = element_text(size = 15)),
+  heights = c(1.5, 2, 1.5)
+  # top = grid::textGrob(bquote(paste("Nominal FDR = ", .(q))), gp = grid::gpar(fontsize = 15), hjust = 4)
+)
+
+ggsave("../output/paper/FDP_sqrtMSE.pdf", FDPqgplot.save, height = 10, width = 15)
+```
+
+```{r}
+TDP.q <- function (g1, M) {cbind.data.frame(g1 = g1, M[M$Noise == "All", 2 : 4])}
+TDP.q.gaussian <- TDP.q('Gaussian', readRDS("../output/paper/simulation/TDP.q.normal.rds"))
+TDP.q.neargaussian <- TDP.q('Near Gaussian', readRDS("../output/paper/simulation/TDP.q.nearnormal.rds"))
+TDP.q.spiky <- TDP.q('Spiky', readRDS("../output/paper/simulation/TDP.q.spiky.rds"))
+TDP.q.skew <- TDP.q('Skew', readRDS("../output/paper/simulation/TDP.q.skew.rds"))
+TDP.q.flattop <- TDP.q('Flat Top', readRDS("../output/paper/simulation/TDP.q.flattop.rds"))
+TDP.q.bimodal <- TDP.q('Bimodal', readRDS("../output/paper/simulation/TDP.q.bimodal.rds"))
+TDP.q <- rbind.data.frame(
+  TDP.q.gaussian,
+  TDP.q.neargaussian,
+  TDP.q.spiky,
+  TDP.q.skew,
+  TDP.q.flattop,
+  TDP.q.bimodal
+)
+```
+
+```{r}
+TDP.q$Method <- plyr::mapvalues(TDP.q$Method, from = levels(TDP.q$Method), to = c('BH', 'qvalue', 'locfdr', 'ashr', 'cashr', 'BH'))
+TDP.q$Method <- factor(TDP.q$Method, levels = c("cashr", "BH", "qvalue", "ashr", "locfdr"))
+TDP.q$pi0 <- as.numeric(levels(TDP.q$pi0))[TDP.q$pi0]
+```
+
+```{r}
+TDP.q.g.plot <- ggplot(data = TDP.q, aes(x = Method, y = TDP, fill = Method, color = Method)) +
+  stat_summary(fun.data = boxplot.quantile, geom = "boxplot", position = "dodge", aes(width = 0.75), show.legend = FALSE) +
+  stat_summary(fun.y = mean, geom = "point", position = position_dodge(width = 0.9), show.legend = FALSE, shape = 13, size = 3) +
+  scale_color_manual(labels = method.name.FDR, values = method.col.FDR) +
+  scale_fill_manual(labels = method.name.FDR, values = alpha(method.col.FDR, 0.35)) +
+# scale_y_continuous(trans = "mysqrt", breaks = c(0, 0.1, 0.2, 0.4, 0.6, 0.8)) +
+  facet_grid(pi0 ~ g1, labeller = label_bquote(rows = pi[0] == .(pi0))) +
+  scale_x_discrete(limits = rev(levels(TDP.q$Method))) +
+  coord_flip() +
+# geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
+  labs(y = "TDP", title = bquote(paste("Nominal FDR = ", .(q)))) +
+  theme(plot.title = element_text(size = 12, hjust = 0),
+        axis.title.y = element_blank(),
+        axis.text.y = element_text(size = 15),
+        axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "bottom",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12))
+```
+
+```{r}
+FDP.TDP.qg.save <- gridExtra::arrangeGrob(
+  density.g.plot + 
+    labs(title = expression(paste('Distribution ', g[1], ' of non-null effects'))) +
+    theme(plot.margin = grid::unit(c(5.5, 92, 25, 10), "points")) +
+    theme(plot.title = element_text(size = 15)),
+  FDP.q.g.plot +
+    labs(title = bquote(paste('Distribution of empirical FDP at nominal FDR = ', .(q)))) +
+    theme(strip.text.x = element_blank(),
+          plot.title = element_text(size = 15),
+          plot.margin = grid::unit(c(5.5, 67.5, 20, 5.5), 'points'),
+          axis.text.x = element_text(size = 12)
+    ),
+  FDP.sqrt.mse.plot +
+    labs(title = 'Root MSE of empirical FDP from nominal value') +
+    theme(strip.text = element_blank(),
+          plot.title = element_text(size = 15),
+          plot.margin = grid::unit(c(5.5, 5.5, 20, 5.5), 'points')
+    ),
+  TDP.q.g.plot +
+    labs(title = bquote(paste('Distribution of empirical TDP at nominal FDR = ', .(q)))) +
+    theme(strip.text.x = element_blank(),
+          plot.title = element_text(size = 15),
+          plot.margin = grid::unit(c(5.5, 67.5, 5.5, 5.5), 'points'),
+          axis.text.x = element_text(size = 12)
+    ),    
+  heights = c(1.5, 2, 1.5, 2)
+  # top = grid::textGrob(bquote(paste("Nominal FDR = ", .(q))), gp = grid::gpar(fontsize = 15), hjust = 4)
+)
+
+ggsave("../output/paper/FDP_sqrtMSE_TDP.pdf", FDP.TDP.qg.save, height = 15, width = 15)
 ```
 
 ------------------------
