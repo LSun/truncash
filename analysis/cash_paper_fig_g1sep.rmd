@@ -295,6 +295,114 @@ FDP.TDP.qg.save <- gridExtra::arrangeGrob(
 ggsave("../output/paper/FDP_sqrtMSE_TDP.pdf", FDP.TDP.qg.save, height = 15, width = 15)
 ```
 
+```{r}
+mean.TDP <- aggregate(TDP ~ Method + pi0 + g1, data = TDP.q, FUN = "mean")
+```
+
+```{r}
+mean.TDP$pi0 <- factor(mean.TDP$pi0)
+mean.TDP.plot <- ggplot(data = mean.TDP,
+                            aes(x = pi0,
+                                y = TDP,
+                                group = Method,
+                                col = Method,
+                                linetype = Method,
+                                shape = Method)) +
+  geom_line(size = 1.25) +
+  geom_point(size = 3) + 
+  scale_color_manual(values = method.col.FDR) +
+  facet_wrap(~ g1, nrow = 1) +
+  labs(y = 'Mean TDP', x = expression(pi[0])) +
+  theme(
+    axis.title.y = element_text(size = 15),
+    axis.text.y = element_text(size = 12),
+    axis.title.x = element_text(size = 15),
+    axis.text.x = element_text(size = 12),
+    strip.text = element_text(size = 15),
+    legend.text = element_text(size = 15),
+    legend.title = element_blank()
+  )
+```
+
+```{r}
+FDP.TDP.power.qg.save <- gridExtra::arrangeGrob(
+  density.g.plot + 
+    labs(title = expression(paste('Distribution ', g[1], ' of non-null effects'))) +
+    theme(plot.margin = grid::unit(c(5.5, 92, 5.5, 10), "points")) +
+    theme(plot.title = element_text(size = 15)),
+  FDP.q.g.plot +
+    labs(title = bquote(paste('Distribution of empirical FDP at nominal FDR = ', .(q)))) +
+    theme(strip.text.x = element_blank(),
+          plot.title = element_text(size = 15),
+          plot.margin = grid::unit(c(20, 67.5, 5.5, 5.5), 'points'),
+          axis.text.x = element_text(size = 12)
+    ),
+  FDP.sqrt.mse.plot +
+    labs(title = 'Root MSE of empirical FDP from nominal value') +
+    theme(strip.text = element_blank(),
+          plot.title = element_text(size = 15),
+          plot.margin = grid::unit(c(20, 5.5, 5.5, 5.5), 'points')
+    ),
+  TDP.q.g.plot +
+    labs(title = bquote(paste('Distribution of empirical TDP at nominal FDR = ', .(q)))) +
+    theme(strip.text.x = element_blank(),
+          plot.title = element_text(size = 15),
+          plot.margin = grid::unit(c(20, 67.5, 5.5, 5.5), 'points'),
+          axis.text.x = element_text(size = 12)
+    ),
+  mean.TDP.plot +
+    labs(title = bquote(paste('Mean of empirical TDP at nominal FDR = ', .(q)))) +
+    theme(strip.text = element_blank(),
+          plot.title = element_text(size = 15),
+          plot.margin = grid::unit(c(20, 5.5, 5.5, 5.5), 'points')
+    ),    
+  heights = c(1.5, 2, 1.5, 2, 1.5)
+  # top = grid::textGrob(bquote(paste("Nominal FDR = ", .(q))), gp = grid::gpar(fontsize = 15), hjust = 4)
+)
+
+ggsave("../output/paper/FDP_sqrtMSE_TDP.pdf", FDP.TDP.power.qg.save, height = 17, width = 15)
+```
+
+```{r}
+scaleFUN <- function(x) sprintf("%.2f", x)
+
+FDP.power.qg.save <- gridExtra::arrangeGrob(
+  density.g.plot + 
+    labs(title = expression(paste('Distribution ', g[1], ' of non-null effects'))) +
+    theme(plot.margin = grid::unit(c(5.5, 92, 5.5, 10), "points")) +
+    theme(plot.title = element_text(size = 15)),
+  FDP.q.g.plot +
+    labs(title = bquote(paste('Distribution of empirical FDP at nominal FDR = ', .(q)))) +
+    theme(strip.text.x = element_blank(),
+          plot.title = element_text(size = 15),
+          plot.margin = grid::unit(c(20, 67.5, 5.5, 5.5), 'points'),
+          axis.text.x = element_text(size = 12)
+    ),
+  FDP.sqrt.mse.plot +
+    labs(title = 'Root MSE of empirical FDP from nominal value') +
+    expand_limits(y = 0) +
+    theme(strip.text = element_blank(),
+          plot.title = element_text(size = 15),
+          plot.margin = grid::unit(c(20, 5.5, 5.5, 15), 'points')
+    ),
+  mean.TDP.plot +
+    labs(title = bquote(paste('Mean of empirical TDP at nominal FDR = ', .(q)))) +
+#    scale_y_continuous(labels = scaleFUN) +
+    expand_limits(y = 0) +
+    theme(strip.text = element_blank(),
+          plot.title = element_text(size = 15),
+          plot.margin = grid::unit(c(20, 5.5, 5.5, 15), 'points')
+    ),    
+  heights = c(1.5, 2, 1.5, 1.5)
+  # top = grid::textGrob(bquote(paste("Nominal FDR = ", .(q))), gp = grid::gpar(fontsize = 15), hjust = 4)
+)
+
+ggsave("../output/paper/FDP_sqrtMSE_Power.pdf", FDP.power.qg.save, height = 13, width = 15)
+```
+
+
+
+
 ------------------------
 
 Not used
