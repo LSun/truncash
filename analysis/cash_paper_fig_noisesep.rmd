@@ -32,13 +32,13 @@ method.col.FDR <- scales::hue_pal()(length(method.name.FDR))[c(5, 1, 2, 4, 3)]
 #####################################
 
 boxplot.quantile <- function(x) {
-  r <- quantile(x, probs = c(0.10, 0.25, 0.5, 0.75, 0.90))
+  r <- quantile(x, probs = c(0.05, 0.25, 0.5, 0.75, 0.95))
   names(r) <- c("ymin", "lower", "middle", "upper", "ymax")
   return(r)
 }
 
 boxplot.quantile.sq <- function (x) {
-  r <- sqrt(quantile(x^2, probs = c(0.10, 0.25, 0.5, 0.75, 0.90)))
+  r <- sqrt(quantile(x^2, probs = c(0.05, 0.25, 0.5, 0.75, 0.95)))
   names(r) <- c("ymin", "lower", "middle", "upper", "ymax")
   return(r)
 }
@@ -60,7 +60,7 @@ mysqrt_trans <- function() {
 ###############################
 
 sd.z <- sapply(z.list, sd)
-Noise <- cut(sd.z, breaks = c(0, quantile(sd.z, probs = 1 : 2 / 3), Inf), labels = c("pseudo-deflation", "in-between", "pseudo-inflation"))
+Noise <- cut(sd.z, breaks = c(0, quantile(sd.z, probs = 1 : 2 / 3), Inf), labels = c("Pseudo-deflation", "In-between", "Pseudo-inflation"))
 
 ###############################
 
@@ -284,3 +284,40 @@ FDP.sqrt.TDP.q.sep.plot.save <- gridExtra::arrangeGrob(
 ggsave("../output/paper/FDP.sqrt.TDP.q.sep.pdf", FDP.sqrt.TDP.q.sep.plot.save, height = 6, width = 8)
 ```
 
+```{r}
+FDP_noise.save <- gridExtra::arrangeGrob(
+  z.sep.plot +
+    labs(y = 'Density', title = "Examples of realized correlated N(0,1) noise") +
+    scale_color_manual(values = "blue") +
+    theme(legend.title = element_blank(),
+         # legend.title = element_text(size = 15),
+         plot.margin = grid::unit(c(5.5, 5.5, 5.5, 110), "points"),
+         plot.title = element_text(size = 15),
+         strip.text = element_text(size = 15),
+         axis.title.x = element_blank(),
+         axis.text.x = element_text(size = 12),
+         axis.title.y = element_text(size = 15)
+    ),
+  FDP.sqrt.q.all.sep.plot +
+    labs(x = 'FDP', title = bquote(paste('Distribution of empirical FDP at nominal FDR = ', .(q)))) +
+    theme(plot.title = element_text(size = 15),
+          axis.title.x = element_text(size = 15),
+          strip.text = element_text(size = 15),
+          plot.margin = grid::unit(c(15, 5.5, 5.5, 5.5), "points"),
+          axis.text.y = element_text(size = 15),
+          axis.text.x = element_text(size = 12)
+    ),
+  TDP.q.all.sep.plot +
+    labs(x = 'TDP', title = bquote(paste('Distribution of empirical TDP at nominal FDR = ', .(q)))) +
+    theme(plot.margin = grid::unit(c(15, 5.5, 5.5, 5.5), "points"),
+          axis.title.x = element_text(size = 15),
+          strip.text = element_text(size = 15),
+          plot.title = element_text(size = 15),
+          axis.text.y = element_text(size = 15),
+          axis.text.x = element_text(size = 12)
+    ),
+  heights = c(1.75, 2, 2)
+)
+
+ggsave("../output/paper/FDP_noise.pdf", FDP_noise.save, height = 7, width = 10)
+```
