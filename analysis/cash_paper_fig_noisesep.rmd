@@ -321,3 +321,93 @@ FDP_noise.save <- gridExtra::arrangeGrob(
 
 ggsave("../output/paper/FDP_noise.pdf", FDP_noise.save, height = 7, width = 10)
 ```
+
+```{r}
+FDP.q.ggdata.0.9$Noise <- factor(FDP.q.ggdata.0.9$Noise, levels = levels(FDP.q.ggdata.0.9$Noise)[c(2, 3, 4, 1)])
+
+TDP.q.ggdata.0.9$Noise <- factor(TDP.q.ggdata.0.9$Noise, levels = levels(TDP.q.ggdata.0.9$Noise)[c(2, 3, 4, 1)])
+
+FDP.sqrt.q.all.sep.plot <- ggplot(data = FDP.q.ggdata.0.9, aes(x = Method, y = FDP, fill = Method, color = Method)) +
+  stat_summary(fun.data = boxplot.quantile.sq, geom = "boxplot", aes(width = 0.75), position = position_dodge(), show.legend = FALSE) +
+  stat_summary(fun.y = mean.sq, geom = "point", position = position_dodge(width = 0.9), show.legend = FALSE, shape = 13, size = 3) +
+  scale_x_discrete(limits = rev(levels(FDP.q.ggdata.0.9$Method))) +
+  scale_y_continuous(trans = "mysqrt", breaks = c(0, 0.1, 0.2, 0.4, 0.6, 0.8)) +
+  coord_flip() +
+  scale_color_manual(labels = method.name.FDR, values = method.col.FDR) +
+  scale_fill_manual(labels = method.name.FDR, values = alpha(method.col.FDR, 0.35)) +
+  facet_wrap(~Noise, nrow = 1) +
+  geom_hline(yintercept = q, col = "black", linetype = "dashed", size = 1) +
+  labs(x = expression(pi[0]), y = "FDP", title = bquote(paste("Nominal FDR = ", .(q), " (", g[1], " is Gaussian; ", pi[0] == 0.9, ")"))) +
+  expand_limits(y = 0) +
+  theme(plot.title = element_text(size = 12, hjust = 0),
+        axis.title.y = element_blank(),
+        axis.text.y = element_text(size = 15),
+        axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "bottom",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12)
+        )
+
+TDP.q.all.sep.plot <- ggplot(data = TDP.q.ggdata.0.9, aes(x = Method, y = TDP, fill = Method, color = Method)) +
+  stat_summary(fun.data = boxplot.quantile, geom = "boxplot", aes(width = 0.75), position = position_dodge(), show.legend = FALSE) +
+  coord_flip() +
+  stat_summary(fun.y = mean, geom = "point", position = position_dodge(width = 0.9), show.legend = FALSE, shape = 13, size = 3) +
+  scale_x_discrete(limits = rev(levels(FDP.q.ggdata.0.9$Method))) +
+  scale_color_manual(labels = method.name.FDR, values = method.col.FDR) +
+  scale_fill_manual(labels = method.name.FDR, values = alpha(method.col.FDR, 0.35)) +
+  facet_wrap(~Noise, nrow = 1) +
+  labs(x = expression(pi[0]), y = "TDP") +
+  expand_limits(y = 0) +
+  theme(axis.title.y = element_blank(),
+        axis.text.y = element_text(size = 15),
+        axis.title.x = element_text(size = 15),
+        axis.text.x = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = "bottom",
+        legend.background = element_rect(color = "grey"),
+        legend.text = element_text(size = 12)
+        )
+```
+
+```{r}
+FDP_noise_new.save <- gridExtra::arrangeGrob(
+  z.sep.plot +
+    labs(y = 'Density', title = 'Examples of realized correlated N(0,1) noise') +
+    scale_color_manual(values = "blue") +
+    expand_limits(x = -4) +
+    theme(legend.title = element_blank(),
+         legend.position = 'right',
+         plot.margin = grid::unit(c(5.5, 95.5, 10, 17.5), "points"),
+         plot.title = element_text(size = 15),
+         strip.text = element_text(size = 15),
+         axis.title.x = element_blank(),
+         axis.text.x = element_text(size = 12),
+         axis.title.y = element_text(size = 15)
+    ),
+  FDP.sqrt.q.all.sep.plot +
+    labs(x = 'FDP', title = bquote(paste('Distribution of FDP'))) +
+    theme(plot.title = element_text(size = 15),
+          axis.title.x = element_text(size = 15),
+          strip.text = element_text(size = 15),
+          plot.margin = grid::unit(c(5.5, 5.5, 5.5, 5.5), "points"),
+          axis.text.y = element_text(size = 15),
+          axis.text.x = element_text(size = 12)
+    ),
+  TDP.q.all.sep.plot +
+    labs(x = 'TDP', title = bquote(paste('Distribution of TDP'))) +
+    theme(plot.margin = grid::unit(c(5.5, 5.5, 5.5, 5.5), "points"),
+          axis.title.x = element_text(size = 15),
+          strip.text = element_text(size = 15),
+          plot.title = element_text(size = 15),
+          axis.text.y = element_text(size = 15),
+          axis.text.x = element_text(size = 12)
+    ),
+  heights = c(1, 1, 1),
+  top = grid::textGrob(label = bquote(paste(
+    'Nominal FDR = ', .(q), ' (', g[1], ' is Guassian; ', pi[0] == 0.9, ')')), gp = grid::gpar(fontsize = 17, fontface = 'bold'), hjust = 1)
+)
+
+ggsave("../output/paper/FDP_noise_new.pdf", FDP_noise_new.save, height = 7, width = 10)
+```
