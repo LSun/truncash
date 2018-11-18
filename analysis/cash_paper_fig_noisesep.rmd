@@ -379,7 +379,7 @@ FDP_noise_new.save <- gridExtra::arrangeGrob(
     expand_limits(x = -4) +
     theme(legend.title = element_blank(),
          legend.position = 'right',
-         plot.margin = grid::unit(c(5.5, 95.5, 10, 17.5), "points"),
+         plot.margin = grid::unit(c(10, 95.5, 10, 17.5), "points"),
          plot.title = element_text(size = 15),
          strip.text = element_text(size = 15),
          axis.title.x = element_blank(),
@@ -404,7 +404,7 @@ FDP_noise_new.save <- gridExtra::arrangeGrob(
           axis.text.y = element_text(size = 15),
           axis.text.x = element_text(size = 12)
     ),
-  heights = c(1, 1, 1),
+  heights = c(1.1, 1, 1),
   top = grid::textGrob(label = bquote(paste(
     'Nominal FDR = ', .(q), ' (', g[1], ' is Guassian; ', pi[0] == 0.9, ')')), gp = grid::gpar(fontsize = 17, fontface = 'bold'), hjust = 1)
 )
