@@ -90,5 +90,6 @@ sum(ashr::qval.from.lfdr(fit.locfdr$fdr) <= 0.1)
 ```
 
 ```{r}
+1 - (ashr::mixcdf(fit.cash$fitted_g, -log2(1.2)) + 1 - ashr::mixcdf(fit.cash$fitted_g, log2(1.2))) / (1 - fit.cash$fitted_g$pi[1])
 1 - sum(pnorm(-log2(1.2), fit.cash$fitted_g$mean[-1], fit.cash$fitted_g$sd[-1]) * 2 * fit.cash$fitted_g$pi[-1]) / (1 - fit.cash$fitted_g$pi[1])
 ```
