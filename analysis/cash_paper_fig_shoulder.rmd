@@ -12,6 +12,39 @@ p <- pnorm(-abs(z)) * 2
 ```
 
 ```{r}
+# setEPS()
+# postscript("../output/paper/hist_z.eps", width = 5, height = 5)
+pdf("../output/paper/hist_z.pdf", width = 7.5, height = 5)
+
+par(mar = c(4.5, 4.5, 2.5, 1))
+
+hist(z, breaks = seq(-10, 10, by = 0.1), prob = TRUE, ylim = c(0, dnorm(0)), xlab = "z-score", xlim = range(c(abs(z), -abs(z))), main = expression("(a): Histogram of correlated z-scores"), cex.main = 2, cex.lab = 2)
+
+x.plot = seq(- max(abs(z.sel)) - 2, max(abs(z.sel)) + 2, length = 1000)
+lines(x.plot, dnorm(x.plot), col = "blue", lwd = 3)
+
+legend("topright", expression('N(0,1)'), lty = 1, col = 'blue', lwd = 3, cex = 1.75, bty = 'n', seg.len = 1.5, x.intersp = 0.5)
+
+dev.off()
+```
+
+```{r}
+# setEPS()
+# postscript("../output/paper/pval_z.eps", width = 5, height = 5)
+pdf("../output/paper/pval_z.pdf", width = 7.5, height = 5)
+
+par(mar = c(4.5, 4.5, 2.5, 1))
+
+hist(p, prob = TRUE, breaks = seq(0, 1, by = 0.01), xlab = "p-value", main = expression("(b): Histogram of correlated p-values"), cex.main = 2, cex.lab = 2)
+
+segments(x0 = 0, x1 = 1, y0 = 1, y1 = 1, col = "blue", lwd = 3)
+
+legend("topright", expression('Uniform[0,1]'), lty = 1, col = 'blue', lwd = 3, cex = 1.75, bty = 'n', seg.len = 1.5, x.intersp = 0.5)
+
+dev.off()
+```
+
+```{r}
 thresh.color <- c("maroon", "purple", "orange")
 #thresh.color <- scales::hue_pal()(10)[5 : 7]
 
@@ -30,7 +63,7 @@ pdf("../output/paper/ecdf_z.pdf", width = 5, height = 5)
 
 par(mar = c(4.5, 4.5, 2.5, 1))
 
-plot(ecdf(z), xlab = "z-score", ylab = "CDF", lwd = 2, main = expression("(a): Empirical CDF"), cex.main = 2, cex.lab = 2, xlim = c(-max(abs(z)), max(abs(z))))
+plot(ecdf(z), xlab = "z-score", ylab = "CDF", lwd = 2, main = expression("(c): Empirical CDF"), cex.main = 2, cex.lab = 2, xlim = c(-max(abs(z)), max(abs(z))))
 lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01)), col = "blue", lwd = 3, lty = 2)
 lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01), 0, 1.6), col = "green", lwd = 3, lty = 4)
 rect(xleft = c(-5, 2.5),
@@ -49,7 +82,7 @@ pdf("../output/paper/ecdf_z_left.pdf", width = 5, height = 5)
 
 par(mar = c(4.5, 4.5, 2.5, 1))
 
-plot(ecdf(z), xlab = "z-score", ylab = "CDF", main = expression("(b): Left Tail"), lwd = 3, xlim = c(-5, -2.5), ylim = c(0, 0.05), cex.main = 2, cex.lab = 2, bty = "n")
+plot(ecdf(z), xlab = "z-score", ylab = "CDF", main = expression("(d): Left Tail"), lwd = 3, xlim = c(-5, -2.5), ylim = c(0, 0.05), cex.main = 2, cex.lab = 2, bty = "n")
 box(col = "red")
 lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01)), col = "blue", lwd = 3, lty = 2)
 lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01), 0, 1.6), col = "green", lwd = 3, lty = 4)
@@ -66,7 +99,7 @@ pdf("../output/paper/ecdf_z_right.pdf", width = 5, height = 5)
 
 par(mar = c(4.5, 4.5, 2.5, 1))
 
-plot(ecdf(z), xlab = "z-score", ylab = "CDF", main = expression("(c): Right Tail"), lwd = 3, xlim = c(2.5, 5), ylim = c(0.95, 1), cex.main = 2, cex.lab = 2, bty = "n")
+plot(ecdf(z), xlab = "z-score", ylab = "CDF", main = expression("(e): Right Tail"), lwd = 3, xlim = c(2.5, 5), ylim = c(0.95, 1), cex.main = 2, cex.lab = 2, bty = "n")
 box(col = "red", lty = 5)
 lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01)), col = "blue", lwd = 3, lty = 2)
 lines(seq(-6, 6, by = 0.01), pnorm(seq(-6, 6, by = 0.01), 0, 1.6), col = "green", lwd = 3, lty = 4)
@@ -83,7 +116,7 @@ pdf("../output/paper/pval_log_z.pdf", width = 5, height = 5)
 
 par(mar = c(4.5, 4.5, 2.5, 1))
 
-plot(sample(-log(p)), ylim = c(0, y.max), ylab = "-log(p-value)", main = expression('(d): Figure 1(c) z-scores'), cex.main = 2, cex.lab = 2, pch = 19)
+plot(sample(-log(p)), ylim = c(0, y.max), ylab = "-log(p-value)", main = expression('(f): Figure 1(c) z-scores'), cex.main = 2, cex.lab = 2, pch = 19)
 abline(h = -log(c(
   0.005,
   pnorm(-sqrt(2 * log(1e4))) * 2,
@@ -100,7 +133,7 @@ pdf("../output/paper/pval_log_N01.pdf", width = 5, height = 5)
 
 par(mar = c(4.5, 4.5, 2.5, 1))
 
-plot(-log(p.norm.1), ylim = c(0, y.max), ylab = "-log(p-value)", main = expression("(e): iid N(0,1) samples"), col = "blue", cex.main = 2, cex.lab = 2, pch = 19)
+plot(-log(p.norm.1), ylim = c(0, y.max), ylab = "-log(p-value)", main = expression("(g): iid N(0,1) samples"), col = "blue", cex.main = 2, cex.lab = 2, pch = 19)
 abline(h = -log(c(
   0.005,
   pnorm(-sqrt(2 * log(1e4))) * 2,
@@ -125,7 +158,7 @@ pdf("../output/paper/pval_log_N016.pdf", width = 5, height = 5)
 
 par(mar = c(4.5, 4.5, 2.5, 1))
 
-plot(-log(p.norm.1.6), ylim = c(0, y.max), ylab = "-log(p-value)", main = expression(paste("(f): iid ", N(0, 1.6^2), " samples")), col = "green", cex.main = 2, cex.lab = 2, pch = 19)
+plot(-log(p.norm.1.6), ylim = c(0, y.max), ylab = "-log(p-value)", main = expression(paste("(h): iid ", N(0, 1.6^2), " samples")), col = "green", cex.main = 2, cex.lab = 2, pch = 19)
 abline(h = -log(c(
   0.005,
   pnorm(-sqrt(2 * log(1e4))) * 2,
@@ -139,39 +172,6 @@ abline(h = -log(c(
 #          "p = 0.005"
 #          ), lty = c(4, 2, 1), lwd = 3, xpd = NA,
 #        col = thresh.color[3 : 1], ncol = 1, cex = 1.5, bty = "n", x.intersp = 0.5, seg.len = 1.5)
-
-dev.off()
-```
-
-```{r}
-# setEPS()
-# postscript("../output/paper/pval_z.eps", width = 5, height = 5)
-pdf("../output/paper/pval_z.pdf", width = 5, height = 5)
-
-par(mar = c(4.5, 4.5, 2.5, 1))
-
-hist(p, prob = TRUE, breaks = seq(0, 1, by = 0.01), xlab = "p-value", main = expression("(g): Histogram of p-values"), cex.main = 2, cex.lab = 2)
-
-segments(x0 = 0, x1 = 1, y0 = 1, y1 = 1, col = "blue", lwd = 3)
-
-legend("topright", expression('Uniform[0,1]'), lty = 1, col = 'blue', lwd = 3, cex = 1.75, bty = 'n', seg.len = 1.5, x.intersp = 0.5)
-
-dev.off()
-```
-
-```{r}
-# setEPS()
-# postscript("../output/paper/hist_z.eps", width = 5, height = 5)
-pdf("../output/paper/hist_z.pdf", width = 5, height = 5)
-
-par(mar = c(4.5, 4.5, 2.5, 1))
-
-hist(z, breaks = seq(-10, 10, by = 0.1), prob = TRUE, ylim = c(0, dnorm(0)), xlab = "z-score", xlim = range(c(abs(z), -abs(z))), main = expression("(h): Histogram of z-scores"), cex.main = 2, cex.lab = 2)
-
-x.plot = seq(- max(abs(z.sel)) - 2, max(abs(z.sel)) + 2, length = 1000)
-lines(x.plot, dnorm(x.plot), col = "blue", lwd = 3)
-
-legend("topright", expression('N(0,1)'), lty = 1, col = 'blue', lwd = 3, cex = 1.75, bty = 'n', seg.len = 1.5, x.intersp = 0.5)
 
 dev.off()
 ```
