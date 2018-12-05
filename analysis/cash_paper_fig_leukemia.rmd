@@ -19,7 +19,8 @@ source("../code/gdfit.R")
 ```
 
 ```{r, cache = TRUE}
-load(url("http://statweb.stanford.edu/~ckirby/brad/LSI/datasets-and-programs/data/leukdata.RData"))
+# load(url("http://statweb.stanford.edu/~ckirby/brad/LSI/datasets-and-programs/data/leukdata.RData"))
+load('../data/LSI/leukdata.RData')
 ```
 
 ## Use Smyth's pipeline to obtain summary statistics
@@ -51,38 +52,38 @@ fit.qvalue <- qvalue::qvalue(p)
 
 ```{r, cache = TRUE}
 fit.ash <- ashr::ash(x, s, mixcompdist = "normal", method = "fdr")
-lfdr.ash.n <- ashr::get_lfdr(fit.ash)
-num.ash.n <- sum(lfdr.ash.n <= 0.2)
-
-pdf("../output/fig/ashr_diag_norm_leukemia.pdf", height = 6, width = 8)
-par(mfrow = c(2, 2))
-ashr::plot_diagnostic(fit.ash, plot.hist = TRUE, breaks = 50)
-dev.off()
-
-fit.ash.u <- ashr::ash(x, s, method = "fdr")
-lfdr.ash.u <- ashr::get_lfdr(fit.ash.u)
-num.ash.u <- sum(lfdr.ash.u <= 0.2)
-
-pdf("../output/fig/ashr_diag_unif_leukemia.pdf", height = 6, width = 8)
-par(mfrow = c(2, 2))
-ashr::plot_diagnostic(fit.ash.u, plot.hist = TRUE, breaks = 50)
-dev.off()
-
-fit.ash.hu <- ashr::ash(x, s, method = "fdr", mixcompdist = "halfuniform")
-lfdr.ash.hu <- ashr::get_lfdr(fit.ash.hu)
-num.ash.hu <- sum(lfdr.ash.hu <= 0.2)
-
-xplot <- seq(-2, 2, length = 1000)
-plot(xplot, ashr:::dens(get_fitted_g(fit.ash), xplot), type = "l", xlim = c(-1, 1),
-     xlab = expression(theta), ylab = expression(pi[1]~g(theta)))
-yplot.u <- yplot.hu <- c()
-for (i in seq(xplot)) {
-  yplot.u[i] <- sum(dunif(xplot[i], get_fitted_g(fit.ash.u)$a[-1], get_fitted_g(fit.ash.u)$b[-1]) * get_fitted_g(fit.ash.u)$pi[-1])
-  yplot.hu[i] <- sum(dunif(xplot[i], get_fitted_g(fit.ash.hu)$a[-1], get_fitted_g(fit.ash.hu)$b[-1]) * get_fitted_g(fit.ash.hu)$pi[-1])
-}
-lines(xplot, yplot.u, col = "blue", lty = 2)
-lines(xplot, yplot.hu, col = "red", lty = 3)
-legend("topleft", lty = 1:3, col = c("black", "blue", "red"), c("normal", "uniform", "halfuniform"))
+# lfdr.ash.n <- ashr::get_lfdr(fit.ash)
+# num.ash.n <- sum(lfdr.ash.n <= 0.2)
+# 
+# pdf("../output/fig/ashr_diag_norm_leukemia.pdf", height = 6, width = 8)
+# par(mfrow = c(2, 2))
+# ashr::plot_diagnostic(fit.ash, plot.hist = TRUE, breaks = 50)
+# dev.off()
+# 
+# fit.ash.u <- ashr::ash(x, s, method = "fdr")
+# lfdr.ash.u <- ashr::get_lfdr(fit.ash.u)
+# num.ash.u <- sum(lfdr.ash.u <= 0.2)
+# 
+# pdf("../output/fig/ashr_diag_unif_leukemia.pdf", height = 6, width = 8)
+# par(mfrow = c(2, 2))
+# ashr::plot_diagnostic(fit.ash.u, plot.hist = TRUE, breaks = 50)
+# dev.off()
+# 
+# fit.ash.hu <- ashr::ash(x, s, method = "fdr", mixcompdist = "halfuniform")
+# lfdr.ash.hu <- ashr::get_lfdr(fit.ash.hu)
+# num.ash.hu <- sum(lfdr.ash.hu <= 0.2)
+# 
+# xplot <- seq(-2, 2, length = 1000)
+# plot(xplot, ashr:::dens(get_fitted_g(fit.ash), xplot), type = "l", xlim = c(-1, 1),
+#      xlab = expression(theta), ylab = expression(pi[1]~g(theta)))
+# yplot.u <- yplot.hu <- c()
+# for (i in seq(xplot)) {
+#   yplot.u[i] <- sum(dunif(xplot[i], get_fitted_g(fit.ash.u)$a[-1], get_fitted_g(fit.ash.u)$b[-1]) * get_fitted_g(fit.ash.u)$pi[-1])
+#   yplot.hu[i] <- sum(dunif(xplot[i], get_fitted_g(fit.ash.hu)$a[-1], get_fitted_g(fit.ash.hu)$b[-1]) * get_fitted_g(fit.ash.hu)$pi[-1])
+# }
+# lines(xplot, yplot.u, col = "blue", lty = 2)
+# lines(xplot, yplot.hu, col = "red", lty = 3)
+# legend("topleft", lty = 1:3, col = c("black", "blue", "red"), c("normal", "uniform", "halfuniform"))
 ```
 
 ## `cashr`
@@ -157,4 +158,52 @@ sum(fit.BH <= 0.1)
 sum(fit.qvalue$qvalues <= 0.1)
 sum(ashr::get_qvalue(fit.ash) <= 0.1)
 sum(ashr::qval.from.lfdr(fit.locfdr$fdr) <= 0.1)
+```
+
+```{r}
+setEPS()
+postscript("../output/paper/leukemia_hist.eps", height = 5, width = 6)
+# pdf("../output/paper/leukemia_hist.pdf", height = 5, width = 6)
+
+#####
+
+hist(z, prob = TRUE, xlab = expression(paste(z, "-score")), cex.lab = 1.25, breaks = 50, main = expression("Leukemia data"), cex.main = 1.5, xlim = c(-10, 10))
+
+lines(x.plot, y.plot, col = method.col[5], lwd = 2.5)
+lines(x.plot, dnorm(x.plot), col = "orange", lty = 1, lwd = 2.5)
+lines(x.plot, dnorm(x.plot, fit.locfdr$fp0[3, 1], fit.locfdr$fp0[3, 2]) * fit.locfdr$fp0[3, 3], col = method.col[3], lty = 1, lwd = 2.5)
+
+text(-3.5, 0.188, "N(0,1)", col = "orange")
+arrows(-2.2, 0.188, -1.3, 0.183, length = 0.1, angle = 20, col = "orange")
+
+text(-6.5, 0.11, bquote(atop(" locfdr empirical null", .(round(fit.locfdr$fp0[3, 3], 2)) %*% N(.(round(fit.locfdr$fp0[3, 1], 2)), .(round(fit.locfdr$fp0[3, 2], 2))^2))), col = method.col[3])
+arrows(-2.8, 0.1115, -1.9, 0.1065, length = 0.1, angle = 20, col = method.col[3])
+
+text(4.5, 0.0925,
+     bquote(atop("                     cashr corr noise dist", .(round(fit.cash$fitted_g$pi[1], 2)) %*% hat(f))),
+     col = method.col[5])
+arrows(2.9, 0.10, 2, 0.095, length = 0.1, angle = 20, col = method.col[5])
+
+dev.off()
+```
+
+```{r}
+# setEPS()
+# postscript("../output/paper/leukemia_lfdr.eps", height = 5, width = 6)
+pdf("../output/paper/leukemia_lfdr.pdf", height = 5, width = 6)
+
+#####
+
+plot(z, z, xlim = c(-10, 10), type = "n", ylim = c(0, 1), ylab = "Local FDR", xlab = expression(paste(z, "-score")), cex.lab = 1.25, main = expression("Leukemia data"), cex.main = 1.5)
+
+points(z, fit.cash$lfdr, pch = 15, cex = 0.5, col = method.col[5])
+points(z, fit.locfdr$fdr, pch = 16, cex = 0.5, col = method.col[3])
+points(z, fit.qvalue$lfdr, pch = 17, cex = 0.5, col = method.col[2])
+points(z, ashr::get_lfdr(fit.ash), pch = 18, cex = 0.5, col = method.col[4])
+
+#abline(h = 0.2, lty = 2)
+
+legend("topright", bty = "n", pch = 15 : 18, col = method.col[c(5, 3, 2, 4)], c("cashr", "locfdr", "qvalue", "ashr"))
+
+dev.off()
 ```

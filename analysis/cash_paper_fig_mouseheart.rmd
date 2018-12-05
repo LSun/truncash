@@ -93,3 +93,27 @@ sum(ashr::qval.from.lfdr(fit.locfdr$fdr) <= 0.1)
 1 - (ashr::mixcdf(fit.cash$fitted_g, -log2(1.2)) + 1 - ashr::mixcdf(fit.cash$fitted_g, log2(1.2))) / (1 - fit.cash$fitted_g$pi[1])
 1 - sum(pnorm(-log2(1.2), fit.cash$fitted_g$mean[-1], fit.cash$fitted_g$sd[-1]) * 2 * fit.cash$fitted_g$pi[-1]) / (1 - fit.cash$fitted_g$pi[1])
 ```
+
+```{r plotting z hist}
+# setEPS()
+# postscript("../output/paper/mouse_hist.eps", height = 5, width = 6)
+pdf("../output/paper/mouse_hist.pdf", height = 5, width = 6)
+
+hist(z, prob = TRUE, main = expression("Mouse data"), xlab = expression(paste(z, "-score")), cex.lab = 1.25, xlim = c(-10, 10), ylim = c(0, 0.25), cex.main = 1.5)
+lines(x.plot, y.plot, col = method.col[5], lwd = 2.5)
+lines(x.plot, dnorm(x.plot), col = "orange", lty = 1, lwd = 2.5)
+lines(x.plot, dnorm(x.plot, fit.locfdr$fp0[3, 1], fit.locfdr$fp0[3, 2]) * fit.locfdr$fp0[3, 3], col = method.col[3], lty = 1, lwd = 2.5)
+
+text(-3.4, 0.2, "N(0,1)", col = "orange")
+arrows(-2.1, 0.2, -1.2, 0.195, length = 0.1, angle = 20, col = "orange")
+
+text(-6.6, 0.13, bquote(atop(" locfdr empirical null", .(round(fit.locfdr$fp0[3, 3], 2)) %*% N(.(round(fit.locfdr$fp0[3, 1], 2)), .(round(fit.locfdr$fp0[3, 2], 2))^2))), col = method.col[3])
+arrows(-2.9, 0.13, -2, 0.125, length = 0.1, angle = 20, col = method.col[3])
+
+text(5.1, 0.090,
+     bquote(atop("                    cashr corr noise dist", .(round(fit.cash$fitted_g$pi[1], 2)) %*% hat(f))),
+     col = method.col[5])
+arrows(3.5, 0.0975, 2.6, 0.0925, length = 0.1, angle = 20, col = method.col[5])
+
+dev.off()
+```
