@@ -1,8 +1,10 @@
 ---
-title: "Figures to show simulated null $z$-scores are $N(0,1)$"
+title: "Figure to show pipeline produces $N(0,1)$ when correlation is removed"
 author: "Lei Sun"
 date: "2018-11-10"
-output: workflowr::wflow_html
+output:
+  workflowr::wflow_html:
+    code_folding: hide
 ---
 
 ```{r}
@@ -53,41 +55,14 @@ z.gtex <- readRDS('../output/paper/simulation/Z.gtex.rds')
 z.gtex.rand.gene <- readRDS('../output/paper/simulation/z.gtex.rand.gene.rds')
 ```
 
-```{r gtex_rand_gene}
-nsim <- nrow(z.gtex.rand.gene)
-pz <- ncol(z.gtex.rand.gene)
-
-png("../output/paper/ecdf_gtex_rand_gene.png", width = 5, height = 5, units = "in", res = 600)
-
-par(mar = c(4.5, 4.5, 2.5, 1))
-
-plot(0, type = "n", xlim = c(-5, 5), ylim = c(0, 1), ylab = "(Empirical) CDF", xlab = "z-scores", cex.lab = 2)
-title(expression('(b): correlation removed'), cex.main = 2)
-
-for (i in seq(nsim)) {
-  lines(ecdf(z.gtex.rand.gene[i, ]), lwd = 1, col = "grey75")
-}
-
-x.plot <- seq(-6, 6, by = 0.01)
-y.plot.norm <- pnorm(x.plot)
-upper.norm <- y.plot.norm + sqrt(log(2 / (1 / nsim)) / (2 * pz))
-lower.norm <- y.plot.norm - sqrt(log(2 / (1 / nsim)) / (2 * pz))
-
-lines(x.plot, y.plot.norm, lwd = 2, col = "blue")
-
-lines(x.plot[upper.norm <= 1 & upper.norm >= 0], upper.norm[upper.norm <= 1 & upper.norm >= 0], lty = 3, col = "blue")
-lines(x.plot[lower.norm <= 1 & lower.norm >= 0], lower.norm[lower.norm <= 1 & lower.norm >= 0], lty = 3, col = "blue")
-
-legend("bottomright", lwd = 1 : 2, col = c("grey75", "blue"), c(expression("F"[p]), expression('N(0,1)')), bty = "n", cex = 2)
-
-dev.off()
-```
-
 ```{r gtex}
 nsim <- length(z.gtex)
 pz <- length(z.gtex[[1]])
 
-png("../output/paper/ecdf_gtex.png", width = 5, height = 5, units = "in", res = 600)
+# setEPS()
+# postscript("../output/paper/ecdf_gtex.eps", width = 5, height = 5)
+# png("../output/paper/ecdf_gtex.png", width = 5, height = 5, units = "in", res = 1200)
+png("../output/paper/ecdf_gtex.png", width = 5, height = 5, units = "in", res = 300)
 
 par(mar = c(4.5, 4.5, 2.5, 1))
 
@@ -113,18 +88,54 @@ legend("bottomright", lwd = 1 : 2, col = c("grey75", "blue"), c(expression("F"[p
 dev.off()
 ```
 
+```{r gtex_rand_gene}
+nsim <- nrow(z.gtex.rand.gene)
+pz <- ncol(z.gtex.rand.gene)
+
+# setEPS()
+# postscript("../output/paper/ecdf_gtex_rand_gene.eps", width = 5, height = 5)
+# png("../output/paper/ecdf_gtex_rand_gene.png", width = 5, height = 5, units = "in", res = 1200)
+png("../output/paper/ecdf_gtex_rand_gene.png", width = 5, height = 5, units = "in", res = 300)
+
+par(mar = c(4.5, 4.5, 2.5, 1))
+
+plot(0, type = "n", xlim = c(-5, 5), ylim = c(0, 1), ylab = "(Empirical) CDF", xlab = "z-scores", cex.lab = 2)
+title(expression('(b): correlation removed'), cex.main = 2)
+
+for (i in seq(nsim)) {
+  lines(ecdf(z.gtex.rand.gene[i, ]), lwd = 1, col = "grey75")
+}
+
+x.plot <- seq(-6, 6, by = 0.01)
+y.plot.norm <- pnorm(x.plot)
+upper.norm <- y.plot.norm + sqrt(log(2 / (1 / nsim)) / (2 * pz))
+lower.norm <- y.plot.norm - sqrt(log(2 / (1 / nsim)) / (2 * pz))
+
+lines(x.plot, y.plot.norm, lwd = 2, col = "blue")
+
+lines(x.plot[upper.norm <= 1 & upper.norm >= 0], upper.norm[upper.norm <= 1 & upper.norm >= 0], lty = 3, col = "blue")
+lines(x.plot[lower.norm <= 1 & lower.norm >= 0], lower.norm[lower.norm <= 1 & lower.norm >= 0], lty = 3, col = "blue")
+
+legend("bottomright", lwd = 1 : 2, col = c("grey75", "blue"), c(expression("F"[p]), expression('N(0,1)')), bty = "n", cex = 2)
+
+dev.off()
+```
+
 ```{r iid}
 nsim <- nrow(z.gtex.rand.gene)
 pz <- ncol(z.gtex.rand.gene)
 
-png("../output/paper/ecdf_iid.png", width = 5, height = 5, units = "in", res = 600)
+# setEPS()
+# postscript("../output/paper/ecdf_iid.eps", width = 5, height = 5)
+# png("../output/paper/ecdf_iid.png", width = 5, height = 5, units = "in", res = 1200)
+png("../output/paper/ecdf_iid.png", width = 5, height = 5, units = "in", res = 300)
 
 par(mar = c(4.5, 4.5, 2.5, 1))
 
 plot(0, type = "n", xlim = c(-5, 5), ylim = c(0, 1), ylab = "(Empirical) CDF", xlab = "z-scores", cex.lab = 2)
 title(expression('(c): iid N(0,1) samples'), cex.main = 2)
 
-for (i in seq(1)) {
+for (i in seq(nsim)) {
   lines(ecdf(rnorm(pz)), lwd = 1, col = "grey75")
 }
 

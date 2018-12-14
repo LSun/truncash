@@ -2,7 +2,9 @@
 title: "The deconvolution figure"
 author: "Lei Sun"
 date: "2018-11-11"
-output: workflowr::wflow_html
+output:
+  workflowr::wflow_html:
+    code_folding: hide
 ---
 
 ## Deconv
@@ -191,7 +193,7 @@ deconv.plot <- ggplot(data = deconv.ggdata, aes(x = x, y = cdfhat, col = method,
                      #, labels = method.name
                      #, guide = guide_legend(nrow = 1)
                      ) +
-  labs(y = expression(paste("CDF of estimated ", hat(g)))
+  labs(y = expression(paste("CDF of (estimated) g"))
        #, x = expression(theta)
        #, title = expression(g == 0.6~delta[0] + 0.3~N(0, 1) + 0.1~N(0, 3^2))
        ) +
@@ -206,7 +208,7 @@ deconv.plot <- ggplot(data = deconv.ggdata, aes(x = x, y = cdfhat, col = method,
         #legend.background = element_rect(color = "grey"),
         legend.text = element_text(size = 15))
 
-ggsave("../output/paper/deconv.pdf", height = 5, width = 10)
+ggsave("../output/paper/deconv.pdf", height = 6, width = 10)
 ```
 
 ```{r}

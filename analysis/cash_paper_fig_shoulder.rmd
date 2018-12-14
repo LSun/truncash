@@ -2,7 +2,9 @@
 title: "The shoulder inflation figure"
 author: "Lei Sun"
 date: "2018-11-11"
-output: workflowr::wflow_html
+output:
+  workflowr::wflow_html:
+    code_folding: hide
 ---
 
 ```{r}

@@ -73,7 +73,6 @@ rect(xleft = c(range(qnorm(quantile.vec1))[1], range(-qnorm(quantile.vec3))[1]),
 dev.off()
 ```
 
-
 ```{r}
 pdf("../output/paper/ecdf_avg_left.pdf", height = 5, width = 5)
 par(mar = c(4.5, 4.5, 2.5, 1))

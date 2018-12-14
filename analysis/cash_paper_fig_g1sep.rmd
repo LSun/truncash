@@ -368,25 +368,25 @@ scaleFUN <- function(x) sprintf("%.2f", x)
 
 FDP.power.qg.save <- gridExtra::arrangeGrob(
   density.g.plot + 
-    labs(title = expression(paste('Distribution ', g[1], ' of non-null effects'))) +
+    labs(title = expression(paste('(a): Distribution ', g[1], ' of non-null effects'))) +
     theme(plot.margin = grid::unit(c(20, 92, 20, 10), "points")) +
     theme(plot.title = element_text(size = 15)),
   FDP.q.g.plot +
-    labs(title = bquote(paste('Distribution of FDP'))) +
+    labs(title = bquote(paste('(b): Distribution of FDP'))) +
     theme(strip.text.x = element_blank(),
           plot.title = element_text(size = 15),
           plot.margin = grid::unit(c(5.5, 67.5, 5.5, 5.5), 'points'),
           axis.text.x = element_text(size = 12)
     ),
   FDP.sqrt.mse.plot +
-    labs(title = 'Root MSE of FDP from nominal FDR') +
+    labs(title = '(c): Root MSE of FDP from nominal FDR') +
     expand_limits(y = 0) +
     theme(strip.text = element_blank(),
           plot.title = element_text(size = 15),
           plot.margin = grid::unit(c(5.5, 5.5, 5.5, 15), 'points')
     ),
   mean.TDP.plot +
-    labs(title = bquote(paste('Mean of TDP'))) +
+    labs(title = bquote(paste('(d): Mean of TDP'))) +
 #    scale_y_continuous(labels = scaleFUN) +
     expand_limits(y = 0) +
     theme(strip.text = element_blank(),

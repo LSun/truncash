@@ -374,7 +374,7 @@ TDP.q.all.sep.plot <- ggplot(data = TDP.q.ggdata.0.9, aes(x = Method, y = TDP, f
 ```{r}
 FDP_noise_new.save <- gridExtra::arrangeGrob(
   z.sep.plot +
-    labs(y = 'Density', title = 'Examples of realized correlated N(0,1) noise') +
+    labs(y = 'Density', title = '(a): Examples of realized correlated N(0,1) noise') +
     scale_color_manual(values = "blue") +
     expand_limits(x = -4) +
     theme(legend.title = element_blank(),
@@ -387,7 +387,7 @@ FDP_noise_new.save <- gridExtra::arrangeGrob(
          axis.title.y = element_text(size = 15)
     ),
   FDP.sqrt.q.all.sep.plot +
-    labs(x = 'FDP', title = bquote(paste('Distribution of FDP'))) +
+    labs(x = 'FDP', title = bquote(paste('(b): Distribution of FDP'))) +
     theme(plot.title = element_text(size = 15),
           axis.title.x = element_text(size = 15),
           strip.text = element_text(size = 15),
@@ -396,7 +396,7 @@ FDP_noise_new.save <- gridExtra::arrangeGrob(
           axis.text.x = element_text(size = 12)
     ),
   TDP.q.all.sep.plot +
-    labs(x = 'TDP', title = bquote(paste('Distribution of TDP'))) +
+    labs(x = 'TDP', title = bquote(paste('(c): Distribution of TDP'))) +
     theme(plot.margin = grid::unit(c(5.5, 5.5, 5.5, 5.5), "points"),
           axis.title.x = element_text(size = 15),
           strip.text = element_text(size = 15),
@@ -406,7 +406,7 @@ FDP_noise_new.save <- gridExtra::arrangeGrob(
     ),
   heights = c(1.1, 1, 1),
   top = grid::textGrob(label = bquote(paste(
-    'Nominal FDR = ', .(q), ' (', g[1], ' is Guassian; ', pi[0] == 0.9, ')')), gp = grid::gpar(fontsize = 17, fontface = 'bold'), hjust = 1)
+    'Nominal FDR = ', .(q), ' (', g[1], ' is Guassian; ', pi[0] == 0.9, ')')), gp = grid::gpar(fontsize = 15, fontface = 'bold'), hjust = 1.125)
 )
 
 ggsave("../output/paper/FDP_noise_new.pdf", FDP_noise_new.save, height = 7, width = 10)

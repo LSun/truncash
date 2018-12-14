@@ -238,11 +238,15 @@ A close look at Efron's classic BRCA data, used in many of his papers to illustr
 * [ECSN: exchangeable correlated standard normal](converging_f.html)
 * [Decorrelation of posterior](decor_post.html)
 * [The correlated $N(0, 1)$ histograms figure](cash_paper_fig1.html)
+* [Deconvolutions with correlated or iid noise](cash_paper_fig_deconv.html)
+* [The shoulder inflation figures](cash_paper_fig_shoulder.html)
 * [The curves of standardized Gaussian derivatives](cash_paper_fig_gd.html)
 * [The FDP in different $g_1$ figure](cash_paper_fig_g1sep.html)
 * [The separation by inflation vs deflation figure](cash_paper_fig_noisesep.html)
 * [The lukemia study figure](cash_paper_fig_leukemia.html)
 * [The mouse heart data figure](cash_paper_fig_mouseheart.html)
+* [The average CDF of correlated $z$-scores is close to $N(0,1)$](cash_paper_fig_avgecdf.html)
+* [The CDF of $z$-scores with correlation kept or removed](cash_paper_fig_marginal.html)
 
 ---
 

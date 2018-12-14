@@ -1,8 +1,10 @@
 ---
-title: "cash_paper_fig_gd"
+title: "Standardized Gaussian Derivatives"
 author: "Lei Sun"
 date: "2018-10-21"
-output: workflowr::wflow_html
+output:
+  workflowr::wflow_html:
+    code_folding: hide
 ---
 
 ## Introduction
