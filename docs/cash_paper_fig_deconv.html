@@ -11,9 +11,9 @@
 
 <meta name="author" content="Lei Sun" />
 
-<meta name="date" content="2018-10-21" />
+<meta name="date" content="2018-11-11" />
 
-<title>Standardized Gaussian Derivatives</title>
+<title>The deconvolution figure</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -325,9 +325,9 @@ div.section {
 
 
 
-<h1 class="title toc-ignore">Standardized Gaussian Derivatives</h1>
+<h1 class="title toc-ignore">The deconvolution figure</h1>
 <h4 class="author"><em>Lei Sun</em></h4>
-<h4 class="date"><em>2018-10-21</em></h4>
+<h4 class="date"><em>2018-11-11</em></h4>
 
 </div>
 
@@ -503,36 +503,19 @@ Message
 <tbody>
 <tr>
 <td style="text-align:left;">
-html
-</td>
-<td style="text-align:left;">
-<a href="https://cdn.rawgit.com/LSun/truncash/562bda224f19fddc76664c6246fd588e53210b5c/docs/cash_paper_fig_gd.html" target="_blank">562bda2</a>
-</td>
-<td style="text-align:left;">
-Lei Sun
-</td>
-<td style="text-align:left;">
-2018-10-21
-</td>
-<td style="text-align:left;">
-Build site.
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
 rmd
 </td>
 <td style="text-align:left;">
-<a href="https://github.com/LSun/truncash/blob/7b6b664652192ae86bcdcc144e6fb4a2b6d2722a/analysis/cash_paper_fig_gd.rmd" target="_blank">7b6b664</a>
+<a href="https://github.com/LSun/truncash/blob/c87b8d270af985fdaff6d0f637e2872561823f72/analysis/cash_paper_fig_deconv.rmd" target="_blank">c87b8d2</a>
 </td>
 <td style="text-align:left;">
 Lei Sun
 </td>
 <td style="text-align:left;">
-2018-10-21
+2018-11-11
 </td>
 <td style="text-align:left;">
-wflow_publish(c(“analysis/cash_paper_fig_gd.rmd”,
+figures
 </td>
 </tr>
 </tbody>
@@ -540,10 +523,11 @@ wflow_publish(c(“analysis/cash_paper_fig_gd.rmd”,
 </ul>
 </details>
 <hr />
-<div id="introduction" class="section level2">
-<h2>Introduction</h2>
-<p>Plotting the standard Gaussian and its standardized derivatives.</p>
-<pre class="r"><code>source(&quot;../code/gdash_lik.R&quot;)</code></pre>
+<div id="deconv" class="section level2">
+<h2>Deconv</h2>
+<pre class="r"><code>z.sel &lt;- readRDS(&quot;../output/paper/simulation/z.sel.rds&quot;)</code></pre>
+<pre class="r"><code>source(&#39;../code/count_to_summary.R&#39;)
+source(&#39;../code/gdash_lik.R&#39;)</code></pre>
 <pre><code>Loading required package: EQL</code></pre>
 <pre><code>Loading required package: ttutils</code></pre>
 <pre><code>Loading required package: SQUAREM</code></pre>
@@ -559,51 +543,287 @@ Attaching package: &#39;CVXR&#39;</code></pre>
 <pre><code>Loading required package: PolynomF</code></pre>
 <pre><code>Loading required package: Rmosek</code></pre>
 <pre><code>Loading required package: ashr</code></pre>
-<pre class="r"><code>plotx &lt;- seq(-10, 10, length = 1000)
-gd.ord &lt;- 10
-hermite = Hermite(gd.ord)
-gd0.std = dnorm(plotx)
-matrix_lik_plot = cbind(gd0.std)
-for (i in 1 : gd.ord) {
-  gd.std = (-1)^i * hermite[[i]](plotx) * gd0.std / sqrt(factorial(i))
-  matrix_lik_plot = cbind(matrix_lik_plot, gd.std)
+<pre class="r"><code>library(ggplot2)</code></pre>
+<pre><code>Warning: package &#39;ggplot2&#39; was built under R version 3.4.4</code></pre>
+<pre class="r"><code>CDF.KW &lt;- function(h, interp = FALSE, eps = 0.001, bw = 0.7){
+    #Wasserstein distance:  ||G-H||_W
+    if(interp == &quot;biweight&quot;){
+    yk = h$x
+    for (j in 1:length(yk))
+        yk[j] = sum(biweight(h$x[j], h$x, bw = bw)*h$y/sum(h$y))
+    H &lt;- cumsum(yk)
+    H &lt;- H/H[length(H)]
+    }
+    else {
+    H &lt;- cumsum(h$y)
+    H &lt;- H/H[length(H)]
+    }
+    return(H)
+}</code></pre>
+<pre class="r"><code>G &lt;- function (t) {
+  0.6 * pnorm(t, 0, 0) + 0.3 * pnorm(t, 0, 1) + 0.1 * pnorm(t, 0, 3)
 }
-method.col &lt;- scales::hue_pal()(gd.ord)</code></pre>
-<pre class="r"><code>setEPS()
-postscript(&quot;../output/paper/GD.eps&quot;, height = 4.5, width = 15)
-#pdf(&quot;../output/paper/GD.pdf&quot;, height = 4.5, width = 15)
 
-par(mfrow = c(1, 2))
-par(mar = c(3, 6.5, 1, 1.5))
-plot(plotx, gd0.std, type = &quot;l&quot;, xlim = c(-5, 5), ylim = range(matrix_lik_plot), xlab = &quot;&quot;, ylab = &#39;&#39;, main = &#39;&#39;, bty = &#39;n&#39;, lwd = 2)
-title(ylab = latex2exp::TeX(&#39;$\\frac{1}{\\sqrt{\\textit{l}!}}\\varphi^{(\\textit{l})}(\\cdot)$&#39;), line = 2.5, cex.lab = 1.5)
-for (i in 1 : 4) {
-  lines(plotx, matrix_lik_plot[, (i + 1)], col = method.col[i], lty = i + 1, lwd = 2)
-}
-legend(&quot;topright&quot;, col = c(1, method.col[1 : 4]), lty = 1 : 5, lwd = 2, bty = &quot;n&quot;, cex = 1.5,
-       c(latex2exp::TeX(&#39;$\\varphi$&#39;), 
-         latex2exp::TeX(&#39;$\\textit{l} = 1$&#39;), 
-         latex2exp::TeX(&#39;$\\textit{l} = 2$&#39;), 
-         latex2exp::TeX(&#39;$\\textit{l} = 3$&#39;), 
-         latex2exp::TeX(&#39;$\\textit{l} = 4$&#39;)
-       ))
+set.seed(777)
 
-plot(plotx, gd0.std, type = &quot;l&quot;, xlim = c(-5, 5), ylim = range(matrix_lik_plot), xlab = &quot;&quot;, ylab = &#39;&#39;, main = &#39;&#39;, bty = &#39;n&#39;, lwd = 2)
-title(ylab = latex2exp::TeX(&#39;$\\frac{1}{\\sqrt{\\textit{l}!}}\\varphi^{(\\textit{l})}(\\cdot)$&#39;), line = 2.5, font = 1, cex.lab = 1.5)
-for (i in 7 : 10) {
-  lines(plotx, matrix_lik_plot[, (i + 1)], col = method.col[i], lty = i + 1, lwd = 2)
-}
-legend(&quot;topright&quot;, col = c(1, method.col[7 : 10]), lty = c(1, 8 : 11), lwd = 2, bty = &quot;n&quot;, cex = 1.5,
-       c(latex2exp::TeX(&#39;$\\varphi$&#39;), 
-         latex2exp::TeX(&#39;$\\textit{l} = 7$&#39;), 
-         latex2exp::TeX(&#39;$\\textit{l} = 8$&#39;), 
-         latex2exp::TeX(&#39;$\\textit{l} = 9$&#39;), 
-         latex2exp::TeX(&#39;$\\textit{l} = 10$&#39;)
-       ))
+theta &lt;- sample(c(
+  rnorm(6e3, 0, 0),
+  rnorm(3e3, 0, 1),
+  rnorm(1e3, 0, 3)
+))
 
-dev.off()</code></pre>
-<pre><code>quartz_off_screen 
-                2 </code></pre>
+x.plot &lt;- seq(-6, 6, by = 0.1)
+
+G.plot &lt;- G(x.plot)</code></pre>
+<pre class="r"><code>r &lt;- readRDS(&quot;../data/liver.rds&quot;)
+nsamp &lt;- 5
+ngene &lt;- 1e4
+Y = lcpm(r)
+subset = top_genes_index(ngene, Y)
+r = r[subset,]
+set.seed(777)
+counts &lt;- r[, sample(ncol(r), 2 * nsamp)]
+design &lt;- model.matrix(~c(rep(0, nsamp), rep(1, nsamp)))
+summary &lt;- count_to_summary(counts, design)
+s &lt;- summary$sebetahat
+s &lt;- s / sqrt(mean(s^2))</code></pre>
+<pre class="r"><code>noise.label &lt;- c(
+  &#39;a&#39;,
+  &#39;b&#39;,
+  &#39;c&#39;,
+  &#39;d&#39;,
+  &#39;e&#39;
+)
+deconv.list &lt;- list()
+for (i in 1 : 5) {
+  if (i &lt;= 4) {
+    Z &lt;- z.sel[i, ]
+  } else {
+    set.seed(777)
+    Z &lt;- rnorm(1e4)
+  }
+    X &lt;- theta + s * Z
+    z &lt;- theta + Z
+
+  ## Truth
+  true.data &lt;- cbind.data.frame(
+    method = &quot;True g&quot;,
+    x = x.plot,
+    cdfhat = G.plot
+  )
+
+  ## ashr
+  fit.ashr &lt;- ashr::ash(X, s, method = &quot;fdr&quot;, mixcompdist = &quot;normal&quot;)
+  ashr.plot &lt;- as.numeric(ashr::mixcdf(ashr::get_fitted_g(fit.ashr), x.plot))
+  ashr.data &lt;- cbind.data.frame(
+    method = &quot;ashr&quot;,
+    x = x.plot,
+    cdfhat = ashr.plot
+  )
+  
+  ## cashr
+  fit.cashr &lt;- gdash(X, s)
+  cashr.plot &lt;- as.numeric(ashr::mixcdf(ashr::get_fitted_g(fit.cashr), x.plot))
+  cashr.data &lt;- cbind.data.frame(
+    method = &quot;cashr&quot;,
+    x = x.plot,
+    cdfhat = cashr.plot
+  )
+
+  ## deconvolveR
+  fit.deconvolveR &lt;- deconvolveR::deconv(tau = x.plot, X = z, family = &quot;Normal&quot;, deltaAt = 0)
+  deconvolveR.data &lt;- cbind.data.frame(
+    method = &quot;deconvolveR&quot;,
+    x = fit.deconvolveR$stats[, 1],
+    cdfhat = fit.deconvolveR$stats[, 4]
+  )
+  
+  ## Kiefer-Wolfowitz&#39;s NPMLE (1956)
+  ## implemented by Koenker-Mizera-Gu&#39;s REBayes (2016)
+  v = seq(-6.025, 6.025, by = 0.05)
+  fit.REBayes &lt;- REBayes::GLmix(x = X, v = v, sigma = s)
+  REBayes.plot &lt;- CDF.KW(fit.REBayes)
+  REBayes.data &lt;- cbind.data.frame(
+    method = &quot;REBayes&quot;,
+    x = fit.REBayes$x,
+    cdfhat = REBayes.plot
+  )
+  
+  ## EbayesThresh
+  fit.EbayesThresh &lt;- EbayesThresh::ebayesthresh(X, sdev = s, verbose = TRUE, prior = &quot;laplace&quot;, a = NA)
+  EbayesThresh.plot &lt;- (1 - fit.EbayesThresh$w) * (x.plot &gt;= 0) + fit.EbayesThresh$w * rmutil::plaplace(x.plot, m = 0, s = 1 / fit.EbayesThresh$a)
+  EbayesThresh.data &lt;- cbind.data.frame(
+    method = &quot;EbayesThresh&quot;,
+    x = x.plot,
+    cdfhat = EbayesThresh.plot
+  )
+  
+  deconv.list[[i]] &lt;- cbind.data.frame(
+    noise = noise.label[i],
+    rbind.data.frame(
+      true.data,
+      EbayesThresh.data,
+      REBayes.data,
+      ashr.data,
+      deconvolveR.data,
+      cashr.data
+    )
+  )
+}</code></pre>
+<pre><code>Warning in stats::nlm(f = loglik, p = aStart, gradtol = 1e-10, ...): NA/Inf
+replaced by maximum positive value
+
+Warning in stats::nlm(f = loglik, p = aStart, gradtol = 1e-10, ...): NA/Inf
+replaced by maximum positive value
+
+Warning in stats::nlm(f = loglik, p = aStart, gradtol = 1e-10, ...): NA/Inf
+replaced by maximum positive value</code></pre>
+<pre><code>Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
+               consider reducing rtol
+
+Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
+               consider reducing rtol
+
+Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
+               consider reducing rtol
+
+Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
+               consider reducing rtol
+
+Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
+               consider reducing rtol
+
+Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
+               consider reducing rtol
+
+Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
+               consider reducing rtol
+
+Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
+               consider reducing rtol
+
+Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
+               consider reducing rtol
+
+Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
+               consider reducing rtol
+
+Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
+               consider reducing rtol
+
+Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
+               consider reducing rtol
+
+Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
+               consider reducing rtol
+
+Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
+               consider reducing rtol
+
+Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
+               consider reducing rtol
+
+Warning in REBayes::KWDual(A, rep(1, k), normalize(w), control = control): estimated mixing distribution has some negative values:
+               consider reducing rtol</code></pre>
+<pre><code>Warning in stats::nlm(f = loglik, p = aStart, gradtol = 1e-10, ...): NA/Inf
+replaced by maximum positive value
+
+Warning in stats::nlm(f = loglik, p = aStart, gradtol = 1e-10, ...): NA/Inf
+replaced by maximum positive value
+
+Warning in stats::nlm(f = loglik, p = aStart, gradtol = 1e-10, ...): NA/Inf
+replaced by maximum positive value
+
+Warning in stats::nlm(f = loglik, p = aStart, gradtol = 1e-10, ...): NA/Inf
+replaced by maximum positive value
+
+Warning in stats::nlm(f = loglik, p = aStart, gradtol = 1e-10, ...): NA/Inf
+replaced by maximum positive value
+
+Warning in stats::nlm(f = loglik, p = aStart, gradtol = 1e-10, ...): NA/Inf
+replaced by maximum positive value
+
+Warning in stats::nlm(f = loglik, p = aStart, gradtol = 1e-10, ...): NA/Inf
+replaced by maximum positive value
+
+Warning in stats::nlm(f = loglik, p = aStart, gradtol = 1e-10, ...): NA/Inf
+replaced by maximum positive value
+
+Warning in stats::nlm(f = loglik, p = aStart, gradtol = 1e-10, ...): NA/Inf
+replaced by maximum positive value
+
+Warning in stats::nlm(f = loglik, p = aStart, gradtol = 1e-10, ...): NA/Inf
+replaced by maximum positive value
+
+Warning in stats::nlm(f = loglik, p = aStart, gradtol = 1e-10, ...): NA/Inf
+replaced by maximum positive value
+
+Warning in stats::nlm(f = loglik, p = aStart, gradtol = 1e-10, ...): NA/Inf
+replaced by maximum positive value</code></pre>
+<pre class="r"><code>deconv.ggdata &lt;- do.call(rbind.data.frame, deconv.list)
+noise.level &lt;- c(&quot;(a)&quot;,
+                  &quot;(b)&quot;,
+                  &quot;(c)&quot;,
+                  &quot;(d)&quot;,
+                  &quot;(e)&quot;)
+deconv.ggdata$noise &lt;- plyr::mapvalues(deconv.ggdata$noise,
+                                        from = noise.label,
+                                        to = noise.level
+                                        )
+deconv.ggdata$noise &lt;- factor(deconv.ggdata$noise,
+                              levels = levels(deconv.ggdata$noise)[c(1, 2, 5, 3, 4)]
+                              )</code></pre>
+<pre class="r"><code>method.col &lt;- c(&quot;black&quot;, scales::hue_pal()(5)[c(1, 3, 4, 2, 5)])
+method.linetype &lt;- rep(1, 6)
+#method.linetype &lt;- c(1, 2, 4, 5, 6)</code></pre>
+<pre class="r"><code>## plotting
+deconv.plot &lt;- ggplot(data = deconv.ggdata, aes(x = x, y = cdfhat, col = method, linetype = method)) +
+  geom_line(size = 1) +
+  facet_wrap(~noise, nrow = 2) +
+  xlim(-5, 5) +
+  scale_linetype_manual(values = method.linetype
+                        #, labels = method.name
+                        #, guide = guide_legend(nrow = 1)
+                        ) +
+  scale_color_manual(values = method.col
+                     #, labels = method.name
+                     #, guide = guide_legend(nrow = 1)
+                     ) +
+  labs(y = expression(paste(&quot;CDF of (estimated) g&quot;))
+       #, x = expression(theta)
+       #, title = expression(g == 0.6~delta[0] + 0.3~N(0, 1) + 0.1~N(0, 3^2))
+       ) +
+  theme(plot.title = element_text(size = 15, hjust = 0.5),
+        axis.title.x = element_blank(),
+        axis.text.x = element_text(size = 10),
+        axis.title.y = element_text(size = 15),
+        axis.text.y = element_text(size = 10),
+        strip.text = element_text(size = 15),
+        legend.position = c(0.85, 0.25),
+        legend.title = element_blank(),
+        #legend.background = element_rect(color = &quot;grey&quot;),
+        legend.text = element_text(size = 15))
+
+ggsave(&quot;../output/paper/deconv.pdf&quot;, height = 6, width = 10)</code></pre>
+<pre><code>Warning: Removed 140 rows containing missing values (geom_path).</code></pre>
+<pre class="r"><code>q &lt;- 0.1
+p.val.3 &lt;- pnorm(-abs((theta + s * z.sel[3, ]) / s)) * 2
+fit.BH.3 &lt;- p.adjust(p.val.3, method = &quot;BH&quot;)
+sum(fit.BH.3 &lt;= q)</code></pre>
+<pre><code>[1] 3218</code></pre>
+<pre class="r"><code>sum(theta[fit.BH.3 &lt;= q] == 0)</code></pre>
+<pre><code>[1] 1484</code></pre>
+<pre class="r"><code>sum(theta[fit.BH.3 &lt;= q] == 0) / sum(fit.BH.3 &lt;= q)</code></pre>
+<pre><code>[1] 0.461156</code></pre>
+<pre class="r"><code>fit.qvalue.3 &lt;- qvalue::qvalue(p.val.3)
+fit.qvalue.3$pi0</code></pre>
+<pre><code>[1] 0.3909627</code></pre>
+<pre class="r"><code>sum(fit.qvalue.3$qvalues &lt;= q)</code></pre>
+<pre><code>[1] 5021</code></pre>
+<pre class="r"><code>sum(theta[fit.qvalue.3$qvalues &lt;= q] == 0)</code></pre>
+<pre><code>[1] 2689</code></pre>
+<pre class="r"><code>sum(theta[fit.qvalue.3$qvalues &lt;= q] == 0) / sum(fit.qvalue.3$qvalues &lt;= q)</code></pre>
+<pre><code>[1] 0.5355507</code></pre>
 </div>
 <div id="session-information" class="section level2">
 <h2>Session information</h2>
@@ -623,25 +843,32 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] ashr_2.2-7        Rmosek_8.0.69     PolynomF_1.0-2    CVXR_0.95        
-[5] REBayes_1.3       Matrix_1.2-14     SQUAREM_2017.10-1 EQL_1.0-0        
-[9] ttutils_1.0-1    
+ [1] ggplot2_3.1.0     ashr_2.2-7        Rmosek_8.0.69    
+ [4] PolynomF_1.0-2    CVXR_0.95         REBayes_1.3      
+ [7] Matrix_1.2-14     SQUAREM_2017.10-1 EQL_1.0-0        
+[10] ttutils_1.0-1    
 
 loaded via a namespace (and not attached):
- [1] latex2exp_0.4.0   gmp_0.5-13.1      Rcpp_0.12.16     
- [4] plyr_1.8.4        compiler_3.4.3    git2r_0.23.0     
- [7] workflowr_1.1.1   R.methodsS3_1.7.1 R.utils_2.6.0    
-[10] iterators_1.0.9   tools_3.4.3       digest_0.6.15    
-[13] bit_1.1-13        evaluate_0.10.1   lattice_0.20-35  
-[16] foreach_1.4.4     yaml_2.1.19       parallel_3.4.3   
-[19] Rmpfr_0.7-0       ECOSolveR_0.4     stringr_1.3.1    
-[22] knitr_1.20        rprojroot_1.3-2   bit64_0.9-7      
-[25] grid_3.4.3        R6_2.2.2          rmarkdown_1.9    
-[28] magrittr_1.5      whisker_0.3-2     scales_0.5.0     
-[31] MASS_7.3-50       backports_1.1.2   codetools_0.2-15 
-[34] htmltools_0.3.6   scs_1.1-1         colorspace_1.3-2 
-[37] stringi_1.2.2     munsell_0.4.3     pscl_1.5.2       
-[40] doParallel_1.0.11 truncnorm_1.0-8   R.oo_1.22.0      </code></pre>
+ [1] qvalue_2.10.0     locfit_1.5-9.1    reshape2_1.4.3   
+ [4] splines_3.4.3     lattice_0.20-35   colorspace_1.3-2 
+ [7] htmltools_0.3.6   yaml_2.1.19       gmp_0.5-13.1     
+[10] rlang_0.3.0.1     R.oo_1.22.0       pillar_1.2.2     
+[13] glue_1.2.0        Rmpfr_0.7-0       withr_2.1.2      
+[16] R.utils_2.6.0     bit64_0.9-7       bindrcpp_0.2.2   
+[19] scs_1.1-1         foreach_1.4.4     plyr_1.8.4       
+[22] bindr_0.1.1       stringr_1.3.1     munsell_0.4.3    
+[25] gtable_0.2.0      workflowr_1.1.1   R.methodsS3_1.7.1
+[28] codetools_0.2-15  evaluate_0.10.1   labeling_0.3     
+[31] knitr_1.20        doParallel_1.0.11 pscl_1.5.2       
+[34] parallel_3.4.3    Rcpp_0.12.16      edgeR_3.20.9     
+[37] backports_1.1.2   scales_0.5.0      limma_3.34.9     
+[40] truncnorm_1.0-8   bit_1.1-13        digest_0.6.15    
+[43] stringi_1.2.2     dplyr_0.7.4       grid_3.4.3       
+[46] rprojroot_1.3-2   ECOSolveR_0.4     tools_3.4.3      
+[49] magrittr_1.5      lazyeval_0.2.1    tibble_1.4.2     
+[52] whisker_0.3-2     pkgconfig_2.0.1   MASS_7.3-50      
+[55] assertthat_0.2.0  rmarkdown_1.9     iterators_1.0.9  
+[58] R6_2.2.2          git2r_0.23.0      compiler_3.4.3   </code></pre>
 </div>
 
 <!-- Adjust MathJax settings so that all math formulae are shown using
