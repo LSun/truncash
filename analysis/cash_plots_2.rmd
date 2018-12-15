@@ -222,13 +222,13 @@ pi0hat.mat <- cbind.data.frame(
   do.call(rbind, pi0hat.list)
 )
 
-##================================================================
+##===============================================================
 
 sd.z <- sapply(z.list, sd)
 Noise <- cut(sd.z, breaks = c(0, quantile(sd.z, probs = 1 : 2 / 3), Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
 # Noise <- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
 
-##================================================================
+##===============================================================
 
 FDP.list <- lapply(q.vec, function (q) {
   t(mapply(function (qvalue.mat, beta, q) {
@@ -259,7 +259,7 @@ names(TDP.list) <- q.vec
 ```
 
 ```{r, cache = TRUE, message = FALSE, warning = FALSE}
-##=================================================
+##===================================================
 
 pi0hat.noise.mat <- rbind.data.frame(
   cbind.data.frame(Noise = rep("All", length(Noise)), pi0hat.mat),
@@ -286,7 +286,7 @@ pi0hat.plot <- ggplot(data = pi0hat.ggdata, aes(x = pi0, y = pi0hat)) +
         legend.background = element_rect(color = "grey"),
         legend.text = element_text(size = 12))
 
-##==================================================
+##====================================================
 
 FDP.calib.ggdata <- FXP.ggdata(FDP.list, Noise)
 
@@ -494,10 +494,6 @@ FSR.calib.plot
 ```{r, fig.asp = 0.5, message = FALSE, warning = FALSE}
 FDP.q.plot
 TDP.q.plot
-```
-
-```{r temp normal}
-saveRDS(TDP.q.ggdata, '~/Desktop/temp3/TDP.q.normal.rds')
 ```
 
 ## Big normal
@@ -1069,10 +1065,6 @@ FDP.q.plot
 TDP.q.plot
 ```
 
-```{r temp nearnormal}
-saveRDS(TDP.q.ggdata, '~/Desktop/temp3/TDP.q.nearnormal.rds')
-```
-
 ## Spiky
 
 $$
@@ -1365,10 +1357,6 @@ FSR.calib.plot
 ```{r, fig.asp = 0.5, message = FALSE, warning = FALSE}
 FDP.q.plot
 TDP.q.plot
-```
-
-```{r temp spiky}
-saveRDS(TDP.q.ggdata, '~/Desktop/temp3/TDP.q.spiky.rds')
 ```
 
 ## Skew
@@ -1664,10 +1652,6 @@ FDP.q.plot
 TDP.q.plot
 ```
 
-```{r temp skew}
-saveRDS(TDP.q.ggdata, '~/Desktop/temp3/TDP.q.skew.rds')
-```
-
 ## Flattop
 
 $$
@@ -1948,10 +1932,6 @@ FSR.calib.plot
 ```{r, fig.asp = 0.5, message = FALSE, warning = FALSE}
 FDP.q.plot
 TDP.q.plot
-```
-
-```{r temp flattop}
-saveRDS(TDP.q.ggdata, '~/Desktop/temp3/TDP.q.flattop.rds')
 ```
 
 ## Bimodal
@@ -2239,10 +2219,6 @@ FSR.calib.plot
 ```{r, fig.asp = 0.5, message = FALSE, warning = FALSE}
 FDP.q.plot
 TDP.q.plot
-```
-
-```{r temp bimodal}
-saveRDS(TDP.q.ggdata, '~/Desktop/temp3/TDP.q.bimodal.rds')
 ```
 
 ## Put together
