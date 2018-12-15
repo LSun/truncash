@@ -332,7 +332,7 @@ div.section {
 </div>
 
 
-<p><strong>Last updated:</strong> 2018-10-12</p>
+<p><strong>Last updated:</strong> 2018-12-15</p>
 <strong>workflowr checks:</strong> <small>(Click a bullet for more information)</small>
 <ul>
 <li>
@@ -361,7 +361,7 @@ div.section {
 </li>
 <li>
 <details>
-<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/f20502c2a4508f05ffd49cf1a4fb12e0c8fafdd3" target="_blank">f20502c</a> </summary></p>
+<p><summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/LSun/truncash/tree/ef4498bcf7f13c888696164c83665680f7caa788" target="_blank">ef4498b</a> </summary></p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 <pre><code>
 Ignored files:
@@ -387,6 +387,9 @@ Ignored files:
     Ignored:    analysis/cash_fdr_4_cache/
     Ignored:    analysis/cash_fdr_5_cache/
     Ignored:    analysis/cash_fdr_6_cache/
+    Ignored:    analysis/cash_paper_fig1_cache/
+    Ignored:    analysis/cash_paper_fig_avgecdf_cache/
+    Ignored:    analysis/cash_paper_fig_deconv_cache/
     Ignored:    analysis/cash_paper_fig_leukemia_cache/
     Ignored:    analysis/cash_plots_2_cache/
     Ignored:    analysis/cash_plots_3_cache/
@@ -495,6 +498,74 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/ef4498bcf7f13c888696164c83665680f7caa788/analysis/cash_plots_2.rmd" target="_blank">ef4498b</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-12-14
+</td>
+<td style="text-align:left;">
+cash_plots
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/33d044d710b755ef8a5d8d8a56c80d54a35c9e91/analysis/cash_plots_2.rmd" target="_blank">33d044d</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-12-14
+</td>
+<td style="text-align:left;">
+cash plots
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/LSun/truncash/blob/41708027c6747da67fb316dbf7a7b19cf6066a7a/analysis/cash_plots_2.rmd" target="_blank">4170802</a>
+</td>
+<td style="text-align:left;">
+Lei Sun
+</td>
+<td style="text-align:left;">
+2018-11-14
+</td>
+<td style="text-align:left;">
+TDP
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/LSun/truncash/39b2b841cd3a3784b3ac008f761a3b8c51dd21b0/docs/cash_plots_2.html" target="_blank">39b2b84</a>
+</td>
+<td style="text-align:left;">
+LSun
+</td>
+<td style="text-align:left;">
+2018-10-12
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 html
@@ -1238,13 +1309,13 @@ LSun
   do.call(rbind, pi0hat.list)
 )
 
-##================================================================
+##===============================================================
 
 sd.z &lt;- sapply(z.list, sd)
 Noise &lt;- cut(sd.z, breaks = c(0, quantile(sd.z, probs = 1 : 2 / 3), Inf), labels = c(&quot;Deflated Noise&quot;, &quot;In-between&quot;, &quot;Inflated Noise&quot;))
 # Noise &lt;- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c(&quot;Deflated Noise&quot;, &quot;In-between&quot;, &quot;Inflated Noise&quot;))
 
-##================================================================
+##===============================================================
 
 FDP.list &lt;- lapply(q.vec, function (q) {
   t(mapply(function (qvalue.mat, beta, q) {
@@ -1272,7 +1343,7 @@ TDP.list &lt;- lapply(q.vec, function(q) {
   }, qvalue.list, beta.list, q))
 })
 names(TDP.list) &lt;- q.vec</code></pre>
-<pre class="r"><code>##=================================================
+<pre class="r"><code>##===================================================
 
 pi0hat.noise.mat &lt;- rbind.data.frame(
   cbind.data.frame(Noise = rep(&quot;All&quot;, length(Noise)), pi0hat.mat),
@@ -1299,7 +1370,7 @@ pi0hat.plot &lt;- ggplot(data = pi0hat.ggdata, aes(x = pi0, y = pi0hat)) +
         legend.background = element_rect(color = &quot;grey&quot;),
         legend.text = element_text(size = 12))
 
-##==================================================
+##====================================================
 
 FDP.calib.ggdata &lt;- FXP.ggdata(FDP.list, Noise)
 
@@ -1845,7 +1916,10 @@ LSun
   plotx,
   ploty = dnorm(plotx, 0, 5)
 )</code></pre>
-<pre class="r"><code>pi0hat.mat &lt;- cbind.data.frame(pi0 = factor(do.call(rbind, pi0.list)), do.call(rbind, pi0hat.list))
+<pre class="r"><code>pi0hat.mat &lt;- cbind.data.frame(
+  pi0 = factor(do.call(rbind, pi0.list)),
+  do.call(rbind, pi0hat.list)
+)
 
 FDP.list &lt;- lapply(q.vec, function (q) {
   t(mapply(function (qvalue.mat, beta, q) {
@@ -1875,7 +1949,6 @@ TDP.list &lt;- lapply(q.vec, function(q) {
 names(TDP.list) &lt;- q.vec</code></pre>
 <pre class="r"><code>sd.z &lt;- sapply(z.list, sd)
 Noise &lt;- cut(sd.z, breaks = c(0, quantile(sd.z, probs = 1 : 2 / 3), Inf), labels = c(&quot;Deflated Noise&quot;, &quot;In-between&quot;, &quot;Inflated Noise&quot;))
-# Noise &lt;- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c(&quot;Deflated Noise&quot;, &quot;In-between&quot;, &quot;Inflated Noise&quot;))
 
 ##=================================================
 
@@ -2294,7 +2367,10 @@ LSun
   plotx,
   ploty = 0.6 * dnorm(plotx) + 0.4 * dnorm(plotx, 0, 3)
 )</code></pre>
-<pre class="r"><code>pi0hat.mat &lt;- cbind.data.frame(pi0 = factor(do.call(rbind, pi0.list)), do.call(rbind, pi0hat.list))
+<pre class="r"><code>pi0hat.mat &lt;- cbind.data.frame(
+  pi0 = factor(do.call(rbind, pi0.list)),
+  do.call(rbind, pi0hat.list)
+)
 
 FDP.list &lt;- lapply(q.vec, function (q) {
   t(mapply(function (qvalue.mat, beta, q) {
@@ -2324,7 +2400,6 @@ TDP.list &lt;- lapply(q.vec, function(q) {
 names(TDP.list) &lt;- q.vec</code></pre>
 <pre class="r"><code>sd.z &lt;- sapply(z.list, sd)
 Noise &lt;- cut(sd.z, breaks = c(0, quantile(sd.z, probs = 1 : 2 / 3), Inf), labels = c(&quot;Deflated Noise&quot;, &quot;In-between&quot;, &quot;Inflated Noise&quot;))
-# Noise &lt;- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c(&quot;Deflated Noise&quot;, &quot;In-between&quot;, &quot;Inflated Noise&quot;))
 
 ##=================================================
 
@@ -2697,21 +2772,20 @@ LSun
 <div id="spiky" class="section level2">
 <h2>Spiky</h2>
 <p><span class="math display">\[
-g_4 = 0.4 N\left(0, 0.5^2\right) + 0.2 N\left(0, 1^2\right) + 0.2 N\left(0, 2^2\right) + 0.2 N\left(0, 3^2\right)
+g_4 = 0.4 N\left(0, 0.5^2\right) + 0.2 N\left(0, 2^2\right) + 0.4 N\left(0, 3^2\right)
 \]</span></p>
 <pre class="r"><code>plotx &lt;- seq(-6, 6, by = 0.01)
 plot(plotx, plotx, ylim = c(0,
         0.4 * dnorm(0, 0, 0.5) + 
-        0.2 * dnorm(0) +
         0.2 * dnorm(0, 0, 2) +
-        0.2 * dnorm(0, 0, 3)),
+        0.4 * dnorm(0, 0, 3)),
      xlab = expression(theta), ylab = expression(g(theta)),
      type = &quot;n&quot;)
 lines(plotx, dnorm(plotx), lty = 2)
-lines(plotx, 0.4 * dnorm(plotx, 0, 0.5) + 
-        0.2 * dnorm(plotx) +
-        0.2 * dnorm(plotx, 0, 2) +
-        0.2 * dnorm(plotx, 0, 3), col = &quot;blue&quot;)
+lines(plotx,
+      0.4 * dnorm(plotx, 0, 0.5) + 
+      0.2 * dnorm(plotx, 0, 2) +
+      0.4 * dnorm(plotx, 0, 3), col = &quot;blue&quot;)
 legend(&quot;topright&quot;, lty = c(1, 2), col = c(4, 1), c(&quot;g&quot;, &quot;N(0, 1)&quot;))</code></pre>
 <p><img src="figure/cash_plots_2.rmd/g4-1.png" width="672" style="display: block; margin: auto;" /></p>
 <details>
@@ -2749,11 +2823,13 @@ LSun
   g = &quot;Spiky&quot;,
   plotx,
   ploty = 0.4 * dnorm(plotx, 0, 0.5) + 
-        0.2 * dnorm(plotx) +
         0.2 * dnorm(plotx, 0, 2) +
-        0.2 * dnorm(plotx, 0, 3)
+        0.4 * dnorm(plotx, 0, 3)
 )</code></pre>
-<pre class="r"><code>pi0hat.mat &lt;- cbind.data.frame(pi0 = factor(do.call(rbind, pi0.list)), do.call(rbind, pi0hat.list))
+<pre class="r"><code>pi0hat.mat &lt;- cbind.data.frame(
+  pi0 = factor(do.call(rbind, pi0.list)),
+  do.call(rbind, pi0hat.list)
+)
 
 FDP.list &lt;- lapply(q.vec, function (q) {
   t(mapply(function (qvalue.mat, beta, q) {
@@ -2783,7 +2859,6 @@ TDP.list &lt;- lapply(q.vec, function(q) {
 names(TDP.list) &lt;- q.vec</code></pre>
 <pre class="r"><code>sd.z &lt;- sapply(z.list, sd)
 Noise &lt;- cut(sd.z, breaks = c(0, quantile(sd.z, probs = 1 : 2 / 3), Inf), labels = c(&quot;Deflated Noise&quot;, &quot;In-between&quot;, &quot;Inflated Noise&quot;))
-# Noise &lt;- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c(&quot;Deflated Noise&quot;, &quot;In-between&quot;, &quot;Inflated Noise&quot;))
 
 ##=================================================
 
@@ -3208,7 +3283,10 @@ LSun
         0.25 * dnorm(plotx, 0, 1) +
         0.25 * dnorm(plotx, 1, 1)
 )</code></pre>
-<pre class="r"><code>pi0hat.mat &lt;- cbind.data.frame(pi0 = factor(do.call(rbind, pi0.list)), do.call(rbind, pi0hat.list))
+<pre class="r"><code>pi0hat.mat &lt;- cbind.data.frame(
+  pi0 = factor(do.call(rbind, pi0.list)),
+  do.call(rbind, pi0hat.list)
+)
 
 FDP.list &lt;- lapply(q.vec, function (q) {
   t(mapply(function (qvalue.mat, beta, q) {
@@ -3238,7 +3316,6 @@ TDP.list &lt;- lapply(q.vec, function(q) {
 names(TDP.list) &lt;- q.vec</code></pre>
 <pre class="r"><code>sd.z &lt;- sapply(z.list, sd)
 Noise &lt;- cut(sd.z, breaks = c(0, quantile(sd.z, probs = 1 : 2 / 3), Inf), labels = c(&quot;Deflated Noise&quot;, &quot;In-between&quot;, &quot;Inflated Noise&quot;))
-# Noise &lt;- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c(&quot;Deflated Noise&quot;, &quot;In-between&quot;, &quot;Inflated Noise&quot;))
 
 ##=================================================
 
@@ -3611,14 +3688,14 @@ LSun
 <div id="flattop" class="section level2">
 <h2>Flattop</h2>
 <p><span class="math display">\[
-g_6 = \frac17\left[N\left(-1.5, 0.5^2\right) + N\left(-1, 0.5^2\right) + N\left(-0.5, 0.5^2\right) + N\left(0, 0.5^2\right) + N\left(0.5, 0.5^2\right) + N\left(1, 0.5^2\right) + N\left(1.5, 0.5^2\right)\right]
+g_6 = 0.5N(-1.5,1.5^2) + 0.5N(1.5,1.5^2)
 \]</span></p>
 <pre class="r"><code>plotx &lt;- seq(-6, 6, by = 0.01)
 plot(plotx, plotx, ylim = c(0, dnorm(0)),
      xlab = expression(theta), ylab = expression(g(theta)),
      type = &quot;n&quot;)
 lines(plotx, dnorm(plotx), lty = 2)
-lines(plotx, sapply(plotx, function(x) {mean(dnorm(x, seq(-1.5, 1.5, by = 0.5), 0.5))}), col = &quot;blue&quot;)
+lines(plotx, sapply(plotx, function(x) {mean(dnorm(x, c(-1.5, 1.5), 1.5))}), col = &quot;blue&quot;)
 legend(&quot;topright&quot;, lty = c(1, 2), col = c(4, 1), c(&quot;g&quot;, &quot;N(0, 1)&quot;))</code></pre>
 <p><img src="figure/cash_plots_2.rmd/g6-1.png" width="672" style="display: block; margin: auto;" /></p>
 <details>
@@ -3655,9 +3732,12 @@ LSun
 <pre class="r"><code>density.ggdata.flattop &lt;- cbind.data.frame(
   g = &quot;Flat Top&quot;,
   plotx,
-  ploty = sapply(plotx, function(x) {mean(dnorm(x, seq(-1.5, 1.5, by = 0.5), 0.5))})
+  ploty = sapply(plotx, function(x) {mean(dnorm(x, c(-1.5, 1.5), 1.5))})
 )</code></pre>
-<pre class="r"><code>pi0hat.mat &lt;- cbind.data.frame(pi0 = factor(do.call(rbind, pi0.list)), do.call(rbind, pi0hat.list))
+<pre class="r"><code>pi0hat.mat &lt;- cbind.data.frame(
+  pi0 = factor(do.call(rbind, pi0.list)),
+  do.call(rbind, pi0hat.list)
+)
 
 FDP.list &lt;- lapply(q.vec, function (q) {
   t(mapply(function (qvalue.mat, beta, q) {
@@ -3687,7 +3767,6 @@ TDP.list &lt;- lapply(q.vec, function(q) {
 names(TDP.list) &lt;- q.vec</code></pre>
 <pre class="r"><code>sd.z &lt;- sapply(z.list, sd)
 Noise &lt;- cut(sd.z, breaks = c(0, quantile(sd.z, probs = 1 : 2 / 3), Inf), labels = c(&quot;Deflated Noise&quot;, &quot;In-between&quot;, &quot;Inflated Noise&quot;))
-# Noise &lt;- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c(&quot;Deflated Noise&quot;, &quot;In-between&quot;, &quot;Inflated Noise&quot;))
 
 ##=================================================
 
@@ -4108,7 +4187,10 @@ LSun
   ploty = 0.5 * dnorm(plotx, -1.5, 1) + 
         0.5 * dnorm(plotx, 1.5, 1)
 )</code></pre>
-<pre class="r"><code>pi0hat.mat &lt;- cbind.data.frame(pi0 = factor(do.call(rbind, pi0.list)), do.call(rbind, pi0hat.list))
+<pre class="r"><code>pi0hat.mat &lt;- cbind.data.frame(
+  pi0 = factor(do.call(rbind, pi0.list)),
+  do.call(rbind, pi0hat.list)
+)
 
 FDP.list &lt;- lapply(q.vec, function (q) {
   t(mapply(function (qvalue.mat, beta, q) {
@@ -4138,7 +4220,7 @@ TDP.list &lt;- lapply(q.vec, function(q) {
 names(TDP.list) &lt;- q.vec</code></pre>
 <pre class="r"><code>sd.z &lt;- sapply(z.list, sd)
 Noise &lt;- cut(sd.z, breaks = c(0, quantile(sd.z, probs = 1 : 2 / 3), Inf), labels = c(&quot;Deflated Noise&quot;, &quot;In-between&quot;, &quot;Inflated Noise&quot;))
-# Noise &lt;- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c(&quot;Deflated Noise&quot;, &quot;In-between&quot;, &quot;Inflated Noise&quot;))
+## Noise &lt;- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c(&quot;Deflated Noise&quot;, &quot;In-between&quot;, &quot;Inflated Noise&quot;))
 
 ##=================================================
 
@@ -4595,9 +4677,9 @@ FDP.q.g.plot &lt;- ggplot(data = FDP.q.g.ggdata, aes(x = pi0, y = FDP, fill = Me
         legend.text = element_text(size = 12))
 
 FDP.q.g.plot.save &lt;- gridExtra::arrangeGrob(density.g.plot, FDP.q.g.plot, heights = c(1, 1.5))</code></pre>
-<pre><code>Warning: Removed 8 rows containing non-finite values (stat_summary).
+<pre><code>Warning: Removed 5 rows containing non-finite values (stat_summary).
 
-Warning: Removed 8 rows containing non-finite values (stat_summary).</code></pre>
+Warning: Removed 5 rows containing non-finite values (stat_summary).</code></pre>
 <pre class="r"><code>ggsave(&quot;../output/fig/FDP.q.g.pdf&quot;, FDP.q.g.plot.save, height = 6, width = 9)
 
 ##=========================================================
@@ -4723,7 +4805,7 @@ knitr::kable(D)</code></pre>
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>R version 3.4.3 (2017-11-30)
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
-Running under: macOS High Sierra 10.13.6
+Running under: macOS  10.14.1
 
 Matrix products: default
 BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
@@ -4736,7 +4818,7 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] ggplot2_2.2.1     reshape2_1.4.3    qvalue_2.10.0    
+ [1] ggplot2_3.1.0     reshape2_1.4.3    qvalue_2.10.0    
  [4] locfdr_1.1-8      ashr_2.2-7        Rmosek_8.0.69    
  [7] CVXR_0.95         REBayes_1.3       Matrix_1.2-14    
 [10] SQUAREM_2017.10-1 EQL_1.0-0         ttutils_1.0-1    
@@ -4745,21 +4827,23 @@ other attached packages:
 loaded via a namespace (and not attached):
  [1] splines_3.4.3     lattice_0.20-35   colorspace_1.3-2 
  [4] htmltools_0.3.6   yaml_2.1.19       gmp_0.5-13.1     
- [7] rlang_0.2.0       R.oo_1.22.0       pillar_1.2.2     
-[10] Rmpfr_0.7-0       R.utils_2.6.0     bit64_0.9-7      
-[13] scs_1.1-1         foreach_1.4.4     plyr_1.8.4       
-[16] stringr_1.3.1     munsell_0.4.3     gtable_0.2.0     
-[19] workflowr_1.1.1   R.methodsS3_1.7.1 codetools_0.2-15 
-[22] evaluate_0.10.1   labeling_0.3      knitr_1.20       
-[25] doParallel_1.0.11 pscl_1.5.2        parallel_3.4.3   
-[28] highr_0.6         Rcpp_0.12.16      backports_1.1.2  
-[31] scales_0.5.0      truncnorm_1.0-8   bit_1.1-13       
-[34] gridExtra_2.3     digest_0.6.15     stringi_1.2.2    
-[37] grid_3.4.3        rprojroot_1.3-2   ECOSolveR_0.4    
-[40] tools_3.4.3       magrittr_1.5      lazyeval_0.2.1   
-[43] tibble_1.4.2      whisker_0.3-2     MASS_7.3-50      
-[46] rmarkdown_1.9     iterators_1.0.9   R6_2.2.2         
-[49] git2r_0.21.0      compiler_3.4.3   </code></pre>
+ [7] rlang_0.3.0.1     R.oo_1.22.0       pillar_1.2.2     
+[10] withr_2.1.2       glue_1.2.0        Rmpfr_0.7-0      
+[13] R.utils_2.6.0     bit64_0.9-7       bindrcpp_0.2.2   
+[16] bindr_0.1.1       scs_1.1-1         foreach_1.4.4    
+[19] plyr_1.8.4        stringr_1.3.1     munsell_0.4.3    
+[22] gtable_0.2.0      workflowr_1.1.1   R.methodsS3_1.7.1
+[25] codetools_0.2-15  evaluate_0.10.1   labeling_0.3     
+[28] knitr_1.20        doParallel_1.0.11 pscl_1.5.2       
+[31] parallel_3.4.3    highr_0.6         Rcpp_0.12.16     
+[34] backports_1.1.2   scales_0.5.0      truncnorm_1.0-8  
+[37] bit_1.1-13        gridExtra_2.3     digest_0.6.15    
+[40] stringi_1.2.2     dplyr_0.7.4       grid_3.4.3       
+[43] rprojroot_1.3-2   ECOSolveR_0.4     tools_3.4.3      
+[46] magrittr_1.5      lazyeval_0.2.1    tibble_1.4.2     
+[49] pkgconfig_2.0.1   whisker_0.3-2     MASS_7.3-50      
+[52] assertthat_0.2.0  rmarkdown_1.9     iterators_1.0.9  
+[55] R6_2.2.2          git2r_0.23.0      compiler_3.4.3   </code></pre>
 </div>
 
 <!-- Adjust MathJax settings so that all math formulae are shown using
