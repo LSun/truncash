@@ -587,7 +587,10 @@ for (i in 1 : nsim) {
 ```
 
 ```{r, cache = TRUE}
-pi0hat.mat <- cbind.data.frame(pi0 = factor(do.call(rbind, pi0.list)), do.call(rbind, pi0hat.list))
+pi0hat.mat <- cbind.data.frame(
+  pi0 = factor(do.call(rbind, pi0.list)),
+  do.call(rbind, pi0hat.list)
+)
 
 FDP.list <- lapply(q.vec, function (q) {
   t(mapply(function (qvalue.mat, beta, q) {
@@ -620,7 +623,6 @@ names(TDP.list) <- q.vec
 ```{r, cache = TRUE, message = FALSE, warning = FALSE}
 sd.z <- sapply(z.list, sd)
 Noise <- cut(sd.z, breaks = c(0, quantile(sd.z, probs = 1 : 2 / 3), Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
-# Noise <- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
 
 ##=================================================
 
@@ -872,7 +874,10 @@ for (i in 1 : nsim) {
 ```
 
 ```{r, cache = TRUE}
-pi0hat.mat <- cbind.data.frame(pi0 = factor(do.call(rbind, pi0.list)), do.call(rbind, pi0hat.list))
+pi0hat.mat <- cbind.data.frame(
+  pi0 = factor(do.call(rbind, pi0.list)),
+  do.call(rbind, pi0hat.list)
+)
 
 FDP.list <- lapply(q.vec, function (q) {
   t(mapply(function (qvalue.mat, beta, q) {
@@ -905,7 +910,6 @@ names(TDP.list) <- q.vec
 ```{r, cache = TRUE, message = FALSE, warning = FALSE}
 sd.z <- sapply(z.list, sd)
 Noise <- cut(sd.z, breaks = c(0, quantile(sd.z, probs = 1 : 2 / 3), Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
-# Noise <- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
 
 ##=================================================
 
@@ -1166,7 +1170,10 @@ for (i in 1 : nsim) {
 ```
 
 ```{r, cache = TRUE}
-pi0hat.mat <- cbind.data.frame(pi0 = factor(do.call(rbind, pi0.list)), do.call(rbind, pi0hat.list))
+pi0hat.mat <- cbind.data.frame(
+  pi0 = factor(do.call(rbind, pi0.list)),
+  do.call(rbind, pi0hat.list)
+)
 
 FDP.list <- lapply(q.vec, function (q) {
   t(mapply(function (qvalue.mat, beta, q) {
@@ -1199,7 +1206,6 @@ names(TDP.list) <- q.vec
 ```{r, cache = TRUE, message = FALSE, warning = FALSE}
 sd.z <- sapply(z.list, sd)
 Noise <- cut(sd.z, breaks = c(0, quantile(sd.z, probs = 1 : 2 / 3), Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
-# Noise <- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
 
 ##=================================================
 
@@ -1459,7 +1465,10 @@ for (i in 1 : nsim) {
 ```
 
 ```{r, cache = TRUE}
-pi0hat.mat <- cbind.data.frame(pi0 = factor(do.call(rbind, pi0.list)), do.call(rbind, pi0hat.list))
+pi0hat.mat <- cbind.data.frame(
+  pi0 = factor(do.call(rbind, pi0.list)),
+  do.call(rbind, pi0hat.list)
+)
 
 FDP.list <- lapply(q.vec, function (q) {
   t(mapply(function (qvalue.mat, beta, q) {
@@ -1492,7 +1501,6 @@ names(TDP.list) <- q.vec
 ```{r, cache = TRUE, message = FALSE, warning = FALSE}
 sd.z <- sapply(z.list, sd)
 Noise <- cut(sd.z, breaks = c(0, quantile(sd.z, probs = 1 : 2 / 3), Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
-# Noise <- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
 
 ##=================================================
 
@@ -1741,7 +1749,10 @@ for (i in 1 : nsim) {
 ```
 
 ```{r, cache = TRUE}
-pi0hat.mat <- cbind.data.frame(pi0 = factor(do.call(rbind, pi0.list)), do.call(rbind, pi0hat.list))
+pi0hat.mat <- cbind.data.frame(
+  pi0 = factor(do.call(rbind, pi0.list)),
+  do.call(rbind, pi0hat.list)
+)
 
 FDP.list <- lapply(q.vec, function (q) {
   t(mapply(function (qvalue.mat, beta, q) {
@@ -1774,7 +1785,6 @@ names(TDP.list) <- q.vec
 ```{r, cache = TRUE, message = FALSE, warning = FALSE}
 sd.z <- sapply(z.list, sd)
 Noise <- cut(sd.z, breaks = c(0, quantile(sd.z, probs = 1 : 2 / 3), Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
-# Noise <- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
 
 ##=================================================
 
@@ -2028,7 +2038,10 @@ for (i in 1 : nsim) {
 ```
 
 ```{r, cache = TRUE}
-pi0hat.mat <- cbind.data.frame(pi0 = factor(do.call(rbind, pi0.list)), do.call(rbind, pi0hat.list))
+pi0hat.mat <- cbind.data.frame(
+  pi0 = factor(do.call(rbind, pi0.list)),
+  do.call(rbind, pi0hat.list)
+)
 
 FDP.list <- lapply(q.vec, function (q) {
   t(mapply(function (qvalue.mat, beta, q) {
@@ -2061,7 +2074,7 @@ names(TDP.list) <- q.vec
 ```{r, cache = TRUE, message = FALSE, warning = FALSE}
 sd.z <- sapply(z.list, sd)
 Noise <- cut(sd.z, breaks = c(0, quantile(sd.z, probs = 1 : 2 / 3), Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
-# Noise <- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
+## Noise <- cut(sd.z, breaks = c(0, z.under, z.over, Inf), labels = c("Deflated Noise", "In-between", "Inflated Noise"))
 
 ##=================================================
 
